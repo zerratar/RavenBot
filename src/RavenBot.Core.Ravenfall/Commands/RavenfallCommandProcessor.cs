@@ -1,0 +1,78 @@
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using RavenBot.Core.Handlers;
+using RavenBot.Core.Net;
+using RavenBot.Core.Ravenfall.Models;
+
+namespace RavenBot.Core.Ravenfall.Commands
+{
+    public class RavenfallCommandProcessor : CommandProcessor
+    {
+        private readonly IRavenfallClient game;
+        private readonly IPlayerProvider playerProvider;
+
+        public RavenfallCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
+        {
+            this.game = game;
+            this.playerProvider = playerProvider;
+        }
+
+        public override async Task ProcessAsync(IMessageBroadcaster broadcaster, ICommand cmd)
+        {
+            if (!await this.game.ProcessAsync(Settings.UNITY_SERVER_PORT))
+            {
+                //broadcaster.Broadcast(
+
+                broadcaster.Send(cmd.Sender.Username,
+                    Localization.GAME_NOT_STARTED);
+                return;
+            }
+
+            var arg = cmd.Arguments?.ToLower();
+            if (string.IsNullOrEmpty(arg))
+            {
+                return;
+            }
+
+            if (arg.StartsWith("help"))
+            {
+                //broadcaster.Broadcast(
+
+                broadcaster.Send(cmd.Sender.Username,
+                    "The commands are available in the panels below the stream :-) Too many commands.");
+                return;
+            }
+
+            if (arg.StartsWith("join"))
+            {
+                var player = playerProvider.Get(cmd.Sender);
+                await game.SendPlayerJoinAsync(player);
+            }
+
+            if (arg.StartsWith("task"))
+            {
+                var player = playerProvider.Get(cmd.Sender);
+                var task = arg.Split(' ').LastOrDefault();
+
+                var availableTasks = Enum.GetValues(typeof(PlayerTask))
+                    .Cast<PlayerTask>()
+                    .ToList();
+
+                if (string.IsNullOrEmpty(task))
+                {
+                    //broadcaster.Broadcast(
+
+                    broadcaster.Send(cmd.Sender.Username,
+                            $"You need to specify a task, currently supported tasks: {string.Join(", ", availableTasks.Select(x => x.ToString()))}");
+                    return;
+                }
+
+                var targetTask = availableTasks.FirstOrDefault(x =>
+                    x.ToString().Equals(task, StringComparison.InvariantCultureIgnoreCase));
+
+                await game.SendPlayerTaskAsync(player, targetTask);
+            }
+        }
+    }
+}

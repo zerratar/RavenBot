@@ -1,0 +1,5 @@
+{
+  "twitchBotUsername": "<twitch bot name>",
+  "twitchBotAuthToken": "<twitch auth stuff here>",
+  "twitchChannel":  "<twitch channel name here>"
+}
