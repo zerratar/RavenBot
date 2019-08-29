@@ -40,7 +40,6 @@ namespace RavenBot
             this.channelProvider = channelProvider;
             this.credentialsProvider = credentialsProvider;
             this.CreateTwitchClient();
-            this.Start();
         }
 
         public void Start()
