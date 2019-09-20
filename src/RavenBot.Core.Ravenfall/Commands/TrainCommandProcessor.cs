@@ -15,6 +15,11 @@ namespace RavenBot.Core.Ravenfall.Commands
         private readonly IRavenfallClient game;
         private readonly IPlayerProvider playerProvider;
 
+        private readonly string[] trainableSkills = new string[]
+        {
+            "all", "atk", "def", "str", "magic", "ranged", "fishing", "cooking", "mining", "crafting", "farming",
+        };
+
         public TrainCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
         {
             this.game = game;
@@ -51,9 +56,8 @@ namespace RavenBot.Core.Ravenfall.Commands
             var skill = arg?.Split(' ').LastOrDefault();
             if (string.IsNullOrEmpty(skill))
             {
-                //broadcaster.Broadcast(
                 broadcaster.Send(cmd.Sender.Username,
-                    $"You need to specify a skill to train, currently supported skills: all, atk, def, str, woodcutting, fishing, mining");
+                    $"You need to specify a skill to train, currently supported skills: " + string.Join(", ", trainableSkills));
                 return;
             }
 
@@ -83,6 +87,8 @@ namespace RavenBot.Core.Ravenfall.Commands
             if (StartsWith(val, "def")) return 1;
             if (StartsWith(val, "str")) return 2;
             if (StartsWith(val, "all")) return 3;
+            if (StartsWith(val, "magic")) return 4;
+            if (StartsWith(val, "ranged")) return 5;
             return -1;
         }
 
@@ -100,5 +106,4 @@ namespace RavenBot.Core.Ravenfall.Commands
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool StartsWith(string str, string arg) => str.StartsWith(arg, StringComparison.OrdinalIgnoreCase);
     }
-
 }

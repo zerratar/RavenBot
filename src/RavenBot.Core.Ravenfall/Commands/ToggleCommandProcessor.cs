@@ -38,12 +38,12 @@ namespace RavenBot.Core.Ravenfall.Commands
             if (cmd.Arguments.Contains("helm", StringComparison.OrdinalIgnoreCase))
             {
                 var player = playerProvider.Get(cmd.Sender);
-                await game.SendToggleHelmetAsync(player);
+                await game.ToggleHelmetAsync(player);
             }
             else if (cmd.Arguments.Contains("pet", StringComparison.OrdinalIgnoreCase))
             {
                 var player = playerProvider.Get(cmd.Sender);
-                await game.SendTogglePetAsync(player);
+                await game.TogglePetAsync(player);
             }
             else
             {

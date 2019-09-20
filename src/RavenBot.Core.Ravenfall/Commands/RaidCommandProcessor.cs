@@ -39,11 +39,11 @@ namespace RavenBot.Core.Ravenfall.Commands
                     return;
                 }
 
-                await this.game.SendRaidStartAsync(player);
+                await this.game.RaidStartAsync(player);
                 return;
             }
 
-            await this.game.SendPlayerJoinRaidAsync(player);
+            await this.game.JoinRaidAsync(player);
         }
     }
 }

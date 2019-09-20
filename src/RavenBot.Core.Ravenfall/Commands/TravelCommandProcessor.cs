@@ -4,12 +4,11 @@ using RavenBot.Core.Net;
 
 namespace RavenBot.Core.Ravenfall.Commands
 {
-    public class JoinCommandProcessor : CommandProcessor
+    public class TravelCommandProcessor : CommandProcessor
     {
         private readonly IRavenfallClient game;
         private readonly IPlayerProvider playerProvider;
-
-        public JoinCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
+        public TravelCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
         {
             this.game = game;
             this.playerProvider = playerProvider;
@@ -19,15 +18,19 @@ namespace RavenBot.Core.Ravenfall.Commands
         {
             if (!await this.game.ProcessAsync(Settings.UNITY_SERVER_PORT))
             {
-                //broadcaster.Broadcast(
-
-                broadcaster.Send(cmd.Sender.Username,
-                    Localization.GAME_NOT_STARTED);
+                broadcaster.Send(cmd.Sender.Username, Localization.GAME_NOT_STARTED);
                 return;
             }
 
             var player = playerProvider.Get(cmd.Sender);
-            await game.JoinAsync(player);
+            var destination = cmd.Arguments?.ToLower();
+            if (string.IsNullOrEmpty(destination))
+            {
+                broadcaster.Send(cmd.Sender.Username, "You must specify a destination, !travel <destination>");
+                return;
+            }
+
+            await game.TravelAsync(player, destination);
         }
     }
 }

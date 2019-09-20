@@ -2,9 +2,9 @@
 
 namespace RavenBot.Core.Ravenfall.Requests
 {
-    public class BuyItemRequest
+    public class ItemQueryRequest
     {
-        public BuyItemRequest(
+        public ItemQueryRequest(
             Player player,
             string itemQuery)
         {

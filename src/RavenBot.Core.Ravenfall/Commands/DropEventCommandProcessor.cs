@@ -4,12 +4,12 @@ using RavenBot.Core.Net;
 
 namespace RavenBot.Core.Ravenfall.Commands
 {
-    public class KickCommandProcessor : CommandProcessor
+    public class DropEventCommandProcessor : CommandProcessor
     {
         private readonly IRavenfallClient game;
         private readonly IPlayerProvider playerProvider;
 
-        public KickCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
+        public DropEventCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
         {
             this.game = game;
             this.playerProvider = playerProvider;
@@ -19,14 +19,13 @@ namespace RavenBot.Core.Ravenfall.Commands
         {
             if (!await this.game.ProcessAsync(Settings.UNITY_SERVER_PORT))
             {
-
                 broadcaster.Send(cmd.Sender.Username,
                 //broadcaster.Broadcast(
                     Localization.GAME_NOT_STARTED);
                 return;
             }
 
-            if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator)
+            if (!cmd.Sender.IsBroadcaster)
             {
                 //broadcaster.Broadcast(
 
@@ -35,19 +34,15 @@ namespace RavenBot.Core.Ravenfall.Commands
                 return;
             }
 
-            var targetPlayerName = cmd.Arguments?.Trim();
+            var item = cmd.Arguments?.Trim();
 
-            if (string.IsNullOrEmpty(targetPlayerName))
+            if (string.IsNullOrEmpty(item))
             {
-                //broadcaster.Broadcast(
-
-                broadcaster.Send(cmd.Sender.Username,
-                    "You are kicking who? Provide a username");
                 return;
             }
 
-            var targetPlayer = playerProvider.Get(targetPlayerName);
-            await game.KickAsync(targetPlayer);
+            var player = playerProvider.Get(cmd.Sender);
+            await game.ItemDropEventAsync(player, item);
         }
     }
 }

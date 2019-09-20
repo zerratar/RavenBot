@@ -4,17 +4,16 @@ using RavenBot.Core.Net;
 
 namespace RavenBot.Core.Ravenfall.Commands
 {
-    public class KickCommandProcessor : CommandProcessor
+    public class ObserveCommandProcessor : CommandProcessor
     {
         private readonly IRavenfallClient game;
         private readonly IPlayerProvider playerProvider;
 
-        public KickCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
+        public ObserveCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
         {
             this.game = game;
             this.playerProvider = playerProvider;
         }
-
         public override async Task ProcessAsync(IMessageBroadcaster broadcaster, ICommand cmd)
         {
             if (!await this.game.ProcessAsync(Settings.UNITY_SERVER_PORT))
@@ -29,25 +28,23 @@ namespace RavenBot.Core.Ravenfall.Commands
             if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator)
             {
                 //broadcaster.Broadcast(
-
                 broadcaster.Send(cmd.Sender.Username,
-                    "You do not have permission to kick a player from the game.");
+                    "You do not have permission to set the currently observed player.");
                 return;
             }
 
             var targetPlayerName = cmd.Arguments?.Trim();
-
-            if (string.IsNullOrEmpty(targetPlayerName))
+            Models.Player player = null;
+            if (!string.IsNullOrEmpty(targetPlayerName))
             {
-                //broadcaster.Broadcast(
-
-                broadcaster.Send(cmd.Sender.Username,
-                    "You are kicking who? Provide a username");
-                return;
+                player = playerProvider.Get(targetPlayerName);
+            }
+            else
+            {
+                player = playerProvider.Get(cmd.Sender);
             }
 
-            var targetPlayer = playerProvider.Get(targetPlayerName);
-            await game.KickAsync(targetPlayer);
+            await game.ObservePlayerAsync(player);
         }
     }
 }

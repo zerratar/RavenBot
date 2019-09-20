@@ -29,7 +29,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             }
 
             var player = playerProvider.Get(cmd.Sender);
-            await this.game.SendRequestPlayerResourcesAsync(player);
+            await this.game.RequestPlayerResourcesAsync(player);
         }
     }
 }

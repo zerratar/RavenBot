@@ -27,7 +27,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             }
             var player = playerProvider.Get(cmd.Sender);
             var skill = cmd.Arguments;
-            await this.game.SendRequestHighestSkillAsync(player, skill);
+            await this.game.RequestHighestSkillAsync(player, skill);
         }
     }
 }

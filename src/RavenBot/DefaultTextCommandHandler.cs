@@ -19,10 +19,25 @@ namespace RavenBot
             Register<ArenaCommandProcessor>("arena");
             Register<CraftCommandProcessor>("craft");
             Register<JoinCommandProcessor>("join", "play");
-            Register<TradeItemCommandProcessor>("sell", "buy");
+            Register<LeaveCommandProcessor>("leave", "exit", "quit");
+
+            Register<IslandInfoCommandProcessor>("island","position","where");
+            Register<TrainingInfoCommandProcessor>("training");
+            
+
+
+            //Register<TradeItemCommandProcessor>("sell", "buy");
+
             Register<ToggleCommandProcessor>("toggle");
             Register<TrainCommandProcessor>("train", "task", "strength", "attack", "mine", "defense", "mining", "wood", "crafting", "fishing", "fish", "woodcutting");
             Register<RavenfallCommandProcessor>("rpg", "raven", "ravenfall", "r");
+
+            Register<ObserveCommandProcessor>("observe", "show");
+
+            Register<SailCommandProcessor>("sail", "disembark");
+            Register<TravelCommandProcessor>("travel");
+
+            Register<DropEventCommandProcessor>("drop");
         }
     }
 }

@@ -38,11 +38,11 @@ namespace RavenBot.Core.Ravenfall.Commands
             var player = playerProvider.Get(cmd.Sender);
             if (string.IsNullOrEmpty(command) || command.Equals("join"))
             {
-                await game.SendPlayerJoinArenaAsync(player);
+                await game.JoinArenaAsync(player);
             }
             else if (command.Equals("leave"))
             {
-                await game.SendPlayerLeaveArenaAsync(player);
+                await game.LeaveArenaAsync(player);
             }
             else if (command.Equals("start") || command.Equals("begin"))
             {
@@ -53,7 +53,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                     return;
                 }
 
-                await game.SendStartArenaAsync(player);
+                await game.StartArenaAsync(player);
             }
             else if (command.Equals("cancel") || command.Equals("end"))
             {
@@ -65,7 +65,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                     return;
                 }
 
-                await game.SendCancelArenaAsync(player);
+                await game.CancelArenaAsync(player);
             }
             else
             {
@@ -81,7 +81,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                     }
 
                     var targetPlayer = playerProvider.Get(cmd.Sender);
-                    await game.SendKickPlayerFromArenaAsync(player, targetPlayer);
+                    await game.KickPlayerFromArenaAsync(player, targetPlayer);
                 }
                 else if (command.StartsWith("add "))
                 {
@@ -94,7 +94,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                     }
 
                     var targetPlayer = playerProvider.Get(cmd.Sender);
-                    await game.SendAddPlayerToArenaAsync(player, targetPlayer);
+                    await game.AddPlayerToArenaAsync(player, targetPlayer);
                 }
             }
         }

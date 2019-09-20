@@ -47,7 +47,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             if (arg.StartsWith("join"))
             {
                 var player = playerProvider.Get(cmd.Sender);
-                await game.SendPlayerJoinAsync(player);
+                await game.JoinAsync(player);
             }
 
             if (arg.StartsWith("task"))

@@ -28,8 +28,8 @@ namespace RavenBot.Core.Ravenfall.Commands
             }
 
             var categoryAndType = cmd.Arguments?.Trim();
-            var categories = Enum.GetNames(typeof(ItemCategory));
-            var types = Enum.GetNames(typeof(ItemType));
+            var categories = Enum.GetNames(typeof(CraftableCategory));
+            //var types = Enum.GetNames(typeof(ItemType));
             if (string.IsNullOrEmpty(categoryAndType))
             {
                 //broadcaster.Broadcast(
@@ -45,29 +45,43 @@ namespace RavenBot.Core.Ravenfall.Commands
 
             //var types = categoryAndType.Split(" ");
 
-            if (categories.Any(x => x.Equals(categoryAndType, StringComparison.InvariantCultureIgnoreCase)) ||
-                types.Any(x => x.Equals(categoryAndType, StringComparison.InvariantCultureIgnoreCase)))
+            if (categories.Any(x => x.Equals(categoryAndType, StringComparison.InvariantCultureIgnoreCase))
+                /*types.Any(x => x.Equals(categoryAndType, StringComparison.InvariantCultureIgnoreCase))*/)
             {
                 var player = playerProvider.Get(cmd.Sender);
-                if (Enum.TryParse(typeof(ItemType), categoryAndType, true, out var item))
+                if (Enum.TryParse(typeof(CraftableCategory), categoryAndType, true, out var item))
                 {
-                    var category = ItemCategory.Armor;
-                    switch ((ItemType)item)
+                    var category = ItemCategory.Weapon;
+                    switch ((CraftableCategory)item)
                     {
-                        case ItemType.Amulet:
-                            category = ItemCategory.Amulet;
+                        case CraftableCategory.Weapon:
+                            category = ItemCategory.Weapon;
                             break;
-                        case ItemType.Ring:
+
+                        case CraftableCategory.Armor:
+                        case CraftableCategory.Helm:
+                        case CraftableCategory.Chest:
+                        case CraftableCategory.Gloves:
+                        case CraftableCategory.Leggings:
+                        case CraftableCategory.Boots:
+                            category = ItemCategory.Armor;
+                            break;
+
+                        case CraftableCategory.Ring:
                             category = ItemCategory.Ring;
+                            break;
+
+                        case CraftableCategory.Amulet:
+                            category = ItemCategory.Amulet;
                             break;
                     }
 
-                    await game.SendCraftAsync(player, category.ToString(), categoryAndType);
+                    await game.CraftAsync(player, category.ToString(), categoryAndType);
                     return;
                 }
                 else if (Enum.TryParse(typeof(ItemCategory), categoryAndType, true, out var weapon))
                 {
-                    await game.SendCraftAsync(player, categoryAndType, "");
+                    await game.CraftAsync(player, categoryAndType, "");
                     return;
                 }
 
@@ -79,14 +93,28 @@ namespace RavenBot.Core.Ravenfall.Commands
 
         }
 
+
+        public enum CraftableCategory
+        {
+            Weapon,
+            Armor,
+            Helm,
+            Chest,
+            Gloves,
+            Leggings,
+            Boots,
+            Ring,
+            Amulet
+        }
+
         public enum ItemCategory
         {
             Weapon,
             Armor,
             Ring,
             Amulet,
-            Food,
-            Potion
+            //Food,
+            //Potion
         }
 
         public enum ItemType

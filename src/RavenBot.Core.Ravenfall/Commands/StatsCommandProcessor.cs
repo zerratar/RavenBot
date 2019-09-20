@@ -30,11 +30,11 @@ namespace RavenBot.Core.Ravenfall.Commands
             if (string.IsNullOrEmpty(cmd.Arguments))
             {
 
-                broadcaster.Broadcast("You can customize your character here https://www.ravenfall.stream/customization/");
+                broadcaster.Broadcast("You can customize your character here https://www.ravenfall.stream/customization");
                 return;
             }
 
-            await this.game.SendPlayerAppearanceUpdateAsync(player, cmd.Arguments);
+            await this.game.PlayerAppearanceUpdateAsync(player, cmd.Arguments);
         }
     }
 
@@ -61,7 +61,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             }
 
             var player = playerProvider.Get(cmd.Sender);
-            await this.game.SendRequestPlayerStatsAsync(player, cmd.Arguments);
+            await this.game.RequestPlayerStatsAsync(player, cmd.Arguments);
         }
     }
 }

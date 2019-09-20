@@ -61,21 +61,116 @@ namespace RavenBot.Core.Ravenfall
             this.client.Subscribe("item_pickup", SendResponseToTwitchChat);
 
             this.client.Subscribe("item_trade_result", SendResponseToTwitchChat);
+
+            this.client.Subscribe("ferry_enter_failed", SendResponseToTwitchChat);
+            this.client.Subscribe("ferry_leave_failed", SendResponseToTwitchChat);
+            this.client.Subscribe("ferry_travel_failed", SendResponseToTwitchChat);
+
+            this.client.Subscribe("train_failed", SendResponseToTwitchChat);
+
+            this.client.Subscribe("ferry_success", SendResponseToTwitchChat);
+            this.client.Subscribe("train_info", SendResponseToTwitchChat);
+            this.client.Subscribe("island_info", SendResponseToTwitchChat);
+
+            this.client.Subscribe("message", SendResponseToTwitchChat);
         }
 
-        private async void OnUserSub(TwitchSubscription obj)
-        {
-            await SendAsync("twitch_sub", obj);
-        }
+        public Task JoinAsync(Player player) => SendAsync("join", player);
 
-        private void OnUserLeft(TwitchUserLeft obj)
-        {
-            logger.WriteDebug(obj.Name + " left the channel");
-        }
+        public Task DuelRequestAsync(Player challenger, Player target)
+            => SendAsync("duel", new DuelPlayerRequest(challenger, target));
 
-        private void OnUserJoined(TwitchUserJoined obj)
+        public Task CancelDuelRequestAsync(Player player)
+            => SendAsync("duel_cancel", player);
+
+        public Task AcceptDuelRequestAsync(Player player)
+            => SendAsync("duel_accept", player);
+
+        public Task DeclineDuelRequestAsync(Player player)
+            => SendAsync("duel_decline", player);
+
+        public Task JoinRaidAsync(Player player)
+            => SendAsync("raid_join", player);
+
+        public Task RaidStartAsync(Player player)
+            => SendAsync("raid_force", player);
+
+        public Task RequestPlayerStatsAsync(Player player, string skill)
+            => SendAsync("player_stats", new PlayerStatsRequest(player, skill));
+
+        public Task RequestPlayerResourcesAsync(Player player)
+            => SendAsync("player_resources", player);
+
+        public Task RequestHighestSkillAsync(Player player, string skill)
+            => SendAsync("highest_skill", new HighestSkillRequest(player, skill));
+
+        public Task PlayerAppearanceUpdateAsync(Player player, string appearance)
+            => SendAsync("change_appearance", new PlayerAppearanceRequest(player, appearance));
+
+        public Task ToggleHelmetAsync(Player player)
+            => SendAsync("toggle_helmet", player);
+
+        public Task TogglePetAsync(Player player)
+            => SendAsync("toggle_pet", player);
+
+        public Task SellItemAsync(Player player, string itemQuery)
+            => SendAsync("sell_item", new ItemQueryRequest(player, itemQuery));
+
+        public Task BuyItemAsync(Player player, string itemQuery)
+            => SendAsync("buy_item", new ItemQueryRequest(player, itemQuery));
+
+        public Task SendPlayerTaskAsync(Player player, PlayerTask task, params string[] args)
+            => SendAsync("task", new PlayerTaskRequest(player, task.ToString(), args));
+
+        public Task JoinArenaAsync(Player player)
+            => SendAsync("arena_join", player);
+
+        public Task LeaveArenaAsync(Player player)
+            => SendAsync("arena_leave", player);
+
+        public Task LeaveAsync(Player player)
+            => SendAsync("leave", player);
+
+        public Task StartArenaAsync(Player player)
+            => SendAsync("arena_begin", player);
+
+        public Task CancelArenaAsync(Player player)
+            => SendAsync("arena_end", player);
+
+        public Task KickPlayerFromArenaAsync(Player player, Player targetPlayer)
+            => SendAsync("arena_kick", new ArenaKickRequest(player, targetPlayer));
+
+        public Task AddPlayerToArenaAsync(Player player, Player targetPlayer)
+            => SendAsync("arena_add", new ArenaAddRequest(player, targetPlayer));
+
+        public Task KickAsync(Player targetPlayer)
+            => SendAsync("kick", targetPlayer);
+
+        public Task CraftAsync(Player targetPlayer, string itemCategory, string itemType)
+            => SendAsync("craft", new CraftRequest(targetPlayer, itemCategory, itemType));
+
+        public Task TravelAsync(Player player, string destination)
+            => SendAsync("ferry_travel", new FerryTravelRequest(player, destination));
+
+        public Task DisembarkFerryAsync(Player player)
+            => SendAsync("ferry_leave", player);
+
+        public Task EmbarkFerryAsync(Player player)
+            => SendAsync("ferry_enter", player);
+
+        public Task ObservePlayerAsync(Player player)
+            => SendAsync("observe", player);
+
+        public Task ItemDropEventAsync(Player player, string item)
+            => SendAsync("item_drop_event", new ItemQueryRequest(player, item));
+
+        public Task<bool> ProcessAsync(int serverPort)
+            => this.client.ProcessAsync(serverPort);
+
+        public void Dispose()
         {
-            logger.WriteDebug(obj.Name + " joined the channel");
+            this.client.Dispose();
+            this.client.Connected -= Client_OnConnect;
         }
 
         private async void Client_OnConnect(object sender, EventArgs e)
@@ -86,125 +181,9 @@ namespace RavenBot.Core.Ravenfall
             }
         }
 
-        public Task SendPlayerJoinAsync(Player player)
-        {
-            return SendAsync("join", player);
-        }
-
-        public Task SendDuelRequestAsync(Player challenger, Player target)
-        {
-            return SendAsync("duel", new DuelPlayerRequest(challenger, target));
-        }
-
-        public Task SendCancelDuelRequestAsync(Player player)
-        {
-            return SendAsync("duel_cancel", player);
-        }
-
-        public Task SendAcceptDuelRequestAsync(Player player)
-        {
-            return SendAsync("duel_accept", player);
-        }
-
-        public Task SendDeclineDuelRequestAsync(Player player)
-        {
-            return SendAsync("duel_decline", player);
-        }
-
-        public Task SendPlayerJoinRaidAsync(Player player)
-        {
-            return SendAsync("raid_join", player);
-        }
-
-        public Task SendRaidStartAsync(Player player)
-        {
-            return SendAsync("raid_force", player);
-        }
-
-        public Task SendRequestPlayerStatsAsync(Player player, string skill)
-        {
-            return SendAsync("player_stats", new PlayerStatsRequest(player, skill));
-        }
-
-        public Task SendRequestPlayerResourcesAsync(Player player)
-        {
-            return SendAsync("player_resources", player);
-        }
-
-        public Task SendRequestHighestSkillAsync(Player player, string skill)
-        {
-            return SendAsync("highest_skill", new HighestSkillRequest(player, skill));
-        }
-
-        public Task SendPlayerAppearanceUpdateAsync(Player player, string appearance)
-        {
-            return SendAsync("change_appearance", new PlayerAppearanceRequest(player, appearance));
-        }
-
-        public Task SendToggleHelmetAsync(Player player)
-        {
-            return SendAsync("toggle_helmet", player);
-        }
-
-        public Task SendTogglePetAsync(Player player)
-        {
-            return SendAsync("toggle_pet", player);
-        }
-
-        public Task SendSellItemAsync(Player player, string itemQuery)
-        {
-            return SendAsync("sell_item", new SellItemRequest(player, itemQuery));
-        }
-
-        public Task SendBuyItemAsync(Player player, string itemQuery)
-        {
-            return SendAsync("buy_item", new BuyItemRequest(player, itemQuery));
-        }
-
-        public Task SendPlayerTaskAsync(Player player, PlayerTask task, params string[] args)
-        {
-            return SendAsync("task", new PlayerTaskRequest(player, task.ToString(), args));
-        }
-
-        public Task SendPlayerJoinArenaAsync(Player player)
-        {
-            return SendAsync("arena_join", player);
-        }
-
-        public Task SendPlayerLeaveArenaAsync(Player player)
-        {
-            return SendAsync("arena_leave", player);
-        }
-
-        public Task SendStartArenaAsync(Player player)
-        {
-            return SendAsync("arena_begin", player);
-        }
-
-        public Task SendCancelArenaAsync(Player player)
-        {
-            return SendAsync("arena_end", player);
-        }
-
-        public Task SendKickPlayerFromArenaAsync(Player player, Player targetPlayer)
-        {
-            return SendAsync("arena_kick", new ArenaKickRequest(player, targetPlayer));
-        }
-
-        public Task SendAddPlayerToArenaAsync(Player player, Player targetPlayer)
-        {
-            return SendAsync("arena_add", new ArenaAddRequest(player, targetPlayer));
-        }
-
-        public Task SendKickPlayerAsync(Player targetPlayer)
-        {
-            return SendAsync("kick", targetPlayer);
-        }
-
-        public Task SendCraftAsync(Player targetPlayer, string itemCategory, string itemType)
-        {
-            return SendAsync("craft", new CraftRequest(targetPlayer, itemCategory, itemType));
-        }
+        private async void OnUserSub(TwitchSubscription obj) => await SendAsync("twitch_sub", obj);
+        private void OnUserLeft(TwitchUserLeft obj) => logger.WriteDebug(obj.Name + " left the channel");
+        private void OnUserJoined(TwitchUserJoined obj) => logger.WriteDebug(obj.Name + " joined the channel");
 
         private async Task SendAsync<T>(string name, T packet)
         {
@@ -231,24 +210,20 @@ namespace RavenBot.Core.Ravenfall
             }
         }
 
-        private void OnRaidStart(IGameCommand obj)
-        {
-            this.messageBus.Send(MessageBus.Broadcast, obj.Args.LastOrDefault());
-        }
+        private void OnRaidStart(IGameCommand obj) => Broadcast(obj);
 
-        private void OnKickPlayerFailed(IGameCommand obj)
-        {
-            this.messageBus.Send(MessageBus.Broadcast, obj.Args.LastOrDefault());
-        }
+        private void OnKickPlayerFailed(IGameCommand obj) => Broadcast(obj);
 
-        private void OnKickPlayerSuccess(IGameCommand obj)
-        {
-            this.messageBus.Send(MessageBus.Broadcast, obj.Args.LastOrDefault());
-        }
+        private void OnKickPlayerSuccess(IGameCommand obj) => Broadcast(obj);
 
         private void OnJoinFailed(IGameCommand obj)
         {
             this.messageBus.Send(MessageBus.Broadcast, obj.Destination + ", Join failed. Reason: " + obj.Args.LastOrDefault());
+        }
+
+        private void Broadcast(IGameCommand obj)
+        {
+            this.messageBus.Send(MessageBus.Broadcast, obj.Args.LastOrDefault());
         }
 
         private void EnqueueRequest(string request)
@@ -256,15 +231,8 @@ namespace RavenBot.Core.Ravenfall
             this.requests.Enqueue(request);
         }
 
-        public void Dispose()
-        {
-            this.client.Dispose();
-            this.client.Connected -= Client_OnConnect;
-        }
+        public Task RequestIslandInfoAsync(Player player) => SendAsync("island_info", player);
 
-        public Task<bool> ProcessAsync(int serverPort)
-        {
-            return this.client.ProcessAsync(serverPort);
-        }
+        public Task RequestTrainingInfoAsync(Player player) => SendAsync("train_info", player);
     }
 }

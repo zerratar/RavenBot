@@ -9,6 +9,5 @@
         Cooking,
         Farming,
         Fighting,
-        Trading        
     }
 }

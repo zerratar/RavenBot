@@ -37,12 +37,12 @@ namespace RavenBot.Core.Ravenfall.Commands
 
             if (cmd.Command.Equals("sell", StringComparison.OrdinalIgnoreCase))
             {
-                await this.game.SendSellItemAsync(player, cmd.Arguments);
+                await this.game.SellItemAsync(player, cmd.Arguments);
             }
             else if (cmd.Command.Equals("buy", StringComparison.OrdinalIgnoreCase))
             {
 
-                await this.game.SendBuyItemAsync(player, cmd.Arguments);
+                await this.game.BuyItemAsync(player, cmd.Arguments);
             }
         }
     }
