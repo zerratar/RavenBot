@@ -15,7 +15,7 @@ You may have to unselect the project references manually and add them back. I do
 ## Running
 Make sure you update the settings.json file before running!
 
-```jsonc
+```json
 {
    // The username of your bot
   "twitchBotUsername": "<twitch bot name>",   

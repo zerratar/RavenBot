@@ -2,18 +2,17 @@
 
 namespace RavenBot.Core.Ravenfall.Requests
 {
-
-    public class ItemQueryRequest
+    public class StreamerRaid
     {
-        public ItemQueryRequest(
+        public StreamerRaid(
             Player player,
-            string itemQuery)
+            bool war)
         {
             Player = player;
-            ItemQuery = itemQuery;
+            War = war;
         }
 
         public Player Player { get; }
-        public string ItemQuery { get; }
+        public bool War { get; }
     }
 }

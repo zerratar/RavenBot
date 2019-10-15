@@ -38,5 +38,6 @@ namespace RavenBot.Core.Ravenfall
         Task DisembarkFerryAsync(Player player);
         Task EmbarkFerryAsync(Player player);
         Task RequestTrainingInfoAsync(Player player);
+        Task RaidStreamerAsync(Player target, bool isRaidWar);
     }
 }

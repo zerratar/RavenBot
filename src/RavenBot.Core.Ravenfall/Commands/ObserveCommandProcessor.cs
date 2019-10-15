@@ -1,6 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using RavenBot.Core.Handlers;
 using RavenBot.Core.Net;
+using RavenBot.Core.Twitch;
 
 namespace RavenBot.Core.Ravenfall.Commands
 {
@@ -8,12 +10,15 @@ namespace RavenBot.Core.Ravenfall.Commands
     {
         private readonly IRavenfallClient game;
         private readonly IPlayerProvider playerProvider;
+        private readonly ITwitchUserStore userStore;
 
-        public ObserveCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
+        public ObserveCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider, ITwitchUserStore userStore)
         {
             this.game = game;
             this.playerProvider = playerProvider;
+            this.userStore = userStore;
         }
+
         public override async Task ProcessAsync(IMessageBroadcaster broadcaster, ICommand cmd)
         {
             if (!await this.game.ProcessAsync(Settings.UNITY_SERVER_PORT))
@@ -25,12 +30,26 @@ namespace RavenBot.Core.Ravenfall.Commands
                 return;
             }
 
-            if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator)
+            if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator && !cmd.Sender.IsSubscriber)
             {
                 //broadcaster.Broadcast(
                 broadcaster.Send(cmd.Sender.Username,
                     "You do not have permission to set the currently observed player.");
                 return;
+            }
+
+            if (cmd.Sender.IsSubscriber)
+            {
+                var user = userStore.Get(cmd.Sender.Username);
+                var command = nameof(ObserveCommandProcessor);
+                if (!user.CanUseCommand(command))
+                {
+                    var timeLeft = user.GetCooldown(command);
+                    broadcaster.Broadcast($"{cmd.Sender.Username}, You must wait another {Math.Floor(timeLeft.TotalSeconds)} secs to use that command.");
+                    return;
+                }
+
+                user.UseCommand(command, TimeSpan.FromSeconds(120));
             }
 
             var targetPlayerName = cmd.Arguments?.Trim();
@@ -45,6 +64,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             }
 
             await game.ObservePlayerAsync(player);
+
         }
     }
 }

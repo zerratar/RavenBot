@@ -95,6 +95,22 @@ namespace RavenBot
             this.messageBus.Send(nameof(TwitchUserJoined), new TwitchUserJoined(e.Username));
         }
 
+        private void OnMessageReceived(object sender, OnMessageReceivedArgs e)
+        {
+            if (e.ChatMessage.Bits == 0) return;
+
+            this.messageBus.Send(
+                nameof(TwitchCheer),
+                new TwitchCheer(
+                    e.ChatMessage.Id,
+                    e.ChatMessage.Username,
+                    e.ChatMessage.DisplayName,
+                    e.ChatMessage.Bits)
+            );
+
+            this.Broadcast($"Thank you {e.ChatMessage.DisplayName} for the {e.ChatMessage.Bits} bits!!! <3");
+        }
+
         private async void OnCommandReceived(object sender, OnChatCommandReceivedArgs e)
         {
             await commandHandler.HandleAsync(this, new TwitchCommand(e.Command));
@@ -120,7 +136,7 @@ namespace RavenBot
             if (string.IsNullOrEmpty(message)) return;
 
             client.SendMessage(this.channelProvider.Get(), message);
-            
+
             //if (message.IndexOf(',') == -1) return;
             //var user = message.Remove(message.IndexOf(','));
             //var msg = message.Substring(message.IndexOf(',') + 1);
@@ -142,7 +158,10 @@ namespace RavenBot
                 new TwitchSubscription(
                     e.ReSubscriber.UserId,
                     e.ReSubscriber.Login,
-                    e.ReSubscriber.DisplayName, e.ReSubscriber.Months, false));
+                    e.ReSubscriber.DisplayName,
+                    null,
+                    e.ReSubscriber.Months, 
+                    false));
 
             this.Broadcast($"Thank you {e.ReSubscriber.DisplayName} for the resub!!! <3");
         }
@@ -150,12 +169,13 @@ namespace RavenBot
         private void OnNewSub(object sender, OnNewSubscriberArgs e)
         {
             this.messageBus.Send(nameof(TwitchSubscription),
-                new TwitchSubscription(e.Subscriber.UserId,
+                new TwitchSubscription(
+                    e.Subscriber.UserId,
                     e.Subscriber.Login,
-                    e.Subscriber.DisplayName, 1, true));
+                    e.Subscriber.DisplayName,
+                    null, 1, true));
 
             this.Broadcast($"Thank you {e.Subscriber.DisplayName} for the sub!!! <3");
-
         }
 
         private void OnPrimeSub(object sender, OnCommunitySubscriptionArgs e)
@@ -163,8 +183,9 @@ namespace RavenBot
             this.messageBus.Send(nameof(TwitchSubscription),
                 new TwitchSubscription(
                     e.GiftedSubscription.UserId,
-                   e.GiftedSubscription.Login,
-                    e.GiftedSubscription.DisplayName, 1, false));
+                    e.GiftedSubscription.Login,
+                    e.GiftedSubscription.DisplayName,
+                    null, 1, false));
 
             this.Broadcast($"Thank you {e.GiftedSubscription.DisplayName} for the sub!!! <3");
         }
@@ -172,9 +193,13 @@ namespace RavenBot
         private void OnGiftedSub(object sender, OnGiftedSubscriptionArgs e)
         {
             this.messageBus.Send(nameof(TwitchSubscription),
-                new TwitchSubscription(e.GiftedSubscription.Id,
-                   e.GiftedSubscription.Login,
-                    e.GiftedSubscription.DisplayName, 1, false));
+                new TwitchSubscription(
+                    e.GiftedSubscription.Id,
+                    e.GiftedSubscription.Login,
+                    e.GiftedSubscription.DisplayName,
+                    e.GiftedSubscription.MsgParamRecipientId,
+                    1,
+                    false));
 
             this.Broadcast($"Thank you {e.GiftedSubscription.DisplayName} for the gifted sub!!! <3");
         }
@@ -186,6 +211,7 @@ namespace RavenBot
             CreateTwitchClient();
             Start();
         }
+
         public void Stop()
         {
             if (kernel.Started) kernel.Stop();
@@ -193,7 +219,6 @@ namespace RavenBot
 
             if (client.IsConnected)
                 client.Disconnect();
-
 
             messageSubscription?.Unsubscribe();
             broadcastSubscription?.Unsubscribe();
@@ -204,9 +229,15 @@ namespace RavenBot
             messageBus.Send("twitch", "");
         }
 
+        private void OnRaidNotification(object sender, OnRaidNotificationArgs e)
+        {
+            this.Broadcast($"Thank you {e.RaidNotificaiton.DisplayName} for the raid! <3");
+        }
+
         private void Subscribe()
         {
             client.OnChatCommandReceived += OnCommandReceived;
+            client.OnMessageReceived += OnMessageReceived;
             client.OnConnected += OnConnected;
             client.OnDisconnected += OnDisconnected;
             client.OnUserJoined += OnUserJoined;
@@ -215,11 +246,13 @@ namespace RavenBot
             client.OnCommunitySubscription += OnPrimeSub;
             client.OnNewSubscriber += OnNewSub;
             client.OnReSubscriber += OnReSub;
+            client.OnRaidNotification += OnRaidNotification;
         }
 
         private void Unsubscribe()
         {
             client.OnChatCommandReceived -= OnCommandReceived;
+            client.OnMessageReceived -= OnMessageReceived;
             client.OnConnected -= OnConnected;
             client.OnDisconnected -= OnDisconnected;
             client.OnUserJoined -= OnUserJoined;
@@ -228,6 +261,7 @@ namespace RavenBot
             client.OnCommunitySubscription -= OnPrimeSub;
             client.OnNewSubscriber -= OnNewSub;
             client.OnReSubscriber -= OnReSub;
+            client.OnRaidNotification -= OnRaidNotification;
         }
     }
 }

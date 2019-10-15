@@ -9,11 +9,15 @@ namespace RavenBot
         public DefaultTextCommandHandler(IoC ioc)
             : base(ioc)
         {
+#if DEBUG
+            Register<ForceAddPlayerCommandProcessor>("add");
+#endif
+
             Register<ApperanceCommandProcessor>("appearance", "looks");
             Register<StatsCommandProcessor>("stats", "status");
             Register<ResourcesCommandProcessor>("resources", "resource", "res");
             Register<HighestSkillCommandProcessor>("highest");
-            Register<RaidCommandProcessor>("raid");
+            Register<RaidCommandProcessor>("raid", "raidwar");
             Register<DuelCommandProcessor>("duel");
             Register<KickCommandProcessor>("kick");
             Register<ArenaCommandProcessor>("arena");
@@ -21,12 +25,10 @@ namespace RavenBot
             Register<JoinCommandProcessor>("join", "play");
             Register<LeaveCommandProcessor>("leave", "exit", "quit");
 
-            Register<IslandInfoCommandProcessor>("island","position","where");
+            Register<IslandInfoCommandProcessor>("island", "position", "where");
             Register<TrainingInfoCommandProcessor>("training");
-            
 
-
-            //Register<TradeItemCommandProcessor>("sell", "buy");
+            Register<TradeItemCommandProcessor>("sell", "buy");
 
             Register<ToggleCommandProcessor>("toggle");
             Register<TrainCommandProcessor>("train", "task", "strength", "attack", "mine", "defense", "mining", "wood", "crafting", "fishing", "fish", "woodcutting");

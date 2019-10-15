@@ -27,7 +27,7 @@ namespace RavenBot.Core.Ravenfall
 
             messageBus.Subscribe<TwitchUserJoined>(nameof(TwitchUserJoined), OnUserJoined);
             messageBus.Subscribe<TwitchUserLeft>(nameof(TwitchUserLeft), OnUserLeft);
-
+            messageBus.Subscribe<TwitchCheer>(nameof(TwitchCheer), OnUserCheer);
             messageBus.Subscribe<TwitchSubscription>(nameof(TwitchSubscription), OnUserSub);
 
             this.client = client;
@@ -164,6 +164,15 @@ namespace RavenBot.Core.Ravenfall
         public Task ItemDropEventAsync(Player player, string item)
             => SendAsync("item_drop_event", new ItemQueryRequest(player, item));
 
+        public Task RequestIslandInfoAsync(Player player) 
+            => SendAsync("island_info", player);
+
+        public Task RequestTrainingInfoAsync(Player player) 
+            => SendAsync("train_info", player);
+
+        public Task RaidStreamerAsync(Player target, bool isRaidWar) 
+            => SendAsync("raid_streamer", new StreamerRaid(target, isRaidWar));
+
         public Task<bool> ProcessAsync(int serverPort)
             => this.client.ProcessAsync(serverPort);
 
@@ -180,7 +189,7 @@ namespace RavenBot.Core.Ravenfall
                 await this.client.SendAsync(request);
             }
         }
-
+        private async void OnUserCheer(TwitchCheer obj) => await SendAsync("twitch_cheer", obj);
         private async void OnUserSub(TwitchSubscription obj) => await SendAsync("twitch_sub", obj);
         private void OnUserLeft(TwitchUserLeft obj) => logger.WriteDebug(obj.Name + " left the channel");
         private void OnUserJoined(TwitchUserJoined obj) => logger.WriteDebug(obj.Name + " joined the channel");
@@ -230,9 +239,5 @@ namespace RavenBot.Core.Ravenfall
         {
             this.requests.Enqueue(request);
         }
-
-        public Task RequestIslandInfoAsync(Player player) => SendAsync("island_info", player);
-
-        public Task RequestTrainingInfoAsync(Player player) => SendAsync("train_info", player);
     }
 }
