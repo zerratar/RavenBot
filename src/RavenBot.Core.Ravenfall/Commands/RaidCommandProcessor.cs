@@ -11,14 +11,12 @@ namespace RavenBot.Core.Ravenfall.Commands
         private readonly IRavenfallClient game;
         private readonly IPlayerProvider playerProvider;
         private readonly ITwitchUserStore userStore;
-
         public RaidCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider, ITwitchUserStore userStore)
         {
             this.game = game;
             this.playerProvider = playerProvider;
             this.userStore = userStore;
         }
-
         public override async Task ProcessAsync(IMessageBroadcaster broadcaster, ICommand cmd)
         {
             if (!await this.game.ProcessAsync(Settings.UNITY_SERVER_PORT))
@@ -28,9 +26,10 @@ namespace RavenBot.Core.Ravenfall.Commands
             }
 
             var player = playerProvider.Get(cmd.Sender);
+            var isRaidWar = cmd.Command.Contains("war", StringComparison.OrdinalIgnoreCase);
             if (string.IsNullOrEmpty(cmd.Arguments))
             {
-                if (cmd.Command.Contains("war", StringComparison.OrdinalIgnoreCase))
+                if (isRaidWar)
                 {
                     return;
                 }
@@ -41,7 +40,7 @@ namespace RavenBot.Core.Ravenfall.Commands
 
             if (!string.IsNullOrEmpty(cmd.Arguments))
             {
-                if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator && cmd.Sender.IsSubscriber)
+                if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator && !cmd.Sender.IsSubscriber)
                 {
                     broadcaster.Send(cmd.Sender.Username, Localization.PERMISSION_DENIED);
                     return;
@@ -49,7 +48,8 @@ namespace RavenBot.Core.Ravenfall.Commands
 
                 if (cmd.Arguments.Contains("start", StringComparison.OrdinalIgnoreCase))
                 {
-                    if (cmd.Sender.IsSubscriber)
+                    var isSubscriber = cmd.Sender.IsSubscriber && !cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator;
+                    if (isSubscriber)
                     {
                         var user = userStore.Get(cmd.Sender.Username);
                         var command = nameof(RaidCommandProcessor);
@@ -59,7 +59,6 @@ namespace RavenBot.Core.Ravenfall.Commands
                             broadcaster.Broadcast($"{cmd.Sender.Username}, You must wait another {Math.Floor(timeLeft.TotalSeconds)} secs to use that command.");
                             return;
                         }
-
                         user.UseCommand(command, TimeSpan.FromHours(1));
                     }
 
@@ -73,7 +72,6 @@ namespace RavenBot.Core.Ravenfall.Commands
                     return;
                 }
 
-                var isRaidWar = cmd.Command.Contains("war", StringComparison.OrdinalIgnoreCase);
                 var target = playerProvider.Get(cmd.Arguments);
                 await this.game.RaidStreamerAsync(target, isRaidWar);
             }

@@ -37,8 +37,8 @@ namespace RavenBot.Core.Ravenfall.Commands
                     "You do not have permission to set the currently observed player.");
                 return;
             }
-
-            if (cmd.Sender.IsSubscriber)
+            var isSubscriber = cmd.Sender.IsSubscriber && !cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator;
+            if (isSubscriber)
             {
                 var user = userStore.Get(cmd.Sender.Username);
                 var command = nameof(ObserveCommandProcessor);
