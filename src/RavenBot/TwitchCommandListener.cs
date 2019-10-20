@@ -206,6 +206,8 @@ namespace RavenBot
 
         private void OnDisconnected(object sender, OnDisconnectedEventArgs e)
         {
+            logger.WriteDebug("Disconnected from the Twitch IRC Server");
+
             Unsubscribe();
             isInitialized = false;
             CreateTwitchClient();
@@ -226,12 +228,13 @@ namespace RavenBot
 
         private void OnConnected(object sender, OnConnectedArgs e)
         {
+            logger.WriteDebug("Connected to Twitch IRC Server");
             messageBus.Send("twitch", "");
         }
 
         private void OnRaidNotification(object sender, OnRaidNotificationArgs e)
-        {
-            this.Broadcast($"Thank you {e.RaidNotificaiton.DisplayName} for the raid! <3");
+        {            
+            this.Broadcast($"Thank you {e.RaidNotification.DisplayName} for the raid! <3");
         }
 
         private void Subscribe()
