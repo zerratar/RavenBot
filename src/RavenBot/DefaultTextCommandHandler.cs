@@ -9,16 +9,20 @@ namespace RavenBot
         public DefaultTextCommandHandler(IoC ioc)
             : base(ioc)
         {
+
 #if DEBUG
+            Register<DropEventCommandProcessor>("drop");
             Register<ForceAddPlayerCommandProcessor>("add");
 #endif
+
+            Register<RavenfallInfoCommandProcessor>("ravenfall");
 
             Register<ApperanceCommandProcessor>("appearance", "looks");
             Register<StatsCommandProcessor>("stats", "status");
             Register<ResourcesCommandProcessor>("resources", "resource", "res");
-            Register<HighestSkillCommandProcessor>("highest");
+            Register<HighestSkillCommandProcessor>("highest", "top");
             Register<RaidCommandProcessor>("raid", "raidwar");
-            Register<DuelCommandProcessor>("duel");
+            Register<DuelCommandProcessor>("duel", "figh");
             Register<KickCommandProcessor>("kick");
             Register<ArenaCommandProcessor>("arena");
             Register<CraftCommandProcessor>("craft");
@@ -26,20 +30,20 @@ namespace RavenBot
             Register<LeaveCommandProcessor>("leave", "exit", "quit");
 
             Register<IslandInfoCommandProcessor>("island", "position", "where");
-            Register<TrainingInfoCommandProcessor>("training");
+            Register<TrainingInfoCommandProcessor>("skill", "training");
 
             Register<TradeItemCommandProcessor>("sell", "buy");
 
             Register<ToggleCommandProcessor>("toggle");
             Register<TrainCommandProcessor>("train", "task", "strength", "attack", "mine", "defense", "mining", "wood", "crafting", "fishing", "fish", "woodcutting");
-            Register<RavenfallCommandProcessor>("rpg", "raven", "ravenfall", "r");
+            Register<RavenfallCommandProcessor>("rpg");
 
-            Register<ObserveCommandProcessor>("observe", "show");
+            Register<ObserveCommandProcessor>("observe", "show", "display");
 
             Register<SailCommandProcessor>("sail", "disembark");
             Register<TravelCommandProcessor>("travel");
 
-            Register<DropEventCommandProcessor>("drop");
+            Register<PlayerCountCommandProcessor>("online", "players");
         }
     }
 }

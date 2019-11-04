@@ -19,6 +19,7 @@ namespace RavenBot.Core.Ravenfall
         Task CraftAsync(Player targetPlayer, string itemCategory, string itemType);
         Task DuelRequestAsync(Player challenger, Player target);
         Task CancelDuelRequestAsync(Player player);
+        Task PlayerCountAsync(Player player);
         Task AcceptDuelRequestAsync(Player player);
         Task DeclineDuelRequestAsync(Player player);
         Task JoinRaidAsync(Player player);

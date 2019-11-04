@@ -97,6 +97,12 @@ namespace RavenBot
 
         private void OnMessageReceived(object sender, OnMessageReceivedArgs e)
         {
+            //const string SpawnRaidBossReward = "a92e0fcc-4c31-4b8b-b521-9cf4972a8fb7";
+            //if (e.ChatMessage.CustomRewardId == SpawnRaidBossReward)
+            //{
+            //    logger.WriteDebug("SPAWN RAID BOSSUUU!!");
+            //}
+
             if (e.ChatMessage.Bits == 0) return;
 
             this.messageBus.Send(
@@ -232,16 +238,23 @@ namespace RavenBot
             messageBus.Send("twitch", "");
         }
 
+        private void OnReconnected(object sender, OnReconnectedEventArgs e)
+        {
+            logger.WriteDebug("Reconnected to Twitch IRC Server");
+            messageBus.Send("twitch", "");
+        }
+
         private void OnRaidNotification(object sender, OnRaidNotificationArgs e)
         {            
             this.Broadcast($"Thank you {e.RaidNotification.DisplayName} for the raid! <3");
         }
 
         private void Subscribe()
-        {
+        {            
             client.OnChatCommandReceived += OnCommandReceived;
             client.OnMessageReceived += OnMessageReceived;
             client.OnConnected += OnConnected;
+            client.OnReconnected += OnReconnected;
             client.OnDisconnected += OnDisconnected;
             client.OnUserJoined += OnUserJoined;
             client.OnUserLeft += OnUserLeft;

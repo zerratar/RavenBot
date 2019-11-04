@@ -89,6 +89,9 @@ namespace RavenBot.Core.Ravenfall
         public Task DeclineDuelRequestAsync(Player player)
             => SendAsync("duel_decline", player);
 
+        public Task PlayerCountAsync(Player player)
+            => SendAsync("player_count", player);
+
         public Task JoinRaidAsync(Player player)
             => SendAsync("raid_join", player);
 
@@ -164,13 +167,13 @@ namespace RavenBot.Core.Ravenfall
         public Task ItemDropEventAsync(Player player, string item)
             => SendAsync("item_drop_event", new ItemQueryRequest(player, item));
 
-        public Task RequestIslandInfoAsync(Player player) 
+        public Task RequestIslandInfoAsync(Player player)
             => SendAsync("island_info", player);
 
-        public Task RequestTrainingInfoAsync(Player player) 
+        public Task RequestTrainingInfoAsync(Player player)
             => SendAsync("train_info", player);
 
-        public Task RaidStreamerAsync(Player target, bool isRaidWar) 
+        public Task RaidStreamerAsync(Player target, bool isRaidWar)
             => SendAsync("raid_streamer", new StreamerRaid(target, isRaidWar));
 
         public Task<bool> ProcessAsync(int serverPort)
