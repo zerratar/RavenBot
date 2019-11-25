@@ -22,7 +22,7 @@ namespace RavenBot
             Register<ResourcesCommandProcessor>("resources", "resource", "res");
             Register<HighestSkillCommandProcessor>("highest", "top");
             Register<RaidCommandProcessor>("raid", "raidwar");
-            Register<DuelCommandProcessor>("duel", "figh");
+            Register<DuelCommandProcessor>("duel", "fight");
             Register<KickCommandProcessor>("kick");
             Register<ArenaCommandProcessor>("arena");
             Register<CraftCommandProcessor>("craft");
