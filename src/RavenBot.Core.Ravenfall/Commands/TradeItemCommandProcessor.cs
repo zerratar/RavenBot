@@ -27,7 +27,6 @@ namespace RavenBot.Core.Ravenfall.Commands
                 return;
             }
 
-            var player = playerProvider.Get(cmd.Sender);
 
             if (string.IsNullOrEmpty(cmd.Arguments) || !cmd.Arguments.Trim().Contains(" "))
             {
@@ -35,6 +34,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                 return;
             }
 
+            var player = playerProvider.Get(cmd.Sender);
             if (cmd.Command.Equals("sell", StringComparison.OrdinalIgnoreCase))
             {
                 await this.game.SellItemAsync(player, cmd.Arguments);

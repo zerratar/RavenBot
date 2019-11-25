@@ -121,7 +121,14 @@ namespace RavenBot.Core.Ravenfall
 
         public Task BuyItemAsync(Player player, string itemQuery)
             => SendAsync("buy_item", new ItemQueryRequest(player, itemQuery));
+        public Task GiftItemAsync(Player player, string itemQuery)
+            => SendAsync("gift_item", new ItemQueryRequest(player, itemQuery));
+        public Task VendorItemAsync(Player player, string itemQuery)
+            => SendAsync("vendor_item", new ItemQueryRequest(player, itemQuery));
 
+        public Task ValueItemAsync(Player player, string itemQuery)
+            => SendAsync("value_item", new ItemQueryRequest(player, itemQuery));
+        
         public Task SendPlayerTaskAsync(Player player, PlayerTask task, params string[] args)
             => SendAsync("task", new PlayerTaskRequest(player, task.ToString(), args));
 
