@@ -4,12 +4,12 @@ using RavenBot.Core.Net;
 
 namespace RavenBot.Core.Ravenfall.Commands
 {
-    public class LeaveCommandProcessor : CommandProcessor
+    public class ValueItemCommandProcessor : CommandProcessor
     {
         private readonly IRavenfallClient game;
         private readonly IPlayerProvider playerProvider;
 
-        public LeaveCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
+        public ValueItemCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
         {
             this.game = game;
             this.playerProvider = playerProvider;
@@ -19,20 +19,19 @@ namespace RavenBot.Core.Ravenfall.Commands
         {
             if (!await this.game.ProcessAsync(Settings.UNITY_SERVER_PORT))
             {
-
                 broadcaster.Send(cmd.Sender.Username,
                     Localization.GAME_NOT_STARTED);
                 return;
             }
 
-            var player = playerProvider.Get(cmd.Sender);
-            if (player == null)
+            if (string.IsNullOrEmpty(cmd.Arguments) || !cmd.Arguments.Trim().Contains(" "))
             {
-
-                broadcaster.Send(cmd.Sender.Username, "Uh oh, bug when trying to leave :(");
+                broadcaster.Send(cmd.Sender.Username, cmd.Command + "<item>");
+                return;
             }
 
-            await game.LeaveAsync(player);
+            var player = playerProvider.Get(cmd.Sender);
+            await this.game.ValueItemAsync(player, cmd.Arguments);
         }
     }
 }

@@ -36,6 +36,9 @@ namespace RavenBot.Core.Ravenfall
         Task TogglePetAsync(Player player);
         Task SellItemAsync(Player player, string itemQuery);
         Task BuyItemAsync(Player player, string itemQuery);
+        Task VendorItemAsync(Player player, string itemQuery);
+        Task GiftItemAsync(Player player, string itemQuery);
+        Task ValueItemAsync(Player player, string itemQuery);
         Task DisembarkFerryAsync(Player player);
         Task EmbarkFerryAsync(Player player);
         Task RequestTrainingInfoAsync(Player player);

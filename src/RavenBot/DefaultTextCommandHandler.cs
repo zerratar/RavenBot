@@ -33,6 +33,9 @@ namespace RavenBot
             Register<TrainingInfoCommandProcessor>("skill", "training");
 
             Register<TradeItemCommandProcessor>("sell", "buy");
+            Register<VendorItemCommandProcessor>("vendor");
+            Register<GiftItemCommandProcessor>("gift");
+            Register<ValueItemCommandProcessor>("value");
 
             Register<ToggleCommandProcessor>("toggle");
             Register<TrainCommandProcessor>("train", "task", "strength", "attack", "mine", "defense", "mining", "wood", "crafting", "fishing", "fish", "woodcutting");
