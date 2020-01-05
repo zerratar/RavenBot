@@ -24,7 +24,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                 return;
             }
 
-            if (string.IsNullOrEmpty(cmd.Arguments) || !cmd.Arguments.Trim().Contains(" "))
+            if (string.IsNullOrEmpty(cmd.Arguments))
             {
                 broadcaster.Send(cmd.Sender.Username, cmd.Command + "<item>");
                 return;

@@ -98,6 +98,9 @@ namespace RavenBot.Core.Ravenfall
         public Task RaidStartAsync(Player player)
             => SendAsync("raid_force", player);
 
+        public Task JoinDungeonAsync(Player player)
+            => SendAsync("dungeon_join", player);
+
         public Task RequestPlayerStatsAsync(Player player, string skill)
             => SendAsync("player_stats", new PlayerStatsRequest(player, skill));
 
@@ -121,14 +124,19 @@ namespace RavenBot.Core.Ravenfall
 
         public Task BuyItemAsync(Player player, string itemQuery)
             => SendAsync("buy_item", new ItemQueryRequest(player, itemQuery));
+
         public Task GiftItemAsync(Player player, string itemQuery)
             => SendAsync("gift_item", new ItemQueryRequest(player, itemQuery));
+
         public Task VendorItemAsync(Player player, string itemQuery)
             => SendAsync("vendor_item", new ItemQueryRequest(player, itemQuery));
 
         public Task ValueItemAsync(Player player, string itemQuery)
             => SendAsync("value_item", new ItemQueryRequest(player, itemQuery));
-        
+
+        public Task CraftRequirementAsync(Player player, string itemName)
+            => SendAsync("req_item", new ItemQueryRequest(player, itemName));
+
         public Task SendPlayerTaskAsync(Player player, PlayerTask task, params string[] args)
             => SendAsync("task", new PlayerTaskRequest(player, task.ToString(), args));
 
@@ -156,8 +164,8 @@ namespace RavenBot.Core.Ravenfall
         public Task KickAsync(Player targetPlayer)
             => SendAsync("kick", targetPlayer);
 
-        public Task CraftAsync(Player targetPlayer, string itemCategory, string itemType)
-            => SendAsync("craft", new CraftRequest(targetPlayer, itemCategory, itemType));
+        public Task CraftAsync(Player targetPlayer, string itemQuery)
+            => SendAsync("craft", new ItemQueryRequest(targetPlayer, itemQuery));
 
         public Task TravelAsync(Player player, string destination)
             => SendAsync("ferry_travel", new FerryTravelRequest(player, destination));

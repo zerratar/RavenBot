@@ -16,7 +16,7 @@ namespace RavenBot.Core.Ravenfall
         Task KickPlayerFromArenaAsync(Player player, Player targetPlayer);
         Task AddPlayerToArenaAsync(Player player, Player targetPlayer);
         Task KickAsync(Player targetPlayer);
-        Task CraftAsync(Player targetPlayer, string itemCategory, string itemType);
+        Task CraftAsync(Player targetPlayer, string itemQuery);
         Task DuelRequestAsync(Player challenger, Player target);
         Task CancelDuelRequestAsync(Player player);
         Task PlayerCountAsync(Player player);
@@ -24,6 +24,8 @@ namespace RavenBot.Core.Ravenfall
         Task DeclineDuelRequestAsync(Player player);
         Task JoinRaidAsync(Player player);
         Task RaidStartAsync(Player player);
+        Task JoinDungeonAsync(Player player);
+        Task CraftRequirementAsync(Player player, string itemName);
         Task RequestIslandInfoAsync(Player player);
         Task RequestPlayerResourcesAsync(Player player);
         Task TravelAsync(Player player, string destination);

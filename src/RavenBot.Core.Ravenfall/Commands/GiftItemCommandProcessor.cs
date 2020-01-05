@@ -4,6 +4,7 @@ using RavenBot.Core.Net;
 
 namespace RavenBot.Core.Ravenfall.Commands
 {
+
     public class GiftItemCommandProcessor : CommandProcessor
     {
         private readonly IRavenfallClient game;
@@ -31,7 +32,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             }
 
             var player = playerProvider.Get(cmd.Sender);
-            await this.game.VendorItemAsync(player, cmd.Arguments);
+            await this.game.GiftItemAsync(player, cmd.Arguments);
         }
     }
 }

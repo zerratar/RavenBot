@@ -22,6 +22,8 @@ namespace RavenBot
             Register<ResourcesCommandProcessor>("resources", "resource", "res");
             Register<HighestSkillCommandProcessor>("highest", "top");
             Register<RaidCommandProcessor>("raid", "raidwar");
+            Register<DungeonCommandProcessor>("dungeon");
+
             Register<DuelCommandProcessor>("duel", "fight");
             Register<KickCommandProcessor>("kick");
             Register<ArenaCommandProcessor>("arena");
@@ -36,6 +38,7 @@ namespace RavenBot
             Register<VendorItemCommandProcessor>("vendor");
             Register<GiftItemCommandProcessor>("gift");
             Register<ValueItemCommandProcessor>("value");
+            Register<CraftRequirementCommandProcessor>("req", "requirement", "requirements");
 
             Register<ToggleCommandProcessor>("toggle");
             Register<TrainCommandProcessor>("train", "task", "strength", "attack", "mine", "defense", "mining", "wood", "crafting", "fishing", "fish", "woodcutting");

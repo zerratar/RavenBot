@@ -47,7 +47,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             await game.JoinAsync(player);
         }
     }
-#endif
+#endif    
 
     public class JoinCommandProcessor : CommandProcessor
     {

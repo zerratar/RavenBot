@@ -4,12 +4,12 @@ using RavenBot.Core.Net;
 
 namespace RavenBot.Core.Ravenfall.Commands
 {
-    public class VendorItemCommandProcessor : CommandProcessor
+    public class CraftRequirementCommandProcessor : CommandProcessor
     {
         private readonly IRavenfallClient game;
         private readonly IPlayerProvider playerProvider;
 
-        public VendorItemCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
+        public CraftRequirementCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
         {
             this.game = game;
             this.playerProvider = playerProvider;
@@ -24,14 +24,14 @@ namespace RavenBot.Core.Ravenfall.Commands
                 return;
             }
 
-            if (string.IsNullOrEmpty(cmd.Arguments))
+            if (string.IsNullOrEmpty(cmd.Arguments) || !cmd.Arguments.Trim().Contains(" "))
             {
-                broadcaster.Send(cmd.Sender.Username, cmd.Command + " <item> (optional: <amount>, default 1)");
+                broadcaster.Send(cmd.Sender.Username, cmd.Command + " <item>");
                 return;
             }
 
             var player = playerProvider.Get(cmd.Sender);
-            await this.game.VendorItemAsync(player, cmd.Arguments);
+            await this.game.CraftRequirementAsync(player, cmd.Arguments);
         }
     }
 }
