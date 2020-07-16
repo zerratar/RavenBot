@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using RavenBot.Core;
 using RavenBot.Core.Handlers;
 using RavenBot.Core.Twitch;
@@ -23,8 +24,10 @@ namespace RavenBot
         private IMessageBusSubscription messageSubscription;
         private TwitchClient client;
         private bool isInitialized;
+        private int reconnectDelay = 10000;
+        private bool tryToReconnect = true;
         private bool disposed;
-
+        
         public TwitchCommandListener(
             ILogger logger,
             IKernel kernel,
@@ -213,20 +216,43 @@ namespace RavenBot
         private void OnDisconnected(object sender, OnDisconnectedEventArgs e)
         {
             logger.WriteDebug("Disconnected from the Twitch IRC Server");
-
-            Unsubscribe();
-            isInitialized = false;
-            CreateTwitchClient();
-            Start();
+            TryToReconnect();
         }
+
+        private void TryToReconnect()
+        {
+            try
+            {
+                Unsubscribe();
+                isInitialized = false;
+                CreateTwitchClient();
+                Start();
+            }
+            catch (Exception)
+            {
+                logger.WriteDebug($"Failed to reconnect to the Twitch IRC Server. Retry in {reconnectDelay}ms");
+                Task.Run(async () =>
+                {
+                    await Task.Delay(reconnectDelay);
+
+                    if (!tryToReconnect)
+                        return;
+
+                    TryToReconnect();
+                });
+            }
+        }
+    
 
         public void Stop()
         {
             if (kernel.Started) kernel.Stop();
             Unsubscribe();
 
+            tryToReconnect = false;
             if (client.IsConnected)
                 client.Disconnect();
+
 
             messageSubscription?.Unsubscribe();
             broadcastSubscription?.Unsubscribe();
