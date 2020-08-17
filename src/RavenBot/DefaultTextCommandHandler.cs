@@ -29,6 +29,7 @@ namespace RavenBot
             Register<ArenaCommandProcessor>("arena");
             Register<CraftCommandProcessor>("craft");
             Register<JoinCommandProcessor>("join", "play");
+            Register<ExpMultiplierProcessor>("!exp");
             Register<LeaveCommandProcessor>("leave", "exit", "quit");
 
             Register<IslandInfoCommandProcessor>("island", "position", "where");

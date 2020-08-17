@@ -7,6 +7,7 @@ namespace RavenBot.Core.Ravenfall
     {
         Task<bool> ProcessAsync(int serverPort);
         Task JoinAsync(Player player);
+        Task SetExpMultiplierAsync(Player player, int number);
         Task SendPlayerTaskAsync(Player player, PlayerTask task, params string[] args);
         Task JoinArenaAsync(Player player);
         Task LeaveArenaAsync(Player player);

@@ -77,6 +77,8 @@ namespace RavenBot.Core.Ravenfall
 
         public Task JoinAsync(Player player) => SendAsync("join", player);
 
+        public Task SetExpMultiplierAsync(Player player, int number) 
+            => SendAsync("exp_multiplier", new SetExpMultiplierRequest(player, number));
         public Task DuelRequestAsync(Player challenger, Player target)
             => SendAsync("duel", new DuelPlayerRequest(challenger, target));
 
