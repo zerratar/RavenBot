@@ -4,28 +4,25 @@ using RavenBot.Core.Net;
 
 namespace RavenBot.Core.Ravenfall.Commands
 {
-    public class JoinCommandProcessor : CommandProcessor
+    public class ReloadCommandProcessor : CommandProcessor
     {
         private readonly IRavenfallClient game;
         private readonly IPlayerProvider playerProvider;
-
-        public JoinCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
+        public ReloadCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
         {
             this.game = game;
             this.playerProvider = playerProvider;
         }
-
         public override async Task ProcessAsync(IMessageBroadcaster broadcaster, ICommand cmd)
         {
             if (!await this.game.ProcessAsync(Settings.UNITY_SERVER_PORT))
             {
-                broadcaster.Send(cmd.Sender.Username,
-                    Localization.GAME_NOT_STARTED);
+                broadcaster.Send(cmd.Sender.Username, Localization.GAME_NOT_STARTED);
                 return;
             }
 
-            var player = playerProvider.Get(cmd.Sender, cmd.Arguments);
-            await game.JoinAsync(player);
+            var player = playerProvider.Get(cmd.Sender);
+            await game.ReloadGameAsync(player);
         }
     }
 }

@@ -77,7 +77,7 @@ namespace RavenBot.Core.Ravenfall
 
         public Task JoinAsync(Player player) => SendAsync("join", player);
 
-        public Task SetExpMultiplierAsync(Player player, int number) 
+        public Task SetExpMultiplierAsync(Player player, int number)
             => SendAsync("exp_multiplier", new SetExpMultiplierRequest(player, number));
         public Task DuelRequestAsync(Player challenger, Player target)
             => SendAsync("duel", new DuelPlayerRequest(challenger, target));
@@ -100,8 +100,22 @@ namespace RavenBot.Core.Ravenfall
         public Task RaidStartAsync(Player player)
             => SendAsync("raid_force", player);
 
+        public Task DungeonStartAsync(Player player)
+            => SendAsync("dungeon_force", player);
+
         public Task JoinDungeonAsync(Player player)
             => SendAsync("dungeon_join", player);
+
+        public Task ReloadGameAsync(Player player)
+            => SendAsync("reload", player);
+
+        public Task GetMaxMultiplierAsync(Player player)
+            => SendAsync("multiplier", player);
+
+        public Task SetPetAsync(Player player, string pet)
+            => SendAsync("set_pet", new SetPetRequest(player, pet));
+        public Task GetPetAsync(Player player)
+            => SendAsync("get_pet", new GetPetRequest(player));
 
         public Task RequestPlayerStatsAsync(Player player, string skill)
             => SendAsync("player_stats", new PlayerStatsRequest(player, skill));

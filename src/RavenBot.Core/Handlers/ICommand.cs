@@ -15,6 +15,7 @@
         bool IsBroadcaster { get; }
         bool IsModerator { get; }
         bool IsSubscriber { get; }
+        bool IsVip { get; }
         string ColorHex { get; }
     }
 }

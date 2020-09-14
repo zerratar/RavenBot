@@ -3,14 +3,17 @@
 namespace RavenBot.Core.Ravenfall.Models
 {
     public class Player
-    { public Player(
-            string userId,
-            string username,
-            string displayName,
-            string color,
-            bool isBroadcaster,
-            bool isModerator,
-            bool isSubscriber)
+    {
+        public Player(
+              string userId,
+              string username,
+              string displayName,
+              string color,
+              bool isBroadcaster,
+              bool isModerator,
+              bool isSubscriber,
+              bool isVip,
+              string identifier)
         {
             if (string.IsNullOrEmpty(username)) throw new ArgumentNullException(nameof(username));
             Username = username.StartsWith("@") ? username.Substring(1) : username;
@@ -20,6 +23,8 @@ namespace RavenBot.Core.Ravenfall.Models
             IsBroadcaster = isBroadcaster;
             IsModerator = isModerator;
             IsSubscriber = isSubscriber;
+            IsVip = isVip;
+            Identifier = identifier;
         }
 
         public string Username { get; }
@@ -29,5 +34,7 @@ namespace RavenBot.Core.Ravenfall.Models
         public bool IsBroadcaster { get; }
         public bool IsModerator { get; }
         public bool IsSubscriber { get; }
+        public bool IsVip { get; }
+        public string Identifier { get; }
     }
 }

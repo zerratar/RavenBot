@@ -2,16 +2,13 @@
 
 namespace RavenBot.Core.Ravenfall.Requests
 {
-
-    public class PlayerStatsRequest
+    public class GetPetRequest
     {
         public Player Player { get; }
-        public string Skill { get; }
 
-        public PlayerStatsRequest(Player player, string skill)
+        public GetPetRequest(Player player)
         {
             Player = player;
-            Skill = skill;
         }
     }
 }

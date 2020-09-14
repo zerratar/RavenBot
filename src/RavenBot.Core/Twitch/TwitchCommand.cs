@@ -117,7 +117,7 @@ namespace RavenBot.Core.Twitch
             var isModerator = cmd.ChatMessage.IsModerator;
             var isSubscriber = cmd.ChatMessage.IsSubscriber;
             var isBroadcaster = cmd.ChatMessage.IsBroadcaster;
-
+            var isVip = false;
             this.Sender = new TwitchCommandSender(
                 cmd.ChatMessage.UserId,
                 cmd.ChatMessage.Username,
@@ -125,6 +125,7 @@ namespace RavenBot.Core.Twitch
                 isBroadcaster,
                 isModerator,
                 isSubscriber,
+                isVip,
                 cmd.ChatMessage.ColorHex);
         }
 
@@ -141,6 +142,7 @@ namespace RavenBot.Core.Twitch
                 bool isBroadcaster,
                 bool isModerator,
                 bool isSubscriber,
+                bool isVip,
                 string colorHex)
             {
                 UserId = userId;
@@ -149,6 +151,7 @@ namespace RavenBot.Core.Twitch
                 IsBroadcaster = isBroadcaster;
                 IsModerator = isModerator;
                 IsSubscriber = isSubscriber;
+                IsVip = isVip;
                 ColorHex = colorHex;
             }
 
@@ -158,6 +161,7 @@ namespace RavenBot.Core.Twitch
             public bool IsBroadcaster { get; }
             public bool IsModerator { get; }
             public bool IsSubscriber { get; }
+            public bool IsVip { get; }
             public string ColorHex { get; }
 
             public override string ToString()

@@ -36,6 +36,7 @@ namespace RavenBot
 
             ioc.RegisterShared<ICommandListener, TwitchCommandListener>();
             ioc.RegisterShared<IRavenfallClient, UnityRavenfallClient>();
+            ioc.RegisterShared<ICommandBindingProvider, CommandBindingProvider>();
 
             using (var cmdListener = ioc.Resolve<ICommandListener>())
             {
