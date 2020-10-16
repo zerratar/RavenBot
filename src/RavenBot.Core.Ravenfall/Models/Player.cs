@@ -35,6 +35,7 @@ namespace RavenBot.Core.Ravenfall.Models
         public bool IsModerator { get; }
         public bool IsSubscriber { get; }
         public bool IsVip { get; }
+        public int SubTier { get; }
         public string Identifier { get; }
     }
 }

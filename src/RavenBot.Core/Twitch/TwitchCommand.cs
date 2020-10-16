@@ -116,7 +116,7 @@ namespace RavenBot.Core.Twitch
 
             var isModerator = cmd.ChatMessage.IsModerator;
             var isSubscriber = cmd.ChatMessage.IsSubscriber;
-            var isBroadcaster = cmd.ChatMessage.IsBroadcaster;
+            var isBroadcaster = cmd.ChatMessage.IsBroadcaster;            
             var isVip = false;
             this.Sender = new TwitchCommandSender(
                 cmd.ChatMessage.UserId,

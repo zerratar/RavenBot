@@ -40,14 +40,14 @@ namespace RavenBot.Core.Ravenfall
 
             this.client.Subscribe("raid_join_success", SendResponseToTwitchChat);
             this.client.Subscribe("raid_join_failed", SendResponseToTwitchChat);
-            this.client.Subscribe("raid_start", OnRaidStart);
+            this.client.Subscribe("raid_start", SendResponseToTwitchChat);
 
             this.client.Subscribe("player_stats", SendResponseToTwitchChat);
             this.client.Subscribe("player_resources", SendResponseToTwitchChat);
             this.client.Subscribe("highest_skill", SendResponseToTwitchChat);
 
-            this.client.Subscribe("kick_success", OnKickPlayerSuccess);
-            this.client.Subscribe("kick_failed", OnKickPlayerFailed);
+            this.client.Subscribe("kick_success", SendResponseToTwitchChat);
+            this.client.Subscribe("kick_failed", SendResponseToTwitchChat);
 
             this.client.Subscribe("craft_success", SendResponseToTwitchChat);
             this.client.Subscribe("craft_failed", SendResponseToTwitchChat);
@@ -77,8 +77,37 @@ namespace RavenBot.Core.Ravenfall
 
         public Task JoinAsync(Player player) => SendAsync("join", player);
 
+        public Task GetStreamerTokenCountAsync(Player player)
+            => SendAsync("token_count", player);
+
+        public Task RedeemStreamerTokenAsync(Player player, string query)
+            => SendAsync("redeem_tokens", new ItemQueryRequest(player, query));
+
+        public Task PlayTicTacToeAsync(Player player, int num)
+            => SendAsync("ttt_play", new PlayerAndNumber(player, num));
+
+        public Task ActivateTicTacToeAsync(Player player)
+            => SendAsync("ttt_activate", player);
+
+        public Task ResetTicTacToeAsync(Player player)
+            => SendAsync("ttt_reset", player);
+
+        public Task GetVillageBoostAsync(Player player)
+            => SendAsync("get_village_boost", player);
+
+        public Task ToggleDiaperModeAsync(Player player)
+            => SendAsync("toggle_diaper_mode", player);
+
+        public Task ToggleItemRequirementsAsync(Player player)
+            => SendAsync("toggle_item_requirements", player);
+
         public Task SetExpMultiplierAsync(Player player, int number)
             => SendAsync("exp_multiplier", new SetExpMultiplierRequest(player, number));
+
+        public Task SetExpMultiplierLimitAsync(Player player, int number)
+            => SendAsync("exp_multiplier_limit", new SetExpMultiplierRequest(player, number));
+
+
         public Task DuelRequestAsync(Player challenger, Player target)
             => SendAsync("duel", new DuelPlayerRequest(challenger, target));
 
@@ -243,35 +272,31 @@ namespace RavenBot.Core.Ravenfall
 
         private void SendResponseToTwitchChat(IGameCommand obj)
         {
-            if (string.IsNullOrEmpty(obj.Destination))
+            this.messageBus.Send(MessageBus.Broadcast, new BroadcastMessage
             {
-                this.messageBus.Send(MessageBus.Broadcast, obj.Args.LastOrDefault());
-            }
-            else
-            {
-                this.messageBus.Send(MessageBus.Message, obj.Destination + ", " + obj.Args.LastOrDefault());
-            }
+                User = obj.Destination,
+                Message = obj.Args.LastOrDefault()
+            });
         }
-
-        private void OnRaidStart(IGameCommand obj) => Broadcast(obj);
-
-        private void OnKickPlayerFailed(IGameCommand obj) => Broadcast(obj);
-
-        private void OnKickPlayerSuccess(IGameCommand obj) => Broadcast(obj);
 
         private void OnJoinFailed(IGameCommand obj)
         {
-            this.messageBus.Send(MessageBus.Broadcast, obj.Destination + ", Join failed. Reason: " + obj.Args.LastOrDefault());
-        }
-
-        private void Broadcast(IGameCommand obj)
-        {
-            this.messageBus.Send(MessageBus.Broadcast, obj.Args.LastOrDefault());
+            this.messageBus.Send(MessageBus.Broadcast, new BroadcastMessage
+            {
+                User = obj.Destination,
+                Message = "Join failed. Reason: " + obj.Args.LastOrDefault()
+            });
         }
 
         private void EnqueueRequest(string request)
         {
             this.requests.Enqueue(request);
         }
+    }
+
+    public class BroadcastMessage
+    {
+        public string User { get; set; }
+        public string Message { get; set; }
     }
 }

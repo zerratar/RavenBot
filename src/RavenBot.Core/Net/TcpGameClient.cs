@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace RavenBot.Core.Net
@@ -134,49 +135,56 @@ namespace RavenBot.Core.Net
         {
             //logger.WriteDebug("TcpGameClient::HandleMessage");
             if (string.IsNullOrEmpty(message)) return;
-            if (message.StartsWith("{"))
+
+            var packet = JsonConvert.DeserializeObject<GamePacket>(message);
+            if (packet != null)
             {
-                var data = JObject.Parse(message);
-                var command = data["Type"].Value<string>();
-                HandleCommand(string.Empty, string.Empty, command, new string[]
-                {
-                    data["Data"].ToString()
-                });
+                HandleCommand(packet.Destination, packet.Command, packet.Args);
             }
-            else
-            {
-                // receiver:cmd|arg1|arg2|arg3|arg4
-                var messageData = message.Split(':');
-                var fullCommand = messageData[1].Split('|');
-                var destination = messageData[0];
-                var correlationId = "";
-                if (destination.Contains("|"))
-                {
-                    // we have a correlationId
-                    var destData = destination.Split('|');
-                    correlationId = destData[0];
-                    destination = destData[1];
-                }
-                var command = fullCommand[0];
-                if (fullCommand.Length > 1)
-                {
-                    var args = fullCommand.Where((x, i) => i != 0).ToArray();
-                    HandleCommand(correlationId, destination, command, args);
-                }
-                else
-                {
-                    HandleCommand(correlationId, destination, command);
-                }
-            }
+
+            //if (message.StartsWith("{"))
+            //{
+            //    var data = JObject.Parse(message);
+            //    var command = data["Type"].Value<string>();
+            //    HandleCommand(string.Empty, command, new string[]
+            //    {
+            //        data["Data"].ToString()
+            //    });
+            //}
+            //else
+            //{
+            //    // receiver:cmd|arg1|arg2|arg3|arg4
+            //    var messageData = message.Split(':');
+            //    var fullCommand = messageData[1].Split('|');
+            //    var destination = messageData[0];
+            //    var correlationId = "";
+            //    if (destination.Contains("|"))
+            //    {
+            //        // we have a correlationId
+            //        var destData = destination.Split('|');
+            //        correlationId = destData[0];
+            //        destination = destData[1];
+            //    }
+            //    var command = fullCommand[0];
+            //    if (fullCommand.Length > 1)
+            //    {
+            //        var args = fullCommand.Where((x, i) => i != 0).ToArray();
+            //        HandleCommand(destination, command, args);
+            //    }
+            //    else
+            //    {
+            //        HandleCommand(destination, command);
+            //    }
+            //}
         }
 
-        private void HandleCommand(string correlationId, string destination, string command, params string[] args)
+        private void HandleCommand(string destination, string command, params string[] args)
         {
             lock (mutex)
             {
                 foreach (var sub in subs.Where(x => x.Identifier == command))
                 {
-                    sub.Invoke(new GameCommand(correlationId, destination, command, args));
+                    sub.Invoke(new GameCommand(destination, command, args));
                 }
             }
         }
@@ -218,5 +226,20 @@ namespace RavenBot.Core.Net
                 this.client.Unsubscribe(this);
             }
         }
+    }
+    public class GamePacket
+    {
+        public GamePacket(string destination, string command, string[] args)
+        {
+            this.Destination = destination;
+            this.Command = command;
+            this.Args = args;
+        }
+
+        public string Destination { get; }
+
+        public string Command { get; }
+
+        public string[] Args { get; }
     }
 }

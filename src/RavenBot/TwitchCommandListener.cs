@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using RavenBot.Core;
 using RavenBot.Core.Handlers;
+using RavenBot.Core.Ravenfall;
 using RavenBot.Core.Twitch;
 using TwitchLib.Client;
 using TwitchLib.Client.Events;
@@ -17,17 +19,20 @@ namespace RavenBot
         private readonly ILogger logger;
         private readonly IKernel kernel;
         private readonly IMessageBus messageBus;
+        private readonly StringDb strings;
         private readonly ICommandHandler commandHandler;
         private readonly IChannelProvider channelProvider;
         private readonly IConnectionCredentialsProvider credentialsProvider;
         private IMessageBusSubscription broadcastSubscription;
-        private IMessageBusSubscription messageSubscription;
         private TwitchClient client;
         private bool isInitialized;
         private int reconnectDelay = 10000;
         private bool tryToReconnect = true;
         private bool disposed;
-        
+
+        private readonly object mutex = new object();
+        private readonly HashSet<string> newSubAdded = new HashSet<string>();
+
         public TwitchCommandListener(
             ILogger logger,
             IKernel kernel,
@@ -39,6 +44,9 @@ namespace RavenBot
             this.logger = logger;
             this.kernel = kernel;
             this.messageBus = messageBus;
+            this.strings = new StringDb();
+            this.strings.Load();
+
             this.commandHandler = commandHandler;
             this.channelProvider = channelProvider;
             this.credentialsProvider = credentialsProvider;
@@ -51,28 +59,6 @@ namespace RavenBot
             EnsureInitialized();
             Subscribe();
             client.Connect();
-        }
-
-        public void Broadcast(string message)
-        {
-            if (!this.client.IsConnected) return;
-            var channel = this.channelProvider.Get();
-
-            if (client.JoinedChannels.Count == 0)
-            {
-                client.JoinChannel(channel);
-            }
-
-            client.SendMessage(channel, message);
-        }
-
-        public void Send(string target, string message)
-        {
-            if (!this.client.IsConnected) return;
-            client.SendMessage(this.channelProvider.Get(), $"{target}, " + message);
-            return;
-
-            //client.SendWhisper(target, message);
         }
 
         public void Dispose()
@@ -130,26 +116,76 @@ namespace RavenBot
             if (isInitialized) return;
 
             if (this.broadcastSubscription == null)
-                this.broadcastSubscription = messageBus.Subscribe<string>(MessageBus.Broadcast, Broadcast);
-            if (this.messageSubscription == null)
-                this.messageSubscription = messageBus.Subscribe<string>(MessageBus.Message, MessageUser);
+                this.broadcastSubscription = messageBus.Subscribe<BroadcastMessage>(MessageBus.Broadcast, Broadcast);
 
             client.Initialize(credentialsProvider.Get(), channelProvider.Get());
             isInitialized = true;
         }
-
-        private void MessageUser(string message)
+        public void Broadcast(BroadcastMessage message)
         {
-            //var channel = this.channelProvider.Get();
+            if (!string.IsNullOrEmpty(message.User))
+            {
+                Broadcast($"{message.User}, {message.Message}");
+                return;
+            }
+
+            Broadcast(message.Message);
+        }
+
+        public void Send(string target, string message)
+        {
+            Broadcast(new BroadcastMessage { User = target, Message = message });
+        }
+
+        public void Broadcast(string message)
+        {
             if (!this.client.IsConnected) return;
-            if (string.IsNullOrEmpty(message)) return;
+            var channel = this.channelProvider.Get();
 
-            client.SendMessage(this.channelProvider.Get(), message);
+            if (client.JoinedChannels.Count == 0)
+                client.JoinChannel(channel);
 
-            //if (message.IndexOf(',') == -1) return;
-            //var user = message.Remove(message.IndexOf(','));
-            //var msg = message.Substring(message.IndexOf(',') + 1);
-            //client.SendWhisper(user.Trim(), msg.Trim());
+            var localizableMessage = message;
+            var target = string.Empty;
+            if (HasTarget(message))
+            {
+                localizableMessage = message.Substring(message.IndexOf(' ') + 1);
+                target = message.Split(',')[0];
+            }
+
+            message = LocalizeMessage(localizableMessage);
+
+            if (string.IsNullOrEmpty(message))
+            {
+                // in case the streamer chose not to have a message in here. 
+                // don't send it. we dont want "name, " messages being sent.
+                return;
+            }
+
+            if (!string.IsNullOrEmpty(target))
+            {
+                message = target + ", " + message;
+            }
+
+            client.SendMessage(channel, message);
+        }
+
+        private string LocalizeMessage(string localizableMessage)
+        {
+            try
+            {
+                var formatKey = strings.GetFormatKey(localizableMessage);
+                return strings.KeyFormat(formatKey, localizableMessage);
+            }
+            finally
+            {
+                strings.Save();
+            }
+        }
+
+        private static bool HasTarget(string message)
+        {
+            return message.IndexOf(',') > 0 && !message.Split(',')[0].Contains(" ");
         }
 
         private void CreateTwitchClient()
@@ -169,7 +205,7 @@ namespace RavenBot
                     e.ReSubscriber.Login,
                     e.ReSubscriber.DisplayName,
                     null,
-                    e.ReSubscriber.Months, 
+                    e.ReSubscriber.Months,
                     false));
 
             this.Broadcast($"Thank you {e.ReSubscriber.DisplayName} for the resub!!! <3");
@@ -202,13 +238,13 @@ namespace RavenBot
         private void OnGiftedSub(object sender, OnGiftedSubscriptionArgs e)
         {
             this.messageBus.Send(nameof(TwitchSubscription),
-                new TwitchSubscription(
-                    e.GiftedSubscription.Id,
-                    e.GiftedSubscription.Login,
-                    e.GiftedSubscription.DisplayName,
-                    e.GiftedSubscription.MsgParamRecipientId,
-                    1,
-                    false));
+            new TwitchSubscription(
+                e.GiftedSubscription.Id,
+                e.GiftedSubscription.Login,
+                e.GiftedSubscription.DisplayName,
+                e.GiftedSubscription.MsgParamRecipientId,
+                1,
+                false));
 
             this.Broadcast($"Thank you {e.GiftedSubscription.DisplayName} for the gifted sub!!! <3");
         }
@@ -242,7 +278,7 @@ namespace RavenBot
                 });
             }
         }
-    
+
 
         public void Stop()
         {
@@ -253,8 +289,6 @@ namespace RavenBot
             if (client.IsConnected)
                 client.Disconnect();
 
-
-            messageSubscription?.Unsubscribe();
             broadcastSubscription?.Unsubscribe();
         }
 
@@ -271,12 +305,12 @@ namespace RavenBot
         }
 
         private void OnRaidNotification(object sender, OnRaidNotificationArgs e)
-        {            
+        {
             this.Broadcast($"Thank you {e.RaidNotification.DisplayName} for the raid! <3");
         }
 
         private void Subscribe()
-        {            
+        {
             client.OnChatCommandReceived += OnCommandReceived;
             client.OnMessageReceived += OnMessageReceived;
             client.OnConnected += OnConnected;

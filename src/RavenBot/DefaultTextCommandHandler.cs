@@ -49,10 +49,24 @@ namespace RavenBot
             Register<ReloadCommandProcessor>(commandBindingProvider.Get("reload"));
 
             Register<RaidCommandProcessor>("raid", "raidwar");
+
+            Register<DiaperModeProcessor>("diaper");
+
+            Register<ToggleItemRequirementsProcessor>("!noitemreq");
             Register<ExpMultiplierProcessor>("!exp");
+            Register<ExpMultiplierLimitProcessor>("!explimit");
+
+            Register<StreamerTokenReedeemProcessor>("claim", "redeem");
+            Register<StreamerTokenProcessor>("token", "tokens");
+
             Register<TradeItemCommandProcessor>("sell", "buy");
             Register<TrainCommandProcessor>("train", "task", "strength", "attack", "mine", "defense", "mining", "wood", "crafting", "fishing", "fish", "woodcutting");
             Register<SailCommandProcessor>("sail", "disembark");
+
+            Register<VillageCommandProcessor>("village", "town");
+
+            // tavern games
+            Register<TicTacToeCommandProcessor>("tictactoe", "ttt");
 
             commandBindingProvider.EnsureBindingsFile();
         }

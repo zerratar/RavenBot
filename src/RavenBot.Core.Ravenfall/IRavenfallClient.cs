@@ -7,7 +7,10 @@ namespace RavenBot.Core.Ravenfall
     {
         Task<bool> ProcessAsync(int serverPort);
         Task JoinAsync(Player player);
+        Task ToggleItemRequirementsAsync(Player player);
+        Task ToggleDiaperModeAsync(Player player);
         Task SetExpMultiplierAsync(Player player, int number);
+        Task SetExpMultiplierLimitAsync(Player player, int number);
         Task SendPlayerTaskAsync(Player player, PlayerTask task, params string[] args);
         Task JoinArenaAsync(Player player);
         Task LeaveArenaAsync(Player player);
@@ -23,10 +26,13 @@ namespace RavenBot.Core.Ravenfall
         Task CancelDuelRequestAsync(Player player);
         Task PlayerCountAsync(Player player);
         Task AcceptDuelRequestAsync(Player player);
+        Task RedeemStreamerTokenAsync(Player player, string query);
+        Task GetStreamerTokenCountAsync(Player player);
         Task DeclineDuelRequestAsync(Player player);
         Task SetPetAsync(Player player, string pet);
         Task GetPetAsync(Player player);
         Task GetMaxMultiplierAsync(Player player);
+        Task GetVillageBoostAsync(Player player);
         Task JoinRaidAsync(Player player);
         Task RaidStartAsync(Player player);
         Task DungeonStartAsync(Player player);
@@ -51,5 +57,11 @@ namespace RavenBot.Core.Ravenfall
         Task EmbarkFerryAsync(Player player);
         Task RequestTrainingInfoAsync(Player player);
         Task RaidStreamerAsync(Player target, bool isRaidWar);
+
+
+        // TAVERN GAMES
+        Task PlayTicTacToeAsync(Player player, int num);
+        Task ActivateTicTacToeAsync(Player player);
+        Task ResetTicTacToeAsync(Player player);
     }
 }

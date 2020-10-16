@@ -4,12 +4,12 @@ using RavenBot.Core.Net;
 
 namespace RavenBot.Core.Ravenfall.Commands
 {
-    public class ExpMultiplierProcessor : CommandProcessor
+    public class StreamerTokenReedeemProcessor : CommandProcessor
     {
         private readonly IRavenfallClient game;
         private readonly IPlayerProvider playerProvider;
 
-        public ExpMultiplierProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
+        public StreamerTokenReedeemProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
         {
             this.game = game;
             this.playerProvider = playerProvider;
@@ -26,14 +26,15 @@ namespace RavenBot.Core.Ravenfall.Commands
                 return;
             }
 
-            var numOfSubs = 1;
-            if (!string.IsNullOrEmpty(cmd.Arguments))
+            var player = playerProvider.Get(cmd.Sender);
+            if (string.IsNullOrEmpty(cmd.Arguments))
             {
-                int.TryParse(cmd.Arguments, out numOfSubs);
+                broadcaster.Send(cmd.Sender.Username,
+                    "You need to specify what to redeem, like: item, exp. See the options available in the Tavern.");
+                return;
             }
 
-            var player = playerProvider.Get(cmd.Sender);
-            await game.SetExpMultiplierAsync(player, numOfSubs);
+            await game.RedeemStreamerTokenAsync(player, cmd.Arguments);
         }
     }
 }

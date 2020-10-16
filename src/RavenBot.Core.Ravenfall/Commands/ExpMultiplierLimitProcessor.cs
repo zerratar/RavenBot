@@ -4,12 +4,12 @@ using RavenBot.Core.Net;
 
 namespace RavenBot.Core.Ravenfall.Commands
 {
-    public class ExpMultiplierProcessor : CommandProcessor
+    public class ExpMultiplierLimitProcessor : CommandProcessor
     {
         private readonly IRavenfallClient game;
         private readonly IPlayerProvider playerProvider;
 
-        public ExpMultiplierProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
+        public ExpMultiplierLimitProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
         {
             this.game = game;
             this.playerProvider = playerProvider;
@@ -31,9 +31,10 @@ namespace RavenBot.Core.Ravenfall.Commands
             {
                 int.TryParse(cmd.Arguments, out numOfSubs);
             }
+            if (numOfSubs < 15) return;
 
             var player = playerProvider.Get(cmd.Sender);
-            await game.SetExpMultiplierAsync(player, numOfSubs);
+            await game.SetExpMultiplierLimitAsync(player, numOfSubs);
         }
     }
 }

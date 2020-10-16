@@ -7,7 +7,6 @@ namespace RavenBot.Core
     public class MessageBus : IMessageBus
     {
         public const string Broadcast = "broadcast";
-        public const string Message = "message";
 
         private readonly object mutex = new object();
         private readonly List<Subscription> subscriptions = new List<Subscription>();
