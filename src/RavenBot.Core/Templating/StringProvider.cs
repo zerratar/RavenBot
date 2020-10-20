@@ -65,5 +65,13 @@ namespace RavenBot.Core
             SaveStrings();
             return key;
         }
+
+        public void Override(string oldValue, string newValue)
+        {
+            if (newValue == null)
+                values[oldValue] = oldValue;
+            else
+                values[oldValue] = newValue;
+        }
     }
 }

@@ -4,13 +4,11 @@ namespace RavenBot.Core
 {
     public class StringTemplateProcessor : IStringTemplateProcessor
     {
+
         public string Process(IStringTemplate template, params object[] arguments)
         {
             if (template == null)
                 throw new ArgumentNullException(nameof(template));
-
-            if (arguments.Length > template.Parameters.Length)
-                throw new ArgumentOutOfRangeException(nameof(arguments) + " does not match the required parameter count expected in the template.");
 
             var args = new IStringTemplateArgument[template.Parameters.Length];
             for (var i = 0; i < template.Parameters.Length; ++i)
@@ -19,7 +17,7 @@ namespace RavenBot.Core
                 args[i] = new StringTemplateArgument(template.Parameters[i], argValue);
             }
 
-            return ProcessTemplateImpl(template, args);
+            return ProcessTemplateImpl(template, null, args);
         }
 
         public string Process(IStringTemplate template, params IStringTemplateArgument[] arguments)
@@ -27,15 +25,29 @@ namespace RavenBot.Core
             if (template == null)
                 throw new ArgumentNullException(nameof(template));
 
-            if (arguments.Length > template.Parameters.Length)
-                throw new ArgumentOutOfRangeException(nameof(arguments) + " does not match the required parameter count expected in the template.");
-
-            return ProcessTemplateImpl(template, arguments);
+            return ProcessTemplateImpl(template, null, arguments);
         }
 
-        private string ProcessTemplateImpl(IStringTemplate template, IStringTemplateArgument[] arguments)
+        public string Process(IStringTemplate template, IStringTemplate templateOverride, params object[] arguments)
         {
-            var output = FixMalformedTemplate(template.Template);
+            if (template == null)
+                throw new ArgumentNullException(nameof(template));
+            if (templateOverride == null)
+                throw new ArgumentNullException(nameof(templateOverride));
+
+            var args = new IStringTemplateArgument[template.Parameters.Length];
+            for (var i = 0; i < template.Parameters.Length; ++i)
+            {
+                var argValue = i < arguments.Length ? arguments[i] : null;
+                args[i] = new StringTemplateArgument(template.Parameters[i], argValue);
+            }
+
+            return ProcessTemplateImpl(template, templateOverride, args);
+        }
+
+        private string ProcessTemplateImpl(IStringTemplate template, IStringTemplate templateOverride, IStringTemplateArgument[] arguments)
+        {
+            var output = FixMalformedTemplate(templateOverride?.Template ?? template.Template);
             foreach (var arg in arguments)
             {
                 AssertArgumentType(arg);

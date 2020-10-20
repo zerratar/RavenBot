@@ -1,4 +1,6 @@
-﻿namespace RavenBot.Core.Twitch
+﻿using System;
+
+namespace RavenBot.Core.Twitch
 {
     public class TwitchMessageFormatter : ITwitchMessageFormatter
     {
@@ -23,9 +25,21 @@
 
         public string Format(string message, object[] args, StringTemplateParserOption options)
         {
-            message = stringProvider.Get(message);
             var template = parser.Parse(message, options);
-            return processor.Process(template, args);
+
+            var str = stringProvider.Get(message);
+            if (str == message)
+            {
+                return processor.Process(template, args);
+            }
+
+            var templateOverride = parser.Parse(str, options);
+            return processor.Process(template, templateOverride, args);
+        }
+
+        public void OverrideFormat(string oldValue, string newValue)
+        {
+            stringProvider.Override(oldValue, newValue);
         }
     }
 }

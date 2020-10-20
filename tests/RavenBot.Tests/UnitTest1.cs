@@ -17,13 +17,59 @@ namespace RavenBot.Tests
 
         const string expected_result = "A level 1234 raid boss appeared! Type !raid to join!";
 
+        [TestMethod]
+        public void TestTwitchMessageFormatter_ManipulatedFormat_FormatMessage()
+        {
+            var testFormat = "Test {a} {b}";
+            var newFormat = "HEHE {b} {a} {b}";
+
+            var formatter = new TwitchMessageFormatter(new StringProvider(), new StringTemplateProcessor(), new StringTemplateParser());
+
+            formatter.OverrideFormat(testFormat, newFormat);
+
+            var result = formatter.Format(testFormat, "kaaru", "mantis");
+            Assert.AreEqual("HEHE mantis kaaru mantis", result);
+        }
+
+        [TestMethod]
+        public void TestTwitchMessageFormatter_TooManyArgs_FormatMessage()
+        {
+            var formatter = new TwitchMessageFormatter(new StringProvider(), new StringTemplateProcessor(), new StringTemplateParser());
+            var result = formatter.Format("Hello world {a}", "kaaru", "mantis");
+            Assert.AreEqual("Hello world kaaru", result);
+        }
+
+        [TestMethod]
+        public void TestTwitchMessageFormatter_NotEnoughArgs_FormatMessage()
+        {
+            var formatter = new TwitchMessageFormatter(new StringProvider(), new StringTemplateProcessor(), new StringTemplateParser());
+            var result = formatter.Format("Hello world {a} {b}", "kaaru");
+            Assert.AreEqual("Hello world kaaru b", result);
+        }
+
+        [TestMethod]
+        public void TestTwitchMessageFormatter_NotEnoughArgs2_FormatMessage()
+        {
+            var formatter = new TwitchMessageFormatter(new StringProvider(), new StringTemplateProcessor(), new StringTemplateParser());
+            var result = formatter.Format("Hello world {a} {b}", "kaaru", "");
+            Assert.AreEqual("Hello world kaaru ", result);
+        }
+
+        [TestMethod]
+        public void TestTwitchMessageFormatter_MixArgs_FormatMessage()
+        {
+            var formatter = new TwitchMessageFormatter(new StringProvider(), new StringTemplateProcessor(), new StringTemplateParser());
+            var result = formatter.Format("Hello world {a} {b} {a}", "kaaru", "mantis");
+            Assert.AreEqual("Hello world kaaru mantis kaaru", result);
+        }
+
 
         [TestMethod]
         public void TestTwitchMessageFormatter_MessyData2_FormatMessage()
         {
             var formatter = new TwitchMessageFormatter(new StringProvider(), new StringTemplateProcessor(), new StringTemplateParser());
             var result = formatter.Format(messyTemplateData2, templateVarValue);
-            Assert.AreEqual(result, expected_result);
+            Assert.AreEqual(expected_result, result);
         }
 
         [TestMethod]
@@ -31,7 +77,7 @@ namespace RavenBot.Tests
         {
             var formatter = new TwitchMessageFormatter(new StringProvider(), new StringTemplateProcessor(), new StringTemplateParser());
             var result = formatter.Format(messyTemplateData, templateVarValue);
-            Assert.AreEqual(result, expected_result);
+            Assert.AreEqual(expected_result, result);
         }
 
         [TestMethod]
@@ -40,14 +86,14 @@ namespace RavenBot.Tests
             IStringTemplateParser parser = new StringTemplateParser();
             IStringTemplate template = parser.Parse(messyTemplateData, StringTemplateParserOption.FixMalformedTemplate);
 
-            Assert.AreEqual(template.Template, templateData);
-            Assert.AreEqual(template.Parameters.Length, 1);
-            Assert.AreEqual(template.Parameters[0].Name, templateVarName);
+            Assert.AreEqual(templateData, template.Template);
+            Assert.AreEqual(1, template.Parameters.Length);
+            Assert.AreEqual(templateVarName, template.Parameters[0].Name);
 
             IStringTemplateProcessor processor = new StringTemplateProcessor();
             var a = processor.Process(template, templateVarValue);
 
-            Assert.AreEqual(a, expected_result);
+            Assert.AreEqual(expected_result, a);
         }
 
         [TestMethod]
@@ -56,14 +102,14 @@ namespace RavenBot.Tests
             IStringTemplateParser parser = new StringTemplateParser();
             IStringTemplate template = parser.Parse(messyTemplateData);
 
-            Assert.AreEqual(template.Template, messyTemplateData);
-            Assert.AreEqual(template.Parameters.Length, 1);
-            Assert.AreEqual(template.Parameters[0].Name, templateVarName);
+            Assert.AreEqual(messyTemplateData, template.Template);
+            Assert.AreEqual(1, template.Parameters.Length);
+            Assert.AreEqual(templateVarName, template.Parameters[0].Name);
 
             IStringTemplateProcessor processor = new StringTemplateProcessor();
             var a = processor.Process(template, templateVarValue);
 
-            Assert.AreEqual(a, expected_result);
+            Assert.AreEqual(expected_result, a);
         }
 
         [TestMethod]
@@ -72,14 +118,14 @@ namespace RavenBot.Tests
             IStringTemplateParser parser = new StringTemplateParser();
             IStringTemplate template = parser.Parse(templateDataWhitespaces);
 
-            Assert.AreEqual(template.Template, templateDataWhitespaces);
-            Assert.AreEqual(template.Parameters.Length, 1);
-            Assert.AreEqual(template.Parameters[0].Name, templateVarName);
+            Assert.AreEqual(templateDataWhitespaces, template.Template);
+            Assert.AreEqual(1, template.Parameters.Length);
+            Assert.AreEqual(templateVarName, template.Parameters[0].Name);
 
             IStringTemplateProcessor processor = new StringTemplateProcessor();
             var a = processor.Process(template, templateVarValue);
 
-            Assert.AreEqual(a, expected_result);
+            Assert.AreEqual(expected_result, a);
         }
 
         [TestMethod]
@@ -88,14 +134,14 @@ namespace RavenBot.Tests
             IStringTemplateParser parser = new StringTemplateParser();
             IStringTemplate template = parser.Parse(templateData);
 
-            Assert.AreEqual(template.Template, templateData);
-            Assert.AreEqual(template.Parameters.Length, 1);
-            Assert.AreEqual(template.Parameters[0].Name, templateVarName);
+            Assert.AreEqual(templateData, template.Template);
+            Assert.AreEqual(1, template.Parameters.Length);
+            Assert.AreEqual(templateVarName, template.Parameters[0].Name);
 
             IStringTemplateProcessor processor = new StringTemplateProcessor();
             var a = processor.Process(template, templateVarValue);
 
-            Assert.AreEqual(a, expected_result);
+            Assert.AreEqual(expected_result, a);
         }
 
         [TestMethod]
@@ -119,10 +165,10 @@ namespace RavenBot.Tests
             var argD = template.CreateArgument(template.Parameters[0], templateVarValue);
             var d = processor.Process(template, argD);
 
-            Assert.AreEqual(a, expected_result);
-            Assert.AreEqual(a, b);
-            Assert.AreEqual(a, c);
-            Assert.AreEqual(a, d);
+            Assert.AreEqual(expected_result, a);
+            Assert.AreEqual(expected_result, b);
+            Assert.AreEqual(expected_result, c);
+            Assert.AreEqual(expected_result, d);
         }
     }
 }
