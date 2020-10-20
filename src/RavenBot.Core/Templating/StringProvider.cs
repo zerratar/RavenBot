@@ -46,7 +46,7 @@ namespace RavenBot.Core
             {
                 try
                 {
-                    var content = JsonConvert.SerializeObject(values);
+                    var content = JsonConvert.SerializeObject(values, Formatting.Indented);
                     System.IO.File.WriteAllText(stringsFile, content);
                 }
                 catch
@@ -59,9 +59,9 @@ namespace RavenBot.Core
         public string Get(string key)
         {
             if (values.TryGetValue(key, out var value))
-                return value;
+                return value ?? key; // null should be key value
 
-            values[key] = key;
+            values[key] = null;
             SaveStrings();
             return key;
         }

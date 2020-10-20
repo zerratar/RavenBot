@@ -26,7 +26,7 @@ namespace RavenBot.Core.Ravenfall.Commands
 
             if (string.IsNullOrEmpty(cmd.Arguments) || !cmd.Arguments.Trim().Contains(" "))
             {
-                broadcaster.Broadcast(cmd.Sender.Username, "{command} <playername> <item> (optional: <amount>, default 1)", cmd.Command);
+                broadcaster.Broadcast(cmd.Sender.Username, Localization.GIFT_HELP, cmd.Command);
                 return;
             }
 

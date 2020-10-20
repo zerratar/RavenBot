@@ -24,14 +24,14 @@ namespace RavenBot.Core.Ravenfall.Commands
 
             if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator)
             {
-                broadcaster.Broadcast(cmd.Sender.Username, "You do not have permission to kick a player from the game.");
+                broadcaster.Broadcast(cmd.Sender.Username, Localization.KICK_PERM);
                 return;
             }
 
             var targetPlayerName = cmd.Arguments?.Trim();
             if (string.IsNullOrEmpty(targetPlayerName))
             {
-                broadcaster.Broadcast(cmd.Sender.Username, "You are kicking who? Provide a username");
+                broadcaster.Broadcast(cmd.Sender.Username, Localization.KICK_NO_USER);
                 return;
             }
 

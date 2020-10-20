@@ -22,15 +22,14 @@ namespace RavenBot.Core.Ravenfall.Commands
         {
             if (!await this.game.ProcessAsync(Settings.UNITY_SERVER_PORT))
             {
-                broadcaster.Broadcast(cmd.Sender.Username,
-                    Localization.GAME_NOT_STARTED);
+                broadcaster.Broadcast(cmd.Sender.Username, Localization.GAME_NOT_STARTED);
                 return;
             }
 
 
             if (string.IsNullOrEmpty(cmd.Arguments) || !cmd.Arguments.Trim().Contains(" "))
             {
-                broadcaster.Broadcast(cmd.Sender.Username, "{command} <item> (optional: <amount>, default 1) <price per item>", cmd.Command);
+                broadcaster.Broadcast(cmd.Sender.Username, Localization.TRADE_NO_ARG, cmd.Command);
                 return;
             }
 

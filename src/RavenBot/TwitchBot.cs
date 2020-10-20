@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using RavenBot.Core;
 using RavenBot.Core.Handlers;
 using RavenBot.Core.Net;
+using RavenBot.Core.Ravenfall.Commands;
 using RavenBot.Core.Twitch;
 using TwitchLib.Client;
 using TwitchLib.Client.Events;
@@ -92,12 +93,6 @@ namespace RavenBot
 
         private void OnMessageReceived(object sender, OnMessageReceivedArgs e)
         {
-            //const string SpawnRaidBossReward = "a92e0fcc-4c31-4b8b-b521-9cf4972a8fb7";
-            //if (e.ChatMessage.CustomRewardId == SpawnRaidBossReward)
-            //{
-            //    logger.WriteDebug("SPAWN RAID BOSSUUU!!");
-            //}
-
             if (e.ChatMessage.Bits == 0) return;
 
             this.messageBus.Send(
@@ -109,7 +104,7 @@ namespace RavenBot
                     e.ChatMessage.Bits)
             );
 
-            this.Broadcast("Thank you {displayName} for the {bits} bits!!! <3", e.ChatMessage.DisplayName, e.ChatMessage.Bits);
+            this.Broadcast(Localization.Twitch.THANK_YOU_BITS, e.ChatMessage.DisplayName, e.ChatMessage.Bits);
         }
 
         private async void OnCommandReceived(object sender, OnChatCommandReceivedArgs e)
@@ -131,16 +126,6 @@ namespace RavenBot
         public void Broadcast(IGameCommand message)
         {
             Broadcast(message.Destination, message.Format, message.Args);
-        }
-
-        public void Broadcast(string message)
-        {
-            this.Broadcast(null, null, message);
-        }
-
-        public void Send(string target, string message)
-        {
-            Broadcast(target, message);
         }
 
         public void Broadcast(string format, params object[] args)
@@ -188,7 +173,7 @@ namespace RavenBot
                     e.ReSubscriber.Months,
                     false));
 
-            this.Broadcast("Thank you {displayName} for the resub!!! <3", e.ReSubscriber.DisplayName);
+            this.Broadcast(Localization.Twitch.THANK_YOU_RESUB, e.ReSubscriber.DisplayName);
         }
 
         private void OnNewSub(object sender, OnNewSubscriberArgs e)
@@ -200,7 +185,7 @@ namespace RavenBot
                     e.Subscriber.DisplayName,
                     null, 1, true));
 
-            this.Broadcast("Thank you {displayName} for the sub!!! <3", e.Subscriber.DisplayName);
+            this.Broadcast(Localization.Twitch.THANK_YOU_SUB, e.Subscriber.DisplayName);
         }
 
         private void OnPrimeSub(object sender, OnCommunitySubscriptionArgs e)
@@ -212,7 +197,7 @@ namespace RavenBot
                     e.GiftedSubscription.DisplayName,
                     null, 1, false));
 
-            this.Broadcast("Thank you {displayName} for the sub!!! <3", e.GiftedSubscription.DisplayName);
+            this.Broadcast(Localization.Twitch.THANK_YOU_SUB, e.GiftedSubscription.DisplayName);
         }
 
         private void OnGiftedSub(object sender, OnGiftedSubscriptionArgs e)
@@ -226,7 +211,7 @@ namespace RavenBot
                 1,
                 false));
 
-            this.Broadcast("Thank you {displayName} for the gifted sub!!! <3", e.GiftedSubscription.DisplayName);
+            this.Broadcast(Localization.Twitch.THANK_YOU_GIFT_SUB, e.GiftedSubscription.DisplayName);
         }
 
         private void OnDisconnected(object sender, OnDisconnectedEventArgs e)
@@ -286,13 +271,14 @@ namespace RavenBot
 
         private void OnRaidNotification(object sender, OnRaidNotificationArgs e)
         {
-            this.Broadcast("Thank you {displayName} for the raid! <3", e.RaidNotification.DisplayName);
+            this.Broadcast(Localization.Twitch.THANK_YOU_RAID, e.RaidNotification.DisplayName);
         }
 
         private void Cleanup()
         {
             try
             {
+                int count = 0;
                 var folder = GetAssemblyDirectory();
                 if (System.IO.Directory.GetFiles(folder, "ravenfall*").Length > 0)
                     return;
@@ -302,9 +288,13 @@ namespace RavenBot
                 {
                     if (f.Contains("settings") && System.IO.File.Exists(f))
                     {
+                        ++count;
                         System.IO.File.Delete(f);
                     }
                 }
+
+                if (count > 0)
+                    logger.WriteDebug($"{count} tmp files cleared out.");
             }
             catch { }
         }

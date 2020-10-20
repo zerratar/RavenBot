@@ -26,8 +26,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             var player = playerProvider.Get(cmd.Sender);
             if (string.IsNullOrEmpty(cmd.Arguments))
             {
-                broadcaster.Broadcast(cmd.Sender.Username,
-                    "You need to specify what to redeem, like: item, exp. See the options available in the Tavern.");
+                broadcaster.Broadcast(cmd.Sender.Username, Localization.REDEEM_NO_ARG);
                 return;
             }
 

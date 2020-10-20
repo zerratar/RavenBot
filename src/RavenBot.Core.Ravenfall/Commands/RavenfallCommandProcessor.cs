@@ -34,8 +34,7 @@ namespace RavenBot.Core.Ravenfall.Commands
 
             if (arg.StartsWith("help"))
             {
-                broadcaster.Broadcast(cmd.Sender.Username,
-                    "The commands are available in the panels below the stream :-) Too many commands.");
+                broadcaster.Broadcast(cmd.Sender.Username, Localization.HELP);
                 return;
             }
 
@@ -56,8 +55,7 @@ namespace RavenBot.Core.Ravenfall.Commands
 
                 if (string.IsNullOrEmpty(task))
                 {
-                    broadcaster.Broadcast(cmd.Sender.Username,
-                            "You need to specify a task, currently supported tasks: {tasks}", string.Join(", ", availableTasks.Select(x => x.ToString())));
+                    broadcaster.Broadcast(cmd.Sender.Username, Localization.TASK_NO_ARG, string.Join(", ", availableTasks.Select(x => x.ToString())));
                     return;
                 }
 

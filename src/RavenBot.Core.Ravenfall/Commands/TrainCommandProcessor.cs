@@ -51,8 +51,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             var skill = arg?.Split(' ').LastOrDefault();
             if (string.IsNullOrEmpty(skill))
             {
-                broadcaster.Broadcast(cmd.Sender.Username,
-                    "You need to specify a skill to train, currently supported skills: {skills}", string.Join(", ", trainableSkills));
+                broadcaster.Broadcast(cmd.Sender.Username, Localization.TRAIN_NO_ARG, string.Join(", ", trainableSkills));
                 return;
             }
 
@@ -65,8 +64,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                 var value = GetSkillTypeFromString(skill);
                 if (value == -1)
                 {
-                    //broadcaster.Broadcast(
-                    broadcaster.Broadcast(cmd.Sender.Username, "You cannot train '{skill}'.", skill);
+                    broadcaster.Broadcast(cmd.Sender.Username, Localization.TRAIN_INVALID, skill);
                 }
                 else
                 {

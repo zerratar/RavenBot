@@ -29,7 +29,7 @@ namespace RavenBot.Core.Ravenfall.Commands
 
             if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator && !cmd.Sender.IsSubscriber)
             {
-                broadcaster.Broadcast(cmd.Sender.Username, "You do not have permission to set the currently observed player.");
+                broadcaster.Broadcast(cmd.Sender.Username, Localization.OBSERVE_PERM);
                 return;
             }
             var isSubscriber = cmd.Sender.IsSubscriber && !cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator;
@@ -40,7 +40,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                 if (!user.CanUseCommand(command))
                 {
                     var timeLeft = user.GetCooldown(command);
-                    broadcaster.Broadcast(cmd.Sender.Username, "You must wait another {secondsLeft} secs to use that command.", Math.Floor(timeLeft.TotalSeconds));
+                    broadcaster.Broadcast(cmd.Sender.Username, Localization.COMMAND_COOLDOWN, Math.Floor(timeLeft.TotalSeconds));
                     return;
                 }
 

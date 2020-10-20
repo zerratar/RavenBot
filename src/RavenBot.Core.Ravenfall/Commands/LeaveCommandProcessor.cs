@@ -25,10 +25,7 @@ namespace RavenBot.Core.Ravenfall.Commands
 
             var player = playerProvider.Get(cmd.Sender);
             if (player == null)
-            {
-
-                chat.Broadcast(cmd.Sender.Username, "Uh oh, bug when trying to leave :(");
-            }
+                return;
 
             await game.LeaveAsync(player);
         }

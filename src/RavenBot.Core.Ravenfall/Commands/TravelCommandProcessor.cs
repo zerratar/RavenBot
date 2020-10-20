@@ -26,7 +26,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             var destination = cmd.Arguments?.ToLower();
             if (string.IsNullOrEmpty(destination))
             {
-                broadcaster.Broadcast(cmd.Sender.Username, "You must specify a destination, !travel <destination>");
+                broadcaster.Broadcast(cmd.Sender.Username, Localization.TRAVEL_NO_ARG);
                 return;
             }
 

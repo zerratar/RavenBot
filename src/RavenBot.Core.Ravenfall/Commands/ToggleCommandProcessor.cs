@@ -26,7 +26,7 @@ namespace RavenBot.Core.Ravenfall.Commands
 
             if (string.IsNullOrEmpty(cmd.Arguments))
             {
-                broadcaster.Broadcast(cmd.Sender.Username, "You need to specify what to toggle, like: helm or pet");
+                broadcaster.Broadcast(cmd.Sender.Username, Localization.TOGGLE_NO_ARG);
                 return;
             }
 
@@ -42,7 +42,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             }
             else
             {
-                broadcaster.Broadcast(cmd.Sender.Username, "{invalidOption} cannot be toggled.", cmd.Arguments);
+                broadcaster.Broadcast(cmd.Sender.Username, Localization.TOGGLE_INVALID, cmd.Arguments);
             }
         }
     }

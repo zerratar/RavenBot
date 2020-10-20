@@ -48,8 +48,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             {
                 if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator)
                 {
-                    broadcaster.Broadcast(cmd.Sender.Username, "You do not have permission to force start the arena.");
-                    //broadcaster.Broadcast("You do not have permission to force start the arena.");
+                    broadcaster.Broadcast(cmd.Sender.Username, Localization.ARENA_PERM_FORCE);
                     return;
                 }
 
@@ -59,8 +58,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             {
                 if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator)
                 {
-                    //broadcaster.Broadcast(
-                    broadcaster.Broadcast(cmd.Sender.Username, "You do not have permission to cancel the arena.");
+                    broadcaster.Broadcast(cmd.Sender.Username, Localization.ARENA_PERM_CANCEL);
                     return;
                 }
 
@@ -68,17 +66,15 @@ namespace RavenBot.Core.Ravenfall.Commands
             }
             else
             {
-                var targetPlayerName = command.Split(' ').LastOrDefault();
                 if (command.StartsWith("kick "))
                 {
                     if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator)
                     {
-                        //broadcaster.Broadcast(
-                        broadcaster.Broadcast(cmd.Sender.Username, "You do not have permission to kick a player from the arena.");
+                        broadcaster.Broadcast(cmd.Sender.Username, Localization.ARENA_PERM_KICK);
                         return;
                     }
-
-                    var targetPlayer = playerProvider.Get(cmd.Sender);
+                    var targetPlayerName = command.Split(' ').LastOrDefault();
+                    var targetPlayer = playerProvider.Get(targetPlayerName);
                     await game.KickPlayerFromArenaAsync(player, targetPlayer);
                 }
                 else if (command.StartsWith("add "))
@@ -86,7 +82,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                     if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator)
                     {
                         //broadcaster.Broadcast(
-                        broadcaster.Broadcast(cmd.Sender.Username, "You do not have permission to add a player to the arena.");
+                        broadcaster.Broadcast(cmd.Sender.Username, Localization.ARENA_PERM_ADD);
                         return;
                     }
 
