@@ -7,7 +7,7 @@ using RavenBot.Core.Ravenfall.Models;
 
 namespace RavenBot.Core.Ravenfall.Commands
 {
-    public class RavenfallCommandProcessor : CommandProcessor
+    public class RavenfallCommandProcessor : Net.RavenfallCommandProcessor
     {
         private readonly IRavenfallClient game;
         private readonly IPlayerProvider playerProvider;
@@ -18,14 +18,11 @@ namespace RavenBot.Core.Ravenfall.Commands
             this.playerProvider = playerProvider;
         }
 
-        public override async Task ProcessAsync(IMessageBroadcaster broadcaster, ICommand cmd)
+        public override async Task ProcessAsync(IMessageChat broadcaster, ICommand cmd)
         {
             if (!await this.game.ProcessAsync(Settings.UNITY_SERVER_PORT))
             {
-                //broadcaster.Broadcast(
-
-                broadcaster.Send(cmd.Sender.Username,
-                    Localization.GAME_NOT_STARTED);
+                broadcaster.Broadcast(cmd.Sender.Username, Localization.GAME_NOT_STARTED);
                 return;
             }
 
@@ -37,9 +34,7 @@ namespace RavenBot.Core.Ravenfall.Commands
 
             if (arg.StartsWith("help"))
             {
-                //broadcaster.Broadcast(
-
-                broadcaster.Send(cmd.Sender.Username,
+                broadcaster.Broadcast(cmd.Sender.Username,
                     "The commands are available in the panels below the stream :-) Too many commands.");
                 return;
             }
@@ -61,10 +56,8 @@ namespace RavenBot.Core.Ravenfall.Commands
 
                 if (string.IsNullOrEmpty(task))
                 {
-                    //broadcaster.Broadcast(
-
-                    broadcaster.Send(cmd.Sender.Username,
-                            $"You need to specify a task, currently supported tasks: {string.Join(", ", availableTasks.Select(x => x.ToString()))}");
+                    broadcaster.Broadcast(cmd.Sender.Username,
+                            "You need to specify a task, currently supported tasks: {tasks}", string.Join(", ", availableTasks.Select(x => x.ToString())));
                     return;
                 }
 

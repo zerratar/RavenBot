@@ -18,7 +18,7 @@ namespace RavenBot.Core.Handlers
             this.ioc = ioc;
         }
 
-        public async Task HandleAsync(IMessageBroadcaster listener, ICommand cmd)
+        public async Task HandleAsync(IMessageChat listener, ICommand cmd)
         {
             if (commands.TryGetValue(cmd.Command, out var processor))
             {

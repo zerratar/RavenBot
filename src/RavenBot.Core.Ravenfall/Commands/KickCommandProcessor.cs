@@ -1,10 +1,9 @@
 ﻿using System.Threading.Tasks;
 using RavenBot.Core.Handlers;
-using RavenBot.Core.Net;
 
 namespace RavenBot.Core.Ravenfall.Commands
 {
-    public class KickCommandProcessor : CommandProcessor
+    public class KickCommandProcessor : Net.RavenfallCommandProcessor
     {
         private readonly IRavenfallClient game;
         private readonly IPlayerProvider playerProvider;
@@ -15,34 +14,24 @@ namespace RavenBot.Core.Ravenfall.Commands
             this.playerProvider = playerProvider;
         }
 
-        public override async Task ProcessAsync(IMessageBroadcaster broadcaster, ICommand cmd)
+        public override async Task ProcessAsync(IMessageChat broadcaster, ICommand cmd)
         {
-            if (!await this.game.ProcessAsync(Settings.UNITY_SERVER_PORT))
+            if (!await game.ProcessAsync(Settings.UNITY_SERVER_PORT))
             {
-
-                broadcaster.Send(cmd.Sender.Username,
-                //broadcaster.Broadcast(
-                    Localization.GAME_NOT_STARTED);
+                broadcaster.Broadcast(cmd.Sender.Username, Localization.GAME_NOT_STARTED);
                 return;
             }
 
             if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator)
             {
-                //broadcaster.Broadcast(
-
-                broadcaster.Send(cmd.Sender.Username,
-                    "You do not have permission to kick a player from the game.");
+                broadcaster.Broadcast(cmd.Sender.Username, "You do not have permission to kick a player from the game.");
                 return;
             }
 
             var targetPlayerName = cmd.Arguments?.Trim();
-
             if (string.IsNullOrEmpty(targetPlayerName))
             {
-                //broadcaster.Broadcast(
-
-                broadcaster.Send(cmd.Sender.Username,
-                    "You are kicking who? Provide a username");
+                broadcaster.Broadcast(cmd.Sender.Username, "You are kicking who? Provide a username");
                 return;
             }
 

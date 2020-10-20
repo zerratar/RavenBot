@@ -4,7 +4,7 @@ using RavenBot.Core.Net;
 
 namespace RavenBot.Core.Ravenfall.Commands
 {
-    public class TravelCommandProcessor : CommandProcessor
+    public class TravelCommandProcessor : Net.RavenfallCommandProcessor
     {
         private readonly IRavenfallClient game;
         private readonly IPlayerProvider playerProvider;
@@ -14,11 +14,11 @@ namespace RavenBot.Core.Ravenfall.Commands
             this.playerProvider = playerProvider;
         }
 
-        public override async Task ProcessAsync(IMessageBroadcaster broadcaster, ICommand cmd)
+        public override async Task ProcessAsync(IMessageChat broadcaster, ICommand cmd)
         {
             if (!await this.game.ProcessAsync(Settings.UNITY_SERVER_PORT))
             {
-                broadcaster.Send(cmd.Sender.Username, Localization.GAME_NOT_STARTED);
+                broadcaster.Broadcast(cmd.Sender.Username, Localization.GAME_NOT_STARTED);
                 return;
             }
 
@@ -26,7 +26,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             var destination = cmd.Arguments?.ToLower();
             if (string.IsNullOrEmpty(destination))
             {
-                broadcaster.Send(cmd.Sender.Username, "You must specify a destination, !travel <destination>");
+                broadcaster.Broadcast(cmd.Sender.Username, "You must specify a destination, !travel <destination>");
                 return;
             }
 

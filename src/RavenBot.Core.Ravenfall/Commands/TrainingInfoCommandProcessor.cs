@@ -4,7 +4,7 @@ using RavenBot.Core.Net;
 
 namespace RavenBot.Core.Ravenfall.Commands
 {
-    public class TrainingInfoCommandProcessor : CommandProcessor
+    public class TrainingInfoCommandProcessor : Net.RavenfallCommandProcessor
     {
         private readonly IRavenfallClient game;
         private readonly IPlayerProvider playerProvider;
@@ -14,22 +14,19 @@ namespace RavenBot.Core.Ravenfall.Commands
             this.game = game;
             this.playerProvider = playerProvider;
         }
-        public override async Task ProcessAsync(IMessageBroadcaster broadcaster, ICommand cmd)
+        public override async Task ProcessAsync(IMessageChat broadcaster, ICommand cmd)
         {
             if (!await this.game.ProcessAsync(Settings.UNITY_SERVER_PORT))
             {
-                broadcaster.Send(cmd.Sender.Username,
-                //broadcaster.Broadcast(
-                    Localization.GAME_NOT_STARTED);
+                broadcaster.Broadcast(cmd.Sender.Username, Localization.GAME_NOT_STARTED);
                 return;
             }
-
 
             var player = playerProvider.Get(cmd.Sender);
             if (player == null)
             {
 
-                broadcaster.Send(cmd.Sender.Username, "Uh oh, bug when trying to leave :(");
+                broadcaster.Broadcast(cmd.Sender.Username, "Uh oh, bug when trying to leave :(");
             }
 
             await game.RequestTrainingInfoAsync(player);

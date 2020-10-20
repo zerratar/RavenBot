@@ -34,11 +34,16 @@ namespace RavenBot
 
             ioc.RegisterShared<IPlayerProvider, PlayerProvider>();
 
-            ioc.RegisterShared<ICommandListener, TwitchCommandListener>();
+            ioc.RegisterShared<IStringProvider, StringProvider>();
+            ioc.RegisterShared<IStringTemplateParser, StringTemplateParser>();
+            ioc.RegisterShared<IStringTemplateProcessor, StringTemplateProcessor>();
+            ioc.RegisterShared<ITwitchMessageFormatter, TwitchMessageFormatter>();
+
             ioc.RegisterShared<IRavenfallClient, UnityRavenfallClient>();
             ioc.RegisterShared<ICommandBindingProvider, CommandBindingProvider>();
+            ioc.RegisterShared<ITwitchBot, TwitchBot>();
 
-            using (var cmdListener = ioc.Resolve<ICommandListener>())
+            using (var cmdListener = ioc.Resolve<ITwitchBot>())
             {
                 cmdListener.Start();
 

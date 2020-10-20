@@ -3,17 +3,17 @@
     public class GameCommand : IGameCommand
     {
 
-        public GameCommand(string destination, string command, params string[] args)
+        public GameCommand(string destination, string id, string message, params string[] args)
         {
             this.Destination = destination;
-            this.Command = command;
+            this.Identifier = id;
+            this.Format = message;
             this.Args = args;
         }
 
         public string Destination { get; }
-
-        public string Command { get; }
-
+        public string Identifier { get; }
+        public string Format { get; }
         public string[] Args { get; }
     }
 }

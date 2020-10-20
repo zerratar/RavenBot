@@ -3,7 +3,8 @@
     public interface IGameCommand
     {
         string Destination { get; }
-        string Command { get; }
+        string Identifier { get; }
+        string Format { get; }
         string[] Args { get; }
     }
 }

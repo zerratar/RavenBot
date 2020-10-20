@@ -5,7 +5,7 @@ using RavenBot.Core.Net;
 
 namespace RavenBot.Core.Ravenfall.Commands
 {
-    public class ToggleCommandProcessor : CommandProcessor
+    public class ToggleCommandProcessor : Net.RavenfallCommandProcessor
     {
         private readonly IRavenfallClient game;
         private readonly IPlayerProvider playerProvider;
@@ -16,22 +16,17 @@ namespace RavenBot.Core.Ravenfall.Commands
             this.playerProvider = playerProvider;
         }
 
-        public override async Task ProcessAsync(IMessageBroadcaster broadcaster, ICommand cmd)
+        public override async Task ProcessAsync(IMessageChat broadcaster, ICommand cmd)
         {
             if (!await this.game.ProcessAsync(Settings.UNITY_SERVER_PORT))
             {
-                //broadcaster.Broadcast(
-
-                broadcaster.Send(cmd.Sender.Username,
-                    Localization.GAME_NOT_STARTED);
+                broadcaster.Broadcast(cmd.Sender.Username, Localization.GAME_NOT_STARTED);
                 return;
             }
 
             if (string.IsNullOrEmpty(cmd.Arguments))
             {
-
-                broadcaster.Send(cmd.Sender.Username,
-                    "You need to specify what to toggle, like: helm or pet");
+                broadcaster.Broadcast(cmd.Sender.Username, "You need to specify what to toggle, like: helm or pet");
                 return;
             }
 
@@ -47,7 +42,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             }
             else
             {
-                broadcaster.Send(cmd.Sender.Username, cmd.Arguments + " cannot be toggled.");
+                broadcaster.Broadcast(cmd.Sender.Username, "{invalidOption} cannot be toggled.", cmd.Arguments);
             }
         }
     }

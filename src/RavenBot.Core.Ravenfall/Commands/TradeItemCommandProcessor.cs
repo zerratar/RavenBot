@@ -5,7 +5,7 @@ using RavenBot.Core.Net;
 
 namespace RavenBot.Core.Ravenfall.Commands
 {
-    public class TradeItemCommandProcessor : CommandProcessor
+    public class TradeItemCommandProcessor : Net.RavenfallCommandProcessor
     {
         private readonly IRavenfallClient game;
         private readonly IPlayerProvider playerProvider;
@@ -18,11 +18,11 @@ namespace RavenBot.Core.Ravenfall.Commands
             this.playerProvider = playerProvider;
 
         }
-        public override async Task ProcessAsync(IMessageBroadcaster broadcaster, ICommand cmd)
+        public override async Task ProcessAsync(IMessageChat broadcaster, ICommand cmd)
         {
             if (!await this.game.ProcessAsync(Settings.UNITY_SERVER_PORT))
             {
-                broadcaster.Send(cmd.Sender.Username,
+                broadcaster.Broadcast(cmd.Sender.Username,
                     Localization.GAME_NOT_STARTED);
                 return;
             }
@@ -30,7 +30,7 @@ namespace RavenBot.Core.Ravenfall.Commands
 
             if (string.IsNullOrEmpty(cmd.Arguments) || !cmd.Arguments.Trim().Contains(" "))
             {
-                broadcaster.Send(cmd.Sender.Username, cmd.Command + " <item> (optional: <amount>, default 1) <price per item>");
+                broadcaster.Broadcast(cmd.Sender.Username, "{command} <item> (optional: <amount>, default 1) <price per item>", cmd.Command);
                 return;
             }
 

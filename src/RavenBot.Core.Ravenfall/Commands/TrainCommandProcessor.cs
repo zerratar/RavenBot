@@ -3,12 +3,11 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using RavenBot.Core.Handlers;
-using RavenBot.Core.Net;
 using RavenBot.Core.Ravenfall.Models;
 
 namespace RavenBot.Core.Ravenfall.Commands
 {
-    public class TrainCommandProcessor : CommandProcessor
+    public class TrainCommandProcessor : Net.RavenfallCommandProcessor
     {
         private const int ServerPort = 4040;
 
@@ -26,19 +25,15 @@ namespace RavenBot.Core.Ravenfall.Commands
             this.playerProvider = playerProvider;
         }
 
-        public override async Task ProcessAsync(IMessageBroadcaster broadcaster, ICommand cmd)
+        public override async Task ProcessAsync(IMessageChat broadcaster, ICommand cmd)
         {
             if (!await this.game.ProcessAsync(ServerPort))
             {
-                //broadcaster.Broadcast(
-                broadcaster.Send(cmd.Sender.Username,
-                Localization.GAME_NOT_STARTED);
+                broadcaster.Broadcast(cmd.Sender.Username, Localization.GAME_NOT_STARTED);
                 return;
             }
 
             var player = playerProvider.Get(cmd.Sender);
-
-
             if (GetCombatTypeFromString(cmd.Command) != -1)
             {
                 await game.SendPlayerTaskAsync(player, PlayerTask.Fighting, cmd.Command);
@@ -56,8 +51,8 @@ namespace RavenBot.Core.Ravenfall.Commands
             var skill = arg?.Split(' ').LastOrDefault();
             if (string.IsNullOrEmpty(skill))
             {
-                broadcaster.Send(cmd.Sender.Username,
-                    $"You need to specify a skill to train, currently supported skills: " + string.Join(", ", trainableSkills));
+                broadcaster.Broadcast(cmd.Sender.Username,
+                    "You need to specify a skill to train, currently supported skills: {skills}", string.Join(", ", trainableSkills));
                 return;
             }
 
@@ -71,8 +66,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                 if (value == -1)
                 {
                     //broadcaster.Broadcast(
-                    broadcaster.Send(cmd.Sender.Username,
-                        $"You cannot train '{skill}'.");
+                    broadcaster.Broadcast(cmd.Sender.Username, "You cannot train '{skill}'.", skill);
                 }
                 else
                 {

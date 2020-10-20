@@ -4,17 +4,17 @@ using RavenBot.Core.Handlers;
 
 namespace RavenBot.Core.Net
 {
-    public abstract class CommandProcessor : ICommandProcessor
+    public abstract class RavenfallCommandProcessor : ICommandProcessor
     {
         public virtual void Dispose()
         {
         }
 
-        public abstract Task ProcessAsync(IMessageBroadcaster broadcaster, ICommand cmd);
+        public abstract Task ProcessAsync(IMessageChat broadcaster, ICommand cmd);
     }
 
     public interface ICommandProcessor : IDisposable
     {
-        Task ProcessAsync(IMessageBroadcaster broadcaster, ICommand cmd);
+        Task ProcessAsync(IMessageChat broadcaster, ICommand cmd);
     }
 }

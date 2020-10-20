@@ -70,18 +70,20 @@ namespace RavenBot.Core
             }
         }
 
-        private string GetDirectoryPath(string dir)
+        private string GetAssemblyDirectory()
         {
             var codeBase = Assembly.GetExecutingAssembly().CodeBase;
-            var assemblyDirectory = Path.GetDirectoryName(Uri.UnescapeDataString(new UriBuilder(codeBase).Path));
-            return Path.Combine(assemblyDirectory, dbDirectory);
+            return Path.GetDirectoryName(Uri.UnescapeDataString(new UriBuilder(codeBase).Path));
+        }
+
+        private string GetDirectoryPath(string dir)
+        {
+            return Path.Combine(GetAssemblyDirectory(), dbDirectory);
         }
 
         private string GetFilePath(string file)
         {
-            var codeBase = Assembly.GetExecutingAssembly().CodeBase;
-            var assemblyDirectory = Path.GetDirectoryName(Uri.UnescapeDataString(new UriBuilder(codeBase).Path));
-            return Path.Combine(assemblyDirectory, dbDirectory, file);
+            return Path.Combine(GetAssemblyDirectory(), dbDirectory, file);
         }
 
         public void Add(string msg)

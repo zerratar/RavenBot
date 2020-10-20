@@ -5,7 +5,7 @@ using RavenBot.Core.Net;
 
 namespace RavenBot.Core.Ravenfall.Commands
 {
-    public class ArenaCommandProcessor : CommandProcessor
+    public class ArenaCommandProcessor : Net.RavenfallCommandProcessor
     {
         private readonly IRavenfallClient game;
         private readonly IPlayerProvider playerProvider;
@@ -16,7 +16,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             this.playerProvider = playerProvider;
         }
 
-        public override async Task ProcessAsync(IMessageBroadcaster broadcaster, ICommand cmd)
+        public override async Task ProcessAsync(IMessageChat broadcaster, ICommand cmd)
         {
             if (!await this.game.ProcessAsync(Settings.UNITY_SERVER_PORT))
             {
@@ -48,7 +48,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             {
                 if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator)
                 {
-                    broadcaster.Send(cmd.Sender.Username, "You do not have permission to force start the arena.");
+                    broadcaster.Broadcast(cmd.Sender.Username, "You do not have permission to force start the arena.");
                     //broadcaster.Broadcast("You do not have permission to force start the arena.");
                     return;
                 }
@@ -60,8 +60,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                 if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator)
                 {
                     //broadcaster.Broadcast(
-                    broadcaster.Send(cmd.Sender.Username,
-                    "You do not have permission to cancel the arena.");
+                    broadcaster.Broadcast(cmd.Sender.Username, "You do not have permission to cancel the arena.");
                     return;
                 }
 
@@ -75,8 +74,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                     if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator)
                     {
                         //broadcaster.Broadcast(
-                        broadcaster.Send(cmd.Sender.Username,
-                            "You do not have permission to kick a player from the arena.");
+                        broadcaster.Broadcast(cmd.Sender.Username, "You do not have permission to kick a player from the arena.");
                         return;
                     }
 
@@ -88,8 +86,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                     if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator)
                     {
                         //broadcaster.Broadcast(
-                        broadcaster.Send(cmd.Sender.Username,
-                        "You do not have permission to add a player to the arena.");
+                        broadcaster.Broadcast(cmd.Sender.Username, "You do not have permission to add a player to the arena.");
                         return;
                     }
 

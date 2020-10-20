@@ -6,7 +6,7 @@ using RavenBot.Core.Twitch;
 
 namespace RavenBot.Core.Ravenfall.Commands
 {
-    public class ObserveCommandProcessor : CommandProcessor
+    public class ObserveCommandProcessor : Net.RavenfallCommandProcessor
     {
         private readonly IRavenfallClient game;
         private readonly IPlayerProvider playerProvider;
@@ -19,22 +19,17 @@ namespace RavenBot.Core.Ravenfall.Commands
             this.userStore = userStore;
         }
 
-        public override async Task ProcessAsync(IMessageBroadcaster broadcaster, ICommand cmd)
+        public override async Task ProcessAsync(IMessageChat broadcaster, ICommand cmd)
         {
             if (!await this.game.ProcessAsync(Settings.UNITY_SERVER_PORT))
             {
-
-                broadcaster.Send(cmd.Sender.Username,
-                //broadcaster.Broadcast(
-                    Localization.GAME_NOT_STARTED);
+                broadcaster.Broadcast(cmd.Sender.Username, Localization.GAME_NOT_STARTED);
                 return;
             }
 
             if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator && !cmd.Sender.IsSubscriber)
             {
-                //broadcaster.Broadcast(
-                broadcaster.Send(cmd.Sender.Username,
-                    "You do not have permission to set the currently observed player.");
+                broadcaster.Broadcast(cmd.Sender.Username, "You do not have permission to set the currently observed player.");
                 return;
             }
             var isSubscriber = cmd.Sender.IsSubscriber && !cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator;
@@ -45,7 +40,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                 if (!user.CanUseCommand(command))
                 {
                     var timeLeft = user.GetCooldown(command);
-                    broadcaster.Broadcast($"{cmd.Sender.Username}, You must wait another {Math.Floor(timeLeft.TotalSeconds)} secs to use that command.");
+                    broadcaster.Broadcast(cmd.Sender.Username, "You must wait another {secondsLeft} secs to use that command.", Math.Floor(timeLeft.TotalSeconds));
                     return;
                 }
 

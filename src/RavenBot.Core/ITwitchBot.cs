@@ -2,7 +2,7 @@
 
 namespace RavenBot.Core
 {
-    public interface ICommandListener : IDisposable
+    public interface ITwitchBot : IDisposable
     {
         void Start();
         void Stop();

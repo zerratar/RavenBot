@@ -32,7 +32,7 @@ namespace RavenBot.Core.Ravenfall
 
             this.client = client;
             this.client.Connected += Client_OnConnect;
-            this.client.Subscribe("join_failed", OnJoinFailed);
+            this.client.Subscribe("join_failed", SendResponseToTwitchChat);
             this.client.Subscribe("join_success", SendResponseToTwitchChat);
 
             this.client.Subscribe("arena_join_success", SendResponseToTwitchChat);
@@ -152,7 +152,7 @@ namespace RavenBot.Core.Ravenfall
         public Task RequestPlayerResourcesAsync(Player player)
             => SendAsync("player_resources", player);
 
-        public Task RequestHighscoreAsync(Player player, string skill) 
+        public Task RequestHighscoreAsync(Player player, string skill)
             => SendAsync("highscore", new PlayerStatsRequest(player, skill));
 
         public Task RequestHighestSkillAsync(Player player, string skill)
@@ -275,20 +275,7 @@ namespace RavenBot.Core.Ravenfall
 
         private void SendResponseToTwitchChat(IGameCommand obj)
         {
-            this.messageBus.Send(MessageBus.Broadcast, new BroadcastMessage
-            {
-                User = obj.Destination,
-                Message = obj.Args.LastOrDefault()
-            });
-        }
-
-        private void OnJoinFailed(IGameCommand obj)
-        {
-            this.messageBus.Send(MessageBus.Broadcast, new BroadcastMessage
-            {
-                User = obj.Destination,
-                Message = "Join failed. Reason: " + obj.Args.LastOrDefault()
-            });
+            this.messageBus.Send(MessageBus.Broadcast, obj);
         }
 
         private void EnqueueRequest(string request)
@@ -297,9 +284,9 @@ namespace RavenBot.Core.Ravenfall
         }
     }
 
-    public class BroadcastMessage
-    {
-        public string User { get; set; }
-        public string Message { get; set; }
-    }
+    //public class BroadcastMessage
+    //{
+    //    public string User { get; set; }
+    //    public string Message { get; set; }
+    //}
 }

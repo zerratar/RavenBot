@@ -4,7 +4,7 @@ using RavenBot.Core.Net;
 
 namespace RavenBot.Core.Ravenfall.Commands
 {
-    public class ForceAddPlayerCommandProcessor : CommandProcessor
+    public class ForceAddPlayerCommandProcessor : Net.RavenfallCommandProcessor
     {
         private readonly IRavenfallClient game;
         private readonly IPlayerProvider playerProvider;
@@ -15,30 +15,23 @@ namespace RavenBot.Core.Ravenfall.Commands
             this.playerProvider = playerProvider;
         }
 
-        public override async Task ProcessAsync(IMessageBroadcaster broadcaster, ICommand cmd)
+        public override async Task ProcessAsync(IMessageChat broadcaster, ICommand cmd)
         {
             if (!await this.game.ProcessAsync(Settings.UNITY_SERVER_PORT))
             {
-                broadcaster.Send(cmd.Sender.Username,
-                    Localization.GAME_NOT_STARTED);
+                broadcaster.Broadcast(cmd.Sender.Username, Localization.GAME_NOT_STARTED);
                 return;
             }
 
             if (!cmd.Sender.IsBroadcaster || !cmd.Sender.DisplayName.ToLower().Equals("zerratar"))
-            {
                 return;
-            }
 
             if (string.IsNullOrEmpty(cmd.Arguments))
-            {
                 return;
-            }
 
             var values = cmd.Arguments.Split(' ');
             if (values.Length <= 1)
-            {
                 return;
-            }
 
             var player = playerProvider.Get(values[0], values[1]);
             await game.JoinAsync(player);

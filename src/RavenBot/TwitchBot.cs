@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 using System.Threading.Tasks;
 using RavenBot.Core;
 using RavenBot.Core.Handlers;
-using RavenBot.Core.Ravenfall;
+using RavenBot.Core.Net;
 using RavenBot.Core.Twitch;
 using TwitchLib.Client;
 using TwitchLib.Client.Events;
@@ -14,10 +16,11 @@ using TwitchLib.Communication.Models;
 
 namespace RavenBot
 {
-    public class TwitchCommandListener : ICommandListener, IMessageBroadcaster
+    public class TwitchBot : ITwitchBot, IMessageChat
     {
         private readonly ILogger logger;
         private readonly IKernel kernel;
+        private readonly ITwitchMessageFormatter messageFormatter;
         private readonly IMessageBus messageBus;
         private readonly StringDb strings;
         private readonly ICommandHandler commandHandler;
@@ -33,9 +36,10 @@ namespace RavenBot
         private readonly object mutex = new object();
         private readonly HashSet<string> newSubAdded = new HashSet<string>();
 
-        public TwitchCommandListener(
+        public TwitchBot(
             ILogger logger,
             IKernel kernel,
+            ITwitchMessageFormatter localizer,
             IMessageBus messageBus,
             ICommandHandler commandHandler,
             IChannelProvider channelProvider,
@@ -43,6 +47,7 @@ namespace RavenBot
         {
             this.logger = logger;
             this.kernel = kernel;
+            this.messageFormatter = localizer;
             this.messageBus = messageBus;
             this.strings = new StringDb();
             this.strings.Load();
@@ -51,6 +56,7 @@ namespace RavenBot
             this.channelProvider = channelProvider;
             this.credentialsProvider = credentialsProvider;
             this.CreateTwitchClient();
+            this.Cleanup();
         }
 
         public void Start()
@@ -103,7 +109,7 @@ namespace RavenBot
                     e.ChatMessage.Bits)
             );
 
-            this.Broadcast($"Thank you {e.ChatMessage.DisplayName} for the {e.ChatMessage.Bits} bits!!! <3");
+            this.Broadcast("Thank you {displayName} for the {bits} bits!!! <3", e.ChatMessage.DisplayName, e.ChatMessage.Bits);
         }
 
         private async void OnCommandReceived(object sender, OnChatCommandReceivedArgs e)
@@ -116,80 +122,50 @@ namespace RavenBot
             if (isInitialized) return;
 
             if (this.broadcastSubscription == null)
-                this.broadcastSubscription = messageBus.Subscribe<BroadcastMessage>(MessageBus.Broadcast, Broadcast);
+                this.broadcastSubscription = messageBus.Subscribe<IGameCommand>(MessageBus.Broadcast, Broadcast);
 
             client.Initialize(credentialsProvider.Get(), channelProvider.Get());
             isInitialized = true;
         }
-        public void Broadcast(BroadcastMessage message)
-        {
-            if (!string.IsNullOrEmpty(message.User))
-            {
-                Broadcast($"{message.User}, {message.Message}");
-                return;
-            }
 
-            Broadcast(message.Message);
-        }
-
-        public void Send(string target, string message)
+        public void Broadcast(IGameCommand message)
         {
-            Broadcast(new BroadcastMessage { User = target, Message = message });
+            Broadcast(message.Destination, message.Format, message.Args);
         }
 
         public void Broadcast(string message)
         {
-            if (!this.client.IsConnected) return;
+            this.Broadcast(null, null, message);
+        }
+
+        public void Send(string target, string message)
+        {
+            Broadcast(target, message);
+        }
+
+        public void Broadcast(string format, params object[] args)
+        {
+            Broadcast(null, format, args);
+        }
+
+        public void Broadcast(string user, string format, params object[] args)
+        {
+            if (!this.client.IsConnected || string.IsNullOrWhiteSpace(format))
+                return;
+
             var channel = this.channelProvider.Get();
 
             if (client.JoinedChannels.Count == 0)
                 client.JoinChannel(channel);
 
-            var localizableMessage = message;
-            var target = string.Empty;
-            if (HasTarget(message))
-            {
-                localizableMessage = message.Substring(message.IndexOf(' ') + 1);
-                target = message.Split(',')[0];
-            }
-
-            message = LocalizeMessage(localizableMessage);
-
-            if (string.IsNullOrEmpty(message))
-            {
-                // in case the streamer chose not to have a message in here. 
-                // don't send it. we dont want "name, " messages being sent.
+            var msg = messageFormatter.Format(format, args);
+            if (string.IsNullOrEmpty(msg))
                 return;
-            }
 
-            if (!string.IsNullOrEmpty(target))
-            {
-                message = target + ", " + message;
-            }
+            if (!string.IsNullOrEmpty(user))
+                msg = user + ", " + msg;
 
-            client.SendMessage(channel, message);
-        }
-
-        private string LocalizeMessage(string localizableMessage)
-        {
-            try
-            {
-                var formatKey = strings.GetFormatKey(localizableMessage);
-                return strings.KeyFormat(formatKey, localizableMessage);
-            }
-            catch
-            {
-                return localizableMessage;
-            }
-            finally
-            {
-                strings.Save();
-            }
-        }
-
-        private static bool HasTarget(string message)
-        {
-            return message.IndexOf(',') > 0 && !message.Split(',')[0].Contains(" ");
+            client.SendMessage(channel, msg);
         }
 
         private void CreateTwitchClient()
@@ -212,7 +188,7 @@ namespace RavenBot
                     e.ReSubscriber.Months,
                     false));
 
-            this.Broadcast($"Thank you {e.ReSubscriber.DisplayName} for the resub!!! <3");
+            this.Broadcast("Thank you {displayName} for the resub!!! <3", e.ReSubscriber.DisplayName);
         }
 
         private void OnNewSub(object sender, OnNewSubscriberArgs e)
@@ -224,7 +200,7 @@ namespace RavenBot
                     e.Subscriber.DisplayName,
                     null, 1, true));
 
-            this.Broadcast($"Thank you {e.Subscriber.DisplayName} for the sub!!! <3");
+            this.Broadcast("Thank you {displayName} for the sub!!! <3", e.Subscriber.DisplayName);
         }
 
         private void OnPrimeSub(object sender, OnCommunitySubscriptionArgs e)
@@ -236,7 +212,7 @@ namespace RavenBot
                     e.GiftedSubscription.DisplayName,
                     null, 1, false));
 
-            this.Broadcast($"Thank you {e.GiftedSubscription.DisplayName} for the sub!!! <3");
+            this.Broadcast("Thank you {displayName} for the sub!!! <3", e.GiftedSubscription.DisplayName);
         }
 
         private void OnGiftedSub(object sender, OnGiftedSubscriptionArgs e)
@@ -250,7 +226,7 @@ namespace RavenBot
                 1,
                 false));
 
-            this.Broadcast($"Thank you {e.GiftedSubscription.DisplayName} for the gifted sub!!! <3");
+            this.Broadcast("Thank you {displayName} for the gifted sub!!! <3", e.GiftedSubscription.DisplayName);
         }
 
         private void OnDisconnected(object sender, OnDisconnectedEventArgs e)
@@ -310,7 +286,33 @@ namespace RavenBot
 
         private void OnRaidNotification(object sender, OnRaidNotificationArgs e)
         {
-            this.Broadcast($"Thank you {e.RaidNotification.DisplayName} for the raid! <3");
+            this.Broadcast("Thank you {displayName} for the raid! <3", e.RaidNotification.DisplayName);
+        }
+
+        private void Cleanup()
+        {
+            try
+            {
+                var folder = GetAssemblyDirectory();
+                if (System.IO.Directory.GetFiles(folder, "ravenfall*").Length > 0)
+                    return;
+
+                var settingFiles = System.IO.Directory.GetFiles(folder, "*.json");
+                foreach (var f in settingFiles)
+                {
+                    if (f.Contains("settings") && System.IO.File.Exists(f))
+                    {
+                        System.IO.File.Delete(f);
+                    }
+                }
+            }
+            catch { }
+        }
+
+        private string GetAssemblyDirectory()
+        {
+            var codeBase = Assembly.GetExecutingAssembly().CodeBase;
+            return Path.GetDirectoryName(Uri.UnescapeDataString(new UriBuilder(codeBase).Path));
         }
 
         private void Subscribe()

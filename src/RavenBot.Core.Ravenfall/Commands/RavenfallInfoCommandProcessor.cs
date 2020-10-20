@@ -4,9 +4,9 @@ using RavenBot.Core.Net;
 
 namespace RavenBot.Core.Ravenfall.Commands
 {
-    public class RavenfallInfoCommandProcessor : CommandProcessor
+    public class RavenfallInfoCommandProcessor : Net.RavenfallCommandProcessor
     {
-        public override Task ProcessAsync(IMessageBroadcaster broadcaster, ICommand cmd)
+        public override Task ProcessAsync(IMessageChat broadcaster, ICommand cmd)
         {
 
             if (cmd.Arguments == null || cmd.Arguments.Length == 0)

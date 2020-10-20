@@ -133,58 +133,22 @@ namespace RavenBot.Core.Net
 
         private void HandleMessage(string message)
         {
-            //logger.WriteDebug("TcpGameClient::HandleMessage");
             if (string.IsNullOrEmpty(message)) return;
 
             var packet = JsonConvert.DeserializeObject<GamePacket>(message);
             if (packet != null)
             {
-                HandleCommand(packet.Destination, packet.Command, packet.Args);
+                HandleCommand(packet.Destination, packet.Id, packet.Format, packet.Args);
             }
-
-            //if (message.StartsWith("{"))
-            //{
-            //    var data = JObject.Parse(message);
-            //    var command = data["Type"].Value<string>();
-            //    HandleCommand(string.Empty, command, new string[]
-            //    {
-            //        data["Data"].ToString()
-            //    });
-            //}
-            //else
-            //{
-            //    // receiver:cmd|arg1|arg2|arg3|arg4
-            //    var messageData = message.Split(':');
-            //    var fullCommand = messageData[1].Split('|');
-            //    var destination = messageData[0];
-            //    var correlationId = "";
-            //    if (destination.Contains("|"))
-            //    {
-            //        // we have a correlationId
-            //        var destData = destination.Split('|');
-            //        correlationId = destData[0];
-            //        destination = destData[1];
-            //    }
-            //    var command = fullCommand[0];
-            //    if (fullCommand.Length > 1)
-            //    {
-            //        var args = fullCommand.Where((x, i) => i != 0).ToArray();
-            //        HandleCommand(destination, command, args);
-            //    }
-            //    else
-            //    {
-            //        HandleCommand(destination, command);
-            //    }
-            //}
         }
 
-        private void HandleCommand(string destination, string command, params string[] args)
+        private void HandleCommand(string user, string id, string format, params string[] args)
         {
             lock (mutex)
             {
-                foreach (var sub in subs.Where(x => x.Identifier == command))
+                foreach (var sub in subs.Where(x => x.Identifier == id))
                 {
-                    sub.Invoke(new GameCommand(destination, command, args));
+                    sub.Invoke(new GameCommand(user, id, format, args));
                 }
             }
         }
@@ -229,17 +193,17 @@ namespace RavenBot.Core.Net
     }
     public class GamePacket
     {
-        public GamePacket(string destination, string command, string[] args)
+        public GamePacket(string destination, string id, string format, string[] args)
         {
             this.Destination = destination;
-            this.Command = command;
+            this.Id = id;
+            this.Format = format;
             this.Args = args;
         }
 
         public string Destination { get; }
-
-        public string Command { get; }
-
+        public string Id { get; }
+        public string Format { get; }
         public string[] Args { get; }
     }
 }

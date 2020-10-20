@@ -5,7 +5,7 @@ namespace RavenBot.Core.Handlers
 {
     public interface ICommandHandler
     {
-        Task HandleAsync(IMessageBroadcaster listener, ICommand cmd);
+        Task HandleAsync(IMessageChat listener, ICommand cmd);
         void Register<TCommandProcessor>(string cmd, params string[] aliases)
             where TCommandProcessor : ICommandProcessor;
         void Register<TCommandProcessor>(string[] cmds)

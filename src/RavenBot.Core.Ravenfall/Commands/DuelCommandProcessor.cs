@@ -5,7 +5,7 @@ using RavenBot.Core.Net;
 
 namespace RavenBot.Core.Ravenfall.Commands
 {
-    public class DuelCommandProcessor : CommandProcessor
+    public class DuelCommandProcessor : Net.RavenfallCommandProcessor
     {
         private readonly IRavenfallClient game;
         private readonly IPlayerProvider playerProvider;
@@ -16,22 +16,18 @@ namespace RavenBot.Core.Ravenfall.Commands
             this.playerProvider = playerProvider;
         }
 
-        public override async Task ProcessAsync(IMessageBroadcaster broadcaster, ICommand cmd)
+        public override async Task ProcessAsync(IMessageChat broadcaster, ICommand cmd)
         {
             if (!await this.game.ProcessAsync(Settings.UNITY_SERVER_PORT))
             {
-                //broadcaster.Broadcast(
-
-                broadcaster.Send(cmd.Sender.Username,
-                    Localization.GAME_NOT_STARTED);
+                broadcaster.Broadcast(cmd.Sender.Username, Localization.GAME_NOT_STARTED);
                 return;
             }
 
             var sub = cmd.Arguments?.Trim();
             if (string.IsNullOrEmpty(sub))
             {
-                //broadcaster.Broadcast(
-                broadcaster.Send(cmd.Sender.Username,
+                broadcaster.Broadcast(cmd.Sender.Username,
                     "To duel a player you need to specify their name. ex: '!duel JohnDoe', to accept or decline a duel request use '!duel accept' or '!duel decline'. You may also cancel an ongoing request by using '!duel cancel'");
                 return;
             }
