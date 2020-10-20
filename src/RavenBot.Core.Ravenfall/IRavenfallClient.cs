@@ -21,6 +21,7 @@ namespace RavenBot.Core.Ravenfall
         Task AddPlayerToArenaAsync(Player player, Player targetPlayer);
         Task KickAsync(Player targetPlayer);
         Task CraftAsync(Player targetPlayer, string itemQuery);
+        Task RequestHighscoreAsync(Player player, string skill);
         Task DuelRequestAsync(Player challenger, Player target);
         Task ReloadGameAsync(Player player);
         Task CancelDuelRequestAsync(Player player);

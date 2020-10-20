@@ -182,7 +182,8 @@ namespace RavenBot.Core
                     arguments = diff.Deletions.ToArray();
                     for (var i = 0; i < diff.Deletions.Count; ++i)
                     {
-                        output = output.Replace(diff.Deletions[i], ArgOpen + i + ArgClose);
+                        if (!string.IsNullOrEmpty(diff.Deletions[i]))
+                            output = output.Replace(diff.Deletions[i], ArgOpen + i + ArgClose);
                     }
                     break;
                 }

@@ -177,6 +177,10 @@ namespace RavenBot
                 var formatKey = strings.GetFormatKey(localizableMessage);
                 return strings.KeyFormat(formatKey, localizableMessage);
             }
+            catch
+            {
+                return localizableMessage;
+            }
             finally
             {
                 strings.Save();

@@ -152,6 +152,9 @@ namespace RavenBot.Core.Ravenfall
         public Task RequestPlayerResourcesAsync(Player player)
             => SendAsync("player_resources", player);
 
+        public Task RequestHighscoreAsync(Player player, string skill) 
+            => SendAsync("highscore", new PlayerStatsRequest(player, skill));
+
         public Task RequestHighestSkillAsync(Player player, string skill)
             => SendAsync("highest_skill", new HighestSkillRequest(player, skill));
 
