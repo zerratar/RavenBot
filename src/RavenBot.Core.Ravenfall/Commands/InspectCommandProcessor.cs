@@ -3,17 +3,17 @@ using RavenBot.Core.Handlers;
 
 namespace RavenBot.Core.Ravenfall.Commands
 {
-    public class DungeonCommandProcessor : Net.RavenfallCommandProcessor
+
+    public class InspectCommandProcessor : Net.RavenfallCommandProcessor
     {
         private readonly IRavenfallClient game;
         private readonly IPlayerProvider playerProvider;
 
-        public DungeonCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
+        public InspectCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
         {
             this.game = game;
             this.playerProvider = playerProvider;
         }
-
         public override async Task ProcessAsync(IMessageChat broadcaster, ICommand cmd)
         {
             if (!await this.game.ProcessAsync(Settings.UNITY_SERVER_PORT))
@@ -23,13 +23,12 @@ namespace RavenBot.Core.Ravenfall.Commands
             }
 
             var player = playerProvider.Get(cmd.Sender);
-            if (string.IsNullOrEmpty(cmd.Arguments))
+            if (!string.IsNullOrEmpty(cmd.Arguments))
             {
-                await this.game.JoinDungeonAsync(player);
-                return;
+                player = playerProvider.Get(cmd.Arguments);
             }
 
-            await this.game.DungeonStartAsync(player);
+            await game.InspectPlayerAsync(player);
         }
     }
 }

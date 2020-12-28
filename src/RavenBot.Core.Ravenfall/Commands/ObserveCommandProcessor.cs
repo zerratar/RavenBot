@@ -14,6 +14,7 @@ namespace RavenBot.Core.Ravenfall.Commands
 
         public ObserveCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider, ITwitchUserStore userStore)
         {
+            this.RequiresBroadcaster = true;
             this.game = game;
             this.playerProvider = playerProvider;
             this.userStore = userStore;

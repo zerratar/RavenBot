@@ -3,12 +3,12 @@ using RavenBot.Core.Handlers;
 
 namespace RavenBot.Core.Ravenfall.Commands
 {
-    public class DungeonCommandProcessor : Net.RavenfallCommandProcessor
+    public class ScrollsCommandProcessor : Net.RavenfallCommandProcessor
     {
         private readonly IRavenfallClient game;
         private readonly IPlayerProvider playerProvider;
 
-        public DungeonCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
+        public ScrollsCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
         {
             this.game = game;
             this.playerProvider = playerProvider;
@@ -23,13 +23,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             }
 
             var player = playerProvider.Get(cmd.Sender);
-            if (string.IsNullOrEmpty(cmd.Arguments))
-            {
-                await this.game.JoinDungeonAsync(player);
-                return;
-            }
-
-            await this.game.DungeonStartAsync(player);
+            await game.GetScrollCountAsync(player);
         }
     }
 }

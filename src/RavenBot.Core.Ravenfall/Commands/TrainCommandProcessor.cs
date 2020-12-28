@@ -16,7 +16,9 @@ namespace RavenBot.Core.Ravenfall.Commands
 
         private readonly string[] trainableSkills = new string[]
         {
-            "all", "atk", "def", "str", "magic", "ranged", "fishing", "cooking", "mining", "crafting", "farming",
+            "all", "atk", "def", "str", "magic",
+            "ranged", "fishing", "cooking", "mining",
+            "crafting", "farming", "healing",
         };
 
         public TrainCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
@@ -81,6 +83,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             if (StartsWith(val, "all")) return 3;
             if (StartsWith(val, "magic")) return 4;
             if (StartsWith(val, "ranged")) return 5;
+            if (StartsWith(val, "heal")) return 6;
             return -1;
         }
 

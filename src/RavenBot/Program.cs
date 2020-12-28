@@ -39,6 +39,8 @@ namespace RavenBot
             ioc.RegisterShared<IStringTemplateProcessor, StringTemplateProcessor>();
             ioc.RegisterShared<ITwitchMessageFormatter, TwitchMessageFormatter>();
 
+            ioc.RegisterShared<ICommandProvider, CommandProvider>();
+
             ioc.RegisterShared<IRavenfallClient, UnityRavenfallClient>();
             ioc.RegisterShared<ICommandBindingProvider, CommandBindingProvider>();
             ioc.RegisterShared<ITwitchBot, TwitchBot>();

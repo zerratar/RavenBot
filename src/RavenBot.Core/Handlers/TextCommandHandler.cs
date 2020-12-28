@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using RavenBot.Core.Net;
@@ -12,10 +13,14 @@ namespace RavenBot.Core.Handlers
         private readonly ConcurrentDictionary<string, ICommandProcessor> commands
             = new ConcurrentDictionary<string, ICommandProcessor>();
 
-
         public TextCommandHandler(IoC ioc)
         {
             this.ioc = ioc;
+        }
+
+        public IReadOnlyDictionary<string, ICommandProcessor> GetCommandProcessors()
+        {
+            return commands;
         }
 
         public async Task HandleAsync(IMessageChat listener, ICommand cmd)

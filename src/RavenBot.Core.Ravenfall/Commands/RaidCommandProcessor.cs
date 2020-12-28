@@ -40,12 +40,6 @@ namespace RavenBot.Core.Ravenfall.Commands
 
             if (!string.IsNullOrEmpty(cmd.Arguments))
             {
-                if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator && !cmd.Sender.IsSubscriber)
-                {
-                    broadcaster.Broadcast(cmd.Sender.Username, Localization.PERMISSION_DENIED);
-                    return;
-                }
-
                 if (cmd.Arguments.Contains("start", StringComparison.OrdinalIgnoreCase))
                 {
                     await this.game.RaidStartAsync(player);

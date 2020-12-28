@@ -11,6 +11,7 @@ namespace RavenBot.Core.Ravenfall.Commands
 
         public ExpMultiplierLimitProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
         {
+            this.RequiresBroadcaster = true;
             this.game = game;
             this.playerProvider = playerProvider;
         }

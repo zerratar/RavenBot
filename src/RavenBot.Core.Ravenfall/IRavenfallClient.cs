@@ -10,6 +10,7 @@ namespace RavenBot.Core.Ravenfall
         Task ToggleItemRequirementsAsync(Player player);
         Task ToggleDiaperModeAsync(Player player);
         Task SetExpMultiplierAsync(Player player, int number);
+        Task UseExpMultiplierScrollAsync(Player player, int number);
         Task SetExpMultiplierLimitAsync(Player player, int number);
         Task SendPlayerTaskAsync(Player player, PlayerTask task, params string[] args);
         Task JoinArenaAsync(Player player);
@@ -17,7 +18,9 @@ namespace RavenBot.Core.Ravenfall
         Task LeaveAsync(Player player);
         Task StartArenaAsync(Player player);
         Task CancelArenaAsync(Player player);
+        Task TurnIntoMonsterAsync(Player player);
         Task KickPlayerFromArenaAsync(Player player, Player targetPlayer);
+        Task InspectPlayerAsync(Player player);
         Task AddPlayerToArenaAsync(Player player, Player targetPlayer);
         Task KickAsync(Player targetPlayer);
         Task CraftAsync(Player targetPlayer, string itemQuery);
@@ -26,10 +29,14 @@ namespace RavenBot.Core.Ravenfall
         Task ReloadGameAsync(Player player);
         Task CancelDuelRequestAsync(Player player);
         Task PlayerCountAsync(Player player);
+        Task SetTimeOfDayAsync(Player player, int totalTime, int freezeTime);
         Task AcceptDuelRequestAsync(Player player);
         Task RedeemStreamerTokenAsync(Player player, string query);
         Task GetStreamerTokenCountAsync(Player player);
+        Task GetScrollCountAsync(Player player);
         Task DeclineDuelRequestAsync(Player player);
+        Task UnequipAsync(Player player, string item);
+        Task EquipAsync(Player player, string item);
         Task SetPetAsync(Player player, string pet);
         Task GetPetAsync(Player player);
         Task GetMaxMultiplierAsync(Player player);
@@ -62,7 +69,9 @@ namespace RavenBot.Core.Ravenfall
 
         // TAVERN GAMES
         Task PlayTicTacToeAsync(Player player, int num);
+        Task ScalePlayerAsync(Player player, float v);
         Task ActivateTicTacToeAsync(Player player);
         Task ResetTicTacToeAsync(Player player);
+
     }
 }

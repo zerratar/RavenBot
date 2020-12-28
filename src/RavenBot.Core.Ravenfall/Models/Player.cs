@@ -4,6 +4,10 @@ namespace RavenBot.Core.Ravenfall.Models
 {
     public class Player
     {
+        public Player()
+        {
+        }
+
         public Player(
               string userId,
               string username,
@@ -27,15 +31,15 @@ namespace RavenBot.Core.Ravenfall.Models
             Identifier = identifier;
         }
 
-        public string Username { get; }
-        public string UserId { get; }
-        public string DisplayName { get; }
-        public string Color { get; }
-        public bool IsBroadcaster { get; }
-        public bool IsModerator { get; }
-        public bool IsSubscriber { get; }
-        public bool IsVip { get; }
-        public int SubTier { get; }
-        public string Identifier { get; }
+        public string Username { get; set; }
+        public string UserId { get; set; }
+        public string DisplayName { get; set; }
+        public string Color { get; set; }
+        public bool IsBroadcaster { get; set; }
+        public bool IsModerator { get; set; }
+        public bool IsSubscriber { get; set; }
+        public bool IsVip { get; set; }
+        public int SubTier { get; set; }
+        public string Identifier { get; set; }
     }
 }

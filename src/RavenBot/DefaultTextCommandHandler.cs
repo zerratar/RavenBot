@@ -42,6 +42,16 @@ namespace RavenBot
             Register<ToggleCommandProcessor>(commandBindingProvider.Get("toggle"));
             Register<RavenfallCommandProcessor>(commandBindingProvider.Get("rpg"));
             Register<ObserveCommandProcessor>(commandBindingProvider.Get("show"));//"observe", "show", "display");
+            Register<MonsterCommandProcessor>(commandBindingProvider.Get("monster"));
+
+            Register<TinyPlayerCommandProcessor>(commandBindingProvider.Get("small"));
+            Register<GiantPlayerCommandProcessor>(commandBindingProvider.Get("big"));
+
+
+            Register<SetDayCommandProcessor>(commandBindingProvider.Get("day"));
+            Register<SetNightCommandProcessor>(commandBindingProvider.Get("night"));
+
+
             Register<TravelCommandProcessor>(commandBindingProvider.Get("travel"));
             Register<PlayerCountCommandProcessor>(commandBindingProvider.Get("online"));//, "players");
 
@@ -49,9 +59,16 @@ namespace RavenBot
             Register<MultiplierCommandProcessor>(commandBindingProvider.Get("multiplier"));
             Register<ReloadCommandProcessor>(commandBindingProvider.Get("reload"));
 
+            Register<UnequipCommandProcessor>(commandBindingProvider.Get("unequip"));
+            Register<EquipCommandProcessor>(commandBindingProvider.Get("equip"));
+
             Register<RaidCommandProcessor>("raid", "raidwar");
 
             Register<DiaperModeProcessor>("diaper");
+
+            Register<InspectCommandProcessor>("inspect");
+            Register<ScrollsCommandProcessor>("scrolls");
+            Register<UseExpMultiplierScrollProcessor>("exp");
 
             Register<ToggleItemRequirementsProcessor>("!noitemreq");
             Register<ExpMultiplierProcessor>("!exp");

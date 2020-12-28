@@ -6,6 +6,8 @@ namespace RavenBot.Core.Net
 {
     public abstract class RavenfallCommandProcessor : ICommandProcessor
     {
+        public bool RequiresBroadcaster { get; set; }
+
         public virtual void Dispose()
         {
         }
@@ -15,6 +17,8 @@ namespace RavenBot.Core.Net
 
     public interface ICommandProcessor : IDisposable
     {
+        bool RequiresBroadcaster { get; }
+
         Task ProcessAsync(IMessageChat broadcaster, ICommand cmd);
     }
 }

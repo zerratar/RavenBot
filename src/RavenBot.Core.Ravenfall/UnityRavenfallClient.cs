@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using RavenBot.Core.Net;
+using RavenBot.Core.Ravenfall.Commands;
 using RavenBot.Core.Ravenfall.Models;
 using RavenBot.Core.Ravenfall.Requests;
 using RavenBot.Core.Twitch;
@@ -14,15 +15,18 @@ namespace RavenBot.Core.Ravenfall
     {
         private readonly ConcurrentQueue<string> requests = new ConcurrentQueue<string>();
         private readonly ILogger logger;
+        private readonly IPlayerProvider playerProvider;
         private readonly IMessageBus messageBus;
         private readonly IGameClient client;
 
         public UnityRavenfallClient(
             ILogger logger,
+            IPlayerProvider playerProvider,
             IMessageBus messageBus,
             IGameClient2 client)
         {
             this.logger = logger;
+            this.playerProvider = playerProvider;
             this.messageBus = messageBus;
 
             messageBus.Subscribe<TwitchUserJoined>(nameof(TwitchUserJoined), OnUserJoined);
@@ -32,6 +36,9 @@ namespace RavenBot.Core.Ravenfall
 
             this.client = client;
             this.client.Connected += Client_OnConnect;
+
+            this.client.Subscribe("session_owner", RegisterSessionOwner);
+
             this.client.Subscribe("join_failed", SendResponseToTwitchChat);
             this.client.Subscribe("join_success", SendResponseToTwitchChat);
 
@@ -75,10 +82,24 @@ namespace RavenBot.Core.Ravenfall
             this.client.Subscribe("message", SendResponseToTwitchChat);
         }
 
-        public Task JoinAsync(Player player) => SendAsync("join", player);
+        private void RegisterSessionOwner(IGameCommand obj)
+        {
+            if (string.IsNullOrEmpty(obj.Args[0]))
+                return;
 
+            var plr = playerProvider.Get(obj.Args[0], obj.Args[1]);
+            plr.IsBroadcaster = true;
+
+            messageBus.Send("streamer_userid_acquired", plr.UserId);
+        }
+
+        public Task JoinAsync(Player player) => SendAsync("join", player);
+        public Task InspectPlayerAsync(Player player) => SendAsync("inspect", player);
         public Task GetStreamerTokenCountAsync(Player player)
             => SendAsync("token_count", player);
+
+        public Task GetScrollCountAsync(Player player)
+            => SendAsync("scrolls_count", player);
 
         public Task RedeemStreamerTokenAsync(Player player, string query)
             => SendAsync("redeem_tokens", new ItemQueryRequest(player, query));
@@ -104,9 +125,14 @@ namespace RavenBot.Core.Ravenfall
         public Task SetExpMultiplierAsync(Player player, int number)
             => SendAsync("exp_multiplier", new SetExpMultiplierRequest(player, number));
 
+        public Task UseExpMultiplierScrollAsync(Player player, int number)
+            => SendAsync("use_exp_scroll", new SetExpMultiplierRequest(player, number));
+        
         public Task SetExpMultiplierLimitAsync(Player player, int number)
             => SendAsync("exp_multiplier_limit", new SetExpMultiplierRequest(player, number));
 
+        public Task SetTimeOfDayAsync(Player player, int totalTime, int freezeTime)
+            => SendAsync("set_time", new SetTimeOfDayRequest(player, totalTime, freezeTime));
 
         public Task DuelRequestAsync(Player challenger, Player target)
             => SendAsync("duel", new DuelPlayerRequest(challenger, target));
@@ -140,6 +166,11 @@ namespace RavenBot.Core.Ravenfall
 
         public Task GetMaxMultiplierAsync(Player player)
             => SendAsync("multiplier", player);
+        public Task EquipAsync(Player player, string pet)
+            => SendAsync("equip", new ItemQueryRequest(player, pet));
+
+        public Task UnequipAsync(Player player, string pet)
+            => SendAsync("unequip", new ItemQueryRequest(player, pet));
 
         public Task SetPetAsync(Player player, string pet)
             => SendAsync("set_pet", new SetPetRequest(player, pet));
@@ -152,6 +183,8 @@ namespace RavenBot.Core.Ravenfall
         public Task RequestPlayerResourcesAsync(Player player)
             => SendAsync("player_resources", player);
 
+        public Task ScalePlayerAsync(Player player, float scale)
+            => SendAsync("set_player_scale", new SetScaleRequest(player, scale));
         public Task RequestHighscoreAsync(Player player, string skill)
             => SendAsync("highscore", new PlayerStatsRequest(player, skill));
 
@@ -227,6 +260,9 @@ namespace RavenBot.Core.Ravenfall
         public Task ObservePlayerAsync(Player player)
             => SendAsync("observe", player);
 
+        public Task TurnIntoMonsterAsync(Player player)
+            => SendAsync("monster", player);
+
         public Task ItemDropEventAsync(Player player, string item)
             => SendAsync("item_drop_event", new ItemQueryRequest(player, item));
 
@@ -282,6 +318,7 @@ namespace RavenBot.Core.Ravenfall
         {
             this.requests.Enqueue(request);
         }
+
     }
 
     //public class BroadcastMessage

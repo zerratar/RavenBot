@@ -20,7 +20,7 @@ namespace RavenBot.Core.Ravenfall.Commands
         {
             if (!await this.game.ProcessAsync(Settings.UNITY_SERVER_PORT))
             {
-                broadcaster.Broadcast(Localization.GAME_NOT_STARTED);
+                broadcaster.Broadcast("", Localization.GAME_NOT_STARTED);
                 return;
             }
 

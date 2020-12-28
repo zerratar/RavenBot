@@ -1,5 +1,6 @@
 ﻿using TwitchLib.Client.Models;
 using RavenBot.Core.Handlers;
+using TwitchLib.Api.Helix.Models.StreamsMetadata;
 
 namespace RavenBot.Core.Twitch
 {
@@ -52,26 +53,36 @@ namespace RavenBot.Core.Twitch
         public string UserId { get; }
         public string UserName { get; }
         public string DisplayName { get; }
+        public bool IsModerator { get; }
+        public bool IsSubscriber { get; }
+        public bool IsVip { get; }
         public int Bits { get; }
 
         public TwitchCheer(
             string userId,
             string userName,
             string displayName,
+            bool isModerator,
+            bool isSubscriber,
+            bool isVip,
             int bits)
         {
             UserId = userId;
             UserName = userName;
+            IsModerator = isModerator;
+            IsSubscriber = isSubscriber;
+            IsVip = isVip;
             DisplayName = displayName;
             Bits = bits;
         }
-
     }
 
     public class TwitchSubscription
     {
         public string UserId { get; }
         public string ReceiverUserId { get; }
+        public bool IsModerator { get; }
+        public bool IsSubscriber { get; }
         public string UserName { get; }
         public string DisplayName { get; }
         public int Months { get; }
@@ -82,11 +93,15 @@ namespace RavenBot.Core.Twitch
             string userName,
             string displayName,
             string receiverUserId,
+            bool isModerator,
+            bool isSubscriber,
             int months,
             bool isNew)
         {
             UserId = userId;
             ReceiverUserId = receiverUserId;
+            IsModerator = isModerator;
+            IsSubscriber = isSubscriber;
             UserName = userName;
             DisplayName = displayName;
             Months = months;
@@ -106,6 +121,10 @@ namespace RavenBot.Core.Twitch
         public string Name { get; }
         public string NameColor { get; }
     }
+    public class TwitchHypeTrain
+    {
+
+    }
 
     public class TwitchCommand : ICommand
     {
@@ -116,8 +135,9 @@ namespace RavenBot.Core.Twitch
 
             var isModerator = cmd.ChatMessage.IsModerator;
             var isSubscriber = cmd.ChatMessage.IsSubscriber;
-            var isBroadcaster = cmd.ChatMessage.IsBroadcaster;            
+            var isBroadcaster = cmd.ChatMessage.IsBroadcaster;
             var isVip = false;
+
             this.Sender = new TwitchCommandSender(
                 cmd.ChatMessage.UserId,
                 cmd.ChatMessage.Username,

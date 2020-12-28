@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using RavenBot.Core.Net;
 
 namespace RavenBot.Core.Handlers
@@ -10,5 +11,6 @@ namespace RavenBot.Core.Handlers
             where TCommandProcessor : ICommandProcessor;
         void Register<TCommandProcessor>(string[] cmds)
             where TCommandProcessor : ICommandProcessor;
+        IReadOnlyDictionary<string, ICommandProcessor> GetCommandProcessors();
     }
 }

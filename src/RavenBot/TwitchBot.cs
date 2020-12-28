@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using RavenBot.Core;
 using RavenBot.Core.Handlers;
 using RavenBot.Core.Net;
+using RavenBot.Core.Ravenfall;
 using RavenBot.Core.Ravenfall.Commands;
 using RavenBot.Core.Twitch;
 using TwitchLib.Client;
@@ -14,6 +15,7 @@ using TwitchLib.Communication.Clients;
 using TwitchLib.Communication.Enums;
 using TwitchLib.Communication.Events;
 using TwitchLib.Communication.Models;
+using TwitchLib.PubSub;
 
 namespace RavenBot
 {
@@ -21,13 +23,17 @@ namespace RavenBot
     {
         private readonly ILogger logger;
         private readonly IKernel kernel;
+        private readonly IRavenfallClient ravenfall;
+        private readonly IPlayerProvider playerProvider;
+        private readonly ITwitchUserStore userStore;
         private readonly ITwitchMessageFormatter messageFormatter;
         private readonly IMessageBus messageBus;
-        private readonly StringDb strings;
+        private readonly ICommandProvider commandProvider;
         private readonly ICommandHandler commandHandler;
         private readonly IChannelProvider channelProvider;
         private readonly IConnectionCredentialsProvider credentialsProvider;
         private IMessageBusSubscription broadcastSubscription;
+        private TwitchPubSub pubsub;
         private TwitchClient client;
         private bool isInitialized;
         private int reconnectDelay = 10000;
@@ -40,24 +46,45 @@ namespace RavenBot
         public TwitchBot(
             ILogger logger,
             IKernel kernel,
+            IRavenfallClient ravenfall,
+            IPlayerProvider playerProvider,
             ITwitchMessageFormatter localizer,
             IMessageBus messageBus,
+            ICommandProvider commandProvider,
             ICommandHandler commandHandler,
             IChannelProvider channelProvider,
             IConnectionCredentialsProvider credentialsProvider)
         {
             this.logger = logger;
             this.kernel = kernel;
+            this.ravenfall = ravenfall;
+            this.playerProvider = playerProvider;
             this.messageFormatter = localizer;
             this.messageBus = messageBus;
-            this.strings = new StringDb();
-            this.strings.Load();
+            this.commandProvider = commandProvider;
 
             this.commandHandler = commandHandler;
             this.channelProvider = channelProvider;
             this.credentialsProvider = credentialsProvider;
+
+            this.messageBus.Subscribe<string>("streamer_userid_acquired", userid =>
+            {
+                try
+                {
+                    pubsub.ListenToRewards(userid);
+                    pubsub.ListenToHypeTrainEvents(userid);
+                    pubsub.Connect();
+                    logger.WriteDebug("Connecting to PubSub");
+                }
+                catch (Exception exc)
+                {
+                    logger.WriteError(exc.ToString());
+                }
+            });
+
             this.CreateTwitchClient();
-            this.Cleanup();
+
+            ravenfall.ProcessAsync(Settings.UNITY_SERVER_PORT);
         }
 
         public void Start()
@@ -101,10 +128,13 @@ namespace RavenBot
                     e.ChatMessage.Id,
                     e.ChatMessage.Username,
                     e.ChatMessage.DisplayName,
+                    e.ChatMessage.IsModerator,
+                    e.ChatMessage.IsSubscriber,
+                    e.ChatMessage.IsVip,
                     e.ChatMessage.Bits)
             );
 
-            this.Broadcast(Localization.Twitch.THANK_YOU_BITS, e.ChatMessage.DisplayName, e.ChatMessage.Bits);
+            this.Broadcast("", Localization.Twitch.THANK_YOU_BITS, e.ChatMessage.DisplayName, e.ChatMessage.Bits);
         }
 
         private async void OnCommandReceived(object sender, OnChatCommandReceivedArgs e)
@@ -120,17 +150,13 @@ namespace RavenBot
                 this.broadcastSubscription = messageBus.Subscribe<IGameCommand>(MessageBus.Broadcast, Broadcast);
 
             client.Initialize(credentialsProvider.Get(), channelProvider.Get());
+
             isInitialized = true;
         }
 
         public void Broadcast(IGameCommand message)
         {
             Broadcast(message.Destination, message.Format, message.Args);
-        }
-
-        public void Broadcast(string format, params object[] args)
-        {
-            Broadcast(null, format, args);
         }
 
         public void Broadcast(string user, string format, params object[] args)
@@ -155,6 +181,7 @@ namespace RavenBot
 
         private void CreateTwitchClient()
         {
+            pubsub = new TwitchPubSub();
             client = new TwitchClient(new WebSocketClient(new ClientOptions
             {
                 ClientType = ClientType.Chat,
@@ -170,10 +197,12 @@ namespace RavenBot
                     e.ReSubscriber.Login,
                     e.ReSubscriber.DisplayName,
                     null,
+                    e.ReSubscriber.IsModerator,
+                    e.ReSubscriber.IsSubscriber,
                     e.ReSubscriber.Months,
                     false));
 
-            this.Broadcast(Localization.Twitch.THANK_YOU_RESUB, e.ReSubscriber.DisplayName);
+            this.Broadcast("", Localization.Twitch.THANK_YOU_RESUB, e.ReSubscriber.DisplayName);
         }
 
         private void OnNewSub(object sender, OnNewSubscriberArgs e)
@@ -183,9 +212,12 @@ namespace RavenBot
                     e.Subscriber.UserId,
                     e.Subscriber.Login,
                     e.Subscriber.DisplayName,
-                    null, 1, true));
+                    null,
+                    e.Subscriber.IsModerator,
+                    e.Subscriber.IsSubscriber,
+                    1, true));
 
-            this.Broadcast(Localization.Twitch.THANK_YOU_SUB, e.Subscriber.DisplayName);
+            this.Broadcast("", Localization.Twitch.THANK_YOU_SUB, e.Subscriber.DisplayName);
         }
 
         private void OnPrimeSub(object sender, OnCommunitySubscriptionArgs e)
@@ -195,9 +227,12 @@ namespace RavenBot
                     e.GiftedSubscription.UserId,
                     e.GiftedSubscription.Login,
                     e.GiftedSubscription.DisplayName,
-                    null, 1, false));
+                    null,
+                    e.GiftedSubscription.IsModerator,
+                    e.GiftedSubscription.IsSubscriber,
+                    1, false));
 
-            this.Broadcast(Localization.Twitch.THANK_YOU_SUB, e.GiftedSubscription.DisplayName);
+            this.Broadcast("", Localization.Twitch.THANK_YOU_SUB, e.GiftedSubscription.DisplayName);
         }
 
         private void OnGiftedSub(object sender, OnGiftedSubscriptionArgs e)
@@ -208,10 +243,40 @@ namespace RavenBot
                 e.GiftedSubscription.Login,
                 e.GiftedSubscription.DisplayName,
                 e.GiftedSubscription.MsgParamRecipientId,
+                e.GiftedSubscription.IsModerator,
+                e.GiftedSubscription.IsSubscriber,
                 1,
                 false));
 
-            this.Broadcast(Localization.Twitch.THANK_YOU_GIFT_SUB, e.GiftedSubscription.DisplayName);
+            this.Broadcast("", Localization.Twitch.THANK_YOU_GIFT_SUB, e.GiftedSubscription.DisplayName);
+        }
+
+        private void Pubsub_OnHypeTrainProgress(object sender, TwitchLib.PubSub.Models.Responses.Messages.HypeTrainEvents e)
+        {
+            //this.ravenfall.SendHypeTrainProgress(new TwitchHypeTrain
+            //{
+            //    Total = e.Progress.Total,
+            //    Value = e.Progress.Value,
+            //    Level = e.Progress.Level,
+            //    Goal = e.Progress.Goal,
+            //    RemainingSeconds = e.Progress.RemainingSeconds,
+            //    e.Progress.Level.
+            //});
+        }
+
+        private void Pubsub_OnHypeTrainLevelUp(object sender, TwitchLib.PubSub.Models.Responses.Messages.HypeTrainEvents e)
+        {
+            //this.ravenfall.SendHypeTrainLevelUp(new TwitchHypeTrain
+            //{
+            //});
+        }
+
+        private void Pubsub_OnRewardRedeemed(object sender, TwitchLib.PubSub.Events.OnRewardRedeemedArgs e)
+        {
+            var player = playerProvider.Get(e.Login);
+            var cmd = commandProvider.GetCommand(player, e.RewardTitle, e.RewardPrompt);
+            if (cmd != null)
+                commandHandler.HandleAsync(this, cmd);
         }
 
         private void OnDisconnected(object sender, OnDisconnectedEventArgs e)
@@ -254,6 +319,14 @@ namespace RavenBot
             if (client.IsConnected)
                 client.Disconnect();
 
+            try
+            {
+                pubsub.Disconnect();
+            }
+            catch
+            {
+            }
+
             broadcastSubscription?.Unsubscribe();
         }
 
@@ -271,39 +344,39 @@ namespace RavenBot
 
         private void OnRaidNotification(object sender, OnRaidNotificationArgs e)
         {
-            this.Broadcast(Localization.Twitch.THANK_YOU_RAID, e.RaidNotification.DisplayName);
+            this.Broadcast("", Localization.Twitch.THANK_YOU_RAID, e.RaidNotification.DisplayName);
         }
 
-        private void Cleanup()
-        {
-            try
-            {
-                int count = 0;
-                var folder = GetAssemblyDirectory();
-                if (System.IO.Directory.GetFiles(folder, "ravenfall*").Length > 0)
-                    return;
+        //private void Cleanup()
+        //{
+        //    try
+        //    {
+        //        int count = 0;
+        //        var folder = GetAssemblyDirectory();
+        //        if (System.IO.Directory.GetFiles(folder, "ravenfall*").Length > 0)
+        //            return;
 
-                var settingFiles = System.IO.Directory.GetFiles(folder, "*.json");
-                foreach (var f in settingFiles)
-                {
-                    if (f.Contains("settings") && System.IO.File.Exists(f))
-                    {
-                        ++count;
-                        System.IO.File.Delete(f);
-                    }
-                }
+        //        var settingFiles = System.IO.Directory.GetFiles(folder, "*.json");
+        //        foreach (var f in settingFiles)
+        //        {
+        //            if (f.Contains("settings") && System.IO.File.Exists(f))
+        //            {
+        //                ++count;
+        //                System.IO.File.Delete(f);
+        //            }
+        //        }
 
-                if (count > 0)
-                    logger.WriteDebug($"{count} tmp files cleared out.");
-            }
-            catch { }
-        }
+        //        if (count > 0)
+        //            logger.WriteDebug($"{count} tmp files cleared out.");
+        //    }
+        //    catch { }
+        //}
 
-        private string GetAssemblyDirectory()
-        {
-            var codeBase = Assembly.GetExecutingAssembly().CodeBase;
-            return Path.GetDirectoryName(Uri.UnescapeDataString(new UriBuilder(codeBase).Path));
-        }
+        //private string GetAssemblyDirectory()
+        //{
+        //    var codeBase = Assembly.GetExecutingAssembly().CodeBase;
+        //    return Path.GetDirectoryName(Uri.UnescapeDataString(new UriBuilder(codeBase).Path));
+        //}
 
         private void Subscribe()
         {
@@ -319,6 +392,39 @@ namespace RavenBot
             client.OnNewSubscriber += OnNewSub;
             client.OnReSubscriber += OnReSub;
             client.OnRaidNotification += OnRaidNotification;
+
+            pubsub.OnListenResponse += Pubsub_OnListenResponse;
+            pubsub.OnPubSubServiceConnected += Pubsub_OnPubSubServiceConnected;
+            pubsub.OnRewardRedeemed += Pubsub_OnRewardRedeemed;
+            pubsub.OnHypeTrainLevelUp += Pubsub_OnHypeTrainLevelUp;
+            pubsub.OnHypeTrainProgress += Pubsub_OnHypeTrainProgress;
+
+        }
+
+        private void Pubsub_OnListenResponse(object sender, TwitchLib.PubSub.Events.OnListenResponseArgs e)
+        {
+            if (!e.Successful)
+            {
+                logger.WriteError(e.Response.Error);
+            }
+            else
+            {
+                logger.WriteDebug("PubSub Listen OK");
+            }
+        }
+
+        private void Pubsub_OnPubSubServiceConnected(object sender, EventArgs e)
+        {
+            try
+            {
+                var credentials = credentialsProvider.Get();
+                pubsub.SendTopics(credentials.TwitchOAuth);
+                logger.WriteDebug("PubSub Service Connected");
+            }
+            catch (Exception exc)
+            {
+                logger.WriteError(exc.ToString());
+            }
         }
 
         private void Unsubscribe()
@@ -334,6 +440,10 @@ namespace RavenBot
             client.OnNewSubscriber -= OnNewSub;
             client.OnReSubscriber -= OnReSub;
             client.OnRaidNotification -= OnRaidNotification;
+
+            pubsub.OnRewardRedeemed -= Pubsub_OnRewardRedeemed;
+            pubsub.OnHypeTrainLevelUp -= Pubsub_OnHypeTrainLevelUp;
+            pubsub.OnHypeTrainProgress -= Pubsub_OnHypeTrainProgress;
         }
     }
 }
