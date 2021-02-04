@@ -3,6 +3,7 @@
     public interface ICommand
     {
         ICommandSender Sender { get; }
+        string Channel { get; }
         string Command { get; }
         string Arguments { get; }
     }
@@ -16,6 +17,7 @@
         bool IsModerator { get; }
         bool IsSubscriber { get; }
         bool IsVip { get; }
+        bool IsVerifiedBot { get; }
         string ColorHex { get; }
     }
 }

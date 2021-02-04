@@ -30,6 +30,8 @@ namespace RavenBot
             Register<CraftCommandProcessor>(commandBindingProvider.Get("craft"));
             Register<JoinCommandProcessor>(commandBindingProvider.Get("join"));//, "play");
 
+            Register<UnstuckCommandProcessor>(commandBindingProvider.Get("unstuck"));//, "play");
+
             Register<LeaveCommandProcessor>(commandBindingProvider.Get("leave"));//, "exit", "quit") ;
             Register<IslandInfoCommandProcessor>(commandBindingProvider.Get("where"));//"island", "position", "where"); ;
             Register<TrainingInfoCommandProcessor>(commandBindingProvider.Get("training"));//"skill", "training"); 
@@ -85,6 +87,7 @@ namespace RavenBot
 
             // tavern games
             Register<TicTacToeCommandProcessor>("tictactoe", "ttt");
+            Register<RacingCommandProcessor>("race", "racing");
 
             commandBindingProvider.EnsureBindingsFile();
         }

@@ -17,6 +17,11 @@ namespace RavenBot.Core.Ravenfall.Commands
 
         public override async Task ProcessAsync(IMessageChat broadcaster, ICommand cmd)
         {
+            if (cmd.Sender.IsVerifiedBot)
+            {
+                return;
+            }
+
             if (!await game.ProcessAsync(Settings.UNITY_SERVER_PORT))
             {
                 broadcaster.Broadcast(cmd.Sender.Username, Localization.GAME_NOT_STARTED);

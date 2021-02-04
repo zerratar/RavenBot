@@ -20,6 +20,7 @@ namespace RavenBot.Core.Ravenfall
         Task CancelArenaAsync(Player player);
         Task TurnIntoMonsterAsync(Player player);
         Task KickPlayerFromArenaAsync(Player player, Player targetPlayer);
+        Task UnstuckAsync(Player player);
         Task InspectPlayerAsync(Player player);
         Task AddPlayerToArenaAsync(Player player, Player targetPlayer);
         Task KickAsync(Player targetPlayer);
@@ -72,6 +73,8 @@ namespace RavenBot.Core.Ravenfall
         Task ScalePlayerAsync(Player player, float v);
         Task ActivateTicTacToeAsync(Player player);
         Task ResetTicTacToeAsync(Player player);
+        Task ResetPetRacingAsync(Player player);
+        Task PlayPetRacingAsync(Player player);
 
     }
 }

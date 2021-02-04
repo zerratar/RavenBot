@@ -93,6 +93,7 @@ namespace RavenBot.Core.Ravenfall
             messageBus.Send("streamer_userid_acquired", plr.UserId);
         }
 
+        public Task UnstuckAsync(Player player) => SendAsync("unstuck", player);
         public Task JoinAsync(Player player) => SendAsync("join", player);
         public Task InspectPlayerAsync(Player player) => SendAsync("inspect", player);
         public Task GetStreamerTokenCountAsync(Player player)
@@ -112,6 +113,11 @@ namespace RavenBot.Core.Ravenfall
 
         public Task ResetTicTacToeAsync(Player player)
             => SendAsync("ttt_reset", player);
+        public Task ResetPetRacingAsync(Player player)
+            => SendAsync("pet_race_reset", player);
+
+        public Task PlayPetRacingAsync(Player player)
+            => SendAsync("pet_race_play", player);
 
         public Task GetVillageBoostAsync(Player player)
             => SendAsync("get_village_boost", player);
@@ -127,7 +133,7 @@ namespace RavenBot.Core.Ravenfall
 
         public Task UseExpMultiplierScrollAsync(Player player, int number)
             => SendAsync("use_exp_scroll", new SetExpMultiplierRequest(player, number));
-        
+
         public Task SetExpMultiplierLimitAsync(Player player, int number)
             => SendAsync("exp_multiplier_limit", new SetExpMultiplierRequest(player, number));
 

@@ -16,7 +16,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\RavenBot.Core.Ravenfall\RavenBot.Core.Ravenfall.csproj" />
     <ProjectReference Include="..\..\src\RavenBot.Core\RavenBot.Core.csproj" />
-    <ProjectReference Include="..\..\src\RavenBot\RavenBot.csproj" />
+    <ProjectReference Include="..\..\src\RavenBot\LocalBot.csproj" />
   </ItemGroup>
 
 </Project>

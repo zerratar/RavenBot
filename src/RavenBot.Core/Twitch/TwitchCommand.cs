@@ -50,6 +50,7 @@ namespace RavenBot.Core.Twitch
 
     public class TwitchCheer
     {
+        public string Channel { get; }
         public string UserId { get; }
         public string UserName { get; }
         public string DisplayName { get; }
@@ -59,6 +60,7 @@ namespace RavenBot.Core.Twitch
         public int Bits { get; }
 
         public TwitchCheer(
+            string channel,
             string userId,
             string userName,
             string displayName,
@@ -79,6 +81,7 @@ namespace RavenBot.Core.Twitch
 
     public class TwitchSubscription
     {
+        public string Channel { get; }
         public string UserId { get; }
         public string ReceiverUserId { get; }
         public bool IsModerator { get; }
@@ -89,6 +92,7 @@ namespace RavenBot.Core.Twitch
         public bool IsNew { get; }
 
         public TwitchSubscription(
+            string channel,
             string userId,
             string userName,
             string displayName,
@@ -98,6 +102,7 @@ namespace RavenBot.Core.Twitch
             int months,
             bool isNew)
         {
+            Channel = channel;
             UserId = userId;
             ReceiverUserId = receiverUserId;
             IsModerator = isModerator;
@@ -121,9 +126,9 @@ namespace RavenBot.Core.Twitch
         public string Name { get; }
         public string NameColor { get; }
     }
+
     public class TwitchHypeTrain
     {
-
     }
 
     public class TwitchCommand : ICommand
@@ -132,12 +137,13 @@ namespace RavenBot.Core.Twitch
         {
             this.Command = cmd.CommandText?.ToLower();
             this.Arguments = cmd.ArgumentsAsString;
+            this.Channel = cmd.ChatMessage.Channel;
 
             var isModerator = cmd.ChatMessage.IsModerator;
             var isSubscriber = cmd.ChatMessage.IsSubscriber;
             var isBroadcaster = cmd.ChatMessage.IsBroadcaster;
             var isVip = false;
-
+            var isVerifiedBot = false;
             this.Sender = new TwitchCommandSender(
                 cmd.ChatMessage.UserId,
                 cmd.ChatMessage.Username,
@@ -146,9 +152,11 @@ namespace RavenBot.Core.Twitch
                 isModerator,
                 isSubscriber,
                 isVip,
+                isVerifiedBot,
                 cmd.ChatMessage.ColorHex);
         }
 
+        public string Channel { get; }
         public ICommandSender Sender { get; }
         public string Command { get; }
         public string Arguments { get; }
@@ -163,6 +171,7 @@ namespace RavenBot.Core.Twitch
                 bool isModerator,
                 bool isSubscriber,
                 bool isVip,
+                bool isVerifiedBot,
                 string colorHex)
             {
                 UserId = userId;
@@ -173,6 +182,7 @@ namespace RavenBot.Core.Twitch
                 IsSubscriber = isSubscriber;
                 IsVip = isVip;
                 ColorHex = colorHex;
+                IsVerifiedBot = isVerifiedBot;
             }
 
             public string UserId { get; }
@@ -182,6 +192,7 @@ namespace RavenBot.Core.Twitch
             public bool IsModerator { get; }
             public bool IsSubscriber { get; }
             public bool IsVip { get; }
+            public bool IsVerifiedBot { get; }
             public string ColorHex { get; }
 
             public override string ToString()

@@ -16,7 +16,7 @@ namespace RavenBot.Core.Ravenfall
         }
 
         public ICommandSender Sender { get; }
-
+        public string Channel { get; }
         public string Command { get; }
 
         public string Arguments { get; }
@@ -45,6 +45,8 @@ namespace RavenBot.Core.Ravenfall
             public bool IsVip => player.IsVip;
 
             public string ColorHex => player.Color;
+
+            public bool IsVerifiedBot => false;
         }
     }
 }

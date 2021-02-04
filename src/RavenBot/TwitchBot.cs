@@ -125,6 +125,7 @@ namespace RavenBot
             this.messageBus.Send(
                 nameof(TwitchCheer),
                 new TwitchCheer(
+                    e.ChatMessage.Channel,
                     e.ChatMessage.Id,
                     e.ChatMessage.Username,
                     e.ChatMessage.DisplayName,
@@ -145,7 +146,6 @@ namespace RavenBot
         private void EnsureInitialized()
         {
             if (isInitialized) return;
-
             if (this.broadcastSubscription == null)
                 this.broadcastSubscription = messageBus.Subscribe<IGameCommand>(MessageBus.Broadcast, Broadcast);
 
@@ -156,7 +156,7 @@ namespace RavenBot
 
         public void Broadcast(IGameCommand message)
         {
-            Broadcast(message.Destination, message.Format, message.Args);
+            Broadcast(message.Receiver, message.Format, message.Args);
         }
 
         public void Broadcast(string user, string format, params object[] args)
@@ -193,6 +193,7 @@ namespace RavenBot
         {
             this.messageBus.Send(nameof(TwitchSubscription),
                 new TwitchSubscription(
+                    e.Channel,
                     e.ReSubscriber.UserId,
                     e.ReSubscriber.Login,
                     e.ReSubscriber.DisplayName,
@@ -209,6 +210,7 @@ namespace RavenBot
         {
             this.messageBus.Send(nameof(TwitchSubscription),
                 new TwitchSubscription(
+                    e.Channel,
                     e.Subscriber.UserId,
                     e.Subscriber.Login,
                     e.Subscriber.DisplayName,
@@ -224,6 +226,7 @@ namespace RavenBot
         {
             this.messageBus.Send(nameof(TwitchSubscription),
                 new TwitchSubscription(
+                    e.Channel,
                     e.GiftedSubscription.UserId,
                     e.GiftedSubscription.Login,
                     e.GiftedSubscription.DisplayName,
@@ -239,6 +242,7 @@ namespace RavenBot
         {
             this.messageBus.Send(nameof(TwitchSubscription),
             new TwitchSubscription(
+                e.Channel,
                 e.GiftedSubscription.Id,
                 e.GiftedSubscription.Login,
                 e.GiftedSubscription.DisplayName,
@@ -308,7 +312,6 @@ namespace RavenBot
                 });
             }
         }
-
 
         public void Stop()
         {
