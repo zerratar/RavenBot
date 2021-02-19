@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Twitchlib\TwitchLib.PubSub\TwitchLib.PubSub\TwitchLib.PubSub.csproj" />
     <ProjectReference Include="..\RavenBot.Core.Ravenfall\RavenBot.Core.Ravenfall.csproj" />
     <ProjectReference Include="..\Shinobytes.Ravenfall.Core\Shinobytes.Ravenfall.Core.csproj" />
   </ItemGroup>

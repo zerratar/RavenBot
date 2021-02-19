@@ -37,10 +37,10 @@ namespace ROBot.Core.GameServer
             this.playerProvider = playerProvider;
             this.messageBus = messageBus;
 
-            messageBus.Subscribe<TwitchUserJoined>(nameof(TwitchUserJoined), OnUserJoined);
-            messageBus.Subscribe<TwitchUserLeft>(nameof(TwitchUserLeft), OnUserLeft);
-            messageBus.Subscribe<TwitchCheer>(nameof(TwitchCheer), OnUserCheer);
-            messageBus.Subscribe<TwitchSubscription>(nameof(TwitchSubscription), OnUserSub);
+            messageBus.Subscribe<ROBot.Core.Twitch.TwitchUserJoined>(nameof(TwitchUserJoined), OnUserJoined);
+            messageBus.Subscribe<ROBot.Core.Twitch.TwitchUserLeft>(nameof(TwitchUserLeft), OnUserLeft);
+            messageBus.Subscribe<ROBot.Core.Twitch.TwitchCheer>(nameof(TwitchCheer), OnUserCheer);
+            messageBus.Subscribe<ROBot.Core.Twitch.TwitchSubscription>(nameof(TwitchSubscription), OnUserSub);
 
             this.client = client;
             this.client.Connected += Client_Connected;
@@ -240,7 +240,7 @@ namespace ROBot.Core.GameServer
             }
         }
 
-        private async void OnUserCheer(TwitchCheer obj)
+        private async void OnUserCheer(ROBot.Core.Twitch.TwitchCheer obj)
         {
             if (session == null || !session.Name.Equals(obj.Channel, StringComparison.OrdinalIgnoreCase))
                 return;
@@ -248,7 +248,7 @@ namespace ROBot.Core.GameServer
             await SendAsync("twitch_cheer", obj);
         }
 
-        private async void OnUserSub(TwitchSubscription obj)
+        private async void OnUserSub(ROBot.Core.Twitch.TwitchSubscription obj)
         {
             if (session == null || !session.Name.Equals(obj.Channel, StringComparison.OrdinalIgnoreCase))
                 return;
@@ -256,8 +256,8 @@ namespace ROBot.Core.GameServer
             await SendAsync("twitch_sub", obj);
         }
 
-        private void OnUserLeft(TwitchUserLeft obj) => logger.LogDebug(obj.Name + " left the channel");
-        private void OnUserJoined(TwitchUserJoined obj) => logger.LogDebug(obj.Name + " joined the channel");
+        private void OnUserLeft(ROBot.Core.Twitch.TwitchUserLeft obj) => logger.LogDebug(obj.Name + " left the channel");
+        private void OnUserJoined(ROBot.Core.Twitch.TwitchUserJoined obj) => logger.LogDebug(obj.Name + " joined the channel");
 
         private async Task SendAsync<T>(string name, T packet)
         {

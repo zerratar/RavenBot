@@ -26,7 +26,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             var player = playerProvider.Get(cmd.Sender);
             if (string.IsNullOrEmpty(cmd.Arguments))
             {
-                broadcaster.Broadcast("", "You can customize your character here https://www.ravenfall.stream/customization");
+                broadcaster.Broadcast("", "You can customize your character here https://www.ravenfall.stream/characters");
                 return;
             }
 

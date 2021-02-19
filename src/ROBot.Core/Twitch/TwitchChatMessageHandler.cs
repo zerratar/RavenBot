@@ -29,8 +29,8 @@ namespace ROBot.Core.Twitch
                 if (msg.Bits > 0)
                 {
                     this.messageBus.Send(
-                        nameof(TwitchCheer),
-                        new TwitchCheer(
+                        nameof(ROBot.Core.Twitch.TwitchCheer),
+                        new ROBot.Core.Twitch.TwitchCheer(
                             msg.Channel,
                             msg.Id,
                             msg.Username,
