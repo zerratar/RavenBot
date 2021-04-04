@@ -294,7 +294,7 @@ namespace ROBot.Core.Twitch
 
         private void CreateTwitchClient()
         {
-            //pubsub = new TwitchPubSub();
+            pubsub = new TwitchPubSub();
             client = new TwitchClient(new TcpClient(new ClientOptions { ClientType = ClientType.Chat }));
         }
 
@@ -340,14 +340,22 @@ namespace ROBot.Core.Twitch
             }
         }
 
+        private async void OnFailureToReceiveJoinConfirmation(object sender, OnFailureToReceiveJoinConfirmationArgs e)
+        {
+            await Task.Delay(1000);
+            if (client.IsConnected)
+            {
+                JoinChannel(e.Exception.Channel);
+            }
+        }
+
         private void OnReconnected(object sender, OnReconnectedEventArgs e)
         {
             logger.LogDebug("Reconnected to Twitch IRC Server");
-
         }
 
         private void OnRaidNotification(object sender, OnRaidNotificationArgs e)
-        {
+        {            
         }
 
         private void Subscribe()
@@ -364,6 +372,7 @@ namespace ROBot.Core.Twitch
             client.OnNewSubscriber += OnNewSub;
             client.OnReSubscriber += OnReSub;
             client.OnRaidNotification += OnRaidNotification;
+            client.OnFailureToReceiveJoinConfirmation += OnFailureToReceiveJoinConfirmation;
         }
 
         private void Unsubscribe()
@@ -379,6 +388,7 @@ namespace ROBot.Core.Twitch
             client.OnNewSubscriber -= OnNewSub;
             client.OnReSubscriber -= OnReSub;
             client.OnRaidNotification -= OnRaidNotification;
+            client.OnFailureToReceiveJoinConfirmation -= OnFailureToReceiveJoinConfirmation;
         }
 
         public void Dispose()

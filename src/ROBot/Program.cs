@@ -12,15 +12,18 @@ namespace ROBot
 {
     class Program
     {
+        private static bool isExiting;
         static void Main(string[] args)
         {
+            AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomain_ProcessExit);
+
             var ioc = new IoC();
 
             ioc.RegisterCustomShared<IoC>(() => ioc);
             ioc.RegisterCustomShared<IAppSettings>(() => new AppSettingsProvider().Get());
             ioc.RegisterCustomShared<IBotServerSettings>(() => new BotServerSettings
             {
-                ServerIp = "127.0.0.1",
+                ServerIp = "0.0.0.0",
                 ServerPort = 4041
             });
 
@@ -49,15 +52,21 @@ namespace ROBot
             var app = ioc.Resolve<IStreamBotApplication>();
             {
                 app.Run();
-                while (true)
+                while (!isExiting)
                 {
-                    if (Console.ReadKey().Key == ConsoleKey.Q)
-                    {
-                        break;
-                    }
+                    //if (Console.ReadKey().Key == ConsoleKey.Q)
+                    //{
+                    //    break;
+                    //}
+                    System.Threading.Thread.Sleep(10);
                 }
                 app.Shutdown();
             }
+        }
+
+        private static void CurrentDomain_ProcessExit(object sender, EventArgs e)
+        {
+            isExiting = true;
         }
     }
 }

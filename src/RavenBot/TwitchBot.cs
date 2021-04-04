@@ -42,7 +42,7 @@ namespace RavenBot
 
         private readonly object mutex = new object();
         private readonly HashSet<string> newSubAdded = new HashSet<string>();
-
+        private bool connectedToPubsub;
         public TwitchBot(
             ILogger logger,
             IKernel kernel,
@@ -71,9 +71,15 @@ namespace RavenBot
             {
                 try
                 {
+                    if (connectedToPubsub)
+                    {
+                        return;
+                    }
+
                     pubsub.ListenToRewards(userid);
                     pubsub.ListenToHypeTrainEvents(userid);
                     pubsub.Connect();
+                    connectedToPubsub = true;
                     logger.WriteDebug("Connecting to PubSub");
                 }
                 catch (Exception exc)
@@ -419,7 +425,7 @@ namespace RavenBot
         private void Pubsub_OnPubSubServiceConnected(object sender, EventArgs e)
         {
             try
-            {
+            {                
                 var credentials = credentialsProvider.Get();
                 pubsub.SendTopics(credentials.TwitchOAuth);
                 logger.WriteDebug("PubSub Service Connected");
