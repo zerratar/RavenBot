@@ -16,16 +16,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.5.0" />
-    <PackageReference Include="TwitchLib.Api" Version="3.1.4-CI-20201015-22" />
-    <PackageReference Include="TwitchLib.Api.Core" Version="3.1.4-CI-20201015-22" />
-    <PackageReference Include="TwitchLib.Api.Helix" Version="3.1.3" />
-    <PackageReference Include="TwitchLib.Client" Version="3.1.6-CI-20201008-9" />
+    <PackageReference Include="TwitchLib.Api" Version="3.2.3" />
+    <PackageReference Include="TwitchLib.Api.Core" Version="3.2.3" />
+    <PackageReference Include="TwitchLib.Api.Helix" Version="3.2.3" />
+    <PackageReference Include="TwitchLib.Client" Version="3.2.2" />
+    <PackageReference Include="TwitchLib.PubSub" Version="3.2.3-preview-5500be4a524d8812e7bd37de4288610422b41fe6" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Twitchlib\TwitchLib.PubSub\TwitchLib.PubSub\TwitchLib.PubSub.csproj" />
     <ProjectReference Include="..\RavenBot.Core.Ravenfall\RavenBot.Core.Ravenfall.csproj" />
     <ProjectReference Include="..\RavenBot.Core\RavenBot.Core.csproj" />
   </ItemGroup>

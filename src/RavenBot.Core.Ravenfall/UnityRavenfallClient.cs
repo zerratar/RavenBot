@@ -268,7 +268,6 @@ namespace RavenBot.Core.Ravenfall
 
         public Task TurnIntoMonsterAsync(Player player)
             => SendAsync("monster", player);
-
         public Task ItemDropEventAsync(Player player, string item)
             => SendAsync("item_drop_event", new ItemQueryRequest(player, item));
 
@@ -280,6 +279,66 @@ namespace RavenBot.Core.Ravenfall
 
         public Task RaidStreamerAsync(Player target, bool isRaidWar)
             => SendAsync("raid_streamer", new StreamerRaid(target, isRaidWar));
+
+
+        public async Task RestartGameAsync(Player player)
+        {
+            string gamePath = GetRavenfallGamePath();
+            if (string.IsNullOrEmpty(gamePath) || !System.IO.File.Exists(gamePath))
+            {
+                return;
+            }
+
+            await SendAsync("restart", player);
+            await WaitForGameToExit();
+            StartRavenfall(gamePath);
+        }
+
+        private void StartRavenfall(string path)
+        {
+            try
+            {
+                System.Diagnostics.Process.Start(path);
+            }
+            catch { }
+        }
+
+        private async Task WaitForGameToExit()
+        {
+            var ravenfall = System.Diagnostics.Process.GetProcessesByName("ravenfall").FirstOrDefault();
+            if (ravenfall == null || ravenfall.HasExited)
+            {
+                return;
+            }
+            try
+            {
+                await ravenfall.WaitForExitAsync();
+
+                while (!ravenfall.HasExited)
+                {
+                    await Task.Delay(500);
+                    ravenfall.Refresh();
+                }
+            }
+            catch
+            {
+                logger.WriteError("Error when waiting for ravenfall to exit.");
+            }
+        }
+
+        private static string GetRavenfallGamePath()
+        {
+            var ravenfall = System.Diagnostics.Process.GetProcessesByName("Ravenfall").FirstOrDefault();
+            if (ravenfall == null)
+            {
+                if (System.IO.File.Exists("ravenfall.exe"))
+                {
+                    return "ravenfall.exe";
+                }
+            }
+
+            return ravenfall.MainModule.FileName;
+        }
 
         public Task<bool> ProcessAsync(int serverPort)
             => this.client.ProcessAsync(serverPort);

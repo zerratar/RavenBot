@@ -19,6 +19,7 @@ namespace RavenBot.Core.Ravenfall
         Task StartArenaAsync(Player player);
         Task CancelArenaAsync(Player player);
         Task TurnIntoMonsterAsync(Player player);
+        Task RestartGameAsync(Player player);
         Task KickPlayerFromArenaAsync(Player player, Player targetPlayer);
         Task UnstuckAsync(Player player);
         Task InspectPlayerAsync(Player player);

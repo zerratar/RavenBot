@@ -77,7 +77,6 @@ namespace RavenBot
                     }
 
                     pubsub.ListenToRewards(userid);
-                    pubsub.ListenToHypeTrainEvents(userid);
                     pubsub.Connect();
                     connectedToPubsub = true;
                     logger.WriteDebug("Connecting to PubSub");
@@ -261,26 +260,6 @@ namespace RavenBot
             this.Broadcast("", Localization.Twitch.THANK_YOU_GIFT_SUB, e.GiftedSubscription.DisplayName);
         }
 
-        private void Pubsub_OnHypeTrainProgress(object sender, TwitchLib.PubSub.Models.Responses.Messages.HypeTrainEvents e)
-        {
-            //this.ravenfall.SendHypeTrainProgress(new TwitchHypeTrain
-            //{
-            //    Total = e.Progress.Total,
-            //    Value = e.Progress.Value,
-            //    Level = e.Progress.Level,
-            //    Goal = e.Progress.Goal,
-            //    RemainingSeconds = e.Progress.RemainingSeconds,
-            //    e.Progress.Level.
-            //});
-        }
-
-        private void Pubsub_OnHypeTrainLevelUp(object sender, TwitchLib.PubSub.Models.Responses.Messages.HypeTrainEvents e)
-        {
-            //this.ravenfall.SendHypeTrainLevelUp(new TwitchHypeTrain
-            //{
-            //});
-        }
-
         private void Pubsub_OnRewardRedeemed(object sender, TwitchLib.PubSub.Events.OnRewardRedeemedArgs e)
         {
             var player = playerProvider.Get(e.Login);
@@ -405,8 +384,6 @@ namespace RavenBot
             pubsub.OnListenResponse += Pubsub_OnListenResponse;
             pubsub.OnPubSubServiceConnected += Pubsub_OnPubSubServiceConnected;
             pubsub.OnRewardRedeemed += Pubsub_OnRewardRedeemed;
-            pubsub.OnHypeTrainLevelUp += Pubsub_OnHypeTrainLevelUp;
-            pubsub.OnHypeTrainProgress += Pubsub_OnHypeTrainProgress;
 
         }
 
@@ -451,8 +428,6 @@ namespace RavenBot
             client.OnRaidNotification -= OnRaidNotification;
 
             pubsub.OnRewardRedeemed -= Pubsub_OnRewardRedeemed;
-            pubsub.OnHypeTrainLevelUp -= Pubsub_OnHypeTrainLevelUp;
-            pubsub.OnHypeTrainProgress -= Pubsub_OnHypeTrainProgress;
         }
     }
 }

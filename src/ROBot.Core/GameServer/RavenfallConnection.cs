@@ -218,6 +218,7 @@ namespace ROBot.Core.GameServer
         public Task RequestIslandInfoAsync(Player player) => SendAsync("island_info", player);
         public Task RequestTrainingInfoAsync(Player player) => SendAsync("train_info", player);
         public Task RaidStreamerAsync(Player target, bool isRaidWar) => SendAsync("raid_streamer", new StreamerRaid(target, isRaidWar));
+        public Task RestartGameAsync(Player player) => SendAsync("restart", player);
 
         public void Dispose()
         {
