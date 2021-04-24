@@ -116,7 +116,10 @@ namespace ROBot.Core.GameServer
 
         public IGameSession GetSession(string session)
         {
-            return sessionManager.GetByName(session);
+            var s = sessionManager.GetByName(session);
+            if (s == null)
+                return sessionManager.GetByUserId(session);
+            return s;
         }
     }
 }

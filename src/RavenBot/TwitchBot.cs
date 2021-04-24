@@ -76,7 +76,7 @@ namespace RavenBot
                         return;
                     }
 
-                    pubsub.ListenToRewards(userid);
+                    pubsub.ListenToChannelPoints(userid);
                     pubsub.Connect();
                     connectedToPubsub = true;
                     logger.WriteDebug("Connecting to PubSub");
@@ -260,14 +260,6 @@ namespace RavenBot
             this.Broadcast("", Localization.Twitch.THANK_YOU_GIFT_SUB, e.GiftedSubscription.DisplayName);
         }
 
-        private void Pubsub_OnRewardRedeemed(object sender, TwitchLib.PubSub.Events.OnRewardRedeemedArgs e)
-        {
-            var player = playerProvider.Get(e.Login);
-            var cmd = commandProvider.GetCommand(player, e.RewardTitle, e.RewardPrompt);
-            if (cmd != null)
-                commandHandler.HandleAsync(this, cmd);
-        }
-
         private void OnDisconnected(object sender, OnDisconnectedEventArgs e)
         {
             logger.WriteDebug("Disconnected from the Twitch IRC Server");
@@ -335,37 +327,6 @@ namespace RavenBot
             this.Broadcast("", Localization.Twitch.THANK_YOU_RAID, e.RaidNotification.DisplayName);
         }
 
-        //private void Cleanup()
-        //{
-        //    try
-        //    {
-        //        int count = 0;
-        //        var folder = GetAssemblyDirectory();
-        //        if (System.IO.Directory.GetFiles(folder, "ravenfall*").Length > 0)
-        //            return;
-
-        //        var settingFiles = System.IO.Directory.GetFiles(folder, "*.json");
-        //        foreach (var f in settingFiles)
-        //        {
-        //            if (f.Contains("settings") && System.IO.File.Exists(f))
-        //            {
-        //                ++count;
-        //                System.IO.File.Delete(f);
-        //            }
-        //        }
-
-        //        if (count > 0)
-        //            logger.WriteDebug($"{count} tmp files cleared out.");
-        //    }
-        //    catch { }
-        //}
-
-        //private string GetAssemblyDirectory()
-        //{
-        //    var codeBase = Assembly.GetExecutingAssembly().CodeBase;
-        //    return Path.GetDirectoryName(Uri.UnescapeDataString(new UriBuilder(codeBase).Path));
-        //}
-
         private void Subscribe()
         {
             client.OnChatCommandReceived += OnCommandReceived;
@@ -383,8 +344,23 @@ namespace RavenBot
 
             pubsub.OnListenResponse += Pubsub_OnListenResponse;
             pubsub.OnPubSubServiceConnected += Pubsub_OnPubSubServiceConnected;
-            pubsub.OnRewardRedeemed += Pubsub_OnRewardRedeemed;
+            pubsub.OnChannelPointsRewardRedeemed += Pubsub_OnChannelPointsRewardRedeemed;
 
+        }
+        //private void Pubsub_OnRewardRedeemed(object sender, TwitchLib.PubSub.Events.OnRewardRedeemedArgs e)
+        //{
+        //    var player = playerProvider.Get(e.Login);
+        //    var cmd = commandProvider.GetCommand(player, e.RewardTitle, e.RewardPrompt);
+        //    if (cmd != null)
+        //        commandHandler.HandleAsync(this, cmd);
+        //}
+
+        private void Pubsub_OnChannelPointsRewardRedeemed(object sender, TwitchLib.PubSub.Events.OnChannelPointsRewardRedeemedArgs e)
+        {
+            var player = playerProvider.Get(e.RewardRedeemed.Redemption.User.Login);
+            var cmd = commandProvider.GetCommand(player, e.RewardRedeemed.Redemption.Reward.Title, e.RewardRedeemed.Redemption.Reward.Prompt);
+            if (cmd != null)
+                commandHandler.HandleAsync(this, cmd);
         }
 
         private void Pubsub_OnListenResponse(object sender, TwitchLib.PubSub.Events.OnListenResponseArgs e)
@@ -427,7 +403,7 @@ namespace RavenBot
             client.OnReSubscriber -= OnReSub;
             client.OnRaidNotification -= OnRaidNotification;
 
-            pubsub.OnRewardRedeemed -= Pubsub_OnRewardRedeemed;
+            pubsub.OnChannelPointsRewardRedeemed -= Pubsub_OnChannelPointsRewardRedeemed;
         }
     }
 }

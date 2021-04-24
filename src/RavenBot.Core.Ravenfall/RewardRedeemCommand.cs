@@ -3,7 +3,7 @@ using RavenBot.Core.Ravenfall.Models;
 
 namespace RavenBot.Core.Ravenfall
 {
-    internal class RewardRedeemCommand : ICommand
+    public class RewardRedeemCommand : ICommand
     {
         private Player Player;
 

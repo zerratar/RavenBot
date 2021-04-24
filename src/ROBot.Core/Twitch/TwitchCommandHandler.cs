@@ -11,6 +11,7 @@ namespace ROBot.Core.Twitch
         {
         }
 
+        public bool RequiresBroadcaster { get; set; }
         public abstract Task HandleAsync(IBotServer game, ITwitchCommandClient twitch, ICommand cmd);
     }
 }

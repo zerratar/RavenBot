@@ -20,13 +20,13 @@ namespace ROBot.Core.GameServer
             this.playerProvider = new PlayerProvider();
             this.server = server;
             this.Id = id;
-            this.UserId = userId;            
+            this.UserId = userId;
             this.Name = name;
         }
 
         public Guid Id { get; }
         public string Name { get; }
-        public string UserId { get;}
+        public string UserId { get; }
 
         public Player Join(ICommandSender sender, string identifier = "1")
         {
@@ -81,6 +81,11 @@ namespace ROBot.Core.GameServer
             return playerProvider.GetById(userId);
         }
 
+        public Player GetBroadcaster()
+        {
+            return playerProvider.GetById(UserId);
+        }
+
         public bool ContainsUsername(string username)
         {
             return playerProvider.Get(username) != null;
@@ -100,5 +105,6 @@ namespace ROBot.Core.GameServer
         {
             return playerProvider.RemoveById(twitchId);
         }
+
     }
 }

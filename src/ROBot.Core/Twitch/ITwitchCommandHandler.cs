@@ -8,6 +8,7 @@ namespace ROBot.Core.Twitch
 {
     public interface ITwitchCommandHandler : IDisposable
     {
+        bool RequiresBroadcaster { get; set; }
         Task HandleAsync(IBotServer game, ITwitchCommandClient twitch, ICommand cmd);
     }
 }

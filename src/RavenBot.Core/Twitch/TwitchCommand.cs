@@ -133,6 +133,7 @@ namespace RavenBot.Core.Twitch
 
     public class TwitchCommand : ICommand
     {
+
         public TwitchCommand(ChatCommand cmd)
         {
             this.Command = cmd.CommandText?.ToLower();

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
@@ -48,6 +49,9 @@ namespace ROBot.Core.Twitch
         private bool tryToReconnect = true;
         private bool disposed;
 
+        private HashSet<string> connectedToPubsub = new HashSet<string>();
+        private bool pubsubConnection;
+
         public TwitchCommandClient(
             ILogger logger,
             IKernel kernel,
@@ -65,22 +69,38 @@ namespace ROBot.Core.Twitch
             this.commandHandler = commandHandler;
             this.credentialsProvider = credentialsProvider;
 
-            //this.messageBus.Subscribe<string>("streamer_userid_acquired", userid =>
-            //{
-            //    try
-            //    {
-            //        pubsub.ListenToRewards(userid);
-            //        pubsub.ListenToHypeTrainEvents(userid);
-            //        pubsub.Connect();
-            //        logger.LogDebug("Connected to pubsub for " + userid);
-            //    }
-            //    catch (Exception exc)
-            //    {
-            //        logger.LogDebug(exc.ToString());
-            //    }
-            //});
+            this.messageBus.Subscribe<string>("streamer_userid_acquired", userid =>
+            {
+                ListenForChannelPoints(logger, userid);
+            });
+
 
             CreateTwitchClient();
+        }
+
+        private void ListenForChannelPoints(ILogger logger, string userid)
+        {
+            try
+            {
+                if (connectedToPubsub.Contains(userid))
+                {
+                    return;
+                }
+
+                pubsub.ListenToChannelPoints(userid);
+
+                if (!pubsubConnection)
+                {
+                    pubsub.Connect();
+                }
+
+                connectedToPubsub.Add(userid);
+                logger.LogDebug("Connecting to PubSub");
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc.ToString());
+            }
         }
 
         public void Start()
@@ -113,6 +133,14 @@ namespace ROBot.Core.Twitch
             if (client.IsConnected)
                 client.Disconnect();
 
+            try
+            {
+                pubsub.Disconnect();
+            }
+            catch
+            {
+            }
+            pubsubConnection = false;
             broadcastSubscription?.Unsubscribe();
         }
 
@@ -227,6 +255,11 @@ namespace ROBot.Core.Twitch
             await commandHandler.HandleAsync(game, this, e.Command);
         }
 
+        private async void Pubsub_OnChannelPointsRewardRedeemed(object sender, TwitchLib.PubSub.Events.OnChannelPointsRewardRedeemedArgs e)
+        {
+            await commandHandler.HandleAsync(game, this, e);
+        }
+
         private void OnReSub(object sender, OnReSubscriberArgs e)
         {
             this.messageBus.Send(nameof(ROBot.Core.Twitch.TwitchSubscription),
@@ -273,6 +306,11 @@ namespace ROBot.Core.Twitch
 
         public void Broadcast(IGameSessionCommand message)
         {
+            if (!connectedToPubsub.Contains(message.Session.UserId))
+            {
+                ListenForChannelPoints(logger, message.Session.UserId);
+            }
+
             Broadcast(message.Session.Name, message.Receiver, message.Format, message.Args);
         }
 
@@ -355,7 +393,34 @@ namespace ROBot.Core.Twitch
         }
 
         private void OnRaidNotification(object sender, OnRaidNotificationArgs e)
-        {            
+        {
+        }
+
+        private void Pubsub_OnListenResponse(object sender, TwitchLib.PubSub.Events.OnListenResponseArgs e)
+        {
+            if (!e.Successful)
+            {
+                logger.LogError(e.Response.Error);
+            }
+            else
+            {
+                logger.LogDebug("PubSub Listen OK");
+            }
+        }
+
+        private void Pubsub_OnPubSubServiceConnected(object sender, EventArgs e)
+        {
+            try
+            {
+                var credentials = credentialsProvider.Get();
+                pubsub.SendTopics(credentials.TwitchOAuth);
+                logger.LogDebug("PubSub Service Connected");
+                pubsubConnection = true;
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc.ToString());
+            }
         }
 
         private void Subscribe()
@@ -373,6 +438,10 @@ namespace ROBot.Core.Twitch
             client.OnReSubscriber += OnReSub;
             client.OnRaidNotification += OnRaidNotification;
             client.OnFailureToReceiveJoinConfirmation += OnFailureToReceiveJoinConfirmation;
+
+            pubsub.OnListenResponse += Pubsub_OnListenResponse;
+            pubsub.OnPubSubServiceConnected += Pubsub_OnPubSubServiceConnected;
+            pubsub.OnChannelPointsRewardRedeemed += Pubsub_OnChannelPointsRewardRedeemed;
         }
 
         private void Unsubscribe()
@@ -389,6 +458,10 @@ namespace ROBot.Core.Twitch
             client.OnReSubscriber -= OnReSub;
             client.OnRaidNotification -= OnRaidNotification;
             client.OnFailureToReceiveJoinConfirmation -= OnFailureToReceiveJoinConfirmation;
+
+            pubsub.OnListenResponse -= Pubsub_OnListenResponse;
+            pubsub.OnPubSubServiceConnected -= Pubsub_OnPubSubServiceConnected;
+            pubsub.OnChannelPointsRewardRedeemed -= Pubsub_OnChannelPointsRewardRedeemed;
         }
 
         public void Dispose()

@@ -53,5 +53,14 @@ namespace ROBot.Core.GameServer
                 return sessions.FirstOrDefault(x => x.Name.Equals(twitchUserName, StringComparison.OrdinalIgnoreCase));
             }
         }
+
+
+        public IGameSession GetByUserId(string userId)
+        {
+            lock (sessionMutex)
+            {
+                return sessions.FirstOrDefault(x => x.UserId.Equals(userId, StringComparison.OrdinalIgnoreCase));
+            }
+        }
     }
 }

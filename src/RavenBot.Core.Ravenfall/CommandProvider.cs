@@ -36,7 +36,6 @@ namespace RavenBot.Core.Ravenfall
                 ICommandProcessor processor = null;
 
 
-
                 if (string.IsNullOrEmpty(cmd))
                 {
                     foreach (var part in cmdParts)
@@ -55,6 +54,11 @@ namespace RavenBot.Core.Ravenfall
                         return null;
 
                     usedCommand = cmd;
+                }
+
+                if (string.IsNullOrEmpty(arguments))
+                {
+                    arguments = redeemer.Username;
                 }
 
                 if (processor.RequiresBroadcaster)
