@@ -15,6 +15,12 @@ namespace ROBot.Core.GameServer
         {
             lock (sessionMutex)
             {
+                var existingSession = sessions.FirstOrDefault(x => x.Id == sessionId);
+                if (existingSession != null)
+                {
+                    return existingSession;
+                }
+
                 var session = new RavenfallGameSession(server, sessionId, userId, username);
                 sessions.Add(session);
                 if (SessionStarted != null)

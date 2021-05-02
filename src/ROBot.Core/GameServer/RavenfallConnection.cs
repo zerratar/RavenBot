@@ -25,6 +25,8 @@ namespace ROBot.Core.GameServer
         private GameSessionInfo queuedSessionInfo;
         private IGameSession session;
 
+        public Guid InstanceId { get; } = Guid.NewGuid();
+
         public RavenfallConnection(
             ILogger logger,
             IBotServer server,
@@ -98,10 +100,10 @@ namespace ROBot.Core.GameServer
             add
             {
                 internalSessionInfoReceived += value;
-                if (value != null && queuedSessionInfo != null)
-                {
-                    internalSessionInfoReceived.Invoke(this, queuedSessionInfo);
-                }
+                //if (value != null && queuedSessionInfo != null)
+                //{
+                //    internalSessionInfoReceived.Invoke(this, queuedSessionInfo);
+                //}
             }
             remove
             {
@@ -134,22 +136,20 @@ namespace ROBot.Core.GameServer
             var plr = playerProvider.Get(obj.Args[0], obj.Args[1]);
             plr.IsBroadcaster = true;
 
-            var sessionInfo = new GameSessionInfo
+            //if (internalSessionInfoReceived == null)
+            //{
+            //    queuedSessionInfo = sessionInfo;
+            //}
+            //else
+            //{
+            //    queuedSessionInfo = null;
+            internalSessionInfoReceived.Invoke(this, new GameSessionInfo
             {
                 SessionId = sessionId,
                 TwitchUserId = plr.UserId,
                 TwitchUserName = plr.Username
-            };
-
-            if (internalSessionInfoReceived == null)
-            {
-                queuedSessionInfo = sessionInfo;
-            }
-            else
-            {
-                queuedSessionInfo = null;
-                internalSessionInfoReceived.Invoke(this, sessionInfo);
-            }
+            });
+            //}
         }
 
         public Task UnstuckAsync(Player player) => SendAsync("unstuck", player);
@@ -259,6 +259,11 @@ namespace ROBot.Core.GameServer
 
         private void OnUserLeft(ROBot.Core.Twitch.TwitchUserLeft obj) => logger.LogDebug(obj.Name + " left the channel");
         private void OnUserJoined(ROBot.Core.Twitch.TwitchUserJoined obj) => logger.LogDebug(obj.Name + " joined the channel");
+
+        public void Close()
+        {
+            this.client.Close();
+        }
 
         private async Task SendAsync<T>(string name, T packet)
         {

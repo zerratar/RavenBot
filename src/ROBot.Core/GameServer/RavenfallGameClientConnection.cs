@@ -183,6 +183,17 @@ namespace ROBot.Core.GameServer
             }
         }
 
+        internal void Close()
+        {
+            try
+            {
+                GameDisconnected();
+            }
+            catch
+            {
+            }
+        }
+
         private class Subscription : IGameClientSubcription
         {
             public readonly string Identifier;
@@ -206,5 +217,6 @@ namespace ROBot.Core.GameServer
                 this.client.Unsubscribe(this);
             }
         }
+
     }
 }

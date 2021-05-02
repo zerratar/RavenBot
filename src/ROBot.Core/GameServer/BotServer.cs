@@ -15,9 +15,10 @@ namespace ROBot.Core.GameServer
         private readonly IBotServerSettings settings;
         private readonly TcpListener server;
         private bool disposed;
-
+        
         private readonly List<IRavenfallConnection> connections = new List<IRavenfallConnection>();
         private readonly object connectionMutex = new object();
+        private readonly object SessionAuthMutex = new object();
 
         public BotServer(
             ILogger logger,
@@ -39,6 +40,15 @@ namespace ROBot.Core.GameServer
                 return connections.FirstOrDefault(x => x.Session?.Name == ravenfallGameSession.Name);
             }
         }
+
+        public IRavenfallConnection GetConnectionByUserId(string sessionUserId)
+        {
+            lock (connectionMutex)
+            {
+                return connections.FirstOrDefault(x => x.Session?.UserId == sessionUserId);
+            }
+        }
+
 
         public void Start()
         {
@@ -98,11 +108,20 @@ namespace ROBot.Core.GameServer
 
         private void Connection_OnSessionInfoReceived(object sender, GameSessionInfo e)
         {
-            if (sender is IRavenfallConnection connection)
+            lock (SessionAuthMutex)
             {
-                connection.Session = sessionManager.Add(this, e.SessionId, e.TwitchUserId, e.TwitchUserName);
+                if (sender is IRavenfallConnection connection)
+                {
+                    // check for existing connections using the same session details
+                    var existingConnection = GetConnectionByUserId(e.TwitchUserId);
+                    if (existingConnection != null && existingConnection.InstanceId != connection.InstanceId)
+                    {
+                        existingConnection.Close();
+                    }
 
-                logger.LogDebug("[" + connection.EndPointString + "] Ravenfall client authenticated. User: " + connection.Session.Name);
+                    connection.Session = sessionManager.Add(this, e.SessionId, e.TwitchUserId, e.TwitchUserName);
+                    logger.LogDebug("[" + connection.EndPointString + "] Ravenfall client authenticated. User: " + connection.Session.Name);
+                }
             }
         }
 

@@ -69,11 +69,12 @@ namespace ROBot.Core.Twitch
             this.commandHandler = commandHandler;
             this.credentialsProvider = credentialsProvider;
 
-            this.messageBus.Subscribe<string>("streamer_userid_acquired", userid =>
-            {
-                ListenForChannelPoints(logger, userid);
-            });
-
+            // For the time being, pubsub will be disabled as it needs actual token for the person that wants to use it? worked in the old bot. but not here. Wutfacers
+            // ugh...
+            //this.messageBus.Subscribe<string>("streamer_userid_acquired", userid =>
+            //{
+            //    ListenForChannelPoints(logger, userid);
+            //});
 
             CreateTwitchClient();
         }
