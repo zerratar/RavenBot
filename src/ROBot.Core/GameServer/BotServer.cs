@@ -15,7 +15,7 @@ namespace ROBot.Core.GameServer
         private readonly IBotServerSettings settings;
         private readonly TcpListener server;
         private bool disposed;
-        
+
         private readonly List<IRavenfallConnection> connections = new List<IRavenfallConnection>();
         private readonly object connectionMutex = new object();
         private readonly object SessionAuthMutex = new object();
@@ -116,10 +116,16 @@ namespace ROBot.Core.GameServer
                     var existingConnection = GetConnectionByUserId(e.TwitchUserId);
                     if (existingConnection != null && existingConnection.InstanceId != connection.InstanceId)
                     {
+                        if (existingConnection.Session.Created > e.Created)
+                        {
+                            logger.LogDebug("[" + connection.EndPointString + "] Ravenfall client sent a second auth with a created date less than current.");
+                            return;
+                        }
+
                         existingConnection.Close();
                     }
 
-                    connection.Session = sessionManager.Add(this, e.SessionId, e.TwitchUserId, e.TwitchUserName);
+                    connection.Session = sessionManager.Add(this, e.SessionId, e.TwitchUserId, e.TwitchUserName, e.Created);
                     logger.LogDebug("[" + connection.EndPointString + "] Ravenfall client authenticated. User: " + connection.Session.Name);
                 }
             }

@@ -9,6 +9,7 @@ namespace ROBot.Core
         Guid Id { get; }
         string Name { get; }
         string UserId { get; }
+        public DateTime Created { get; }
         Player GetBroadcaster();
         Player Get(string twitchId);
         Player Get(ICommandSender user);

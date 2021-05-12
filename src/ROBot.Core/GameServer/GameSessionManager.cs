@@ -11,7 +11,7 @@ namespace ROBot.Core.GameServer
         public event EventHandler<IGameSession> SessionStarted;
         public event EventHandler<IGameSession> SessionEnded;
 
-        public IGameSession Add(IBotServer server, Guid sessionId, string userId, string username)
+        public IGameSession Add(IBotServer server, Guid sessionId, string userId, string username, DateTime created)
         {
             lock (sessionMutex)
             {
@@ -21,7 +21,7 @@ namespace ROBot.Core.GameServer
                     return existingSession;
                 }
 
-                var session = new RavenfallGameSession(server, sessionId, userId, username);
+                var session = new RavenfallGameSession(server, sessionId, userId, username, created);
                 sessions.Add(session);
                 if (SessionStarted != null)
                     SessionStarted.Invoke(this, session);

@@ -15,18 +15,21 @@ namespace ROBot.Core.GameServer
             IBotServer server,
             Guid id,
             string userId,
-            string name)
+            string name,
+            DateTime created)
         {
             this.playerProvider = new PlayerProvider();
             this.server = server;
             this.Id = id;
             this.UserId = userId;
             this.Name = name;
+            this.Created = created;
         }
 
         public Guid Id { get; }
         public string Name { get; }
         public string UserId { get; }
+        public DateTime Created { get; }
 
         public Player Join(ICommandSender sender, string identifier = "1")
         {

@@ -136,6 +136,12 @@ namespace ROBot.Core.GameServer
             var plr = playerProvider.Get(obj.Args[0], obj.Args[1]);
             plr.IsBroadcaster = true;
 
+            DateTime time = DateTime.MinValue;
+            if (obj.Args.Length > 3)
+            {
+                DateTime.TryParse(obj.Args[3], out time);
+            }
+
             //if (internalSessionInfoReceived == null)
             //{
             //    queuedSessionInfo = sessionInfo;
@@ -145,6 +151,7 @@ namespace ROBot.Core.GameServer
             //    queuedSessionInfo = null;
             internalSessionInfoReceived.Invoke(this, new GameSessionInfo
             {
+                Created = time,
                 SessionId = sessionId,
                 TwitchUserId = plr.UserId,
                 TwitchUserName = plr.Username
