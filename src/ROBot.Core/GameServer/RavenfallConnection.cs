@@ -18,23 +18,31 @@ namespace ROBot.Core.GameServer
     {
         private readonly ConcurrentQueue<string> requests = new ConcurrentQueue<string>();
         private readonly ILogger logger;
+        private readonly IKernel kernel;
         private readonly IBotServer server;
         private readonly IPlayerProvider playerProvider;
         private readonly IMessageBus messageBus;
         private readonly RavenfallGameClientConnection client;
         private GameSessionInfo queuedSessionInfo;
         private IGameSession session;
+        private ITimeoutHandle activePing;
+
+        private int pingSendIndex = 0;
+        private int pongReceiveIndex = 0;
+        private int missedPingCount = 0;
 
         public Guid InstanceId { get; } = Guid.NewGuid();
 
         public RavenfallConnection(
             ILogger logger,
+            IKernel kernel,
             IBotServer server,
             IPlayerProvider playerProvider,
             IMessageBus messageBus,
             RavenfallGameClientConnection client)
         {
             this.logger = logger;
+            this.kernel = kernel;
             this.server = server;
             this.playerProvider = playerProvider;
             this.messageBus = messageBus;
@@ -49,6 +57,7 @@ namespace ROBot.Core.GameServer
             this.client.Disconnected += Client_Disconnected;
 
             this.client.Subscribe("session_owner", RegisterSessionOwner);
+            this.client.Subscribe("pong", PongReceived);
 
             this.client.Subscribe("join_failed", SendResponseToTwitchChat);
             this.client.Subscribe("join_success", SendResponseToTwitchChat);
@@ -93,6 +102,7 @@ namespace ROBot.Core.GameServer
             this.client.Subscribe("message", SendResponseToTwitchChat);
         }
 
+
         private event EventHandler<GameSessionInfo> internalSessionInfoReceived;
 
         public event EventHandler<GameSessionInfo> OnSessionInfoReceived
@@ -123,6 +133,14 @@ namespace ROBot.Core.GameServer
 
         public IPEndPoint EndPoint => client.EndPoint;
         public string EndPointString => EndPoint != null ? EndPoint.Address + ":" + EndPoint.Port : "Unknown";
+
+
+        private void PongReceived(IGameCommand obj)
+        {
+            int.TryParse(obj.Args[0], out pongReceiveIndex);
+            missedPingCount = 0;
+        }
+
         private void RegisterSessionOwner(IGameCommand obj)
         {
             if (string.IsNullOrEmpty(obj.Args[0]))
@@ -226,6 +244,7 @@ namespace ROBot.Core.GameServer
         public Task RequestTrainingInfoAsync(Player player) => SendAsync("train_info", player);
         public Task RaidStreamerAsync(Player target, bool isRaidWar) => SendAsync("raid_streamer", new StreamerRaid(target, isRaidWar));
         public Task RestartGameAsync(Player player) => SendAsync("restart", player);
+        public Task Ping(int correlationId) => SendAsync("ping", new PlayerAndNumber(new Player(), correlationId));
 
         public void Dispose()
         {
@@ -237,15 +256,40 @@ namespace ROBot.Core.GameServer
         private void Client_Disconnected(object sender, EventArgs e)
         {
             server.OnClientDisconnected(this);
+            if (activePing != null)
+            {
+                kernel.ClearTimeout(activePing);
+            }
         }
 
         private async void Client_Connected(object sender, EventArgs e)
         {
             //server.OnClientConnected(this);
+            activePing = kernel.SetTimeout(PingPong, 15000);
             while (requests.TryDequeue(out var request))
             {
                 await this.client.SendAsync(request);
             }
+        }
+
+        private void PingPong()
+        {
+            if (pingSendIndex != pongReceiveIndex)
+            {
+                logger.LogDebug("Connection has not sent any pong back. since last update. Ping " + pingSendIndex + ", Pong " + pongReceiveIndex);
+                // Do nothing as of for now. Since clients have not been updated.
+                // But otherwise we should have a fail count
+                missedPingCount++;
+                // and if that goes beyond 2, client should be disconnected. So the game can force reconnect.
+                if (missedPingCount > 2)
+                {
+                    // this.client.Close();
+                    // return;
+                }
+            }
+
+            Ping(pingSendIndex++);
+            activePing = kernel.SetTimeout(PingPong, 15000);
         }
 
         private async void OnUserCheer(ROBot.Core.Twitch.TwitchCheer obj)

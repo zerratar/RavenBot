@@ -77,5 +77,8 @@ namespace RavenBot.Core.Ravenfall
         Task ResetPetRacingAsync(Player player);
         Task PlayPetRacingAsync(Player player);
 
+
+        // KEEP ALIVE
+        Task Ping(int correlationId);
     }
 }

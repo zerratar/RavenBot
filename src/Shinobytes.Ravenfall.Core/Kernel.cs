@@ -128,6 +128,7 @@ namespace Shinobytes.Ravenfall.RavenNet.Core
             lock (timeoutMutex)
             {
                 this.timeouts.Clear();
+                this.ticks.Clear();
             }
             cancellationTokenSource.Cancel();
             kernelThread.Join();

@@ -1,4 +1,5 @@
-﻿using RavenBot.Core.Ravenfall.Commands;
+﻿using RavenBot.Core;
+using RavenBot.Core.Ravenfall.Commands;
 using System.Net.Sockets;
 
 namespace ROBot.Core.GameServer
@@ -7,14 +8,17 @@ namespace ROBot.Core.GameServer
     {
         private readonly Shinobytes.Ravenfall.RavenNet.Core.IMessageBus messageBus;
         private readonly Microsoft.Extensions.Logging.ILogger logger;
+        private readonly Shinobytes.Ravenfall.RavenNet.Core.IKernel kernel;
         private readonly IPlayerProvider playerProvider;
 
         public RavenfallConnectionProvider(
             Shinobytes.Ravenfall.RavenNet.Core.IMessageBus messageBus,
             Microsoft.Extensions.Logging.ILogger logger,
+            Shinobytes.Ravenfall.RavenNet.Core.IKernel kernel,
             IPlayerProvider playerProvider)
         {
             this.logger = logger;
+            this.kernel = kernel;
             this.playerProvider = playerProvider;
             this.messageBus = messageBus;
         }
@@ -23,6 +27,7 @@ namespace ROBot.Core.GameServer
         {
             return new RavenfallConnection(
                 logger,
+                kernel,
                 server,
                 playerProvider,
                 messageBus,

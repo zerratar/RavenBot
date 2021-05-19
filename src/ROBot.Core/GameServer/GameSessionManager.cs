@@ -18,6 +18,9 @@ namespace ROBot.Core.GameServer
                 var existingSession = sessions.FirstOrDefault(x => x.Id == sessionId);
                 if (existingSession != null)
                 {
+                    if (SessionStarted != null)
+                        SessionStarted.Invoke(this, existingSession);
+
                     return existingSession;
                 }
 
