@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace ROBot.Core.GameServer
 {
@@ -10,6 +11,7 @@ namespace ROBot.Core.GameServer
         IGameSession Add(IBotServer server, Guid sessionId, string userId, string username, DateTime created);
         void Remove(IGameSession session);
 
+        IReadOnlyList<IGameSession> All();
         IGameSession Get(Guid id);
         IGameSession GetByName(string twitchUserName);
         IGameSession GetByUserId(string session);

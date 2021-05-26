@@ -11,7 +11,16 @@ namespace RavenBot.Core.Ravenfall.Commands
         private readonly System.Collections.Generic.List<Player> createdPlayers = new System.Collections.Generic.List<Player>();
 
         private readonly object mutex = new object();
-
+        public int Count
+        {
+            get
+            {
+                lock (mutex)
+                {
+                    return createdPlayers.Count;
+                }
+            }
+        }
         public Player Get(ICommandSender sender, string identifier = null)
         {
             lock (mutex)
@@ -19,7 +28,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                 if (string.IsNullOrEmpty(identifier?.Trim()))
                     identifier = "1";
 
-                var player = createdPlayers.FirstOrDefault(x => x.UserId == sender.UserId && x.Identifier == identifier);
+                var player = createdPlayers.FirstOrDefault(x => x.Username == sender.Username || x.UserId == sender.UserId && x.Identifier == identifier);
                 if (player == null)
                 {
                     player = new Player();

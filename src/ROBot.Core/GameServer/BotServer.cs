@@ -49,6 +49,13 @@ namespace ROBot.Core.GameServer
             }
         }
 
+        public IReadOnlyList<IRavenfallConnection> AllConnections()
+        {
+            lock (connectionMutex)
+            {
+                return connections.ToList();
+            }
+        }
 
         public void Start()
         {
@@ -78,6 +85,13 @@ namespace ROBot.Core.GameServer
                     sessionManager.Remove(connection.Session);
                 }
                 connections.Remove(connection);
+
+                foreach (var badConnection in connections.Where(x => x.EndPointString == "Unknown").ToArray())
+                {
+                    try { badConnection.Dispose(); } catch { }
+                    connections.Remove(badConnection);
+                }
+
                 logger.LogDebug("[" + connection.EndPointString + "] Ravenfall client disconnected.");
             }
         }
@@ -114,15 +128,22 @@ namespace ROBot.Core.GameServer
                 {
                     // check for existing connections using the same session details
                     var existingConnection = GetConnectionByUserId(e.TwitchUserId);
-                    if (existingConnection != null && existingConnection.InstanceId != connection.InstanceId)
+                    if (existingConnection != null)
                     {
-                        if (existingConnection.Session.Created > e.Created)
+                        if (existingConnection.InstanceId != connection.InstanceId)
                         {
-                            logger.LogDebug("[" + connection.EndPointString + "] Ravenfall client sent a second auth with a created date less than current.");
+                            if (existingConnection.Session.Created > e.Created)
+                            {
+                                logger.LogDebug("[" + connection.EndPointString + "] Ravenfall client sent a second auth with a created date less than current.");
+                                return;
+                            }
+
+                            existingConnection.Close();
+                        }
+                        else if (existingConnection.Session != null)
+                        {
                             return;
                         }
-
-                        existingConnection.Close();
                     }
 
                     connection.Session = sessionManager.Add(this, e.SessionId, e.TwitchUserId, e.TwitchUserName, e.Created);

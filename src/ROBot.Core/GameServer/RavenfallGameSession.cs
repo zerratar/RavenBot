@@ -31,6 +31,8 @@ namespace ROBot.Core.GameServer
         public string UserId { get; }
         public DateTime Created { get; }
 
+        public int UserCount => playerProvider.Count;
+
         public Player Join(ICommandSender sender, string identifier = "1")
         {
             var user = playerProvider.Get(sender, identifier);

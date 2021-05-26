@@ -26,6 +26,14 @@ namespace RavenBot.Core
             typeLookup[typeof(TInterface)] = new TypeLookup(typeof(TImplementation), false);
         }
 
+        public void Register(Type type)
+        {
+            typeLookup[type] = new TypeLookup(type, false);
+        }
+        public void Register(Type tInterface, Type tImplementation)
+        {
+            typeLookup[tInterface] = new TypeLookup(tImplementation, false);
+        }
         public void Register<TImplementation>()
         {
             typeLookup[typeof(TImplementation)] = new TypeLookup(typeof(TImplementation), false);

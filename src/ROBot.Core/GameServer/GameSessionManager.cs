@@ -71,5 +71,13 @@ namespace ROBot.Core.GameServer
                 return sessions.FirstOrDefault(x => x.UserId.Equals(userId, StringComparison.OrdinalIgnoreCase));
             }
         }
+
+        public IReadOnlyList<IGameSession> All()
+        {
+            lock (sessionMutex)
+            {
+                return sessions.ToList();
+            }
+        }
     }
 }

@@ -12,12 +12,12 @@ namespace Shinobytes.Ravenfall.RavenNet.Core
         //private readonly LoggerExternalScopeProvider scopeProvider = new LoggerExternalScopeProvider();
         private readonly LoggerScope emptyScope = new LoggerScope();
 
-        private static ConsoleColor MSG = ConsoleColor.White;
-        private static ConsoleColor DBG = ConsoleColor.Cyan;
-        private static ConsoleColor WRN = ConsoleColor.Yellow;
-        private static ConsoleColor ERR = ConsoleColor.Red;
+        protected static ConsoleColor MSG = ConsoleColor.White;
+        protected static ConsoleColor DBG = ConsoleColor.Cyan;
+        protected static ConsoleColor WRN = ConsoleColor.Yellow;
+        protected static ConsoleColor ERR = ConsoleColor.Red;
 
-        private static readonly Dictionary<LogLevel, (string, ConsoleColor, ConsoleColor)> logLevelSeverityMapping = new Dictionary<LogLevel, (string, ConsoleColor, ConsoleColor)>
+        protected static readonly Dictionary<LogLevel, (string, ConsoleColor, ConsoleColor)> logLevelSeverityMapping = new Dictionary<LogLevel, (string, ConsoleColor, ConsoleColor)>
         {
             { LogLevel.None,  ("MSG", MSG, MSG)},
             { LogLevel.Trace, ("MSG", DBG, MSG)},

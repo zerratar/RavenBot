@@ -7,6 +7,7 @@ using ROBot.Ravenfall;
 using ROBot.Core.GameServer;
 using IAppSettings = ROBot.Core.IAppSettings;
 using RavenBot.Core.Twitch;
+using Shinobytes.Network;
 
 namespace ROBot
 {
@@ -27,7 +28,8 @@ namespace ROBot
                 ServerPort = 4041
             });
 
-            ioc.RegisterShared<ILogger, ConsoleLogger>();
+
+            //ioc.RegisterShared<ILogger, ConsoleLogger>();
             ioc.RegisterShared<IKernel, Kernel>();
             ioc.RegisterShared<IStreamBotApplication, StreamBotApp>();
 
@@ -48,6 +50,18 @@ namespace ROBot
             ioc.RegisterShared<ITwitchCredentialsProvider, TwitchCredentialsProvider>();
             ioc.RegisterShared<ITwitchCommandController, TwitchCommandController>();
             ioc.RegisterShared<ITwitchCommandClient, TwitchCommandClient>();
+
+
+
+            // Log extraction
+            // Setting up the server
+            ioc.RegisterCustomShared<ServerSettings>(() => new ServerSettings("0.0.0.0", 6767));
+            ioc.RegisterShared<IServer, TcpServer>();
+            ioc.RegisterShared<IServerConnectionManager, ServerConnectionManager>();
+            ioc.RegisterShared<IServerClientProvider, ServerClientProvider>();
+            ioc.RegisterShared<IServerPacketHandlerProvider, ServerPacketHandlerProvider>();
+            ioc.RegisterShared<IServerPacketSerializer, BinaryServerPacketSerializer>();
+            ioc.RegisterShared<ILogger, ConsoleLogServer>();
 
             var app = ioc.Resolve<IStreamBotApplication>();
             {

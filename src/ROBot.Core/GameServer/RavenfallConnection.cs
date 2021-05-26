@@ -132,7 +132,25 @@ namespace ROBot.Core.GameServer
         }
 
         public IPEndPoint EndPoint => client.EndPoint;
-        public string EndPointString => EndPoint != null ? EndPoint.Address + ":" + EndPoint.Port : "Unknown";
+        public string EndPointString
+        {
+            get
+            {
+                try
+                {
+                    if (client == null)
+                    {
+                        return "Unknown";
+                    }
+
+                    return EndPoint != null ? EndPoint.Address + ":" + EndPoint.Port : "Unknown";
+                }
+                catch
+                {
+                    return "Unknown";
+                }
+            }
+        }
 
 
         private void PongReceived(IGameCommand obj)
@@ -167,6 +185,12 @@ namespace ROBot.Core.GameServer
             //else
             //{
             //    queuedSessionInfo = null;
+
+            if (internalSessionInfoReceived == null)
+            {
+                return;
+            }
+
             internalSessionInfoReceived.Invoke(this, new GameSessionInfo
             {
                 Created = time,

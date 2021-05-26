@@ -15,6 +15,7 @@ namespace ROBot.Core
         Player Get(ICommandSender user);
         Player GetUserByName(string username);
         Player Join(ICommandSender user, string identifier = "1");
+        int UserCount { get; }
         bool Contains(string userId);
         bool ContainsUsername(string username);
         void Leave(string userId);

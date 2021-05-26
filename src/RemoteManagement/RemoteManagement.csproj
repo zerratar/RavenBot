@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <StartupObject></StartupObject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ROBot.Core\ROBot.Core.csproj" />
+    <ProjectReference Include="..\Shinobytes.Network\Shinobytes.Network.csproj" />
+    <ProjectReference Include="..\Shinobytes.Ravenfall.Core\Shinobytes.Ravenfall.Core.csproj" />
+  </ItemGroup>
+
+</Project>

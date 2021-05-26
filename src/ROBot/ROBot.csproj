@@ -24,6 +24,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ROBot.Core\ROBot.Core.csproj" />
+    <ProjectReference Include="..\Shinobytes.Network\Shinobytes.Network.csproj" />
     <ProjectReference Include="..\Shinobytes.Ravenfall.Core\Shinobytes.Ravenfall.Core.csproj" />
   </ItemGroup>
 
