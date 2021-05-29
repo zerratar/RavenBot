@@ -71,10 +71,10 @@ namespace ROBot.Core.Twitch
 
             // For the time being, pubsub will be disabled as it needs actual token for the person that wants to use it? worked in the old bot. but not here. Wutfacers
             // ugh...
-            //this.messageBus.Subscribe<string>("streamer_userid_acquired", userid =>
-            //{
-            //    ListenForChannelPoints(logger, userid);
-            //});
+            this.messageBus.Subscribe<string>("streamer_userid_acquired", userid =>
+            {
+                ListenForChannelPoints(logger, userid);
+            });
 
             CreateTwitchClient();
         }
@@ -88,12 +88,14 @@ namespace ROBot.Core.Twitch
                     return;
                 }
 
-                pubsub.ListenToChannelPoints(userid);
-
-                if (!pubsubConnection)
+                if (pubsubConnection)
                 {
-                    pubsub.Connect();
+                    pubsub.Disconnect();
+                    pubsubConnection = false;
                 }
+
+                pubsub.ListenToChannelPoints(userid);
+                pubsub.Connect();
 
                 connectedToPubsub.Add(userid);
                 logger.LogDebug("Connecting to PubSub");
@@ -415,7 +417,6 @@ namespace ROBot.Core.Twitch
             {
                 var credentials = credentialsProvider.Get();
                 pubsub.SendTopics(credentials.TwitchOAuth);
-                logger.LogDebug("PubSub Service Connected");
                 pubsubConnection = true;
             }
             catch (Exception exc)

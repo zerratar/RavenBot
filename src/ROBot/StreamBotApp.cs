@@ -26,7 +26,9 @@ namespace ROBot
 
             sessionManager.SessionStarted += OnSessionStarted;
             sessionManager.SessionEnded += OnSessionEnded;
+            sessionManager.SessionUpdated += OnSessionUpdated;
         }
+
 
         public void Run()
         {
@@ -50,9 +52,16 @@ namespace ROBot
             if (disposed) return;
             sessionManager.SessionStarted -= OnSessionStarted;
             sessionManager.SessionEnded -= OnSessionEnded;
+            sessionManager.SessionUpdated -= OnSessionUpdated;
             disposed = true;
             twitch.Dispose();
             botServer.Dispose();
+        }
+
+        private void OnSessionUpdated(object sender, GameSessionUpdateEventArgs e)
+        {
+            twitch.LeaveChannel(e.OldName);
+            twitch.JoinChannel(e.NewName);
         }
 
         private void OnSessionStarted(object sender, IGameSession session)

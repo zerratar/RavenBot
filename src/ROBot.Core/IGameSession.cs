@@ -7,7 +7,7 @@ namespace ROBot.Core
     public interface IGameSession
     {
         Guid Id { get; }
-        string Name { get; }
+        string Name { get; set; }
         string UserId { get; }
         public DateTime Created { get; }
         Player GetBroadcaster();

@@ -121,6 +121,8 @@ namespace ROBot.Core.GameServer
             }
         }
 
+        public event EventHandler<GameSessionInfo> OnSessionNameChanged;
+
         public IGameSession Session
         {
             get => session;
@@ -367,5 +369,6 @@ namespace ROBot.Core.GameServer
         {
             return Task.FromResult(true);
         }
+
     }
 }

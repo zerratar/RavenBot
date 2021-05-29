@@ -27,7 +27,9 @@ namespace ROBot.Core.GameServer
         }
 
         public Guid Id { get; }
-        public string Name { get; }
+
+        // mutable in case user changes name during active session
+        public string Name { get; set; } 
         public string UserId { get; }
         public DateTime Created { get; }
 

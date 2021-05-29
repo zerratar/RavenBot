@@ -130,6 +130,11 @@ namespace ROBot.Core.GameServer
                     var existingConnection = GetConnectionByUserId(e.TwitchUserId);
                     if (existingConnection != null)
                     {
+                        if (existingConnection.Session != null && existingConnection.Session.Name != e.TwitchUserName)
+                        {
+                            sessionManager.UpdateName(existingConnection.Session.Id, e.TwitchUserName);
+                        }
+
                         if (existingConnection.InstanceId != connection.InstanceId)
                         {
                             if (existingConnection.Session.Created > e.Created)

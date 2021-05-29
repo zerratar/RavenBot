@@ -10,7 +10,7 @@ namespace ROBot.Core.GameServer
         private readonly object sessionMutex = new object();
         public event EventHandler<IGameSession> SessionStarted;
         public event EventHandler<IGameSession> SessionEnded;
-
+        public event EventHandler<GameSessionUpdateEventArgs> SessionUpdated;
         public IGameSession Add(IBotServer server, Guid sessionId, string userId, string username, DateTime created)
         {
             lock (sessionMutex)
@@ -30,6 +30,14 @@ namespace ROBot.Core.GameServer
                     SessionStarted.Invoke(this, session);
                 return session;
             }
+        }
+
+        public void UpdateName(Guid sessionId, string newSessionName)
+        {
+            var session = Get(sessionId);
+            var oldName = session.Name;
+            session.Name = newSessionName;
+            SessionUpdated?.Invoke(this, new GameSessionUpdateEventArgs(oldName, newSessionName));
         }
 
         public void Remove(IGameSession session)

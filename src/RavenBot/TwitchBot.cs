@@ -39,10 +39,10 @@ namespace RavenBot
         private int reconnectDelay = 10000;
         private bool tryToReconnect = true;
         private bool disposed;
-
+        private bool pubsubIsConnected;
+        private bool listeningToChannelPoints;
         private readonly object mutex = new object();
         private readonly HashSet<string> newSubAdded = new HashSet<string>();
-        private bool connectedToPubsub;
         public TwitchBot(
             ILogger logger,
             IKernel kernel,
@@ -71,14 +71,22 @@ namespace RavenBot
             {
                 try
                 {
-                    if (connectedToPubsub)
+                    if (listeningToChannelPoints)
                     {
                         return;
                     }
 
+
+                    if (pubsubIsConnected)
+                    {
+                        pubsubIsConnected = false;
+                        pubsub.Disconnect();
+                    }
+
                     pubsub.ListenToChannelPoints(userid);
                     pubsub.Connect();
-                    connectedToPubsub = true;
+                    pubsubIsConnected = true;
+
                     logger.WriteDebug("Connecting to PubSub");
                 }
                 catch (Exception exc)
@@ -98,6 +106,10 @@ namespace RavenBot
             EnsureInitialized();
             Subscribe();
             client.Connect();
+            if (!pubsubIsConnected)
+            {
+                pubsub.Connect();
+            }
         }
 
         public void Dispose()
@@ -153,7 +165,7 @@ namespace RavenBot
             if (isInitialized) return;
             if (this.broadcastSubscription == null)
                 this.broadcastSubscription = messageBus.Subscribe<IGameCommand>(MessageBus.Broadcast, Broadcast);
-
+            
             client.Initialize(credentialsProvider.Get(), channelProvider.Get());
 
             isInitialized = true;
@@ -301,6 +313,8 @@ namespace RavenBot
 
             try
             {
+                listeningToChannelPoints = false;
+                pubsubIsConnected = false;
                 pubsub.Disconnect();
             }
             catch
@@ -367,20 +381,28 @@ namespace RavenBot
         {
             if (!e.Successful)
             {
-                logger.WriteError(e.Response.Error);
+                logger.WriteError("Unable to listen to topic: " + e.Topic + ", " + e.Response.Error);
             }
             else
             {
-                logger.WriteDebug("PubSub Listen OK");
+                logger.WriteDebug("PubSub Topic " + e.Topic + " OK");
+                listeningToChannelPoints = true;
             }
         }
 
         private void Pubsub_OnPubSubServiceConnected(object sender, EventArgs e)
         {
             try
-            {                
+            {
+                this.pubsubIsConnected = true;
                 var credentials = credentialsProvider.Get();
-                pubsub.SendTopics(credentials.TwitchOAuth);
+                var oauth = credentials.TwitchOAuth;
+                //if (oauth.Contains(':'))
+                //{
+                //    oauth = oauth.Split(':')[1];
+                //}
+
+                pubsub.SendTopics(oauth);
                 logger.WriteDebug("PubSub Service Connected");
             }
             catch (Exception exc)
