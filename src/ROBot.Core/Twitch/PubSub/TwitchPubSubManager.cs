@@ -44,11 +44,11 @@ namespace ROBot.Core.Twitch
         private string GetAccessTokenRequestUrl(string validationToken)
         {
             return
-                TwitchRedirectUri + "?response_type=code" +
+                TwitchRedirectUri + "?response_type=token" +
                 $"&client_id={TwitchClientID}" +
                 $"&redirect_uri=https://www.ravenfall.stream/login/twitch" +
-                $"&scope=user_read+chat_login+user:read:email+bits:read+chat:read+chat:edit+channel:read:subscriptions+channel:read:redemptions+channel:read:predictions" +
-                $"&state={validationToken}pubsub&force_verify=true";
+                $"&scope=user:read:email+bits:read+chat:read+chat:edit+channel:read:subscriptions+channel:read:redemptions+channel:read:predictions" +
+                $"&state=pubsub{validationToken}&force_verify=true";
         }
 
         public void Dispose()
