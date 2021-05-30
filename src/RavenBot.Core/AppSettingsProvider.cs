@@ -6,8 +6,13 @@ namespace RavenBot.Core
     {
         public IAppSettings Get()
         {
-            var text = System.IO.File.ReadAllText("settings.json");
-            return JsonConvert.DeserializeObject<AppSettings>(text);
+            if (System.IO.File.Exists("settings.json"))
+            {
+                var text = System.IO.File.ReadAllText("settings.json");
+                return JsonConvert.DeserializeObject<AppSettings>(text);
+            }
+
+            return new AppSettings(null, null, null);
         }
     }
 }

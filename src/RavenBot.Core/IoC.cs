@@ -103,6 +103,20 @@ namespace RavenBot.Core
             typeFactories[typeof(T)] = func;
         }
 
+        public void ReplaceSharedInstance<T>(T newInstance)
+        {
+            typeLookup[typeof(T)] = new TypeLookup(typeof(T), true);
+            typeFactories[typeof(T)] = () => newInstance;
+            instances[typeof(T)] = newInstance;
+        }
+
+        public void ReplaceSharedInstance<T, T2>(T2 newInstance)
+        {
+            typeLookup[typeof(T)] = new TypeLookup(typeof(T2), true);
+            typeFactories[typeof(T)] = () => newInstance;
+            instances[typeof(T)] = newInstance;
+        }
+
         public void Dispose()
         {
             foreach (var instance in instances.Values)

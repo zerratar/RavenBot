@@ -1,17 +1,29 @@
 ﻿using System;
+using System.Runtime.InteropServices;
+using System.Windows.Forms;
 using RavenBot.Core;
 using RavenBot.Core.Handlers;
 using RavenBot.Core.Net;
 using RavenBot.Core.Ravenfall;
 using RavenBot.Core.Ravenfall.Commands;
 using RavenBot.Core.Twitch;
+using RavenBot.Forms;
 
 namespace RavenBot
 {
     class Program
     {
+        internal static class NativeMethods
+        {
+            [DllImport("kernel32.dll")]
+            internal static extern Boolean AllocConsole();
+        }
+
+        [STAThread]
         static void Main(string[] args)
         {
+            NativeMethods.AllocConsole();
+
             var ioc = new IoC();
             ioc.RegisterCustomShared<IoC>(() => ioc);
             ioc.RegisterShared<ILogger, ConsoleLogger>();
@@ -44,6 +56,19 @@ namespace RavenBot
             ioc.RegisterShared<IRavenfallClient, UnityRavenfallClient>();
             ioc.RegisterShared<ICommandBindingProvider, CommandBindingProvider>();
             ioc.RegisterShared<ITwitchBot, TwitchBot>();
+
+
+            var appSettings = ioc.Resolve<IAppSettings>();
+            if (string.IsNullOrEmpty(appSettings.TwitchBotUsername) || string.IsNullOrEmpty(appSettings.TwitchBotAuthToken))
+            {
+                Application.SetHighDpiMode(HighDpiMode.SystemAware);
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
+                Application.Run(new SettingsConfigurationForm());
+
+                ioc.ReplaceSharedInstance(new AppSettingsProvider().Get());
+            }
+
 
             using (var cmdListener = ioc.Resolve<ITwitchBot>())
             {

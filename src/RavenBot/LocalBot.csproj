@@ -2,13 +2,17 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net5.0</TargetFramework>
+	<TargetFramework>net5.0-windows</TargetFramework>
     <!--<PublishTrimmed>true</PublishTrimmed>-->
+
+	<UseWindowsForms>true</UseWindowsForms>
     <PublishReadyToRun>true</PublishReadyToRun>
     <PublishSingleFile>true</PublishSingleFile>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <AssemblyName>RavenBot</AssemblyName>
     <RootNamespace>RavenBot</RootNamespace>
+    <ApplicationIcon />
+    <StartupObject />
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -31,7 +35,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="settings.json">
+    <None Update="_settings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
