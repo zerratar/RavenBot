@@ -75,6 +75,8 @@ namespace ROBot.Core.Twitch
                 var command = reward.RewardRedeemed.Redemption.Reward.Title;
                 var cmdParts = command.ToLower().Split(' ');
 
+
+
                 var session = game.GetSession(reward.ChannelId);
 
                 // In case we use brackets to identify a command
@@ -135,10 +137,10 @@ namespace ROBot.Core.Twitch
                 }
                 else
                 {
-                    player = session.Get(redeemer.Id);
+                    player = session.Get(new RewardRedeemUser(redeemer));
                     if (player == null)
                     {
-                        logger.LogError("Error redeeming reward: " + usedCommand + ", redeemer does not exist. ");
+                        logger.LogError("Error redeeming reward: " + usedCommand + ", redeemer does not exist. (" + redeemer.Id + ")");
                         return;
                     }
                 }
@@ -204,5 +206,32 @@ namespace ROBot.Core.Twitch
             }
         }
 
+        internal class RewardRedeemUser : ICommandSender
+        {
+            private readonly TwitchLib.PubSub.Models.Responses.Messages.User user;
+
+            public RewardRedeemUser(TwitchLib.PubSub.Models.Responses.Messages.User user)
+            {
+                this.user = user;
+            }
+
+            public string UserId => user.Id;
+
+            public string Username => user.Login;
+
+            public string DisplayName => user.DisplayName;
+
+            public bool IsBroadcaster => false;
+
+            public bool IsModerator => false;
+
+            public bool IsSubscriber => false;
+
+            public bool IsVip => false;
+
+            public string ColorHex => "#ffffff";
+
+            public bool IsVerifiedBot => false;
+        }
     }
 }

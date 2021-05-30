@@ -136,7 +136,7 @@ namespace ROBot.Core.Twitch
             if (!InChannel(channel))
             {
                 JoinChannel(channel);
-            }
+            }            
 
             client.SendMessage(channel, message);
         }
@@ -158,6 +158,8 @@ namespace ROBot.Core.Twitch
             {
                 if (WaitForConnection(5))
                 {
+                    logger.LogDebug("Joining Twitch Channel " + channel);
+
                     client.JoinChannel(channel);
                     lock (channelMutex)
                     {
@@ -211,6 +213,8 @@ namespace ROBot.Core.Twitch
                 logger.LogDebug("Trying to leave a channel without a name.");
                 return;
             }
+
+            logger.LogDebug("Leaving Twitch Channel " + channel);
 
             pubSubManager.Disconnect(channel);
             client.LeaveChannel(channel);
@@ -268,6 +272,7 @@ namespace ROBot.Core.Twitch
 
         private async void Pubsub_OnChannelPointsRewardRedeemed(object sender, TwitchLib.PubSub.Events.OnChannelPointsRewardRedeemedArgs e)
         {
+            logger.LogDebug("Channel Point Reward Redeemed: " + e.RewardRedeemed?.Redemption?.Reward?.Title + ", by " + e.RewardRedeemed?.Redemption?.User?.Login + ", at " + e.ChannelId);
             await commandHandler.HandleAsync(game, this, e);
         }
 

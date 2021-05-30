@@ -38,7 +38,8 @@ namespace ROBot.Core.Twitch
         {
             awaitingPubSubAccess.Add(username.ToLower());
 
-            return GetAccessTokenRequestUrl(GenerateValidationToken());
+            //return GetAccessTokenRequestUrl(GenerateValidationToken());
+            return "https://www.ravenfall.stream/api/auth/activate-pubsub";
         }
 
         private string GenerateValidationToken()
