@@ -29,6 +29,7 @@ namespace ROBot.Core.Twitch
         private readonly ITwitchMessageFormatter messageFormatter;
         private readonly ITwitchCommandController commandHandler;
         private readonly ITwitchCredentialsProvider credentialsProvider;
+        private readonly ITwitchPubSubManager pubSubManager;
         private IMessageBusSubscription broadcastSubscription;
 
         private readonly ConcurrentQueue<Tuple<string, string>> chatMessageQueue
@@ -42,15 +43,11 @@ namespace ROBot.Core.Twitch
 
         private readonly object channelMutex = new object();
 
-        private TwitchPubSub pubsub;
         private TwitchClient client;
         private bool isInitialized;
         private int reconnectDelay = 10000;
         private bool tryToReconnect = true;
         private bool disposed;
-
-        private HashSet<string> connectedToPubsub = new HashSet<string>();
-        private bool pubsubConnection;
 
         public TwitchCommandClient(
             ILogger logger,
@@ -59,7 +56,8 @@ namespace ROBot.Core.Twitch
             IMessageBus messageBus,
             ITwitchMessageFormatter messageFormatter,
             ITwitchCommandController commandHandler,
-            ITwitchCredentialsProvider credentialsProvider)
+            ITwitchCredentialsProvider credentialsProvider,
+            ITwitchPubSubManager pubSubManager)
         {
             this.logger = logger;
             this.kernel = kernel;
@@ -68,41 +66,27 @@ namespace ROBot.Core.Twitch
             this.messageFormatter = messageFormatter;
             this.commandHandler = commandHandler;
             this.credentialsProvider = credentialsProvider;
+            this.pubSubManager = pubSubManager;
 
-            // For the time being, pubsub will be disabled as it needs actual token for the person that wants to use it? worked in the old bot. but not here. Wutfacers
-            // ugh...
-            this.messageBus.Subscribe<string>("streamer_userid_acquired", userid =>
-            {
-                ListenForChannelPoints(logger, userid);
-            });
+            //// For the time being, pubsub will be disabled as it needs actual token for the person that wants to use it? worked in the old bot. but not here. Wutfacers
+            //// ugh...
+            //this.messageBus.Subscribe<string>("streamer_userid_acquired", userid =>
+            //{
+            //    ListenForChannelPoints(logger, userid);
+            //});
 
+            this.messageBus.Subscribe<PubSubToken>("pubsub", OnPubSubTokenReceived);
             CreateTwitchClient();
         }
 
-        private void ListenForChannelPoints(ILogger logger, string userid)
+        private void OnPubSubTokenReceived(PubSubToken obj)
         {
-            try
+            lock (channelMutex)
             {
-                if (connectedToPubsub.Contains(userid))
+                if (this.joinedChannels.Contains(obj.UserName))
                 {
-                    return;
+                    pubSubManager.Connect(obj.UserName);
                 }
-
-                if (pubsubConnection)
-                {
-                    pubsub.Disconnect();
-                    pubsubConnection = false;
-                }
-
-                pubsub.ListenToChannelPoints(userid);
-                pubsub.Connect();
-
-                connectedToPubsub.Add(userid);
-                logger.LogDebug("Connecting to PubSub");
-            }
-            catch (Exception exc)
-            {
-                logger.LogError(exc.ToString());
             }
         }
 
@@ -136,14 +120,8 @@ namespace ROBot.Core.Twitch
             if (client.IsConnected)
                 client.Disconnect();
 
-            try
-            {
-                pubsub.Disconnect();
-            }
-            catch
-            {
-            }
-            pubsubConnection = false;
+            pubSubManager.Dispose();
+
             broadcastSubscription?.Unsubscribe();
         }
 
@@ -185,6 +163,8 @@ namespace ROBot.Core.Twitch
                     {
                         joinedChannels.Add(channel);
                     }
+
+                    pubSubManager.Connect(channel);
                 }
                 else
                 {
@@ -232,6 +212,7 @@ namespace ROBot.Core.Twitch
                 return;
             }
 
+            pubSubManager.Disconnect(channel);
             client.LeaveChannel(channel);
         }
 
@@ -255,6 +236,33 @@ namespace ROBot.Core.Twitch
 
         private async void OnCommandReceived(object sender, OnChatCommandReceivedArgs e)
         {
+            if (!string.IsNullOrEmpty(e.Command.CommandText) && e.Command.CommandText.Equals("pubsub"))
+            {
+                if (!e.Command.ChatMessage.IsBroadcaster)
+                {
+                    return;
+                }
+                if (string.IsNullOrEmpty(e.Command.ArgumentsAsString))
+                {
+                    return;
+                }
+
+                if (e.Command.ArgumentsAsString.Contains("activate", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (pubSubManager.IsReady(e.Command.ChatMessage.Channel))
+                    {
+                        return;
+                    }
+
+                    var activationLink = pubSubManager.GetActivationLink(e.Command.ChatMessage.UserId, e.Command.ChatMessage.Username);
+                    client.SendWhisper(e.Command.ChatMessage.Username,
+                        "Please use the following link to generate a token that can be used for reading channel point rewards. " +
+                        activationLink
+                        );
+                    return;
+                }
+            }
+
             await commandHandler.HandleAsync(game, this, e.Command);
         }
 
@@ -309,11 +317,6 @@ namespace ROBot.Core.Twitch
 
         public void Broadcast(IGameSessionCommand message)
         {
-            if (!connectedToPubsub.Contains(message.Session.UserId))
-            {
-                ListenForChannelPoints(logger, message.Session.UserId);
-            }
-
             Broadcast(message.Session.Name, message.Receiver, message.Format, message.Args);
         }
 
@@ -335,7 +338,6 @@ namespace ROBot.Core.Twitch
 
         private void CreateTwitchClient()
         {
-            pubsub = new TwitchPubSub();
             client = new TwitchClient(new TcpClient(new ClientOptions { ClientType = ClientType.Chat }));
         }
 
@@ -411,20 +413,6 @@ namespace ROBot.Core.Twitch
             }
         }
 
-        private void Pubsub_OnPubSubServiceConnected(object sender, EventArgs e)
-        {
-            try
-            {
-                var credentials = credentialsProvider.Get();
-                pubsub.SendTopics(credentials.TwitchOAuth);
-                pubsubConnection = true;
-            }
-            catch (Exception exc)
-            {
-                logger.LogError(exc.ToString());
-            }
-        }
-
         private void Subscribe()
         {
             client.OnChatCommandReceived += OnCommandReceived;
@@ -441,9 +429,7 @@ namespace ROBot.Core.Twitch
             client.OnRaidNotification += OnRaidNotification;
             client.OnFailureToReceiveJoinConfirmation += OnFailureToReceiveJoinConfirmation;
 
-            pubsub.OnListenResponse += Pubsub_OnListenResponse;
-            pubsub.OnPubSubServiceConnected += Pubsub_OnPubSubServiceConnected;
-            pubsub.OnChannelPointsRewardRedeemed += Pubsub_OnChannelPointsRewardRedeemed;
+            pubSubManager.OnChannelPointsRewardRedeemed += Pubsub_OnChannelPointsRewardRedeemed;
         }
 
         private void Unsubscribe()
@@ -461,9 +447,7 @@ namespace ROBot.Core.Twitch
             client.OnRaidNotification -= OnRaidNotification;
             client.OnFailureToReceiveJoinConfirmation -= OnFailureToReceiveJoinConfirmation;
 
-            pubsub.OnListenResponse -= Pubsub_OnListenResponse;
-            pubsub.OnPubSubServiceConnected -= Pubsub_OnPubSubServiceConnected;
-            pubsub.OnChannelPointsRewardRedeemed -= Pubsub_OnChannelPointsRewardRedeemed;
+            pubSubManager.OnChannelPointsRewardRedeemed -= Pubsub_OnChannelPointsRewardRedeemed;
         }
 
         public void Dispose()

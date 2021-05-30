@@ -30,6 +30,7 @@ namespace Shinobytes.Network
 
         public Guid Id { get; } = Guid.NewGuid();
 
+        public bool IsReady { get; set; }
         public NetworkClient()
         {
             this.Client = new TcpClient();

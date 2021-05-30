@@ -36,7 +36,7 @@ namespace RemoteManagement
             ioc.RegisterShared<IServerPacketSerializer, BinaryServerPacketSerializer>();
 
             // Setting up the server
-            ioc.RegisterCustomShared<ServerSettings>(() => new ServerSettings("ravenfall.stream", 6767));
+            ioc.RegisterCustomShared<ServerSettings>(() => new ServerSettings("ravenbot.ravenfall.stream", 6767));
             ioc.RegisterShared<IServer, TcpServer>();
             ioc.RegisterShared<IServerConnectionManager, ServerConnectionManager>();
             ioc.RegisterShared<IServerClientProvider, ServerClientProvider>();

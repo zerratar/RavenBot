@@ -16,6 +16,7 @@ namespace ROBot
     {
         private readonly ConsoleLogger logger;
         private readonly IServer server;
+        private readonly IMessageBus messageBus;
         private readonly IServerConnectionManager connectionManager;
         private readonly IServerPacketHandlerProvider packetHandler;
         private readonly IServerPacketSerializer packetSerializer;
@@ -24,9 +25,9 @@ namespace ROBot
         private readonly List<string> messages = new List<string>();
         private readonly int maxMessageStack = 1000;
 
-
         public ConsoleLogServer(
             IServer server,
+            IMessageBus messageBus,
             IServerConnectionManager connectionManager,
             IServerPacketHandlerProvider packetHandler,
             IServerPacketSerializer packetSerializer)
@@ -35,16 +36,32 @@ namespace ROBot
             this.packetHandler = packetHandler;
             this.packetSerializer = packetSerializer;
             this.server = server;
+            this.messageBus = messageBus;
             this.connectionManager = connectionManager;
             SetupServer();
         }
         private async void SetupServer()
         {
+
+            this.messageBus.Subscribe<INetworkClient>("hello", OnHello);
+
             this.server.ClientConnected += Server_ClientConnected;
             this.server.ClientDisconnected += Server_ClientDisconnected;
             await server.StartAsync(CancellationToken.None);
             logger.LogDebug("[Debug]: Log Server Started");
             Broadcast("[Debug]: Log Server Started");
+        }
+
+        private void OnHello(INetworkClient client)
+        {
+            lock (mutex)
+            {
+                foreach (var msg in messages)
+                {
+                    var data = UTF8Encoding.UTF8.GetBytes(msg);
+                    client.Send(data, 0, data.Length);
+                }
+            }
         }
 
         public void Dispose()
@@ -93,7 +110,10 @@ namespace ROBot
             var data = UTF8Encoding.UTF8.GetBytes(str);
             foreach (var connection in connections)
             {
-                connection.Send(data, 0, data.Length);
+                if (connection.IsReady)
+                {
+                    connection.Send(data, 0, data.Length);
+                }
             }
         }
 
@@ -145,14 +165,6 @@ namespace ROBot
 
             e.Client.DataReceived += ServerClient_DataReceived;
 
-            lock (mutex)
-            {
-                foreach (var msg in messages)
-                {
-                    var data = UTF8Encoding.UTF8.GetBytes(msg);
-                    e.Client.Send(data, 0, data.Length);
-                }
-            }
         }
     }
 }

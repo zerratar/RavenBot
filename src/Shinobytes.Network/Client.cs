@@ -10,7 +10,7 @@ namespace Shinobytes.Network
         public Client()
         {
         }
-
+        
         bool IClient.Connected => this.Client != null && this.Client.Connected;
 
         public async Task<bool> ConnectAsync(string host, int port, CancellationToken cancellationToken)

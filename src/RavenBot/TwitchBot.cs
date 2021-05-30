@@ -137,6 +137,9 @@ namespace RavenBot
 
         private void OnMessageReceived(object sender, OnMessageReceivedArgs e)
         {
+            this.logger.WriteDebug(e.ChatMessage.CustomRewardId);
+
+
             if (e.ChatMessage.Bits == 0) return;
 
             this.messageBus.Send(
@@ -165,7 +168,7 @@ namespace RavenBot
             if (isInitialized) return;
             if (this.broadcastSubscription == null)
                 this.broadcastSubscription = messageBus.Subscribe<IGameCommand>(MessageBus.Broadcast, Broadcast);
-            
+
             client.Initialize(credentialsProvider.Get(), channelProvider.Get());
 
             isInitialized = true;

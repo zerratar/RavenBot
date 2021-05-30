@@ -51,6 +51,8 @@ namespace ROBot
             ioc.RegisterShared<ITwitchCommandController, TwitchCommandController>();
             ioc.RegisterShared<ITwitchCommandClient, TwitchCommandClient>();
 
+            ioc.RegisterShared<ITwitchPubSubManager, TwitchPubSubManager>();
+            ioc.RegisterShared<ITwitchPubSubTokenRepository, TwitchPubSubTokenRepository>();
 
 
             // Log extraction
@@ -62,6 +64,7 @@ namespace ROBot
             ioc.RegisterShared<IServerPacketHandlerProvider, ServerPacketHandlerProvider>();
             ioc.RegisterShared<IServerPacketSerializer, BinaryServerPacketSerializer>();
             ioc.RegisterShared<ILogger, ConsoleLogServer>();
+
 
             var app = ioc.Resolve<IStreamBotApplication>();
             {

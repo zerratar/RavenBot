@@ -55,8 +55,7 @@ namespace RavenBot.Twitch
                 TwitchRedirectUri + "?response_type=code" +
                 $"&client_id={TwitchClientID}" +
                 $"&redirect_uri=https://www.ravenfall.stream/api/twitch/authorize" +
-                //$"&redirect_uri=https://localhost:5001/api/twitch/authorize" +
-                $"&scope=user_read+channel:moderate+chat:edit+chat:read" +
+                $"&scope=user_read+chat_login+user:read:email+bits:read+chat:read+chat:edit+channel:read:subscriptions+channel:read:redemptions+channel:read:predictions" +
                 $"&state={validationToken}&force_verify=true";
         }
 

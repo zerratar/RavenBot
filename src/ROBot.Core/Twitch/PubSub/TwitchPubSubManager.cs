@@ -1,0 +1,122 @@
+﻿using Shinobytes.Ravenfall.RavenNet.Core;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using TwitchLib.PubSub.Events;
+
+namespace ROBot.Core.Twitch
+{
+    public class TwitchPubSubManager : ITwitchPubSubManager
+    {
+        private const string TwitchClientID = "757vrtjoawg2rtquprnfb35nqah1w4";
+        private const string TwitchRedirectUri = "https://id.twitch.tv/oauth2/authorize";
+        private readonly Random random = new Random();
+        private readonly IMessageBus messageBus;
+        private readonly ITwitchPubSubTokenRepository repo;
+
+        private HashSet<string> awaitingPubSubAccess = new HashSet<string>();
+
+        private ConcurrentDictionary<string, TwitchPubSubClient> pubsubClients
+            = new ConcurrentDictionary<string, TwitchPubSubClient>();
+
+        public event EventHandler<OnChannelPointsRewardRedeemedArgs> OnChannelPointsRewardRedeemed;
+
+        public TwitchPubSubManager(IMessageBus messageBus, ITwitchPubSubTokenRepository repo)
+        {
+            this.messageBus = messageBus;
+            this.repo = repo;
+        }
+
+        public string GetActivationLink(string userId, string username)
+        {
+            awaitingPubSubAccess.Add(username.ToLower());
+
+            return GetAccessTokenRequestUrl(GenerateValidationToken());
+        }
+
+        private string GenerateValidationToken()
+        {
+            return Convert.ToBase64String(Enumerable.Range(0, 20).Select(x =>
+            (byte)((byte)(random.NextDouble() * ((byte)'z' - (byte)'a')) + (byte)'a')).ToArray());
+        }
+
+        private string GetAccessTokenRequestUrl(string validationToken)
+        {
+            return
+                TwitchRedirectUri + "?response_type=code" +
+                $"&client_id={TwitchClientID}" +
+                $"&redirect_uri=https://www.ravenfall.stream/login/twitch" +
+                $"&scope=user_read+chat_login+user:read:email+bits:read+chat:read+chat:edit+channel:read:subscriptions+channel:read:redemptions+channel:read:predictions" +
+                $"&state={validationToken}pubsub&force_verify=true";
+        }
+
+        public void Dispose()
+        {
+            foreach (var i in pubsubClients.Values)
+            {
+                i.Dispose();
+            }
+            pubsubClients.Clear();
+            awaitingPubSubAccess.Clear();
+        }
+
+        public void Disconnect(string channel)
+        {
+            if (!pubsubClients.TryGetValue(channel.ToLower(), out var client))
+            {
+                return;
+            }
+
+            client.OnChannelPointsRewardRedeemed -= Client_OnChannelPointsRewardRedeemed;
+            pubsubClients.TryRemove(channel.ToLower(), out _);
+            client.Dispose();
+        }
+
+
+        public bool IsReady(string channel)
+        {
+            var key = channel.ToLower();
+            if (!pubsubClients.TryGetValue(key, out var client))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public bool Connect(string channel)
+        {
+            var key = channel.ToLower();
+            if (pubsubClients.TryGetValue(key, out var client))
+            {
+                return true;
+            }
+
+            var token = repo.GetByUserName(channel);
+            if (token == null)
+            {
+                return false;
+            }
+
+
+            if (awaitingPubSubAccess.Contains(key))
+            {
+                awaitingPubSubAccess.Remove(key);
+                messageBus.Send("pubsub_init", channel);
+            }
+
+            client = new TwitchPubSubClient(token);
+            client.OnChannelPointsRewardRedeemed += Client_OnChannelPointsRewardRedeemed;
+
+            pubsubClients[channel.ToLower()] = client;
+            return true;
+        }
+
+        private void Client_OnChannelPointsRewardRedeemed(object sender, OnChannelPointsRewardRedeemedArgs e)
+        {
+            OnChannelPointsRewardRedeemed?.Invoke(this, e);
+        }
+
+    }
+}
