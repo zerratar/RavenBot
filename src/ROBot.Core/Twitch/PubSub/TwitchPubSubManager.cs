@@ -1,4 +1,5 @@
-﻿using Shinobytes.Ravenfall.RavenNet.Core;
+﻿using Microsoft.Extensions.Logging;
+using Shinobytes.Ravenfall.RavenNet.Core;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -13,6 +14,7 @@ namespace ROBot.Core.Twitch
         private const string TwitchRedirectUri = "https://id.twitch.tv/oauth2/authorize";
         private readonly Random random = new Random();
         private readonly IMessageBus messageBus;
+        private readonly ILogger logger;
         private readonly ITwitchPubSubTokenRepository repo;
 
         private HashSet<string> awaitingPubSubAccess = new HashSet<string>();
@@ -22,9 +24,13 @@ namespace ROBot.Core.Twitch
 
         public event EventHandler<OnChannelPointsRewardRedeemedArgs> OnChannelPointsRewardRedeemed;
 
-        public TwitchPubSubManager(IMessageBus messageBus, ITwitchPubSubTokenRepository repo)
+        public TwitchPubSubManager(
+            IMessageBus messageBus,
+            ILogger logger,
+            ITwitchPubSubTokenRepository repo)
         {
             this.messageBus = messageBus;
+            this.logger = logger;
             this.repo = repo;
         }
 
@@ -68,6 +74,8 @@ namespace ROBot.Core.Twitch
                 return;
             }
 
+            logger.LogDebug("Disconnected from PubSub: " + channel);
+
             client.OnChannelPointsRewardRedeemed -= Client_OnChannelPointsRewardRedeemed;
             pubsubClients.TryRemove(channel.ToLower(), out _);
             client.Dispose();
@@ -96,9 +104,9 @@ namespace ROBot.Core.Twitch
             var token = repo.GetByUserName(channel);
             if (token == null)
             {
+                logger.LogWarning("Trying to connect to pubsub for " + channel + " but no token is available.");
                 return false;
             }
-
 
             if (awaitingPubSubAccess.Contains(key))
             {
@@ -106,7 +114,7 @@ namespace ROBot.Core.Twitch
                 messageBus.Send("pubsub_init", channel);
             }
 
-            client = new TwitchPubSubClient(token);
+            client = new TwitchPubSubClient(logger, token);
             client.OnChannelPointsRewardRedeemed += Client_OnChannelPointsRewardRedeemed;
 
             pubsubClients[channel.ToLower()] = client;

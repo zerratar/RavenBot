@@ -16,21 +16,27 @@ namespace ROBot.Core.Twitch
 
         public PubSubToken AddOrUpdate(string userId, string userName, string token)
         {
-            var existing = GetById(userId);
-            if (existing == null)
+            try
             {
-                existing = new PubSubToken();
-                existing.UserId = userId;
-                lock (mutex)
+                var existing = GetById(userId);
+                if (existing == null)
                 {
-                    tokens.Add(existing);
-                    SaveTokens();
+                    existing = new PubSubToken();
+                    existing.UserId = userId;
+                    lock (mutex)
+                    {
+                        tokens.Add(existing);
+                    }
                 }
-            }
 
-            existing.Token = token;
-            existing.UserName = userName;
-            return existing;
+                existing.Token = token;
+                existing.UserName = userName;
+                return existing;
+            }
+            finally
+            {
+                SaveTokens();
+            }
         }
 
         private void SaveTokens()

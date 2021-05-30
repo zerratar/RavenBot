@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using TwitchLib.PubSub;
 using TwitchLib.PubSub.Events;
 
@@ -8,12 +9,14 @@ namespace ROBot.Core.Twitch
     {
         private TwitchPubSub client;
         private bool disposed;
+        private readonly ILogger logger;
         private readonly PubSubToken token;
 
         public event EventHandler<OnChannelPointsRewardRedeemedArgs> OnChannelPointsRewardRedeemed;
 
-        public TwitchPubSubClient(PubSubToken token)
+        public TwitchPubSubClient(ILogger logger, PubSubToken token)
         {
+            this.logger = logger;
             this.token = token;
             this.client = new TwitchPubSub();
 
@@ -25,7 +28,10 @@ namespace ROBot.Core.Twitch
                 client.ListenToChannelPoints(token.UserId);
                 client.Connect();
             }
-            catch { }
+            catch (Exception exc)
+            {
+                logger.LogError("Unable to connect to pubsub for " + token.UserName + ": " + exc);
+            }
         }
 
         private void Client_OnPubSubServiceConnected(object sender, EventArgs e)
@@ -34,19 +40,22 @@ namespace ROBot.Core.Twitch
             {
                 client.SendTopics(token.Token);
             }
-            catch { }
+            catch (Exception exc)
+            {
+                logger.LogError("Unable to send pubsub topics for " + token.UserName + ": " + exc);
+            }
         }
 
         private void Client_OnListenResponse(object sender, OnListenResponseArgs e)
         {
-            //if (!e.Successful)
-            //{
-            //    logger.LogError(e.Response.Error);
-            //}
-            //else
-            //{
-            //    logger.LogDebug("PubSub Listen OK");
-            //}
+            if (!e.Successful)
+            {
+                logger.LogError("Unable to listen to pubsub for " + token.UserName + ": " + e.Response.Error);
+            }
+            else
+            {
+                logger.LogDebug("PubSub " + e.Topic + " Successefull for " + token.UserName);
+            }
         }
 
         private void Client_OnChannelPointsRewardRedeemed(object sender, OnChannelPointsRewardRedeemedArgs e)
