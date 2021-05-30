@@ -29,7 +29,7 @@ namespace ROBot.Core.GameServer
         public Guid Id { get; }
 
         // mutable in case user changes name during active session
-        public string Name { get; set; } 
+        public string Name { get; set; }
         public string UserId { get; }
         public DateTime Created { get; }
 
@@ -90,7 +90,19 @@ namespace ROBot.Core.GameServer
 
         public Player GetBroadcaster()
         {
-            return playerProvider.GetById(UserId);
+            var broadcaster = playerProvider.GetById(UserId);
+            if (broadcaster == null)
+            {
+                broadcaster = playerProvider.GetBroadcaster();
+            }
+
+            if (broadcaster == null)
+            {
+                broadcaster = playerProvider.Get(UserId, Name);
+                broadcaster.IsBroadcaster = true;
+            }
+
+            return broadcaster;
         }
 
         public bool ContainsUsername(string username)

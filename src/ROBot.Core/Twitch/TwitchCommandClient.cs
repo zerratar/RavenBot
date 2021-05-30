@@ -136,7 +136,7 @@ namespace ROBot.Core.Twitch
             if (!InChannel(channel))
             {
                 JoinChannel(channel);
-            }            
+            }
 
             client.SendMessage(channel, message);
         }
@@ -260,7 +260,7 @@ namespace ROBot.Core.Twitch
 
                     var activationLink = pubSubManager.GetActivationLink(e.Command.ChatMessage.UserId, e.Command.ChatMessage.Username);
                     client.SendWhisper(e.Command.ChatMessage.Username,
-                        "Please use the following link to generate a token that can be used for reading channel point rewards. " +
+                        "Please use the following link to activate the channel point rewards. " +
                         activationLink
                         );
                     return;

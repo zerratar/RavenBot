@@ -15,7 +15,6 @@ namespace ROBot.Core.Twitch.Commands
                 var connection = game.GetConnection(session);
                 if (connection != null)
                 {
-
                     var player = session.Get(cmd.Sender);
                     if (!string.IsNullOrEmpty(cmd.Arguments))
                     {

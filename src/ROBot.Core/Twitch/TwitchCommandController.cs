@@ -71,7 +71,7 @@ namespace ROBot.Core.Twitch
             try
             {
                 var redeemer = reward.RewardRedeemed.Redemption.User;
-                var arguments = reward.RewardRedeemed.Redemption.Reward.Prompt;
+                var arguments = string.Empty;//reward.RewardRedeemed.Redemption.Reward.Prompt;
                 var command = reward.RewardRedeemed.Redemption.Reward.Title;
                 var cmdParts = command.ToLower().Split(' ');
 
@@ -145,7 +145,7 @@ namespace ROBot.Core.Twitch
                     }
                 }
 
-                await processor.HandleAsync(game, twitch, new RewardRedeemCommand(player, usedCommand, arguments));
+                await processor.HandleAsync(game, twitch, new RewardRedeemCommand(player, reward.ChannelId, usedCommand, arguments));
             }
             catch (Exception exc)
             {
