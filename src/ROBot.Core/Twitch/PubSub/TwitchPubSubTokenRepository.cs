@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -8,9 +9,11 @@ namespace ROBot.Core.Twitch
     {
         private readonly List<PubSubToken> tokens = new List<PubSubToken>();
         private readonly object mutex = new object();
+        private readonly ILogger logger;
 
-        public TwitchPubSubTokenRepository()
+        public TwitchPubSubTokenRepository(ILogger logger)
         {
+            this.logger = logger;
             LoadTokens();
         }
 
@@ -49,7 +52,10 @@ namespace ROBot.Core.Twitch
                     System.IO.File.WriteAllText("pubsub-tokens.json", data);
                 }
             }
-            catch { }
+            catch (Exception exc)
+            {
+                logger.LogError("Unable to save pubsub-tokens.json: " + exc);
+            }
         }
 
         private void LoadTokens()
@@ -64,9 +70,16 @@ namespace ROBot.Core.Twitch
                         this.tokens.Clear();
                         this.tokens.AddRange(Newtonsoft.Json.JsonConvert.DeserializeObject<List<PubSubToken>>(data));
                     }
+                    else
+                    {
+                        logger.LogDebug("pubsub-tokens.json does not exist. Skipping");
+                    }
                 }
             }
-            catch { }
+            catch (Exception exc)
+            {
+                logger.LogError("Unable to load pubsub-tokens.json: " + exc);
+            }
         }
 
         public PubSubToken GetById(string userId)

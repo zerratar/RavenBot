@@ -40,7 +40,6 @@ namespace ROBot.Core.Twitch.Commands
                     {
                         await connection.DuelRequestAsync(player, session.GetUserByName(sub));
                     }
-                    await connection.DungeonStartAsync(player);
                 }
             }
         }
