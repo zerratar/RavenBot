@@ -47,6 +47,7 @@ namespace RavenBot.Core.Ravenfall
         Task RaidStartAsync(Player player);
         Task DungeonStartAsync(Player player);
         Task JoinDungeonAsync(Player player);
+        Task StopDungeonAsync(Player player);
         Task CraftRequirementAsync(Player player, string itemName);
         Task RequestIslandInfoAsync(Player player);
         Task RequestPlayerResourcesAsync(Player player);

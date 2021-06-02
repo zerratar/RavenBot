@@ -22,8 +22,17 @@ namespace ROBot.Core.Twitch.Commands
                         await connection.JoinDungeonAsync(player);
                         return;
                     }
-
-                    await connection.DungeonStartAsync(player);
+                    else if (cmd.Arguments.Contains("stop", System.StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (player.IsBroadcaster || player.IsModerator)
+                        {
+                            await connection.StopDungeonAsync(player);
+                        }
+                    }
+                    else
+                    {
+                        await connection.DungeonStartAsync(player);
+                    }
                 }
             }
         }

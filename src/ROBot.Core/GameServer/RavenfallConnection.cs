@@ -229,6 +229,7 @@ namespace ROBot.Core.GameServer
         public Task JoinRaidAsync(Player player) => SendAsync("raid_join", player);
         public Task RaidStartAsync(Player player) => SendAsync("raid_force", player);
         public Task DungeonStartAsync(Player player) => SendAsync("dungeon_force", player);
+        public Task StopDungeonAsync(Player player) => SendAsync("dungeon_stop", player);
         public Task JoinDungeonAsync(Player player) => SendAsync("dungeon_join", player);
         public Task ReloadGameAsync(Player player) => SendAsync("reload", player);
         public Task GetMaxMultiplierAsync(Player player) => SendAsync("multiplier", player);
