@@ -324,6 +324,7 @@ namespace ROBot.Core.GameServer
             if (session == null || !session.Name.Equals(obj.Channel, StringComparison.OrdinalIgnoreCase))
                 return;
 
+            logger.LogDebug(obj.Bits + " bits cheered from " + obj.DisplayName + " to " + obj.Channel);
             await SendAsync("twitch_cheer", obj);
         }
 
@@ -332,6 +333,7 @@ namespace ROBot.Core.GameServer
             if (session == null || !session.Name.Equals(obj.Channel, StringComparison.OrdinalIgnoreCase))
                 return;
 
+            logger.LogDebug("Twitch sub from " + obj.DisplayName + " to " + obj.Channel);
             await SendAsync("twitch_sub", obj);
         }
 
@@ -345,15 +347,22 @@ namespace ROBot.Core.GameServer
 
         private async Task SendAsync<T>(string name, T packet)
         {
-            var request = name + ":" + JsonConvert.SerializeObject(packet);
-
-            if (!this.client.IsConnected)
+            try
             {
-                this.EnqueueRequest(request);
-                return;
-            }
+                var request = name + ":" + JsonConvert.SerializeObject(packet);
 
-            await this.client.SendAsync(request);
+                if (!this.client.IsConnected)
+                {
+                    this.EnqueueRequest(request);
+                    return;
+                }
+
+                await this.client.SendAsync(request);
+            }
+            catch (Exception exc)
+            {
+                this.logger.LogError("Unable to send packet (" + name + "): to " + this.session?.Name + ", " + exc);
+            }
         }
 
         private void SendResponseToTwitchChat(IGameCommand obj)
