@@ -10,6 +10,7 @@ namespace ROBot.Core.Twitch.Commands
         {
             this.RequiresBroadcaster = true;
         }
+
         public override async Task HandleAsync(IBotServer game, ITwitchCommandClient twitch, ICommand cmd)
         {
             var channel = cmd.Channel;
