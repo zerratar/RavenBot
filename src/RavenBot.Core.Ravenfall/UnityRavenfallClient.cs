@@ -161,6 +161,9 @@ namespace RavenBot.Core.Ravenfall
         public Task RequestTrainingInfoAsync(Player player) => SendAsync("train_info", player);
         public Task RaidStreamerAsync(Player target, bool isRaidWar) => SendAsync("raid_streamer", new StreamerRaid(target, isRaidWar));
         public Task Ping(int correlationId) => SendAsync("ping", new PlayerAndNumber(new Player(), correlationId));
+        public Task LeaveOnsenAsync(Player player) => SendAsync("onsen_leave", player);
+        public Task JoinOnsenAsync(Player player) => SendAsync("onsen_join", player);
+        public Task GetRestedStatusAsync(Player player) => SendAsync("rested_status", player);
 
         public async Task RestartGameAsync(Player player)
         {

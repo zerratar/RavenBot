@@ -272,7 +272,9 @@ namespace ROBot.Core.GameServer
         public Task RaidStreamerAsync(Player target, bool isRaidWar) => SendAsync("raid_streamer", new StreamerRaid(target, isRaidWar));
         public Task RestartGameAsync(Player player) => SendAsync("restart", player);
         public Task Ping(int correlationId) => SendAsync("ping", new PlayerAndNumber(new Player(), correlationId));
-
+        public Task LeaveOnsenAsync(Player player) => SendAsync("onsen_leave", player);
+        public Task JoinOnsenAsync(Player player) => SendAsync("onsen_join", player);
+        public Task GetRestedStatusAsync(Player player) => SendAsync("rested_status", player);
         public void Dispose()
         {
             this.client.Connected -= Client_Connected;

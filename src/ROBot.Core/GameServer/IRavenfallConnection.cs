@@ -1,6 +1,8 @@
 ﻿using RavenBot.Core.Ravenfall;
+using RavenBot.Core.Ravenfall.Models;
 using System;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace ROBot.Core.GameServer
 {

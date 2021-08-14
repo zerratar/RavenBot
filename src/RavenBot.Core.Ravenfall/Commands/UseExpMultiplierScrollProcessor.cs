@@ -1,15 +1,14 @@
 ﻿using System.Threading.Tasks;
 using RavenBot.Core.Handlers;
-using RavenBot.Core.Net;
 
 namespace RavenBot.Core.Ravenfall.Commands
 {
-    public class ExpMultiplierProcessor : Net.RavenfallCommandProcessor
+    public class UseExpMultiplierScrollProcessor : Net.RavenfallCommandProcessor
     {
         private readonly IRavenfallClient game;
         private readonly IPlayerProvider playerProvider;
 
-        public ExpMultiplierProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
+        public UseExpMultiplierScrollProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
         {
             this.RequiresBroadcaster = true;
             this.game = game;
@@ -29,7 +28,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                 int.TryParse(cmd.Arguments, out numOfSubs);
 
             var player = playerProvider.Get(cmd.Sender);
-            await game.SetExpMultiplierAsync(player, numOfSubs);
-        }        
+            await game.UseExpMultiplierScrollAsync(player, numOfSubs);
+        }
     }
 }

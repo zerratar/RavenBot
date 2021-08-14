@@ -67,8 +67,10 @@ namespace ROBot.Core.Twitch
                     if (System.IO.File.Exists("pubsub-tokens.json"))
                     {
                         var data = System.IO.File.ReadAllText("pubsub-tokens.json");
+                        var records = Newtonsoft.Json.JsonConvert.DeserializeObject<List<PubSubToken>>(data);
                         this.tokens.Clear();
-                        this.tokens.AddRange(Newtonsoft.Json.JsonConvert.DeserializeObject<List<PubSubToken>>(data));
+                        this.tokens.AddRange(records);
+                        logger.LogDebug(records.Count + " pubsub records loaded.");
                     }
                     else
                     {

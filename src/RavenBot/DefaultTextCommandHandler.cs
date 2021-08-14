@@ -84,6 +84,9 @@ namespace RavenBot
             Register<TrainCommandProcessor>("train", "task", "strength", "attack", "mine", "defense", "mining", "wood", "crafting", "fishing", "fish", "woodcutting");
             Register<SailCommandProcessor>("sail", "disembark");
 
+            Register<OnsenCommandProcessor>("onsen", "rest");
+            Register<RestedCommandProcessor>("rested");
+
             Register<VillageCommandProcessor>("village", "town");
 
             // tavern games

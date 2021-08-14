@@ -4,5 +4,6 @@
     {
         PubSubToken AddOrUpdate(string userId, string userName, string token);
         PubSubToken GetByUserName(string channel);
+        PubSubToken GetById(string userId);
     }
 }

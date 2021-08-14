@@ -104,7 +104,7 @@ namespace ROBot.Core.Twitch
                 return true;
             }
 
-            var token = repo.GetByUserName(channel);
+            var token = repo.GetByUserName(channel) ?? repo.GetById(channel);
             if (token == null)
             {
                 logger.LogWarning("Trying to connect to pubsub for " + channel + " but no token is available.");

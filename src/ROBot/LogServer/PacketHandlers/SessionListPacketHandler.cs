@@ -22,14 +22,19 @@ namespace ROBot.LogServer.PacketHandlers
             this.logger.LogDebug("Session List Packet Received");
 
             var allSessions = sessionManager.All();
+
+            //var jsonData = Newtonsoft.Json.JsonConvert.SerializeObject(allSessions);
+
             var header = UTF8Encoding.UTF8.GetBytes("=+ Session List #" + allSessions.Count + System.Environment.NewLine);
             client.Send(header, 0, header.Length);
+
+
             foreach (var session in allSessions)
             {
                 var data = UTF8Encoding.UTF8.GetBytes(FormatSessionRow(session) + System.Environment.NewLine);
                 client.Send(data, 0, data.Length);
             }
-            
+
             var footer = UTF8Encoding.UTF8.GetBytes("=- Session List" + System.Environment.NewLine);
             client.Send(footer, 0, footer.Length);
             return Task.CompletedTask;

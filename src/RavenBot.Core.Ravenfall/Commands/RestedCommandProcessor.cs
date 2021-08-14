@@ -1,15 +1,14 @@
 ﻿using System.Threading.Tasks;
 using RavenBot.Core.Handlers;
-using RavenBot.Core.Net;
 
 namespace RavenBot.Core.Ravenfall.Commands
 {
-    public class ExpMultiplierProcessor : Net.RavenfallCommandProcessor
+    public class RestedCommandProcessor : Net.RavenfallCommandProcessor
     {
         private readonly IRavenfallClient game;
         private readonly IPlayerProvider playerProvider;
 
-        public ExpMultiplierProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
+        public RestedCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
         {
             this.RequiresBroadcaster = true;
             this.game = game;
@@ -24,12 +23,8 @@ namespace RavenBot.Core.Ravenfall.Commands
                 return;
             }
 
-            var numOfSubs = 1;
-            if (!string.IsNullOrEmpty(cmd.Arguments))
-                int.TryParse(cmd.Arguments, out numOfSubs);
-
             var player = playerProvider.Get(cmd.Sender);
-            await game.SetExpMultiplierAsync(player, numOfSubs);
-        }        
+            await game.GetRestedStatusAsync(player);
+        }
     }
 }

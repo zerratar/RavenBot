@@ -70,6 +70,12 @@ namespace RavenBot.Core.Ravenfall
         Task RaidStreamerAsync(Player target, bool isRaidWar);
 
 
+        // ONSEN
+        Task LeaveOnsenAsync(Player player);
+        Task JoinOnsenAsync(Player player);
+        Task GetRestedStatusAsync(Player player);
+
+
         // TAVERN GAMES
         Task PlayTicTacToeAsync(Player player, int num);
         Task ScalePlayerAsync(Player player, float v);
