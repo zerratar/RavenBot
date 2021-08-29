@@ -38,6 +38,12 @@ namespace ROBot.Core.Twitch.Commands
                             return;
                         }
 
+                        if (cmd.Arguments.Contains("stop", StringComparison.OrdinalIgnoreCase))
+                        {
+                            await connection.StopRaidAsync(player);
+                            return;
+                        }
+
                         if (!cmd.Sender.IsBroadcaster)
                         {
                             twitch.Broadcast(channel, cmd.Sender.Username, Localization.PERMISSION_DENIED);

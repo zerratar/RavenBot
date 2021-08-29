@@ -8,7 +8,8 @@ namespace RavenBot.Core
 {
     public interface ICommandBindingProvider
     {
-        string[] Get(string key);
+        //string[] Get(string key);
+        string[] Get(string key, params string[] optionalKeys);
         void EnsureBindingsFile();
     }
 
@@ -45,14 +46,31 @@ namespace RavenBot.Core
             }
         }
 
-        public string[] Get(string key)
+        public string[] Get(string key, params string[] optionalKeys)
         {
             if (bindings.TryGetValue(key, out var binding))
             {
                 return binding.Aliases;
             }
 
-            bindings[key] = new CommandBinding { Key = key, Aliases = new string[] { key } };
+            if (optionalKeys != null && optionalKeys.Length > 0)
+            {
+                foreach (var optKey in optionalKeys)
+                {
+                    if (bindings.TryGetValue(optKey, out var optBinding))
+                    {
+                        return optBinding.Aliases;
+                    }
+                }
+            }
+
+            var aliases = new List<string>() { key };
+            if (optionalKeys != null && optionalKeys.Length > 0)
+            {
+                aliases.AddRange(optionalKeys);
+            }
+
+            bindings[key] = new CommandBinding { Key = key, Aliases = aliases.ToArray() };
             return new string[] { key };
         }
     }

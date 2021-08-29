@@ -46,6 +46,12 @@ namespace RavenBot.Core.Ravenfall.Commands
                     return;
                 }
 
+                if (cmd.Arguments.Contains("stop", StringComparison.OrdinalIgnoreCase))
+                {
+                    await this.game.StopRaidAsync(player);
+                    return;
+                }
+
                 if (!cmd.Sender.IsBroadcaster)
                 {
                     broadcaster.Broadcast(cmd.Sender.Username, Localization.PERMISSION_DENIED);

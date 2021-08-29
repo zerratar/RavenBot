@@ -164,6 +164,7 @@ namespace RavenBot.Core.Ravenfall
         public Task LeaveOnsenAsync(Player player) => SendAsync("onsen_leave", player);
         public Task JoinOnsenAsync(Player player) => SendAsync("onsen_join", player);
         public Task GetRestedStatusAsync(Player player) => SendAsync("rested_status", player);
+        public Task StopRaidAsync(Player player) => SendAsync("raid_stop", player);
 
         public async Task RestartGameAsync(Player player)
         {

@@ -20,8 +20,8 @@ namespace RavenBot
             Register<ApperanceCommandProcessor>(commandBindingProvider.Get("appearance"));//, "looks");
             Register<StatsCommandProcessor>(commandBindingProvider.Get("stats"));//, "status");
             Register<ResourcesCommandProcessor>(commandBindingProvider.Get("res"));//, "resource", "res");
-            Register<HighestSkillCommandProcessor>("highest", "top");//, "top");
-            Register<HighscoreSkillCommandProcessor>("leaderboard", "highscore", "hs");//, "top");
+            Register<HighestSkillCommandProcessor>(commandBindingProvider.Get("highest", "top"));//, "top");
+            Register<HighscoreSkillCommandProcessor>(commandBindingProvider.Get("leaderboard", "highscore", "hs"));//, "top");
             Register<DungeonCommandProcessor>(commandBindingProvider.Get("dungeon"));
 
             Register<DuelCommandProcessor>(commandBindingProvider.Get("duel"));//, "fight");
@@ -49,10 +49,8 @@ namespace RavenBot
             Register<TinyPlayerCommandProcessor>(commandBindingProvider.Get("small"));
             Register<GiantPlayerCommandProcessor>(commandBindingProvider.Get("big"));
 
-
             Register<SetDayCommandProcessor>(commandBindingProvider.Get("day"));
             Register<SetNightCommandProcessor>(commandBindingProvider.Get("night"));
-
 
             Register<TravelCommandProcessor>(commandBindingProvider.Get("travel"));
             Register<PlayerCountCommandProcessor>(commandBindingProvider.Get("online"));//, "players");
@@ -65,33 +63,33 @@ namespace RavenBot
             Register<UnequipCommandProcessor>(commandBindingProvider.Get("unequip"));
             Register<EquipCommandProcessor>(commandBindingProvider.Get("equip"));
 
-            Register<RaidCommandProcessor>("raid", "raidwar");
+            Register<RaidCommandProcessor>(commandBindingProvider.Get("raid", "raidwar"));
 
-            Register<DiaperModeProcessor>("diaper");
+            Register<DiaperModeProcessor>(commandBindingProvider.Get("diaper"));
 
-            Register<InspectCommandProcessor>("inspect");
-            Register<ScrollsCommandProcessor>("scrolls");
-            Register<UseExpMultiplierScrollProcessor>("exp");
+            Register<InspectCommandProcessor>(commandBindingProvider.Get("inspect"));
+            Register<ScrollsCommandProcessor>(commandBindingProvider.Get("scrolls"));
+            Register<UseExpMultiplierScrollProcessor>(commandBindingProvider.Get("exp"));
 
             Register<ToggleItemRequirementsProcessor>("!noitemreq");
             Register<ExpMultiplierProcessor>("!exp");
             Register<ExpMultiplierLimitProcessor>("!explimit");
 
-            Register<StreamerTokenReedeemProcessor>("claim", "redeem");
-            Register<StreamerTokenProcessor>("token", "tokens");
+            Register<StreamerTokenReedeemProcessor>(commandBindingProvider.Get("claim", "redeem"));
+            Register<StreamerTokenProcessor>(commandBindingProvider.Get("token", "tokens"));
 
-            Register<TradeItemCommandProcessor>("sell", "buy");
-            Register<TrainCommandProcessor>("train", "task", "strength", "attack", "mine", "defense", "mining", "wood", "crafting", "fishing", "fish", "woodcutting");
-            Register<SailCommandProcessor>("sail", "disembark");
+            Register<TradeItemCommandProcessor>(commandBindingProvider.Get("sell", "buy"));
+            Register<TrainCommandProcessor>(commandBindingProvider.Get("train", "task", "strength", "attack", "mine", "defense", "mining", "wood", "crafting", "fishing", "fish", "woodcutting"));
+            Register<SailCommandProcessor>(commandBindingProvider.Get("sail", "disembark"));
 
-            Register<OnsenCommandProcessor>("onsen", "rest");
-            Register<RestedCommandProcessor>("rested");
+            Register<OnsenCommandProcessor>(commandBindingProvider.Get("onsen", "rest"));
+            Register<RestedCommandProcessor>(commandBindingProvider.Get("rested"));
 
-            Register<VillageCommandProcessor>("village", "town");
+            Register<VillageCommandProcessor>(commandBindingProvider.Get("village", "town"));
 
             // tavern games
-            Register<TicTacToeCommandProcessor>("tictactoe", "ttt");
-            Register<RacingCommandProcessor>("race", "racing");
+            Register<TicTacToeCommandProcessor>(commandBindingProvider.Get("tictactoe", "ttt"));
+            Register<RacingCommandProcessor>(commandBindingProvider.Get("race", "racing"));
 
             commandBindingProvider.EnsureBindingsFile();
         }

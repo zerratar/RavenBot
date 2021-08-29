@@ -76,6 +76,7 @@ namespace ROBot.Core.Twitch
             //});
 
             this.messageBus.Subscribe<PubSubToken>("pubsub", OnPubSubTokenReceived);
+
             CreateTwitchClient();
         }
 
@@ -86,6 +87,7 @@ namespace ROBot.Core.Twitch
                 if (this.joinedChannels.Contains(obj.UserName))
                 {
                     pubSubManager.Connect(obj.UserName);
+                    //new TwitchLib.Api.Services.FollowerService()
                 }
             }
         }
@@ -246,6 +248,7 @@ namespace ROBot.Core.Twitch
                 {
                     return;
                 }
+
                 if (string.IsNullOrEmpty(e.Command.ArgumentsAsString))
                 {
                     return;
@@ -317,7 +320,12 @@ namespace ROBot.Core.Twitch
             if (this.broadcastSubscription == null)
                 this.broadcastSubscription = messageBus.Subscribe<IGameSessionCommand>(MessageBus.Broadcast, Broadcast);
 
-            client.Initialize(credentialsProvider.Get());
+            var credentials = credentialsProvider.Get();
+            client.Initialize(credentials);
+
+            //var api = new TwitchLib.Api.TwitchAPI();
+            //api.Settings.ClientId = credentials.TwitchClientID
+
             isInitialized = true;
         }
 

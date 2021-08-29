@@ -44,6 +44,7 @@ namespace RavenBot.Core.Ravenfall
         Task GetMaxMultiplierAsync(Player player);
         Task GetVillageBoostAsync(Player player);
         Task JoinRaidAsync(Player player);
+        Task StopRaidAsync(Player player);
         Task RaidStartAsync(Player player);
         Task DungeonStartAsync(Player player);
         Task JoinDungeonAsync(Player player);
