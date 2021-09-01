@@ -13,6 +13,8 @@
         string UserId { get; }
         string Username { get; }
         string DisplayName { get; }
+        bool IsGameAdmin { get; }
+        bool IsGameModerator { get; }
         bool IsBroadcaster { get; }
         bool IsModerator { get; }
         bool IsSubscriber { get; }

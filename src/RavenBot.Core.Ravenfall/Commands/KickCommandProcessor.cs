@@ -22,7 +22,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                 return;
             }
 
-            if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator)
+            if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator && !cmd.Sender.IsGameAdmin && !cmd.Sender.IsGameModerator)
             {
                 broadcaster.Broadcast(cmd.Sender.Username, Localization.KICK_PERM);
                 return;

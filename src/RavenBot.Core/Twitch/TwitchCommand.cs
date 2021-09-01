@@ -135,7 +135,7 @@ namespace RavenBot.Core.Twitch
     public class TwitchCommand : ICommand
     {
 
-        public TwitchCommand(ChatCommand cmd)
+        public TwitchCommand(ChatCommand cmd, bool isGameAdmin = false, bool isGameModerator = false)
         {
             this.Command = cmd.CommandText?.ToLower();
 
@@ -162,6 +162,8 @@ namespace RavenBot.Core.Twitch
                 cmd.ChatMessage.UserId,
                 cmd.ChatMessage.Username,
                 cmd.ChatMessage.DisplayName,
+                isGameAdmin,
+                isGameModerator,
                 isBroadcaster,
                 isModerator,
                 isSubscriber,
@@ -181,6 +183,8 @@ namespace RavenBot.Core.Twitch
                 string userId,
                 string username,
                 string displayName,
+                bool isGameAdmin,
+                bool isGameModerator,
                 bool isBroadcaster,
                 bool isModerator,
                 bool isSubscriber,
@@ -191,6 +195,8 @@ namespace RavenBot.Core.Twitch
                 UserId = userId;
                 Username = username;
                 DisplayName = displayName;
+                IsGameAdmin = isGameAdmin;
+                IsGameModerator = isGameModerator;
                 IsBroadcaster = isBroadcaster;
                 IsModerator = isModerator;
                 IsSubscriber = isSubscriber;
@@ -208,7 +214,8 @@ namespace RavenBot.Core.Twitch
             public bool IsVip { get; }
             public bool IsVerifiedBot { get; }
             public string ColorHex { get; }
-
+            public bool IsGameAdmin { get; }
+            public bool IsGameModerator { get; }
             public override string ToString()
             {
                 return this.Username;

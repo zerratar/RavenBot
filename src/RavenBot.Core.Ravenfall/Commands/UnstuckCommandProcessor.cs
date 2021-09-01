@@ -22,7 +22,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                 return;
             }
 
-            if (!string.IsNullOrEmpty(cmd.Arguments) && (cmd.Sender.IsBroadcaster || cmd.Sender.IsModerator))
+            if (!string.IsNullOrEmpty(cmd.Arguments) && (cmd.Sender.IsBroadcaster || cmd.Sender.IsModerator || cmd.Sender.IsGameAdmin || cmd.Sender.IsGameModerator))
             {
                 var player = playerProvider.Get(cmd.Arguments);
                 if (player != null)

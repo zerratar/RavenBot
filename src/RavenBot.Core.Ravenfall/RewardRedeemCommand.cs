@@ -19,7 +19,6 @@ namespace RavenBot.Core.Ravenfall
         public ICommandSender Sender { get; }
         public string Channel { get; }
         public string Command { get; }
-
         public string Arguments { get; }
 
         internal class RewardRedeemSender : ICommandSender
@@ -48,6 +47,10 @@ namespace RavenBot.Core.Ravenfall
             public string ColorHex => player.Color;
 
             public bool IsVerifiedBot => false;
+
+            public bool IsGameAdmin => false;
+
+            public bool IsGameModerator => false;
         }
     }
 }

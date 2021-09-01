@@ -8,6 +8,7 @@ using ROBot.Core.GameServer;
 using IAppSettings = ROBot.Core.IAppSettings;
 using RavenBot.Core.Twitch;
 using Shinobytes.Network;
+using RavenBot.Core.Ravenfall.Commands;
 
 namespace ROBot
 {
@@ -35,6 +36,7 @@ namespace ROBot
 
             ioc.RegisterShared<IMessageBus, MessageBus>();
 
+            ioc.RegisterShared<IUserRoleManager, UserRoleManager>();
             ioc.RegisterShared<RavenBot.Core.IStringProvider, RavenBot.Core.StringProvider>();
             ioc.RegisterShared<RavenBot.Core.IStringTemplateParser, RavenBot.Core.StringTemplateParser>();
             ioc.RegisterShared<RavenBot.Core.IStringTemplateProcessor, RavenBot.Core.StringTemplateProcessor>();

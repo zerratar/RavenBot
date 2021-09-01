@@ -46,7 +46,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             }
             else if (command.Equals("start") || command.Equals("begin"))
             {
-                if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator)
+                if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator && !cmd.Sender.IsGameAdmin && !cmd.Sender.IsGameModerator)
                 {
                     broadcaster.Broadcast(cmd.Sender.Username, Localization.ARENA_PERM_FORCE);
                     return;
@@ -56,7 +56,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             }
             else if (command.Equals("cancel") || command.Equals("end"))
             {
-                if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator)
+                if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator && !cmd.Sender.IsGameAdmin && !cmd.Sender.IsGameModerator)
                 {
                     broadcaster.Broadcast(cmd.Sender.Username, Localization.ARENA_PERM_CANCEL);
                     return;
@@ -68,7 +68,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             {
                 if (command.StartsWith("kick "))
                 {
-                    if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator)
+                    if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator && !cmd.Sender.IsGameAdmin && !cmd.Sender.IsGameModerator)
                     {
                         broadcaster.Broadcast(cmd.Sender.Username, Localization.ARENA_PERM_KICK);
                         return;
@@ -79,7 +79,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                 }
                 else if (command.StartsWith("add "))
                 {
-                    if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator)
+                    if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator && !cmd.Sender.IsGameAdmin && !cmd.Sender.IsGameModerator)
                     {
                         //broadcaster.Broadcast(
                         broadcaster.Broadcast(cmd.Sender.Username, Localization.ARENA_PERM_ADD);

@@ -23,6 +23,7 @@ namespace RavenBot
     {
         private readonly ILogger logger;
         private readonly IKernel kernel;
+        private readonly IUserRoleManager userRoleManager;
         private readonly IRavenfallClient ravenfall;
         private readonly IPlayerProvider playerProvider;
         private readonly ITwitchUserStore userStore;
@@ -46,6 +47,7 @@ namespace RavenBot
         public TwitchBot(
             ILogger logger,
             IKernel kernel,
+            IUserRoleManager userRoleManager,
             IRavenfallClient ravenfall,
             IPlayerProvider playerProvider,
             ITwitchMessageFormatter localizer,
@@ -57,6 +59,7 @@ namespace RavenBot
         {
             this.logger = logger;
             this.kernel = kernel;
+            this.userRoleManager = userRoleManager;
             this.ravenfall = ravenfall;
             this.playerProvider = playerProvider;
             this.messageFormatter = localizer;
@@ -160,7 +163,8 @@ namespace RavenBot
 
         private async void OnCommandReceived(object sender, OnChatCommandReceivedArgs e)
         {
-            await commandHandler.HandleAsync(this, new TwitchCommand(e.Command));
+            var uid = e.Command.ChatMessage.UserId;
+            await commandHandler.HandleAsync(this, new TwitchCommand(e.Command, userRoleManager.IsAdministrator(uid), userRoleManager.IsModerator(uid)));
         }
 
         private void EnsureInitialized()

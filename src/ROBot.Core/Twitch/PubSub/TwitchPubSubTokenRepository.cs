@@ -11,6 +11,8 @@ namespace ROBot.Core.Twitch
         private readonly object mutex = new object();
         private readonly ILogger logger;
 
+        private const string PubSubTokenDb = ".\\pubsub-tokens.json";
+
         public TwitchPubSubTokenRepository(ILogger logger)
         {
             this.logger = logger;
@@ -49,12 +51,12 @@ namespace ROBot.Core.Twitch
                 lock (mutex)
                 {
                     var data = Newtonsoft.Json.JsonConvert.SerializeObject(tokens);
-                    System.IO.File.WriteAllText("pubsub-tokens.json", data);
+                    System.IO.File.WriteAllText(PubSubTokenDb, data);
                 }
             }
             catch (Exception exc)
             {
-                logger.LogError("Unable to save pubsub-tokens.json: " + exc);
+                logger.LogError("Unable to save " + PubSubTokenDb + ":" + exc);
             }
         }
 
@@ -64,9 +66,9 @@ namespace ROBot.Core.Twitch
             {
                 lock (mutex)
                 {
-                    if (System.IO.File.Exists("pubsub-tokens.json"))
+                    if (System.IO.File.Exists(PubSubTokenDb))
                     {
-                        var data = System.IO.File.ReadAllText("pubsub-tokens.json");
+                        var data = System.IO.File.ReadAllText(PubSubTokenDb);
                         var records = Newtonsoft.Json.JsonConvert.DeserializeObject<List<PubSubToken>>(data);
                         this.tokens.Clear();
                         this.tokens.AddRange(records);
@@ -74,13 +76,13 @@ namespace ROBot.Core.Twitch
                     }
                     else
                     {
-                        logger.LogDebug("pubsub-tokens.json does not exist. Skipping");
+                        logger.LogDebug(PubSubTokenDb + " does not exist. Skipping");
                     }
                 }
             }
             catch (Exception exc)
             {
-                logger.LogError("Unable to load pubsub-tokens.json: " + exc);
+                logger.LogError("Unable to load " + PubSubTokenDb + ":" + exc);
             }
         }
 

@@ -29,6 +29,7 @@ namespace RavenBot
             ioc.RegisterShared<ILogger, ConsoleLogger>();
             ioc.RegisterShared<IKernel, Kernel>();
 
+            ioc.RegisterShared<IUserRoleManager, UserRoleManager>();
             ioc.RegisterShared<ITwitchUserStore, TwitchUserStore>();
             ioc.RegisterCustomShared<IAppSettings>(() => new AppSettingsProvider().Get());
             ioc.Register<IGameConnection, TcpGameConnection>();

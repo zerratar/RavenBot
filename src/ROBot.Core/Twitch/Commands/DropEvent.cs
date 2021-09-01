@@ -5,8 +5,15 @@ using System.Threading.Tasks;
 
 namespace ROBot.Core.Twitch.Commands
 {
-    public class Kick : TwitchCommandHandler
+    public class DropEvent : TwitchCommandHandler
     {
+        private readonly IUserRoleManager userRoleManager;
+
+        public DropEvent(IUserRoleManager userRoleManager)
+        {
+            this.userRoleManager = userRoleManager;
+        }
+
         public override async Task HandleAsync(IBotServer game, ITwitchCommandClient twitch, ICommand cmd)
         {
             var channel = cmd.Channel;
@@ -16,20 +23,20 @@ namespace ROBot.Core.Twitch.Commands
                 var connection = game.GetConnection(session);
                 if (connection != null)
                 {
-                    if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator && !cmd.Sender.IsGameAdmin && !cmd.Sender.IsGameModerator)
+                    var player = session.Get(cmd.Sender);
+                    var item = cmd.Arguments?.Trim();
+
+                    if (string.IsNullOrEmpty(item))
                     {
-                        twitch.Broadcast(channel, cmd.Sender.Username, Localization.KICK_PERM);
                         return;
                     }
 
-                    var targetPlayerName = cmd.Arguments?.Trim();
-                    if (string.IsNullOrEmpty(targetPlayerName))
+                    if (!userRoleManager.IsAdministrator(player.UserId))
                     {
-                        twitch.Broadcast(channel, cmd.Sender.Username, Localization.KICK_NO_USER);
                         return;
                     }
 
-                    await connection.KickAsync(session.GetUserByName(targetPlayerName));
+                    await connection.ItemDropEventAsync(player, item);
                 }
             }
         }

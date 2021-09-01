@@ -20,7 +20,7 @@ namespace ROBot.Core.Twitch.Commands
                 var connection = game.GetConnection(session);
                 if (connection != null)
                 {
-                    if (!string.IsNullOrEmpty(cmd.Arguments) && (cmd.Sender.IsBroadcaster || cmd.Sender.IsModerator))
+                    if (!string.IsNullOrEmpty(cmd.Arguments) && (cmd.Sender.IsBroadcaster || cmd.Sender.IsModerator || cmd.Sender.IsGameAdmin || cmd.Sender.IsGameModerator))
                     {
                         var player = session.GetUserByName(cmd.Arguments);
                         if (player != null)

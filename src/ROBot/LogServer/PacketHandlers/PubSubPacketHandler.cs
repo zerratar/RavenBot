@@ -2,11 +2,7 @@
 using ROBot.Core.Twitch;
 using Shinobytes.Network;
 using Shinobytes.Ravenfall.RavenNet.Core;
-using System.IO;
-using System.Text.Unicode;
 using System.Threading.Tasks;
-using TwitchLib.Api.ThirdParty.UsernameChange;
-using TwitchLib.PubSub.Interfaces;
 
 namespace ROBot.LogServer.PacketHandlers
 {
@@ -41,23 +37,13 @@ namespace ROBot.LogServer.PacketHandlers
             string token = null;
             try
             {
-                using (var mem = new MemoryStream(packet.Data.Buffer, packet.Data.Offset, packet.Data.Length))
-                using (var reader = new BinaryReader(mem))
+                using (var reader = packet.Data.GetReader())
                 {
-                    short size = 0;
+                    userId = reader.ReadString();
+                    userName = reader.ReadString();
+                    token = reader.ReadString();
 
-                    size = reader.ReadInt16();
-                    userId = System.Text.UTF8Encoding.UTF8.GetString(reader.ReadBytes(size));
-
-                    size = reader.ReadInt16();
-                    userName = System.Text.UTF8Encoding.UTF8.GetString(reader.ReadBytes(size));
-
-                    size = reader.ReadInt16();
-                    token = System.Text.UTF8Encoding.UTF8.GetString(reader.ReadBytes(size));
-
-                    var data = pubSubRepo.AddOrUpdate(userId, userName, token);
-                    messageBus.Send("pubsub", data);
-
+                    messageBus.Send("pubsub", pubSubRepo.AddOrUpdate(userId, userName, token));
                     if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(token))
                     {
                         this.logger.LogError("Bad pubsub data received: "

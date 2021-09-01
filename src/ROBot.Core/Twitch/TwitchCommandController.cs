@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using RavenBot.Core.Handlers;
 using RavenBot.Core.Ravenfall;
+using RavenBot.Core.Ravenfall.Commands;
 using RavenBot.Core.Twitch;
 using ROBot.Core.GameServer;
 using Shinobytes.Ravenfall.RavenNet.Core;
@@ -24,6 +25,7 @@ namespace ROBot.Core.Twitch
         private readonly ConcurrentDictionary<string, Type> handlerLookup = new ConcurrentDictionary<string, Type>();
 
         private ITwitchChatMessageHandler messageHandler;
+        private IUserRoleManager userRoleManager;
 
         public TwitchCommandController(
             ILogger logger,
@@ -33,6 +35,8 @@ namespace ROBot.Core.Twitch
             this.ioc = ioc;
 
             RegisterCommandHandlers();
+
+            userRoleManager = this.ioc.Resolve<IUserRoleManager>();
         }
 
         public async Task HandleAsync(IBotServer game, ITwitchCommandClient twitch, ChatMessage message)
@@ -60,7 +64,8 @@ namespace ROBot.Core.Twitch
             else
                 logger.LogDebug("Twitch Command Received: " + key + argString + " from " + command.ChatMessage.Username + " in #" + command.ChatMessage.Channel);
 
-            await HandleAsync(game, twitch, new TwitchCommand(command));
+            var uid = command.ChatMessage.UserId;
+            await HandleAsync(game, twitch, new TwitchCommand(command, userRoleManager.IsAdministrator(uid), userRoleManager.IsModerator(uid)));
         }
 
         public async Task HandleAsync(IBotServer game, ITwitchCommandClient twitch, OnChannelPointsRewardRedeemedArgs reward)
@@ -232,6 +237,10 @@ namespace ROBot.Core.Twitch
             public string ColorHex => "#ffffff";
 
             public bool IsVerifiedBot => false;
+
+            public bool IsGameAdmin => false;
+
+            public bool IsGameModerator => false;
         }
     }
 }
