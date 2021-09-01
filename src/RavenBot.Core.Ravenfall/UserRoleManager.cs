@@ -10,12 +10,6 @@ namespace RavenBot.Core.Ravenfall.Commands
         private const string ModeratorRole = "mod";
 
         private readonly ConcurrentDictionary<string, string> roles = new ConcurrentDictionary<string, string>();
-        private readonly ILogger logger;
-
-        public UserRoleManager(ILogger logger)
-        {
-            this.logger = logger;
-        }
 
         public string GetRole(string userId)
         {
@@ -40,10 +34,10 @@ namespace RavenBot.Core.Ravenfall.Commands
         {
             var oldRole = GetRole(userId);
 
-            if (oldRole != role)
-            {
-                logger.WriteDebug("User: " + userId + " changed role from " + oldRole + " to " + role);
-            }
+            //if (oldRole != role)
+            //{
+            //    //logger.WriteDebug("User: " + userId + " changed role from " + oldRole + " to " + role);
+            //}
 
             roles[userId] = role;
         }
