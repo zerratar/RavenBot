@@ -101,6 +101,7 @@ namespace ROBot.Core.Twitch
             var key = channel.ToLower();
             if (pubsubClients.TryGetValue(key, out var client))
             {
+                logger.LogDebug("PubSub Client for  " + channel + " already exists. " + client.IsConnected);
                 return true;
             }
 

@@ -12,7 +12,14 @@ namespace ROBot.Core.Twitch
         private readonly ILogger logger;
         private readonly PubSubToken token;
 
+        private bool isConnected;
+        private bool receivesChannelPointRewardDetails;
+
         public event EventHandler<OnChannelPointsRewardRedeemedArgs> OnChannelPointsRewardRedeemed;
+
+        public bool IsConnected => client != null && isConnected;
+
+        public bool IsReady => client != null && isConnected && receivesChannelPointRewardDetails;
 
         public TwitchPubSubClient(ILogger logger, PubSubToken token)
         {
@@ -21,6 +28,8 @@ namespace ROBot.Core.Twitch
             this.client = new TwitchPubSub();
 
             client.OnPubSubServiceConnected += Client_OnPubSubServiceConnected;
+            client.OnPubSubServiceClosed += Client_OnPubSubServiceClosed;
+            client.OnPubSubServiceError += Client_OnPubSubServiceError;
             client.OnListenResponse += Client_OnListenResponse;
             client.OnChannelPointsRewardRedeemed += Client_OnChannelPointsRewardRedeemed;
             try
@@ -34,10 +43,25 @@ namespace ROBot.Core.Twitch
             }
         }
 
+        private void Client_OnPubSubServiceError(object sender, OnPubSubServiceErrorArgs e)
+        {
+            isConnected = false;
+            receivesChannelPointRewardDetails = false;
+            logger.LogError("PubSub ERROR for " + token.UserName + ": " + e.Exception);
+        }
+
+        private void Client_OnPubSubServiceClosed(object sender, EventArgs e)
+        {
+            isConnected = false;
+            receivesChannelPointRewardDetails = false;
+            logger.LogError("PubSub Connection Closed for " + token.UserName);
+        }
+
         private void Client_OnPubSubServiceConnected(object sender, EventArgs e)
         {
             try
             {
+                isConnected = true;
                 logger.LogDebug("Connected to PubSub (" + token.UserName + ")");
                 client.SendTopics(token.Token);
                 logger.LogDebug("Sent PubSub Topics for  " + token.UserName + ": " + token.Token);
@@ -50,18 +74,21 @@ namespace ROBot.Core.Twitch
 
         private void Client_OnListenResponse(object sender, OnListenResponseArgs e)
         {
-            if (!e.Successful)
+            if (e.Successful)
             {
-                logger.LogError("Unable to listen to pubsub for " + token.UserName + ": " + e.Response.Error);
+                receivesChannelPointRewardDetails = true;
+                logger.LogDebug("PubSub " + e.Topic + " Successefull for " + token.UserName);
             }
             else
             {
-                logger.LogDebug("PubSub " + e.Topic + " Successefull for " + token.UserName);
+                logger.LogError("Unable to listen to pubsub for " + token.UserName + ": " + e.Response.Error);
             }
         }
 
         private void Client_OnChannelPointsRewardRedeemed(object sender, OnChannelPointsRewardRedeemedArgs e)
         {
+            isConnected = true;
+            receivesChannelPointRewardDetails = true;
             logger.LogDebug("PubSub (" + token.UserName + ") Channel Point Reward Redeemed: " + e.RewardRedeemed.Redemption.Reward.Title);
             OnChannelPointsRewardRedeemed?.Invoke(this, e);
         }
@@ -73,10 +100,14 @@ namespace ROBot.Core.Twitch
                 return;
             }
 
+            isConnected = false;
+            receivesChannelPointRewardDetails = false;
             logger.LogDebug("PubSub (" + token.UserName + ") disposed.");
 
             client.OnPubSubServiceConnected -= Client_OnPubSubServiceConnected;
             client.OnChannelPointsRewardRedeemed -= Client_OnChannelPointsRewardRedeemed;
+            client.OnPubSubServiceClosed -= Client_OnPubSubServiceClosed;
+            client.OnPubSubServiceError -= Client_OnPubSubServiceError;
             client.OnListenResponse -= Client_OnListenResponse;
             disposed = true;
             try
