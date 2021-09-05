@@ -155,14 +155,13 @@ namespace ROBot
 
         private void Server_ClientDisconnected(object sender, ConnectionEventArgs e)
         {
-            WriteLine("[Debug]: Log Server Client disconnected");
+            //WriteLine("[Debug]: Log Server Client disconnected");
             e.Client.DataReceived -= ServerClient_DataReceived;
         }
 
         private void Server_ClientConnected(object sender, ConnectionEventArgs e)
         {
-            WriteLine("[Debug]: Log Server Client connected");
-
+            //WriteLine("[Debug]: Log Server Client connected");
             e.Client.DataReceived += ServerClient_DataReceived;
 
         }

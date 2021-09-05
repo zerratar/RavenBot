@@ -42,6 +42,7 @@ namespace RavenBot
         private bool disposed;
         private bool pubsubIsConnected;
         private bool listeningToChannelPoints;
+        private string pubsubToken;
         private readonly object mutex = new object();
         private readonly HashSet<string> newSubAdded = new HashSet<string>();
         public TwitchBot(
@@ -70,6 +71,23 @@ namespace RavenBot
             this.channelProvider = channelProvider;
             this.credentialsProvider = credentialsProvider;
 
+            this.messageBus.Subscribe<string>("pubsub_token", data =>
+            {
+                if (listeningToChannelPoints)
+                {
+                    return;
+                }
+
+                var d = data.Split(',');
+                pubsubToken = d[1];
+                pubsub.ListenToChannelPoints(d[0]);
+
+                pubsub.Connect();
+                pubsubIsConnected = true;
+
+                logger.WriteDebug("Connecting to PubSub");
+            });
+
             this.messageBus.Subscribe<string>("streamer_userid_acquired", userid =>
             {
                 try
@@ -87,10 +105,7 @@ namespace RavenBot
                     }
 
                     pubsub.ListenToChannelPoints(userid);
-                    pubsub.Connect();
-                    pubsubIsConnected = true;
 
-                    logger.WriteDebug("Connecting to PubSub");
                 }
                 catch (Exception exc)
                 {
@@ -401,15 +416,22 @@ namespace RavenBot
         {
             try
             {
+                if (string.IsNullOrEmpty(pubsubToken))
+                {
+                    return;
+                }
+
                 this.pubsubIsConnected = true;
-                var credentials = credentialsProvider.Get();
-                var oauth = credentials.TwitchOAuth;
+
+                //var credentials = credentialsProvider.Get();
+                //var oauth = credentials.TwitchOAuth;
+
                 //if (oauth.Contains(':'))
                 //{
                 //    oauth = oauth.Split(':')[1];
                 //}
 
-                pubsub.SendTopics(oauth);
+                pubsub.SendTopics(pubsubToken);
                 logger.WriteDebug("PubSub Service Connected");
             }
             catch (Exception exc)

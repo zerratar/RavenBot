@@ -15,7 +15,7 @@ namespace ROBot.Core.Twitch
         private readonly Random random = new Random();
         private readonly IMessageBus messageBus;
         private readonly ILogger logger;
-        private readonly ITwitchPubSubTokenRepository repo;
+        private readonly ITwitchPubSubTokenRepository pubsubTokenRepo;
 
         private HashSet<string> awaitingPubSubAccess = new HashSet<string>();
 
@@ -31,7 +31,7 @@ namespace ROBot.Core.Twitch
         {
             this.messageBus = messageBus;
             this.logger = logger;
-            this.repo = repo;
+            this.pubsubTokenRepo = repo;
         }
 
         public string GetActivationLink(string userId, string username)
@@ -104,7 +104,7 @@ namespace ROBot.Core.Twitch
                 return true;
             }
 
-            var token = repo.GetByUserName(channel) ?? repo.GetById(channel);
+            var token = pubsubTokenRepo.GetByUserName(channel) ?? pubsubTokenRepo.GetById(channel);
             if (token == null)
             {
                 logger.LogWarning("Trying to connect to pubsub for " + channel + " but no token is available.");

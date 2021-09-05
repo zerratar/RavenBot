@@ -38,6 +38,7 @@ namespace RavenBot.Core.Ravenfall
             this.client.Connected += Client_OnConnect;
 
             this.client.Subscribe("session_owner", RegisterSessionOwner);
+            this.client.Subscribe("pubsub_token", RegisterPubSubToken);
 
             this.client.Subscribe("join_failed", SendResponseToTwitchChat);
             this.client.Subscribe("join_success", SendResponseToTwitchChat);
@@ -80,6 +81,15 @@ namespace RavenBot.Core.Ravenfall
             this.client.Subscribe("island_info", SendResponseToTwitchChat);
 
             this.client.Subscribe("message", SendResponseToTwitchChat);
+        }
+
+        private void RegisterPubSubToken(IGameCommand obj)
+        {
+            var userId = obj.Args[0];
+            var username = obj.Args[1];
+            var token = obj.Args[2];
+
+            messageBus.Send("pubsub_token", userId + "," + token);
         }
 
         private void RegisterSessionOwner(IGameCommand obj)

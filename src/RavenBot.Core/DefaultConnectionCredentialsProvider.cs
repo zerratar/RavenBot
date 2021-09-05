@@ -5,7 +5,6 @@ namespace RavenBot.Core
     public class DefaultConnectionCredentialsProvider : IConnectionCredentialsProvider
     {
         private readonly IAppSettings settings;
-
         public DefaultConnectionCredentialsProvider(IAppSettings settings)
         {
             this.settings = settings;

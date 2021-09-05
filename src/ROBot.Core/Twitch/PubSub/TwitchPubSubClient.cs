@@ -38,7 +38,9 @@ namespace ROBot.Core.Twitch
         {
             try
             {
+                logger.LogDebug("Connected to PubSub (" + token.UserName + ")");
                 client.SendTopics(token.Token);
+                logger.LogDebug("Sent PubSub Topics for  " + token.UserName + ": " + token.Token);
             }
             catch (Exception exc)
             {
@@ -60,6 +62,7 @@ namespace ROBot.Core.Twitch
 
         private void Client_OnChannelPointsRewardRedeemed(object sender, OnChannelPointsRewardRedeemedArgs e)
         {
+            logger.LogDebug("PubSub (" + token.UserName + ") Channel Point Reward Redeemed: " + e.RewardRedeemed.Redemption.Reward.Title);
             OnChannelPointsRewardRedeemed?.Invoke(this, e);
         }
 
@@ -69,6 +72,8 @@ namespace ROBot.Core.Twitch
             {
                 return;
             }
+
+            logger.LogDebug("PubSub (" + token.UserName + ") disposed.");
 
             client.OnPubSubServiceConnected -= Client_OnPubSubServiceConnected;
             client.OnChannelPointsRewardRedeemed -= Client_OnChannelPointsRewardRedeemed;
