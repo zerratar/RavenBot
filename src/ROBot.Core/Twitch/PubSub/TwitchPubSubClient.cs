@@ -51,11 +51,20 @@ namespace ROBot.Core.Twitch
             }
         }
 
-        private void Client_OnPubSubServiceError(object sender, OnPubSubServiceErrorArgs e)
+        private async void Client_OnPubSubServiceError(object sender, OnPubSubServiceErrorArgs e)
         {
+            var wasReady = IsReady;
+
             isConnected = false;
             receivesChannelPointRewardDetails = false;
-            logger.LogError("PubSub ERROR for " + token.UserName + ": " + e.Exception);
+            logger.LogError("PubSub ERROR for " + token.UserName + ": " + e.Exception.Message);
+
+            if (wasReady)
+            {
+                logger.LogWarning("Trying to reconnect to PubSub for  " + token.UserName + "...");
+                await Task.Delay(1000);
+                Connect();
+            }
         }
 
         private async void Client_OnPubSubServiceClosed(object sender, EventArgs e)
