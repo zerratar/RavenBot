@@ -41,6 +41,7 @@ namespace ROBot.Core.Twitch
         {
             try
             {
+                logger.LogDebug("Connecting to PubSub for " + token.UserName + "...");
                 client.ListenToChannelPoints(token.UserId);
                 client.Connect();
             }
@@ -62,7 +63,7 @@ namespace ROBot.Core.Twitch
             isConnected = false;
             receivesChannelPointRewardDetails = false;
             logger.LogError("PubSub Connection Closed for " + token.UserName);
-            
+
             logger.LogWarning("Trying to reconnect to PubSub for  " + token.UserName + "...");
             await Task.Delay(1000);
             Connect();

@@ -96,8 +96,6 @@ namespace ROBot.Core.Twitch
 
         public bool Connect(string channel)
         {
-            logger.LogDebug("Connecting to pubsub for " + channel + "...");
-
             var key = channel.ToLower();
             if (pubsubClients.TryGetValue(key, out var client))
             {
