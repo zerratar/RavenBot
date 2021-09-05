@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
+using System.Threading.Tasks;
 using TwitchLib.PubSub;
 using TwitchLib.PubSub.Events;
 
@@ -32,6 +33,12 @@ namespace ROBot.Core.Twitch
             client.OnPubSubServiceError += Client_OnPubSubServiceError;
             client.OnListenResponse += Client_OnListenResponse;
             client.OnChannelPointsRewardRedeemed += Client_OnChannelPointsRewardRedeemed;
+
+            Connect();
+        }
+
+        private void Connect()
+        {
             try
             {
                 client.ListenToChannelPoints(token.UserId);
@@ -50,11 +57,15 @@ namespace ROBot.Core.Twitch
             logger.LogError("PubSub ERROR for " + token.UserName + ": " + e.Exception);
         }
 
-        private void Client_OnPubSubServiceClosed(object sender, EventArgs e)
+        private async void Client_OnPubSubServiceClosed(object sender, EventArgs e)
         {
             isConnected = false;
             receivesChannelPointRewardDetails = false;
             logger.LogError("PubSub Connection Closed for " + token.UserName);
+            
+            logger.LogWarning("Trying to reconnect to PubSub for  " + token.UserName + "...");
+            await Task.Delay(1000);
+            Connect();
         }
 
         private void Client_OnPubSubServiceConnected(object sender, EventArgs e)
