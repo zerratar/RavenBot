@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Shinobytes.Ravenfall.RavenNet.Core
 {
-    public class ConsoleLogger : ILogger
+    public class HighlightedConsoleLogger : ILogger
     {
         private readonly object writelock = new object();
         //private readonly LoggerExternalScopeProvider scopeProvider = new LoggerExternalScopeProvider();
@@ -28,7 +28,7 @@ namespace Shinobytes.Ravenfall.RavenNet.Core
             { LogLevel.Critical, ("ERR", ERR, ERR)},
         };
 
-        public ConsoleLogger()
+        public HighlightedConsoleLogger()
         {
             Console.OutputEncoding = Encoding.Unicode;
         }
@@ -216,6 +216,38 @@ namespace Shinobytes.Ravenfall.RavenNet.Core
                 BackgroundColor = backgroundColor;
             }
         }
+
+        private struct LoggerScope : IDisposable
+        {
+            public void Dispose() { }
+        }
+    }
+
+    public class ConsoleLogger : ILogger
+    {
+        private readonly object writelock = new object();
+        //private readonly LoggerExternalScopeProvider scopeProvder = new LoggerExternalScopeProvider();
+        private readonly LoggerScope emptyScope = new LoggerScope();
+
+        public ConsoleLogger()
+        {
+            Console.OutputEncoding = Encoding.Unicode;
+        }
+
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
+        {
+            var message = formatter != null ? formatter(state, exception) : state.ToString();
+            var msg = $"[{DateTime.UtcNow}] [{logLevel}] {message}";
+            WriteLine(msg);
+        }
+
+        public bool IsEnabled(LogLevel logLevel) => true;
+
+        public IDisposable BeginScope<TState>(TState state) => emptyScope;//scopeProvider.Push(state);
+
+        public void Write(string message) => Console.Write(message);
+
+        public void WriteLine(string message) => Console.WriteLine(message);
 
         private struct LoggerScope : IDisposable
         {

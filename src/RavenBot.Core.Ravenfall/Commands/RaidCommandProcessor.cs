@@ -52,7 +52,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                     return;
                 }
 
-                if (!cmd.Sender.IsBroadcaster)
+                if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsGameAdmin)
                 {
                     broadcaster.Broadcast(cmd.Sender.Username, Localization.PERMISSION_DENIED);
                     return;

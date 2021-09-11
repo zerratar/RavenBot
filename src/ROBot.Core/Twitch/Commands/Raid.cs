@@ -44,7 +44,7 @@ namespace ROBot.Core.Twitch.Commands
                             return;
                         }
 
-                        if (!cmd.Sender.IsBroadcaster)
+                        if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsGameAdmin)
                         {
                             twitch.Broadcast(channel, cmd.Sender.Username, Localization.PERMISSION_DENIED);
                             return;

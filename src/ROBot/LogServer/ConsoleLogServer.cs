@@ -32,7 +32,7 @@ namespace ROBot
             IServerPacketHandlerProvider packetHandler,
             IServerPacketSerializer packetSerializer)
         {
-            this.logger = new ConsoleLogger();
+            this.logger = new ConsoleLogger(); // HighlightedConsoleLogger
             this.packetHandler = packetHandler;
             this.packetSerializer = packetSerializer;
             this.server = server;
@@ -42,9 +42,7 @@ namespace ROBot
         }
         private async void SetupServer()
         {
-
             this.messageBus.Subscribe<INetworkClient>("hello", OnHello);
-
             this.server.ClientConnected += Server_ClientConnected;
             this.server.ClientDisconnected += Server_ClientDisconnected;
             await server.StartAsync(CancellationToken.None);
