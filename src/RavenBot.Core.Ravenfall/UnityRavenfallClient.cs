@@ -253,8 +253,8 @@ namespace RavenBot.Core.Ravenfall
         }
         private async void OnUserCheer(TwitchCheer obj) => await SendAsync("twitch_cheer", obj);
         private async void OnUserSub(TwitchSubscription obj) => await SendAsync("twitch_sub", obj);
-        private void OnUserLeft(TwitchUserLeft obj) => logger.WriteDebug(obj.Name + " left the channel");
-        private void OnUserJoined(TwitchUserJoined obj) => logger.WriteDebug(obj.Name + " joined the channel");
+        private void OnUserLeft(TwitchUserLeft obj) => logger.WriteMessage(obj.Name + " left the channel");
+        private void OnUserJoined(TwitchUserJoined obj) => logger.WriteMessage(obj.Name + " joined the channel");
 
         private async Task SendAsync<T>(string name, T packet)
         {

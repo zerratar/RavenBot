@@ -10,12 +10,14 @@ namespace RavenBot.Core.Handlers
     public class TextCommandHandler : ICommandHandler//, ICommandAliasRegister
     {
         private readonly IoC ioc;
+        private readonly ILogger logger;
         private readonly ConcurrentDictionary<string, ICommandProcessor> commands
             = new ConcurrentDictionary<string, ICommandProcessor>();
 
         public TextCommandHandler(IoC ioc)
         {
             this.ioc = ioc;
+            this.logger = ioc.Resolve<ILogger>();
         }
 
         public IReadOnlyDictionary<string, ICommandProcessor> GetCommandProcessors()
@@ -27,7 +29,19 @@ namespace RavenBot.Core.Handlers
         {
             if (commands.TryGetValue(cmd.Command, out var processor))
             {
-                Console.WriteLine($"Command received: {cmd.Command} from {cmd.Sender} with args: {cmd.Arguments}");
+                var isChannelPointReward = cmd.GetType().Name.Contains("Reward");
+                if (!isChannelPointReward)
+                {
+                    if (!string.IsNullOrEmpty(cmd.Arguments))
+                    {
+                        logger.WriteDebug($"Command received: {cmd.Command} from {cmd.Sender.Username} with args: {cmd.Arguments}");
+                    }
+                    else
+                    {
+                        logger.WriteDebug($"Command received: {cmd.Command} from {cmd.Sender.Username}");
+                    }
+                }
+
                 await processor.ProcessAsync(listener, cmd);
             }
         }

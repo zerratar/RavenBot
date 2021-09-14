@@ -72,7 +72,7 @@ namespace RavenBot.Core.Net
         private void OnConnectionEstablished()
         {
             if (!this.connection.IsConnected) return;
-            logger.WriteDebug("TcpGameClient::Connected");
+            logger.WriteDebug("Connected to Ravenfall");
             Connected?.Invoke(this, EventArgs.Empty);
             isConnected = true;
         }
@@ -126,7 +126,7 @@ namespace RavenBot.Core.Net
 
         private void DisconnectedFromServer()
         {
-            logger.WriteDebug("TcpGameClient::Disconnected");
+            logger.WriteDebug("Disconnected from Ravenfall");
             isConnected = false;
             readActive = false;
         }

@@ -26,4 +26,6 @@ namespace RavenBot.Core.Ravenfall.Commands
             await game.GetVillageBoostAsync(player);
         }
     }
+
+
 }

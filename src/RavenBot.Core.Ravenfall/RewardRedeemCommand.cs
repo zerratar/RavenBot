@@ -7,7 +7,7 @@ namespace RavenBot.Core.Ravenfall
     {
         private Player Player;
 
-        public RewardRedeemCommand(Player player, string channel, string command, string arguments = null)
+        public RewardRedeemCommand(Player player, string channel, string command, string arguments)
         {
             this.Player = player;
             this.Sender = new RewardRedeemSender(player);

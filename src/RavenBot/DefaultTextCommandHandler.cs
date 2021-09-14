@@ -87,6 +87,8 @@ namespace RavenBot
 
             Register<VillageCommandProcessor>(commandBindingProvider.Get("village", "town"));
 
+            Register<PubSubActivateCommandProcessor>(commandBindingProvider.Get("pubsub", "channelpointrewards", "points", "rewards"));
+
             // tavern games
             Register<TicTacToeCommandProcessor>(commandBindingProvider.Get("tictactoe", "ttt"));
             Register<RacingCommandProcessor>(commandBindingProvider.Get("race", "racing"));

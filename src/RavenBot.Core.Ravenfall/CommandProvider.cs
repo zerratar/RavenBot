@@ -20,7 +20,7 @@ namespace RavenBot.Core.Ravenfall
             this.commandHandler = commandHandler;
         }
 
-        public ICommand GetCommand(Player redeemer, string command, string arguments)
+        public ICommand GetCommand(Player redeemer, string channel, string command, string arguments)
         {
             try
             {
@@ -63,11 +63,11 @@ namespace RavenBot.Core.Ravenfall
 
                 if (processor.RequiresBroadcaster)
                 {
-                    return new RewardRedeemCommand(broadcaster, usedCommand, redeemer.Username);
+                    return new RewardRedeemCommand(broadcaster, channel, usedCommand, redeemer.Username);
                 }
                 else
                 {
-                    return new RewardRedeemCommand(redeemer, usedCommand, arguments);
+                    return new RewardRedeemCommand(redeemer, channel, usedCommand, arguments);
                 }
             }
             catch
