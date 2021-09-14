@@ -17,9 +17,9 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.8.0" />
     <PackageReference Include="TwitchLib.Api" Version="3.2.3" />
-    <PackageReference Include="TwitchLib.Api.Core" Version="3.2.3" />
-    <PackageReference Include="TwitchLib.Api.Helix" Version="3.2.3" />
-    <PackageReference Include="TwitchLib.Client" Version="3.2.2" />
+    <PackageReference Include="TwitchLib.Api.Core" Version="3.2.5-preview-9a3c9a73b72f479e1c27fec4e1c7ec77dd69f125" />
+    <PackageReference Include="TwitchLib.Api.Helix" Version="3.2.5-preview-9a3c9a73b72f479e1c27fec4e1c7ec77dd69f125" />
+    <PackageReference Include="TwitchLib.Client" Version="3.2.3" />
   </ItemGroup>
 
   <ItemGroup>

@@ -225,10 +225,7 @@ namespace Shinobytes.Ravenfall.RavenNet.Core
 
     public class ConsoleLogger : ILogger
     {
-        private readonly object writelock = new object();
-        //private readonly LoggerExternalScopeProvider scopeProvder = new LoggerExternalScopeProvider();
         private readonly LoggerScope emptyScope = new LoggerScope();
-
         public ConsoleLogger()
         {
             Console.OutputEncoding = Encoding.Unicode;
