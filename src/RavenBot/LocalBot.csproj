@@ -26,7 +26,7 @@
     <PackageReference Include="TwitchLib.Api.Core" Version="3.2.5-preview-9a3c9a73b72f479e1c27fec4e1c7ec77dd69f125" />
     <PackageReference Include="TwitchLib.Api.Helix" Version="3.2.5-preview-9a3c9a73b72f479e1c27fec4e1c7ec77dd69f125" />
     <PackageReference Include="TwitchLib.Client" Version="3.2.3" />
-    <PackageReference Include="TwitchLib.PubSub" Version="3.2.3-preview-5500be4a524d8812e7bd37de4288610422b41fe6" />
+    <PackageReference Include="TwitchLib.PubSub" Version="3.2.3" />
   </ItemGroup>
 
   <ItemGroup>
