@@ -297,7 +297,6 @@ namespace RavenBot
                 e.GiftedSubscription.IsSubscriber,
                 1,
                 false));
-
             this.Broadcast("", Localization.Twitch.THANK_YOU_GIFT_SUB, e.GiftedSubscription.DisplayName);
         }
 

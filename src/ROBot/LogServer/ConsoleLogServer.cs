@@ -1,14 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
-using RavenBot.Core.Net.WebSocket;
 using Shinobytes.Network;
 using Shinobytes.Ravenfall.RavenNet.Core;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace ROBot
 {
@@ -42,12 +38,38 @@ namespace ROBot
         }
         private async void SetupServer()
         {
+            this.messageBus.Subscribe("exit", () =>
+            {
+                TrySaveLogToDisk();
+            });
+
             this.messageBus.Subscribe<INetworkClient>("hello", OnHello);
             this.server.ClientConnected += Server_ClientConnected;
             this.server.ClientDisconnected += Server_ClientDisconnected;
             await server.StartAsync(CancellationToken.None);
             logger.LogDebug("[Debug]: Log Server Started");
             Broadcast("[Debug]: Log Server Started");
+        }
+
+        public void TrySaveLogToDisk()
+        {
+            lock (mutex)
+            {
+                try
+                {
+                    const string logsDir = "logs";
+                    var fn = DateTime.UtcNow.ToString("yyyy-MM-dd_hhmmss") + ".log";
+                    if (!System.IO.Directory.Exists(logsDir))
+                    {
+                        System.IO.Directory.CreateDirectory(logsDir);
+                    }
+                    System.IO.File.WriteAllLines(System.IO.Path.Combine(logsDir, fn), messages);
+                }
+                catch (System.Exception exc)
+                {
+                    System.Console.WriteLine(exc.ToString());
+                }
+            }
         }
 
         private void OnHello(INetworkClient client)

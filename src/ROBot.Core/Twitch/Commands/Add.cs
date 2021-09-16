@@ -1,5 +1,4 @@
 ﻿using RavenBot.Core.Handlers;
-using RavenBot.Core.Ravenfall.Models;
 using ROBot.Core.GameServer;
 using System.Threading.Tasks;
 

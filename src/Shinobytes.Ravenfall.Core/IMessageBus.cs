@@ -6,5 +6,6 @@ namespace Shinobytes.Ravenfall.RavenNet.Core
     {
         void Send<T>(string key, T message);
         IMessageBusSubscription Subscribe<T>(string key, Action<T> onMessage);
+        IMessageBusSubscription Subscribe(string key, Action onMessage);
     }
 }

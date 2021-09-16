@@ -22,6 +22,26 @@ namespace Shinobytes.Ravenfall.RavenNet.Core
             }
         }
 
+        public IMessageBusSubscription Subscribe(string key, Action onMessage)
+        {
+            lock (mutex)
+            {
+                var messageBusSubscription = new Subscription(key, o =>
+                {
+                    try
+                    {
+                        onMessage();
+                    }
+                    catch (Exception exc)
+                    {
+                        Console.WriteLine(exc + " --- OnMessag Failed. Invalid type tried to be used");
+                    }
+                }, this);
+                this.subscriptions.Add(messageBusSubscription);
+                return messageBusSubscription;
+            }
+        }
+
         public IMessageBusSubscription Subscribe<T>(string key, Action<T> onMessage)
         {
             lock (mutex)

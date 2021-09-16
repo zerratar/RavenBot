@@ -14,12 +14,14 @@ namespace ROBot
 {
     class Program
     {
+        private static IoC ioc;
         private static bool isExiting;
         static void Main(string[] args)
         {
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomain_ProcessExit);
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
-            var ioc = new IoC();
+            ioc = new IoC();
 
             ioc.RegisterCustomShared<IoC>(() => ioc);
             ioc.RegisterCustomShared<IAppSettings>(() => new AppSettingsProvider().Get());
@@ -83,8 +85,45 @@ namespace ROBot
             }
         }
 
+        private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            if (ioc != null)
+            {
+                try
+                {
+                    var logger = ioc.Resolve<ILogger>() as ConsoleLogServer;
+                    if (logger != null)
+                    {
+                        logger.LogError(e.ToString());
+                        logger.TrySaveLogToDisk();
+                    }
+                    else
+                    {
+                        System.Console.WriteLine(e.ToString());
+                    }
+                }
+                catch (Exception exc)
+                {
+                    System.Console.WriteLine(exc.ToString());
+                }
+            }
+        }
+
         private static void CurrentDomain_ProcessExit(object sender, EventArgs e)
         {
+
+            try
+            {
+                var logger = ioc.Resolve<ILogger>() as ConsoleLogServer;
+                if (logger != null)
+                {
+                    logger.TrySaveLogToDisk();
+                }
+            }
+            catch
+            {
+            }
+
             isExiting = true;
         }
     }
