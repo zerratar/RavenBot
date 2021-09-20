@@ -25,16 +25,21 @@ namespace RavenBot.Core.Twitch
 
         public string Format(string message, object[] args, StringTemplateParserOption options)
         {
-            var template = parser.Parse(message, options);
-
-            var str = stringProvider.Get(message);
-            if (str == message)
+            if (!message.Contains('{'))
             {
-                return processor.Process(template, args);
+                return message;
             }
 
-            var templateOverride = parser.Parse(str, options);
-            return processor.Process(template, templateOverride, args);
+            var template = parser.Parse(message, options);
+
+            //var str = stringProvider.Get(message);
+            //if (str == message)
+            //{
+            return processor.Process(template, args);
+            //}
+
+            //var templateOverride = parser.Parse(str, options);
+            //return processor.Process(template, templateOverride, args);
         }
 
         public void OverrideFormat(string oldValue, string newValue)

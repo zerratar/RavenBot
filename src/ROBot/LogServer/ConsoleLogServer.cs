@@ -143,11 +143,17 @@ namespace ROBot
             {
                 messages.Add(str);
 
-                // relief some pressure on the queue so we dont grow out of memory at some point.
-                while (messages.Count > maxMessageStack)
+                if (messages.Count > maxMessageStack)
                 {
-                    messages.RemoveAt(0);
+                    TrySaveLogToDisk();
+                    messages.Clear();
                 }
+
+                //// relief some pressure on the queue so we dont grow out of memory at some point.
+                //while (messages.Count > maxMessageStack)
+                //{
+                //    messages.RemoveAt(0);
+                //}
             }
         }
 

@@ -76,12 +76,9 @@ namespace ROBot.Core.Twitch
             try
             {
                 var redeemer = reward.RewardRedeemed.Redemption.User;
-                var arguments = string.Empty;//reward.RewardRedeemed.Redemption.Reward.Prompt;
+                var arguments = reward.RewardRedeemed.Redemption.Reward.Prompt?.Trim();
                 var command = reward.RewardRedeemed.Redemption.Reward.Title;
                 var cmdParts = command.ToLower().Split(' ');
-
-
-
                 var session = game.GetSession(reward.ChannelId);
 
                 // In case we use brackets to identify a command
