@@ -21,16 +21,18 @@ namespace ROBot
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomain_ProcessExit);
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
-            ioc = new IoC();
+            const int LogServerPort = 6767;
+            const int BotServerPort = 4041;
+            const string ServerHost = "0.0.0.0";
 
+            ioc = new IoC();
             ioc.RegisterCustomShared<IoC>(() => ioc);
             ioc.RegisterCustomShared<IAppSettings>(() => new AppSettingsProvider().Get());
             ioc.RegisterCustomShared<IBotServerSettings>(() => new BotServerSettings
             {
-                ServerIp = "0.0.0.0",
-                ServerPort = 4041
+                ServerIp = ServerHost,
+                ServerPort = BotServerPort
             });
-
 
             //ioc.RegisterShared<ILogger, ConsoleLogger>();
             ioc.RegisterShared<IKernel, Kernel>();
@@ -61,7 +63,7 @@ namespace ROBot
 
             // Log extraction
             // Setting up the server
-            ioc.RegisterCustomShared<ServerSettings>(() => new ServerSettings("0.0.0.0", 6767));
+            ioc.RegisterCustomShared<ServerSettings>(() => new ServerSettings(ServerHost, LogServerPort));
             ioc.RegisterShared<IServer, TcpServer>();
             ioc.RegisterShared<IServerConnectionManager, ServerConnectionManager>();
             ioc.RegisterShared<IServerClientProvider, ServerClientProvider>();

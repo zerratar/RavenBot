@@ -17,7 +17,7 @@ namespace Shinobytes.Ravenfall.RavenNet.Core
         protected static ConsoleColor WRN = ConsoleColor.Yellow;
         protected static ConsoleColor ERR = ConsoleColor.Red;
 
-        protected static readonly Dictionary<LogLevel, (string, ConsoleColor, ConsoleColor)> logLevelSeverityMapping = new Dictionary<LogLevel, (string, ConsoleColor, ConsoleColor)>
+        public static readonly Dictionary<LogLevel, (string, ConsoleColor, ConsoleColor)> logLevelSeverityMapping = new Dictionary<LogLevel, (string, ConsoleColor, ConsoleColor)>
         {
             { LogLevel.None,  ("MSG", MSG, MSG)},
             { LogLevel.Trace, ("MSG", DBG, MSG)},
@@ -226,6 +226,7 @@ namespace Shinobytes.Ravenfall.RavenNet.Core
     public class ConsoleLogger : ILogger
     {
         private readonly LoggerScope emptyScope = new LoggerScope();
+        private readonly object writeMutex = new object();
         public ConsoleLogger()
         {
             Console.OutputEncoding = Encoding.Unicode;
@@ -233,9 +234,118 @@ namespace Shinobytes.Ravenfall.RavenNet.Core
 
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
-            var message = formatter != null ? formatter(state, exception) : state.ToString();
-            var msg = $"[{DateTime.UtcNow}] [{logLevel}] {message}";
-            WriteLine(msg);
+            lock (writeMutex)
+            {
+                var message = formatter != null ? formatter(state, exception) : state.ToString();
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Write("[");
+                Console.ForegroundColor = ConsoleColor.DarkMagenta;
+                Write($"{DateTime.UtcNow}");
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Write("] ");
+                Console.BackgroundColor = GetBackgroundColor(logLevel);
+                Console.ForegroundColor = GetForegroundColor(logLevel);
+
+                var text = HighlightedConsoleLogger.logLevelSeverityMapping[logLevel].Item1;
+                
+                Write($"[{text}]");
+
+                Console.ResetColor();
+                
+                Write(" ");
+
+                if (message.Contains("[RVNFLL]"))
+                {
+                    message = message.Split("[RVNFLL]").LastOrDefault().Trim();
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    Write("[");
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Write($"RVNFLL");
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    Write("] ");
+                }
+
+                if (message.Contains("[Twitch]"))
+                {
+                    message = message.Split("[Twitch]").LastOrDefault().Trim();
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    Write("[");
+                    Console.ForegroundColor = ConsoleColor.Magenta;
+                    Write($"TWITCH");
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    Write("] ");
+                }
+
+                Console.ForegroundColor = GetMessageColor(logLevel);
+                var msg = $"{message}";
+                WriteLine(msg);
+                Console.ResetColor();
+            }
+        }
+
+        private ConsoleColor GetMessageColor(LogLevel logLevel)
+        {
+            switch (logLevel)
+            {
+                case LogLevel.Error:
+                case LogLevel.Critical:
+                    return ConsoleColor.Red;
+
+                case LogLevel.Warning:
+                    return ConsoleColor.Yellow;
+
+                case LogLevel.Trace:
+                case LogLevel.Information:
+                    return ConsoleColor.White;
+
+                case LogLevel.Debug:
+                    return ConsoleColor.Cyan;
+            }
+            return ConsoleColor.White;
+        }
+
+        private ConsoleColor GetForegroundColor(LogLevel logLevel)
+        {
+            switch (logLevel)
+            {
+                case LogLevel.Error:
+                case LogLevel.Critical:
+                case LogLevel.Warning:
+                    return ConsoleColor.Black;
+
+                case LogLevel.Trace:
+                    return ConsoleColor.White;
+
+                case LogLevel.Information:
+                    return ConsoleColor.Green;
+
+                case LogLevel.Debug:
+                    return ConsoleColor.White;
+            }
+
+            return ConsoleColor.Black;
+        }
+
+        private ConsoleColor GetBackgroundColor(LogLevel logLevel)
+        {
+            switch (logLevel)
+            {
+                case LogLevel.Error:
+                case LogLevel.Critical:
+                    return ConsoleColor.Red;
+
+                case LogLevel.Warning:
+                    return ConsoleColor.Yellow;
+
+                case LogLevel.Trace:
+                case LogLevel.Information:
+                    return ConsoleColor.Black;
+
+                case LogLevel.Debug:
+                    return ConsoleColor.DarkBlue;
+            }
+
+            return ConsoleColor.Black;
         }
 
         public bool IsEnabled(LogLevel logLevel) => true;

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -71,10 +72,13 @@ namespace Shinobytes.Network
                 return;
             }
 
+            TcpClient tcpClient = null;
+            IServerClient client = null;
+
             try
             {
-                var tcpClient = this.tcpServer.EndAcceptTcpClient(ar);
-                var client = clientProvider.Get(tcpClient);
+                tcpClient = this.tcpServer.EndAcceptTcpClient(ar);
+                client = clientProvider.Get(tcpClient);
 
                 client.Disconnected += Client_Disconnected;
                 connectionManager.Add(client);
@@ -84,13 +88,42 @@ namespace Shinobytes.Network
                     ClientConnected.Invoke(this, new ConnectionEventArgs(client));
                 }
             }
-            catch { }
+            catch (Exception exc)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(exc.ToString());
+                Console.ResetColor();
+                try
+                {
+                    if (tcpClient != null && tcpClient.Connected)
+                    {
+                        tcpClient.Close();
+                    }
+
+                    if (client != null)
+                    {
+                        client.Close();
+                    }
+                }
+                catch (Exception exc2)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine(exc2.ToString());
+                    Console.ResetColor();
+                }
+            }
 
             try
             {
                 this.tcpServer.BeginAcceptTcpClient(OnClientConnected, this.tcpServer);
             }
-            catch { }
+            catch (Exception exc)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(exc.ToString());
+
+                Console.ResetColor();
+            }
         }
 
         private void Client_Disconnected(object sender, EventArgs e)
@@ -98,9 +131,21 @@ namespace Shinobytes.Network
             var client = sender as INetworkClient;
             client.Disconnected -= Client_Disconnected;
             connectionManager.Remove(client);
+
             if (ClientDisconnected != null)
             {
                 ClientDisconnected.Invoke(this, new ConnectionEventArgs(client));
+            }
+
+            try
+            {
+                client.Dispose();
+            }
+            catch (Exception exc)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(exc.ToString());
+                Console.ResetColor();
             }
         }
 

@@ -18,14 +18,10 @@ namespace RavenBot.Core.Ravenfall.Commands
         public override async Task ProcessAsync(IMessageChat broadcaster, ICommand cmd)
         {
             var sender = playerProvider.Get(cmd.Sender);
-            if (!sender.IsBroadcaster)
-            {
-                return;
-            }
 
             var targetPlayerName = cmd.Arguments?.Trim();
             Models.Player player = null;
-            if (!string.IsNullOrEmpty(targetPlayerName))
+            if (!string.IsNullOrEmpty(targetPlayerName) && (sender.IsBroadcaster || sender.IsModerator))
             {
                 player = playerProvider.Get(targetPlayerName);
             }

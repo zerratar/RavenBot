@@ -11,7 +11,7 @@ namespace ROBot.Core.GameServer
         event EventHandler<GameSessionUpdateEventArgs> SessionUpdated;
         IGameSession Add(IBotServer server, Guid sessionId, string userId, string username, DateTime created);
         void Remove(IGameSession session);
-        void UpdateName(Guid sessionId, string newSessionName);
+        void Update(Guid sessionId, string twitchUserId, string twitchUserName);
         IReadOnlyList<IGameSession> All();
         IGameSession Get(Guid id);
         IGameSession GetByName(string twitchUserName);

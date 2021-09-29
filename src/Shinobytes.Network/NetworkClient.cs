@@ -62,14 +62,8 @@ namespace Shinobytes.Network
 
         private void Write()
         {
-            while (!disposed && this.Client.Connected)
+            while (!disposed && IsConnected && this.Client.Connected)
             {
-                if (this.Writer == null)
-                {
-                    System.Threading.Thread.Sleep(50);
-                    continue;
-                }
-
                 if (writePackets.TryDequeue(out var packet))
                 {
                     try
@@ -83,28 +77,19 @@ namespace Shinobytes.Network
                         break;
                     }
                 }
-                else
-                {
-                    System.Threading.Thread.Sleep(50);
-                }
-
-                //writeLock.Wait(TimeSpan.FromSeconds(1));
+                Thread.Sleep(1);
             }
-
-            Disconnect();
+            
+            if (!disposed)
+            {
+                Close();
+            }
         }
 
         private void Read()
         {
             while (!disposed && this.Client.Connected)
             {
-                System.Threading.Thread.Sleep(5);
-
-                if (this.Reader == null)
-                {
-                    System.Threading.Thread.Sleep(50);
-                    continue;
-                }
                 try
                 {
                     var read = this.Reader.Read(readBuffer, 0, readBuffer.Length);
@@ -122,7 +107,10 @@ namespace Shinobytes.Network
                 break;
             }
 
-            Disconnect();
+            if (!disposed)
+            {
+                Close();
+            }
         }
 
         private void OnDataReceived(DataPacket dataPacket)
@@ -133,32 +121,28 @@ namespace Shinobytes.Network
             }
         }
 
-        private void Disconnect()
-        {
-            if (!IsConnected || disposed)
-            {
-                return;
-            }
-
-            if (Disconnected != null)
-            {
-                Disconnected.Invoke(this, EventArgs.Empty);
-            }
-
-            IsConnected = false;
-        }
-
         public void Dispose()
         {
-            writeLock.Release();
-            writeLock.Dispose();
-
             if (disposed)
             {
                 return;
             }
 
+            IsConnected = false;
             disposed = true;
+
+            try
+            {
+                writeLock.Release();
+                writeLock.Dispose();
+            }
+            catch { }
+
+            try
+            {
+                if (this.Client.Connected) this.Client.Close();
+            }
+            catch { }
 
             try
             {
@@ -166,7 +150,10 @@ namespace Shinobytes.Network
             }
             catch { }
 
-            Disconnect();
+            if (Disconnected != null)
+            {
+                Disconnected.Invoke(this, EventArgs.Empty);
+            }
         }
 
         public void Send(byte[] data, int offset, int length)
@@ -177,15 +164,17 @@ namespace Shinobytes.Network
 
         public void Close()
         {
-            if (disposed)
-            {
-                return;
-            }
+            //if (disposed)
+            //{
+            //    return;
+            //}
 
-            if (this.Client.Connected)
-            {
-                this.Client.Close();
-            }
+            //if (this.Client.Connected)
+            //{
+            //    this.Client.Close();
+            //}
+
+            Dispose();
         }
     }
 }

@@ -71,7 +71,7 @@ namespace RavenBot.Core
             }
 
             bindings[key] = new CommandBinding { Key = key, Aliases = aliases.ToArray() };
-            return new string[] { key };
+            return aliases.ToArray();
         }
     }
 
@@ -79,5 +79,10 @@ namespace RavenBot.Core
     {
         public string Key { get; set; }
         public string[] Aliases { get; set; }
+
+        public override string ToString()
+        {
+            return "Binding: " + Key + " - Aliases: " + string.Join(",", Aliases);
+        }
     }
 }

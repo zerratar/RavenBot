@@ -9,6 +9,8 @@ namespace ROBot.Core.GameServer
 {
     public class BotServer : IBotServer
     {
+        private const string BotStatusPingIP = "216.245.221.92";
+
         private readonly ILogger logger;
         private readonly IGameSessionManager sessionManager;
         private readonly IRavenfallConnectionProvider connectionProvider;
@@ -37,6 +39,14 @@ namespace ROBot.Core.GameServer
         {
             lock (connectionMutex)
             {
+                if (ravenfallGameSession == null)
+                {
+#if DEBUG
+                    logger.LogDebug("[RVNFLL] BotServer::GetConnection Trying to get connection using null game session.");
+#endif
+                    return null;
+                }
+
                 return connections.FirstOrDefault(x => x.Session?.Name == ravenfallGameSession.Name);
             }
         }
@@ -45,7 +55,15 @@ namespace ROBot.Core.GameServer
         {
             lock (connectionMutex)
             {
-                return connections.FirstOrDefault(x => x.Session?.UserId == sessionUserId);
+                if (string.IsNullOrEmpty(sessionUserId))
+                {
+#if DEBUG
+                    logger.LogDebug("[RVNFLL] BotServer::GetConnectionByUserId Trying to get connection using null or empty user id.");
+#endif
+                    return null;
+                }
+
+                return connections.FirstOrDefault(x => x?.Session?.UserId == sessionUserId);
             }
         }
 
@@ -77,22 +95,44 @@ namespace ROBot.Core.GameServer
 
         public void OnClientDisconnected(IRavenfallConnection connection)
         {
+            RemoveConnection(connection);
+
+            var badConnectionCount = 0;
+            lock (connectionMutex)
+            {
+                var badConnections = connections.Where(x => x != null && x.EndPointString == "Unknown").ToArray();
+                badConnectionCount = badConnections.Length;
+                foreach (var badConnection in badConnections)
+                {
+                    RemoveConnection(badConnection);
+                }
+            }
+
+            logger.LogDebug("[RVNFLL] [" + connection.EndPointString + "] Ravenfall client disconnected.");
+            if (badConnectionCount > 0)
+            {
+                logger.LogDebug("[RVNFLL] Cleaned up " + badConnectionCount + " bad connections.");
+            }
+        }
+
+        private void RemoveConnection(IRavenfallConnection connection)
+        {
             lock (connectionMutex)
             {
                 connection.OnSessionInfoReceived -= Connection_OnSessionInfoReceived;
+
                 if (connection.Session != null)
                 {
                     sessionManager.Remove(connection.Session);
                 }
+
                 connections.Remove(connection);
 
-                foreach (var badConnection in connections.Where(x => x.EndPointString == "Unknown").ToArray())
+                try { connection.Dispose(); }
+                catch (Exception exc)
                 {
-                    try { badConnection.Dispose(); } catch { }
-                    connections.Remove(badConnection);
+                    logger.LogError("[RVNFLL] Disposing Connection Failed: " + exc);
                 }
-
-                logger.LogDebug("[" + connection.EndPointString + "] Ravenfall client disconnected.");
             }
         }
 
@@ -103,9 +143,49 @@ namespace ROBot.Core.GameServer
                 var client = server.EndAcceptTcpClient(ar);
                 if (client != null)
                 {
+                    if (client.Client.RemoteEndPoint != null)
+                    {
+                        try
+                        {
+                            var endpoint = client.Client.RemoteEndPoint as IPEndPoint;
+                            var addr = endpoint.Address?.ToString();
+                            if (addr != null)
+                            {
+                                //if (addr.Equals("86.19.163.208", StringComparison.OrdinalIgnoreCase))
+                                //{
+                                //}
+                                if (addr.Equals(BotStatusPingIP, StringComparison.OrdinalIgnoreCase))
+                                {
+#if DEBUG
+                                    logger.LogDebug("[RVNFLL] Bot Status Ping Recieved.");
+#endif
+                                    client.Close();
+                                    return;
+                                }
+                            }
+                        }
+                        catch
+                        {
+                            // Ignored.
+                        }
+                    }
+
                     var connection = connectionProvider.Get(this, client);
-                    logger.LogDebug("[" + connection.EndPointString + "] Ravenfall client connected.");
-                    connections.Add(connection);
+                    if (connection == null)
+                    {
+#if DEBUG
+                        logger.LogDebug("[RVNFLL] BotServer::OnClientConnected Trying to get connection returned null.");
+#endif
+                        return;
+                    }
+
+                    logger.LogDebug("[RVNFLL] [" + connection.EndPointString + "] Ravenfall client connected.");
+
+                    lock (connectionMutex)
+                    {
+                        connections.Add(connection);
+                    }
+
                     connection.OnSessionInfoReceived += Connection_OnSessionInfoReceived;
                 }
             }
@@ -130,16 +210,16 @@ namespace ROBot.Core.GameServer
                     var existingConnection = GetConnectionByUserId(e.TwitchUserId);
                     if (existingConnection != null)
                     {
-                        if (existingConnection.Session != null && existingConnection.Session.Name != e.TwitchUserName)
+                        if (existingConnection.Session != null)
                         {
-                            sessionManager.UpdateName(existingConnection.Session.Id, e.TwitchUserName);
+                            sessionManager.Update(existingConnection.Session.Id, e.TwitchUserId, e.TwitchUserName);
                         }
 
                         if (existingConnection.InstanceId != connection.InstanceId)
                         {
                             if (existingConnection.Session.Created > e.Created)
                             {
-                                logger.LogDebug("[" + connection.EndPointString + "] Ravenfall client sent a second auth with a created date less than current.");
+                                logger.LogDebug("[RVNFLL] [" + connection.EndPointString + "] Ravenfall client sent a second auth with a created date less than current.");
                                 return;
                             }
 
@@ -152,7 +232,7 @@ namespace ROBot.Core.GameServer
                     }
 
                     connection.Session = sessionManager.Add(this, e.SessionId, e.TwitchUserId, e.TwitchUserName, e.Created);
-                    logger.LogDebug("[" + connection.EndPointString + "] Ravenfall client authenticated. User: " + connection.Session.Name);
+                    logger.LogDebug("[RVNFLL] [" + connection.EndPointString + "] Ravenfall client authenticated. User: " + connection.Session.Name);
                 }
             }
         }

@@ -4,13 +4,12 @@ namespace ROBot.Core.GameServer
 {
     public class GameSessionUpdateEventArgs : EventArgs
     {
-        public GameSessionUpdateEventArgs(string oldName, string newName)
+        public GameSessionUpdateEventArgs(IGameSession session, string oldName)
         {
+            Session = session;
             OldName = oldName;
-            NewName = newName;
         }
-
+        public IGameSession Session { get; }
         public string OldName { get; }
-        public string NewName { get; }
     }
 }

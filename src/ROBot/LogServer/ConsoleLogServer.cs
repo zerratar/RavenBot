@@ -3,6 +3,7 @@ using Shinobytes.Network;
 using Shinobytes.Ravenfall.RavenNet.Core;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Threading;
 
@@ -28,7 +29,7 @@ namespace ROBot
             IServerPacketHandlerProvider packetHandler,
             IServerPacketSerializer packetSerializer)
         {
-            this.logger = new ConsoleLogger(); // HighlightedConsoleLogger
+            this.logger = new ConsoleLogger();
             this.packetHandler = packetHandler;
             this.packetSerializer = packetSerializer;
             this.server = server;
@@ -58,17 +59,46 @@ namespace ROBot
                 try
                 {
                     const string logsDir = "logs";
-                    var fn = DateTime.UtcNow.ToString("yyyy-MM-dd_hhmmss") + ".log";
+                    var fn = DateTime.UtcNow.ToString("yyyy-MM-dd") + ".log";
+
                     if (!System.IO.Directory.Exists(logsDir))
                     {
                         System.IO.Directory.CreateDirectory(logsDir);
                     }
-                    System.IO.File.WriteAllLines(System.IO.Path.Combine(logsDir, fn), messages);
+
+                    System.IO.File.AppendAllLines(System.IO.Path.Combine(logsDir, fn), messages);
                 }
                 catch (System.Exception exc)
                 {
                     System.Console.WriteLine(exc.ToString());
                 }
+                finally
+                {
+                    CleanupLogs();
+                }
+            }
+        }
+
+        private void CleanupLogs()
+        {
+            const string logsDir = "logs";
+            if (!System.IO.Directory.Exists(logsDir))
+            {
+                return;
+            }
+
+            var logs = System.IO.Directory.GetFiles(logsDir, "*.log");
+            foreach (var log in logs)
+            {
+                try
+                {
+                    var fi = new FileInfo(log);
+                    if (fi.CreationTimeUtc >= DateTime.UtcNow.AddDays(1.1))
+                    {
+                        fi.Delete();
+                    }
+                }
+                catch { }
             }
         }
 
@@ -159,13 +189,13 @@ namespace ROBot
 
         private void ServerClient_DataReceived(object sender, DataPacket e)
         {
-            WriteLine("[Debug]: Log Server Received Data: " + e.Length);
+            //WriteLine("[Debug]: Log Server Recieved Data: " + e.Length);
 
             var client = sender as INetworkClient;
             var packet = packetSerializer.Deserialize(e);
             if (e == null)
             {
-                WriteLine("[Debug]: Bad Packet Data Received");
+                WriteLine("[Debug]: Bad Packet Data recieved");
                 return;
             }
 

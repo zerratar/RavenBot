@@ -48,9 +48,25 @@ namespace ROBot.Core.GameServer
 
         public IGameSession Session { get; internal set; }
 
-        public bool IsConnected => this.connection.Connected;
+        public bool IsConnected => this.connection != null && this.connection.Connected;
 
-        public IPEndPoint EndPoint => this.connection.Client.RemoteEndPoint as IPEndPoint;
+        public IPEndPoint EndPoint
+        {
+            get
+            {
+                if (this.connection == null || this.connection.Client == null)
+                {
+                    return null;
+                }
+
+                if (this.connection.Client.RemoteEndPoint != null)
+                {
+                    return this.connection.Client.RemoteEndPoint as IPEndPoint;
+                }
+
+                return null;
+            }
+        }
 
         public Task<bool> ProcessAsync(int serverPort)
         {
@@ -111,6 +127,11 @@ namespace ROBot.Core.GameServer
                     }
 
                     HandleMessage(message);
+                }
+                catch (IOException exc)
+                {
+                    GameDisconnected();
+                    return;
                 }
                 catch (Exception exc)
                 {

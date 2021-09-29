@@ -19,9 +19,9 @@ namespace Shinobytes.Network
             {
                 await Client.ConnectAsync(host, port, cancellationToken);
                 var networkStream = Client.GetStream();
-                this.IsConnected = true;
                 this.Reader = new BinaryReader(networkStream);
-                this.Writer = new BinaryWriter(networkStream);
+                this.Writer = new BinaryWriter(networkStream);                
+                this.IsConnected = true;
                 this.ReadThread.Start();
                 this.WriteThread.Start();
                 return true;
@@ -32,6 +32,5 @@ namespace Shinobytes.Network
             }
             return false;
         }
-
     }
 }

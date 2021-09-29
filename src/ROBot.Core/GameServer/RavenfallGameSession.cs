@@ -30,7 +30,7 @@ namespace ROBot.Core.GameServer
 
         // mutable in case user changes name during active session
         public string Name { get; set; }
-        public string UserId { get; }
+        public string UserId { get; set; }
         public DateTime Created { get; }
 
         public int UserCount => playerProvider.Count;

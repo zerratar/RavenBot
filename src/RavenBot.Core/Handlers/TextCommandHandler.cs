@@ -67,9 +67,10 @@ namespace RavenBot.Core.Handlers
         public void Register<TCommandProcessor>(string[] cmds)
             where TCommandProcessor : ICommandProcessor
         {
+            var key = cmds[0];
             if (cmds.Length > 1)
             {
-                Register<TCommandProcessor>(cmds[0], cmds.Skip(1).Take(cmds.Length - 1).ToArray());
+                Register<TCommandProcessor>(cmds[0], cmds.Where(x => x != key).ToArray());
             }
             else
             {

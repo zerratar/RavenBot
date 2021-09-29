@@ -7,4 +7,13 @@ namespace ROBot
         void Run();
         void Shutdown();
     }
+
+    //public interface IProcessStatistics
+    //{
+    //    IProcessStatisticsReport Report(string key, int value);
+    //}
+
+    //public interface IProcessStatisticsReport
+    //{
+    //}
 }

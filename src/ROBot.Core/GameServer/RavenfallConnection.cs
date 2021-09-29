@@ -27,6 +27,8 @@ namespace ROBot.Core.GameServer
         private IGameSession session;
         private ITimeoutHandle activePing;
 
+        private IPEndPoint endPoint;
+
         private int pingSendIndex = 0;
         private int pongReceiveIndex = 0;
         private int missedPingCount = 0;
@@ -133,7 +135,19 @@ namespace ROBot.Core.GameServer
             }
         }
 
-        public IPEndPoint EndPoint => client.EndPoint;
+        public IPEndPoint EndPoint
+        {
+            get
+            {
+                if (endPoint != null || client == null)
+                {
+                    return endPoint;
+                }
+
+                return client.EndPoint;
+            }
+        }
+
         public string EndPointString
         {
             get
@@ -295,6 +309,7 @@ namespace ROBot.Core.GameServer
         private async void Client_Connected(object sender, EventArgs e)
         {
             //server.OnClientConnected(this);
+            this.endPoint = this.client.EndPoint;
             activePing = kernel.SetTimeout(PingPong, 15000);
             while (requests.TryDequeue(out var request))
             {

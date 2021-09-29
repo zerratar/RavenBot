@@ -26,11 +26,9 @@ namespace ROBot.LogServer.PacketHandlers
         {
             if (packet.Data == null || (packet.Data.Buffer?.Length ?? 0) == 0)
             {
-                this.logger.LogError("An empty PubSub Packet Received");
+                this.logger.LogError("An empty PubSub Packet Recieved");
                 return Task.CompletedTask;
             }
-
-            this.logger.LogDebug("PubSub Packet Received");
 
             string userId = null;
             string userName = null;
@@ -41,12 +39,12 @@ namespace ROBot.LogServer.PacketHandlers
                 {
                     userId = reader.ReadString();
                     userName = reader.ReadString();
-                    token = reader.ReadString();
+                    token = reader.ReadString();                    
 
                     messageBus.Send("pubsub", pubSubRepo.AddOrUpdate(userId, userName, token));
                     if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(token))
                     {
-                        this.logger.LogError("Bad pubsub data received: "
+                        this.logger.LogError("Bad pubsub data recieved: "
                             + ", userId: " + userId
                             + ", userName: " + userName
                             + ", token: " + token
@@ -56,7 +54,7 @@ namespace ROBot.LogServer.PacketHandlers
             }
             catch (System.Exception exc)
             {
-                this.logger.LogError("Bad pubsub data received: " + exc
+                this.logger.LogError("Bad pubsub data recieved: " + exc
                     + ", userId: " + userId
                     + ", userName: " + userName
                     + ", token: " + token

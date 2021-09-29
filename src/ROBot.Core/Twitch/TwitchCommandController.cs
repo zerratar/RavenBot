@@ -57,15 +57,16 @@ namespace ROBot.Core.Twitch
         {
             var key = command.CommandText.ToLower();
             var session = game.GetSession(command.ChatMessage.Channel);
-            var argString = !string.IsNullOrEmpty(command.ArgumentsAsString) ? " (args: " + command.ArgumentsAsString + ") " : "";
-
-            if (session != null)
-                logger.LogDebug("[" + session.Name + "] Command: " + key + argString + " from " + command.ChatMessage.Username);
-            else
-                logger.LogDebug("Twitch Command Received: " + key + argString + " from " + command.ChatMessage.Username + " in #" + command.ChatMessage.Channel);
+            var argString = !string.IsNullOrEmpty(command.ArgumentsAsString) ? " (args: " + command.ArgumentsAsString + ")" : "";
 
             var uid = command.ChatMessage.UserId;
-            await HandleAsync(game, twitch, new TwitchCommand(command, userRoleManager.IsAdministrator(uid), userRoleManager.IsModerator(uid)));
+            if (await HandleAsync(game, twitch, new TwitchCommand(command, userRoleManager.IsAdministrator(uid), userRoleManager.IsModerator(uid))))
+            {
+                if (session != null)
+                    logger.LogDebug("[" + session.Name + "] Command: " + key + argString + " from " + command.ChatMessage.Username);
+                else
+                    logger.LogDebug("Twitch Command Recieved: " + key + argString + " from " + command.ChatMessage.Username + " in #" + command.ChatMessage.Channel);
+            }
         }
 
         public async Task HandleAsync(IBotServer game, ITwitchCommandClient twitch, OnChannelPointsRewardRedeemedArgs reward)
@@ -108,7 +109,13 @@ namespace ROBot.Core.Twitch
                 // in case we never found a handler, fallback to identifier
                 if (processor == null)
                 {
-                    processor = FindHandler(cmd.ToLower());
+                    cmd = cmd?.ToLower();
+                    if (string.IsNullOrEmpty(cmd))
+                    {
+                        return;
+                    }
+
+                    processor = FindHandler(cmd);
                     if (processor == null)
                     {
                         logger.LogError("Error redeeming reward: " + cmd + ", no handler found");
@@ -155,16 +162,17 @@ namespace ROBot.Core.Twitch
             }
         }
 
-        private async Task HandleAsync(IBotServer game, ITwitchCommandClient twitch, ICommand cmd)
+        private async Task<bool> HandleAsync(IBotServer game, ITwitchCommandClient twitch, ICommand cmd)
         {
             var handler = FindHandler(cmd.Command);
             if (handler == null)
             {
-                logger.LogInformation("HandleAsync::Unknown Command: " + cmd.Command + " - " + cmd.Arguments);
-                return;
+                //logger.LogInformation("HandleAsync::Unknown Command: " + cmd.Command + " - " + cmd.Arguments);
+                return false;
             }
 
             await handler.HandleAsync(game, twitch, cmd);
+            return true;
         }
 
         private ITwitchCommandHandler FindHandler(string command)

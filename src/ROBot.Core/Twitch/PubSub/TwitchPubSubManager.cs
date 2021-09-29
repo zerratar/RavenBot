@@ -99,14 +99,17 @@ namespace ROBot.Core.Twitch
             var key = channel.ToLower();
             if (pubsubClients.TryGetValue(key, out var client))
             {
-                logger.LogDebug("PubSub Client for  " + channel + " already exists. Connected: " + client.IsConnected + ",  Ready: " + client.IsReady);
+                if (!client.IsReady || !client.IsConnected)
+                {
+                    logger.LogDebug("PubSub Client for  " + channel + " already exists. Connected: " + client.IsConnected + ",  Ready: " + client.IsReady);
+                }
                 return true;
             }
 
             var token = pubsubTokenRepo.GetByUserName(channel) ?? pubsubTokenRepo.GetById(channel);
             if (token == null)
             {
-                logger.LogWarning("Trying to connect to pubsub for " + channel + " but no token is available.");
+                //logger.LogWarning("Trying to connect to pubsub for " + channel + " but no token is available.");
                 return false;
             }
 

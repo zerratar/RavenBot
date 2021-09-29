@@ -32,12 +32,13 @@ namespace ROBot.Core.GameServer
             }
         }
 
-        public void UpdateName(Guid sessionId, string newSessionName)
+        public void Update(Guid sessionId, string twitchUserId, string newSessionName)
         {
             var session = Get(sessionId);
             var oldName = session.Name;
+            session.UserId = twitchUserId;
             session.Name = newSessionName;
-            SessionUpdated?.Invoke(this, new GameSessionUpdateEventArgs(oldName, newSessionName));
+            SessionUpdated?.Invoke(this, new GameSessionUpdateEventArgs(session, oldName));
         }
 
         public void Remove(IGameSession session)

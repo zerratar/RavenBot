@@ -32,22 +32,28 @@ namespace ROBot.Core.Twitch
         private readonly ITwitchPubSubManager pubSubManager;
         private IMessageBusSubscription broadcastSubscription;
 
-        private readonly ConcurrentQueue<Tuple<string, string>> chatMessageQueue
-            = new ConcurrentQueue<Tuple<string, string>>();
+        //private readonly ConcurrentQueue<Tuple<string, string>> chatMessageQueue
+        //    = new ConcurrentQueue<Tuple<string, string>>();
+
+        private readonly ConcurrentDictionary<string, ConcurrentQueue<string>> chatMessageQueue
+                 = new ConcurrentDictionary<string, ConcurrentQueue<string>>();
+
+        private readonly ConcurrentDictionary<string, DateTime> currentlyJoiningChannels
+            = new ConcurrentDictionary<string, DateTime>();
 
         private readonly ConcurrentQueue<string> channelJoinQueue
             = new ConcurrentQueue<string>();
 
-        private readonly System.Collections.Generic.List<string> joinedChannels
-            = new System.Collections.Generic.List<string>();
+        private readonly HashSet<string> joinedChannels = new HashSet<string>();
 
         private readonly object channelMutex = new object();
 
         private TwitchClient client;
         private bool isInitialized;
         private int reconnectDelay = 10000;
-        private bool tryToReconnect = true;
+        private bool allowReconnection = true;
         private bool disposed;
+        private bool isConnectedToTwitch;
 
         public TwitchCommandClient(
             ILogger logger,
@@ -98,7 +104,6 @@ namespace ROBot.Core.Twitch
             EnsureInitialized();
             Subscribe();
             client.Connect();
-
             RejoinChannels();
         }
 
@@ -118,7 +123,7 @@ namespace ROBot.Core.Twitch
             if (kernel.Started) kernel.Stop();
             Unsubscribe();
 
-            tryToReconnect = false;
+            allowReconnection = false;
             if (client.IsConnected)
                 client.Disconnect();
 
@@ -131,20 +136,38 @@ namespace ROBot.Core.Twitch
         {
             if (!client.IsConnected)
             {
-                chatMessageQueue.Enqueue(new Tuple<string, string>(channel, message));
+                EnqueueChatMessage(channel, message);
+                //chatMessageQueue.Enqueue(new Tuple<string, string>(channel, message));
                 return;
             }
 
             if (!InChannel(channel))
             {
+                EnqueueChatMessage(channel, message);
                 JoinChannel(channel);
+                return;
             }
 
             client.SendMessage(channel, message);
         }
 
+        private void EnqueueChatMessage(string channel, string message)
+        {
+            if (!chatMessageQueue.TryGetValue(channel, out var queue))
+            {
+                chatMessageQueue[channel] = (queue = new ConcurrentQueue<string>());
+            }
+            queue.Enqueue(message);
+        }
+
         public void JoinChannel(string channel)
         {
+            if (!isConnectedToTwitch)
+            {
+                EnqueueJoin(channel);
+                return;
+            }
+
             if (InChannel(channel))
             {
                 return;
@@ -152,7 +175,12 @@ namespace ROBot.Core.Twitch
 
             if (string.IsNullOrEmpty(channel))
             {
-                logger.LogDebug("Trying to join a channel without a name.");
+                logger.LogDebug("[Twitch] Trying to join a channel without a name.");
+                return;
+            }
+
+            if (currentlyJoiningChannels.TryGetValue(channel, out var isJoining) && (DateTime.UtcNow - isJoining) <= TimeSpan.FromSeconds(15))
+            {
                 return;
             }
 
@@ -160,13 +188,21 @@ namespace ROBot.Core.Twitch
             {
                 if (WaitForConnection(5))
                 {
-                    logger.LogDebug("Joining Twitch Channel " + channel);
-
-                    client.JoinChannel(channel);
+                    currentlyJoiningChannels[channel] = DateTime.UtcNow;
                     lock (channelMutex)
                     {
+                        if (joinedChannels.Contains(channel))
+                        {
+                            logger.LogWarning("[Twitch] Retrying to join Twitch Channel " + channel);
+                        }
+                        else
+                        {
+                            logger.LogDebug("[Twitch] Joining Twitch Channel " + channel);
+                        }
                         joinedChannels.Add(channel);
                     }
+
+                    client.JoinChannel(channel);
 
                     pubSubManager.Connect(channel);
                 }
@@ -175,8 +211,9 @@ namespace ROBot.Core.Twitch
                     EnqueueJoin(channel);
                 }
             }
-            catch
+            catch (Exception exc)
             {
+                logger.LogWarning("[Twitch] Failed to join channel: " + channel + ". Retrying in a bit.. " + exc);
                 EnqueueJoin(channel);
             }
         }
@@ -191,11 +228,11 @@ namespace ROBot.Core.Twitch
             var retries = seconds * 10;
             for (var i = 0; i < retries; ++i)
             {
-                if (client.IsConnected)
+                if (isConnectedToTwitch || client.IsConnected)
                     return true;
                 System.Threading.Thread.Sleep(100);
             }
-            return client.IsConnected;
+            return isConnectedToTwitch || client.IsConnected;
         }
 
         public void LeaveChannel(string channel)
@@ -212,18 +249,30 @@ namespace ROBot.Core.Twitch
 
             if (string.IsNullOrEmpty(channel))
             {
-                logger.LogDebug("Trying to leave a channel without a name.");
+                logger.LogDebug("[Twitch] Trying to leave a channel without a name.");
                 return;
             }
 
-            logger.LogDebug("Leaving Twitch Channel " + channel);
+            logger.LogDebug("[Twitch] Leaving Twitch Channel " + channel);
 
             pubSubManager.Disconnect(channel);
             client.LeaveChannel(channel);
         }
 
-        private bool InChannel(string channel)
+        public IReadOnlyList<TwitchLib.Client.Models.JoinedChannel> JoinedChannels()
         {
+            return client.JoinedChannels;
+        }
+
+        public bool InChannel(string channel)
+        {
+            //lock (channelMutex)
+            //{
+            //    if (joinedChannels.Contains(channel))
+            //    {
+            //        return true;
+            //    }
+            //}
             return client.JoinedChannels.Any(x => x.Channel.ToLower() == channel.ToLower());
         }
 
@@ -275,7 +324,7 @@ namespace ROBot.Core.Twitch
 
         private async void Pubsub_OnChannelPointsRewardRedeemed(object sender, TwitchLib.PubSub.Events.OnChannelPointsRewardRedeemedArgs e)
         {
-            logger.LogDebug("Channel Point Reward Redeemed: " + e.RewardRedeemed?.Redemption?.Reward?.Title + ", by " + e.RewardRedeemed?.Redemption?.User?.Login + ", at " + e.ChannelId);
+            logger.LogDebug("[Twitch] Channel Point Reward Redeemed: " + e.RewardRedeemed?.Redemption?.Reward?.Title + ", by " + e.RewardRedeemed?.Redemption?.User?.Login + ", at " + e.ChannelId);
             await commandHandler.HandleAsync(game, this, e);
         }
 
@@ -310,8 +359,10 @@ namespace ROBot.Core.Twitch
 
         private void OnDisconnected(object sender, OnDisconnectedEventArgs e)
         {
-            logger.LogInformation("Disconnected from the Twitch IRC Server");
-            TryToReconnect();
+            this.isConnectedToTwitch = false;
+            logger.LogError("[Twitch] Disconnected from the Twitch IRC Server");
+            Reconnect();
+            client.Reconnect();
         }
 
         private void EnsureInitialized()
@@ -336,7 +387,7 @@ namespace ROBot.Core.Twitch
 
         public void Broadcast(string channel, string user, string format, params object[] args)
         {
-            if (!this.client.IsConnected || string.IsNullOrWhiteSpace(format))
+            if (string.IsNullOrWhiteSpace(format))
                 return;
 
             var msg = messageFormatter.Format(format, args);
@@ -352,63 +403,66 @@ namespace ROBot.Core.Twitch
 
         private void CreateTwitchClient()
         {
-            client = new TwitchClient(new TcpClient(new ClientOptions { ClientType = ClientType.Chat }));
+            isInitialized = false;
+            client = new TwitchClient(new TcpClient(new ClientOptions { ClientType = ClientType.Chat }), TwitchLib.Client.Enums.ClientProtocol.TCP);
+            client.AutoReListenOnException = true;
         }
 
-        private void TryToReconnect()
+        private void Reconnect()
         {
             try
             {
-                if (client != null && client.IsConnected)
-                    return;
+                client.Connect();
 
-                Unsubscribe();
-                isInitialized = false;
-                CreateTwitchClient();
-                Start();
+                //if (client != null && client.IsConnected)
+                //    return;
+                //Unsubscribe();
+                //isInitialized = false;
+                //CreateTwitchClient();
+                //Start();
             }
             catch (Exception)
             {
-                logger.LogInformation($"Failed to reconnect to the Twitch IRC Server. Retry in {reconnectDelay}ms");
-                Task.Run(async () =>
-                {
-                    await Task.Delay(reconnectDelay);
+                //logger.LogInformation($"Failed to reconnect to the Twitch IRC Server. Retry in {reconnectDelay}ms");
+                //Task.Run(async () =>
+                //{
+                //    await Task.Delay(reconnectDelay);
 
-                    if (!tryToReconnect)
-                        return;
+                //    if (!tryToReconnect)
+                //        return;
 
-                    TryToReconnect();
-                });
+                //    TryToReconnect();
+                //});
             }
         }
 
         private void OnConnected(object sender, OnConnectedArgs e)
         {
-            logger.LogDebug("Connected to Twitch IRC Server");
+            logger.LogDebug("[Twitch] Connected to Twitch IRC Server");
+            this.isConnectedToTwitch = true;
+
+            RejoinChannels();
 
             while (channelJoinQueue.TryDequeue(out var channel))
             {
                 JoinChannel(channel);
             }
-
-            while (chatMessageQueue.TryDequeue(out var msg))
-            {
-                SendChatMessage(msg.Item1, msg.Item2);
-            }
         }
 
         private async void OnFailureToReceiveJoinConfirmation(object sender, OnFailureToReceiveJoinConfirmationArgs e)
         {
+            var err = "";
+            if (!string.IsNullOrEmpty(e.Exception.Details))
+                err = " with error: " + e.Exception.Details;
+            logger.LogError("[Twitch] Failed to join channel: " + e.Exception.Channel + err);
             await Task.Delay(1000);
-            if (client.IsConnected)
-            {
-                JoinChannel(e.Exception.Channel);
-            }
+            JoinChannel(e.Exception.Channel);
         }
 
         private void OnReconnected(object sender, OnReconnectedEventArgs e)
         {
-            logger.LogDebug("Reconnected to Twitch IRC Server");
+            this.isConnectedToTwitch = true;
+            logger.LogDebug("[Twitch] Reconnected to Twitch IRC Server");
         }
 
         private void OnRaidNotification(object sender, OnRaidNotificationArgs e)
@@ -419,11 +473,11 @@ namespace ROBot.Core.Twitch
         {
             if (!e.Successful)
             {
-                logger.LogError(e.Response.Error);
+                logger.LogError("[Twitch] " + e.Response.Error);
             }
             else
             {
-                logger.LogDebug("PubSub Listen OK");
+                logger.LogDebug("[Twitch] PubSub Listen OK");
             }
         }
 
@@ -442,8 +496,36 @@ namespace ROBot.Core.Twitch
             client.OnReSubscriber += OnReSub;
             client.OnRaidNotification += OnRaidNotification;
             client.OnFailureToReceiveJoinConfirmation += OnFailureToReceiveJoinConfirmation;
-
+            client.OnJoinedChannel += Client_OnJoinedChannel;
+            client.OnLeftChannel += Client_OnLeftChannel;
             pubSubManager.OnChannelPointsRewardRedeemed += Pubsub_OnChannelPointsRewardRedeemed;
+        }
+
+        private void Client_OnLeftChannel(object sender, OnLeftChannelArgs e)
+        {
+            logger.LogWarning("[Twitch] Left channel: " + e.Channel);
+
+            currentlyJoiningChannels.TryRemove(e.Channel, out _);
+        }
+
+        private void Client_OnJoinedChannel(object sender, OnJoinedChannelArgs e)
+        {
+            logger.LogInformation("[Twitch] Joined " + e.Channel + "");
+
+            if (chatMessageQueue.TryGetValue(e.Channel, out var queue))
+            {
+                if (queue.Count > 0)
+                {
+                    logger.LogInformation("[Twitch] Sending " + queue.Count + " queued chat messages to " + e.Channel);
+                }
+
+                while (queue.TryDequeue(out var msg))
+                {
+                    SendChatMessage(e.Channel, msg);
+                }
+            }
+
+            currentlyJoiningChannels.TryRemove(e.Channel, out _);
         }
 
         private void Unsubscribe()
@@ -460,7 +542,8 @@ namespace ROBot.Core.Twitch
             client.OnReSubscriber -= OnReSub;
             client.OnRaidNotification -= OnRaidNotification;
             client.OnFailureToReceiveJoinConfirmation -= OnFailureToReceiveJoinConfirmation;
-
+            client.OnJoinedChannel -= Client_OnJoinedChannel;
+            client.OnLeftChannel -= Client_OnLeftChannel;
             pubSubManager.OnChannelPointsRewardRedeemed -= Pubsub_OnChannelPointsRewardRedeemed;
         }
 

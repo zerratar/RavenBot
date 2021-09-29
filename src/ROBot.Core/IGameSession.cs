@@ -8,7 +8,7 @@ namespace ROBot.Core
     {
         Guid Id { get; }
         string Name { get; set; }
-        string UserId { get; }
+        string UserId { get; set; }
         public DateTime Created { get; }
         Player GetBroadcaster();
         Player Get(string twitchId);
