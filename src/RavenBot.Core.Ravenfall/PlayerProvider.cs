@@ -22,6 +22,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             }
         }
 
+
         public Player Get(ICommandSender sender, string identifier = null)
         {
             lock (mutex)
@@ -60,6 +61,14 @@ namespace RavenBot.Core.Ravenfall.Commands
                 plr = new Player(null, username, username, null, false, false, false, false, "1");
                 createdPlayers.Add(plr);
                 return plr;
+            }
+        }
+
+        public Player GetByUserId(string twitchUserId)
+        {
+            lock (mutex)
+            {
+                return createdPlayers.FirstOrDefault(x => x.UserId == twitchUserId);
             }
         }
 

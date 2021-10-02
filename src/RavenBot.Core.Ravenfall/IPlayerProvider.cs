@@ -9,7 +9,8 @@ namespace RavenBot.Core.Ravenfall.Commands
         int Count { get; }
         Player Get(string userId, string username);
         Player Get(ICommandSender sender, string identifier = null);
-        Player Get(string username);
+        Player Get(string username);        
+        Player GetByUserId(string twitchUserId);
         Player GetBroadcaster();
     }
 }

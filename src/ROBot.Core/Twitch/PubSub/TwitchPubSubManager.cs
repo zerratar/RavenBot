@@ -75,7 +75,7 @@ namespace ROBot.Core.Twitch
                 return;
             }
 
-            logger.LogDebug("Disconnected from PubSub: " + channel);
+            logger.LogDebug("[RVNFLL] Disconnected from PubSub: " + channel);
 
             client.OnChannelPointsRewardRedeemed -= Client_OnChannelPointsRewardRedeemed;
             pubsubClients.TryRemove(channel.ToLower(), out _);

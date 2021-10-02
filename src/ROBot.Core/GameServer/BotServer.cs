@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 
 namespace ROBot.Core.GameServer
 {
@@ -15,11 +16,12 @@ namespace ROBot.Core.GameServer
         private readonly IGameSessionManager sessionManager;
         private readonly IRavenfallConnectionProvider connectionProvider;
         private readonly IBotServerSettings settings;
-        private readonly TcpListener server;
+        private TcpListener server;
         private bool disposed;
-
+        private ServerState state;
+        private Thread connectionAcceptThread;
         private readonly List<IRavenfallConnection> connections = new List<IRavenfallConnection>();
-        private readonly object connectionMutex = new object();
+        //private readonly object connectionMutex = new object();
         private readonly object SessionAuthMutex = new object();
 
         public BotServer(
@@ -37,7 +39,7 @@ namespace ROBot.Core.GameServer
 
         public IRavenfallConnection GetConnection(IGameSession ravenfallGameSession)
         {
-            lock (connectionMutex)
+            //lock (connectionMutex)
             {
                 if (ravenfallGameSession == null)
                 {
@@ -53,7 +55,7 @@ namespace ROBot.Core.GameServer
 
         public IRavenfallConnection GetConnectionByUserId(string sessionUserId)
         {
-            lock (connectionMutex)
+            //lock (connectionMutex)
             {
                 if (string.IsNullOrEmpty(sessionUserId))
                 {
@@ -69,7 +71,7 @@ namespace ROBot.Core.GameServer
 
         public IReadOnlyList<IRavenfallConnection> AllConnections()
         {
-            lock (connectionMutex)
+            //lock (connectionMutex)
             {
                 return connections.ToList();
             }
@@ -77,19 +79,43 @@ namespace ROBot.Core.GameServer
 
         public void Start()
         {
+
+            if (this.state == ServerState.Started)
+            {
+                logger.LogWarning("[RVNFLL] Trying to start the server while it is already running.");
+                return;
+            }
+
             try
             {
-                if (server.Server.IsBound)
-                {
-                    return;
-                }
 
-                server.Start();
-                server.BeginAcceptTcpClient(new AsyncCallback(OnClientConnected), null);
+                connectionAcceptThread = new System.Threading.Thread(AcceptIncomingConnections);
+                connectionAcceptThread.Start();
+
             }
             catch (Exception exc)
             {
                 logger.LogError(exc.ToString());
+            }
+        }
+
+        private void AcceptIncomingConnections()
+        {
+            try
+            {
+                server.Start();
+                state = ServerState.Started;
+
+                while (this.state == ServerState.Started)
+                {
+                    // server(new AsyncCallback(OnClientConnected), null);
+                    OnClientConnected(server.AcceptTcpClient());
+                }
+            }
+            catch (Exception exc)
+            {
+                state = ServerState.Faulted;
+                TryRestartingServer();
             }
         }
 
@@ -98,7 +124,7 @@ namespace ROBot.Core.GameServer
             RemoveConnection(connection);
 
             var badConnectionCount = 0;
-            lock (connectionMutex)
+            //lock (connectionMutex)
             {
                 var badConnections = connections.Where(x => x != null && x.EndPointString == "Unknown").ToArray();
                 badConnectionCount = badConnections.Length;
@@ -107,8 +133,8 @@ namespace ROBot.Core.GameServer
                     RemoveConnection(badConnection);
                 }
             }
-
-            logger.LogDebug("[RVNFLL] [" + connection.EndPointString + "] Ravenfall client disconnected.");
+            var fromStr = connection.Session?.Name ?? connection.EndPointString;
+            logger.LogDebug("[RVNFLL] [" + fromStr + "] Ravenfall client disconnected.");
             if (badConnectionCount > 0)
             {
                 logger.LogDebug("[RVNFLL] Cleaned up " + badConnectionCount + " bad connections.");
@@ -117,7 +143,7 @@ namespace ROBot.Core.GameServer
 
         private void RemoveConnection(IRavenfallConnection connection)
         {
-            lock (connectionMutex)
+            //lock (connectionMutex)
             {
                 connection.OnSessionInfoReceived -= Connection_OnSessionInfoReceived;
 
@@ -127,48 +153,59 @@ namespace ROBot.Core.GameServer
                 }
 
                 connections.Remove(connection);
-
-                try { connection.Dispose(); }
-                catch (Exception exc)
-                {
-                    logger.LogError("[RVNFLL] Disposing Connection Failed: " + exc);
-                }
             }
         }
 
-        private void OnClientConnected(IAsyncResult ar)
+        private bool TryRestartingServer()
         {
             try
             {
-                var client = server.EndAcceptTcpClient(ar);
+                if (server == null || server.Server == null || !server.Server.IsBound)
+                {
+                    try
+                    {
+                        server.Server.Dispose();
+                        server = null;
+                    }
+                    catch { }
+
+                    {
+                        foreach (var c in this.connections)
+                        {
+                            this.sessionManager.Remove(c.Session);
+
+                            try
+                            {
+                                c.Dispose();
+                            }
+                            catch { }
+                        }
+                        connections.Clear();
+                    }
+
+                    this.sessionManager.ClearAll();
+
+                    this.server = new TcpListener(IPAddress.Any, settings.ServerPort);
+                    this.Start();
+                    return true;
+                }
+            }
+            catch (Exception exc2)
+            {
+                logger.LogError("[RVNFLL] Unable to recover from bad server state: " + exc2);
+            }
+            return false;
+        }
+
+        private void OnClientConnected(TcpClient client)
+        {
+            try
+            {
+                //var client = server.EndAcceptTcpClient(ar);
                 if (client != null)
                 {
-                    if (client.Client.RemoteEndPoint != null)
-                    {
-                        try
-                        {
-                            var endpoint = client.Client.RemoteEndPoint as IPEndPoint;
-                            var addr = endpoint.Address?.ToString();
-                            if (addr != null)
-                            {
-                                //if (addr.Equals("86.19.163.208", StringComparison.OrdinalIgnoreCase))
-                                //{
-                                //}
-                                if (addr.Equals(BotStatusPingIP, StringComparison.OrdinalIgnoreCase))
-                                {
-#if DEBUG
-                                    logger.LogDebug("[RVNFLL] Bot Status Ping Recieved.");
-#endif
-                                    client.Close();
-                                    return;
-                                }
-                            }
-                        }
-                        catch
-                        {
-                            // Ignored.
-                        }
-                    }
+                    if (HandlePingRequest(client))
+                        return;
 
                     var connection = connectionProvider.Get(this, client);
                     if (connection == null)
@@ -181,7 +218,7 @@ namespace ROBot.Core.GameServer
 
                     logger.LogDebug("[RVNFLL] [" + connection.EndPointString + "] Ravenfall client connected.");
 
-                    lock (connectionMutex)
+                    //lock (connectionMutex)
                     {
                         connections.Add(connection);
                     }
@@ -193,11 +230,34 @@ namespace ROBot.Core.GameServer
             {
                 logger.LogError(exc.ToString());
             }
-            try
+        }
+
+        private bool HandlePingRequest(TcpClient client)
+        {
+            if (client.Client.RemoteEndPoint != null)
             {
-                server.BeginAcceptTcpClient(new AsyncCallback(OnClientConnected), null);
+                try
+                {
+                    var endpoint = client.Client.RemoteEndPoint as IPEndPoint;
+                    var addr = endpoint.Address?.ToString();
+                    if (addr != null)
+                    {
+                        if (addr.Equals(BotStatusPingIP, StringComparison.OrdinalIgnoreCase))
+                        {
+#if DEBUG
+                            logger.LogDebug("[RVNFLL] Bot Status Ping Recieved.");
+#endif
+                            client.Close();
+                            return true;
+                        }
+                    }
+                }
+                catch
+                {
+                    // Ignored.
+                }
             }
-            catch { }
+            return false;
         }
 
         private void Connection_OnSessionInfoReceived(object sender, GameSessionInfo e)
@@ -243,6 +303,7 @@ namespace ROBot.Core.GameServer
             if (server.Server.IsBound)
                 server.Stop();
             disposed = true;
+            this.state = ServerState.Disposed;
         }
 
         public IGameSession GetSession(string session)
@@ -252,5 +313,13 @@ namespace ROBot.Core.GameServer
                 return sessionManager.GetByUserId(session);
             return s;
         }
+    }
+
+    public enum ServerState
+    {
+        NotStarted,
+        Started,
+        Faulted,
+        Disposed
     }
 }

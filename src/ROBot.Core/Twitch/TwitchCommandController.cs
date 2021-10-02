@@ -39,7 +39,7 @@ namespace ROBot.Core.Twitch
             userRoleManager = this.ioc.Resolve<IUserRoleManager>();
         }
 
-        public async Task HandleAsync(IBotServer game, ITwitchCommandClient twitch, ChatMessage message)
+        public async Task<bool> HandleAsync(IBotServer game, ITwitchCommandClient twitch, ChatMessage message)
         {
             if (messageHandler == null)
                 messageHandler = ioc.Resolve<ITwitchChatMessageHandler>();
@@ -47,29 +47,43 @@ namespace ROBot.Core.Twitch
             if (messageHandler == null)
             {
                 logger.LogInformation("HandleMessage: No message handler available.");
-                return;
+                return false;
             }
 
             await messageHandler.HandleAsync(game, twitch, message);
+            return true;
         }
 
-        public async Task HandleAsync(IBotServer game, ITwitchCommandClient twitch, ChatCommand command)
+        public async Task<bool> HandleAsync(IBotServer game, ITwitchCommandClient twitch, ChatCommand command)
         {
             var key = command.CommandText.ToLower();
             var session = game.GetSession(command.ChatMessage.Channel);
             var argString = !string.IsNullOrEmpty(command.ArgumentsAsString) ? " (args: " + command.ArgumentsAsString + ")" : "";
 
+            
             var uid = command.ChatMessage.UserId;
-            if (await HandleAsync(game, twitch, new TwitchCommand(command, userRoleManager.IsAdministrator(uid), userRoleManager.IsModerator(uid))))
+            var chatCmd = new TwitchCommand(command, userRoleManager.IsAdministrator(uid), userRoleManager.IsModerator(uid));
+
+            if (session != null)
+            {
+                // add the user as part of this session
+                session.Get(chatCmd.Sender);
+            }
+
+            if (await HandleAsync(game, twitch, chatCmd))
             {
                 if (session != null)
                     logger.LogDebug("[" + session.Name + "] Command: " + key + argString + " from " + command.ChatMessage.Username);
                 else
                     logger.LogDebug("Twitch Command Recieved: " + key + argString + " from " + command.ChatMessage.Username + " in #" + command.ChatMessage.Channel);
+
+                return true;
             }
+
+            return false;
         }
 
-        public async Task HandleAsync(IBotServer game, ITwitchCommandClient twitch, OnChannelPointsRewardRedeemedArgs reward)
+        public async Task<bool> HandleAsync(IBotServer game, ITwitchCommandClient twitch, OnChannelPointsRewardRedeemedArgs reward)
         {
             //logger.LogInformation("Channel Point Rewards not implemented.");
             var cmd = "";
@@ -112,14 +126,14 @@ namespace ROBot.Core.Twitch
                     cmd = cmd?.ToLower();
                     if (string.IsNullOrEmpty(cmd))
                     {
-                        return;
+                        return false;
                     }
 
                     processor = FindHandler(cmd);
                     if (processor == null)
                     {
                         logger.LogError("Error redeeming reward: " + cmd + ", no handler found");
-                        return;
+                        return false;
                     }
 
                     usedCommand = cmd;
@@ -150,15 +164,17 @@ namespace ROBot.Core.Twitch
                     if (player == null)
                     {
                         logger.LogError("Error redeeming reward: " + usedCommand + ", redeemer does not exist. (" + redeemer.Id + ")");
-                        return;
+                        return false;
                     }
                 }
 
                 await processor.HandleAsync(game, twitch, new RewardRedeemCommand(player, reward.ChannelId, usedCommand, arguments));
+                return true;
             }
             catch (Exception exc)
             {
                 logger.LogError("Error redeeming reward:  " + usedCommand + ", " + exc.ToString());
+                return false;
             }
         }
 

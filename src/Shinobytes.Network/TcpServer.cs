@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
+using System.Drawing.Text;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -15,7 +16,7 @@ namespace Shinobytes.Network
         private readonly ServerSettings settings;
         private readonly IServerClientProvider clientProvider;
         private readonly IServerConnectionManager connectionManager;
-        private readonly TcpListener tcpServer;
+        private TcpListener tcpServer;
         private bool disposed;
         private CancellationToken cancellationToken;
 
@@ -78,6 +79,12 @@ namespace Shinobytes.Network
             try
             {
                 tcpClient = this.tcpServer.EndAcceptTcpClient(ar);
+                if (tcpClient == null)
+                {
+                    AcceptConnections();
+                    return;
+                }
+
                 client = clientProvider.Get(tcpClient);
 
                 client.Disconnected += Client_Disconnected;
@@ -113,15 +120,32 @@ namespace Shinobytes.Network
                 }
             }
 
+            AcceptConnections();
+        }
+
+        private void AcceptConnections()
+        {
             try
             {
+                if (!this.tcpServer.Server.IsBound)
+                {
+                    Console.WriteLine("Restarting TCP Server...");
+                    if (!IPAddress.TryParse(this.settings.host, out var ip))
+                    {
+                        ip = IPAddress.Any;
+                    }
+
+                    this.tcpServer = new TcpListener(new IPEndPoint(ip, this.settings.port));
+                    StartAsync(CancellationToken.None);
+                    return;
+                }
+
                 this.tcpServer.BeginAcceptTcpClient(OnClientConnected, this.tcpServer);
             }
             catch (Exception exc)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine(exc.ToString());
-
                 Console.ResetColor();
             }
         }

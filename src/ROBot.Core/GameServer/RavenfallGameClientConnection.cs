@@ -18,8 +18,8 @@ namespace ROBot.Core.GameServer
         private readonly object mutex = new object();
         private readonly List<Subscription> subs = new List<Subscription>();
         private readonly IBotServer server;
-        private readonly TcpClient connection;
         private readonly ILogger logger;
+        private TcpClient connection;
 
         private StreamWriter writer;
         private StreamReader reader;
@@ -176,13 +176,18 @@ namespace ROBot.Core.GameServer
         {
             if (this.disposed) return;
             readActive = false;
-            try
+            
+            if (connection != null)
             {
-                if (connection.Connected)
-                    connection.Close();
-                connection.Dispose();
+                try { writer.Dispose(); } catch { }
+                try { reader.Dispose(); } catch { }
+                try { connection.Close(); } catch { }
+                try { connection.Dispose(); } catch { }
+                writer = null;
+                reader = null;
+                connection = null;
             }
-            catch { }
+
             this.disposed = true;
         }
 

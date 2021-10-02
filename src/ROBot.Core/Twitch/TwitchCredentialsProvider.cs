@@ -1,4 +1,5 @@
-﻿using TwitchLib.Client.Models;
+﻿using System.Threading.Tasks;
+using TwitchLib.Client.Models;
 
 namespace ROBot.Core.Twitch
 {
@@ -17,5 +18,10 @@ namespace ROBot.Core.Twitch
                 settings.TwitchBotUsername,
                 settings.TwitchBotAuthToken);
         }
+
+        //public Task RefreshAccessToken()
+        //{
+        //    var refreshUrl = "https://twitchtokengenerator.com/api/refresh/" + settings.TwitchBotAuthRefreshToken;
+        //}
     }
 }

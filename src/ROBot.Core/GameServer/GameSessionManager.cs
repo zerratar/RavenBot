@@ -56,6 +56,18 @@ namespace ROBot.Core.GameServer
             }
         }
 
+        public void ClearAll()
+        {
+            lock (sessionMutex)
+            {
+                var s = sessions.ToList();
+                foreach (var session in s)
+                {
+                    Remove(session);
+                }
+            }
+        }
+
         public IGameSession Get(Guid id)
         {
             lock (sessionMutex)
@@ -88,5 +100,6 @@ namespace ROBot.Core.GameServer
                 return sessions.ToList();
             }
         }
+
     }
 }

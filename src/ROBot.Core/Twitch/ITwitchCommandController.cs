@@ -8,8 +8,8 @@ namespace ROBot.Core.Twitch
 {
     public interface ITwitchCommandController
     {
-        Task HandleAsync(IBotServer game, ITwitchCommandClient twitch, ChatCommand cmd);
-        Task HandleAsync(IBotServer game, ITwitchCommandClient twitch, ChatMessage msg);
-        Task HandleAsync(IBotServer game, ITwitchCommandClient twitch, OnChannelPointsRewardRedeemedArgs reward);
+        Task<bool> HandleAsync(IBotServer game, ITwitchCommandClient twitch, ChatCommand cmd);
+        Task<bool> HandleAsync(IBotServer game, ITwitchCommandClient twitch, ChatMessage msg);
+        Task<bool> HandleAsync(IBotServer game, ITwitchCommandClient twitch, OnChannelPointsRewardRedeemedArgs reward);
     }
 }

@@ -54,7 +54,8 @@ namespace ROBot.Core.Twitch
         private bool allowReconnection = true;
         private bool disposed;
         private bool isConnectedToTwitch;
-
+        private long usedCommandCount = 0;
+        private long messageCount = 0;
         public TwitchCommandClient(
             ILogger logger,
             IKernel kernel,
@@ -266,16 +267,18 @@ namespace ROBot.Core.Twitch
 
         public bool InChannel(string channel)
         {
-            //lock (channelMutex)
-            //{
-            //    if (joinedChannels.Contains(channel))
-            //    {
-            //        return true;
-            //    }
-            //}
             return client.JoinedChannels.Any(x => x.Channel.ToLower() == channel.ToLower());
         }
 
+        public long GetCommandCount()
+        {
+            return usedCommandCount;
+        }
+
+        public long GetMessageCount()
+        {
+            return messageCount;
+        }
         private void OnUserLeft(object sender, OnUserLeftArgs e)
         {
         }
@@ -286,7 +289,10 @@ namespace ROBot.Core.Twitch
 
         private async void OnMessageReceived(object sender, OnMessageReceivedArgs e)
         {
-            await commandHandler.HandleAsync(game, this, e.ChatMessage);
+            if (await commandHandler.HandleAsync(game, this, e.ChatMessage))
+            {
+                ++messageCount;
+            }
         }
 
         private async void OnCommandReceived(object sender, OnChatCommandReceivedArgs e)
@@ -319,7 +325,10 @@ namespace ROBot.Core.Twitch
                 }
             }
 
-            await commandHandler.HandleAsync(game, this, e.Command);
+            if (await commandHandler.HandleAsync(game, this, e.Command))
+            {
+                ++usedCommandCount;
+            }
         }
 
         private async void Pubsub_OnChannelPointsRewardRedeemed(object sender, TwitchLib.PubSub.Events.OnChannelPointsRewardRedeemedArgs e)
@@ -413,7 +422,8 @@ namespace ROBot.Core.Twitch
             try
             {
                 client.Connect();
-
+                usedCommandCount = 0;
+                messageCount = 0;
                 //if (client != null && client.IsConnected)
                 //    return;
                 //Unsubscribe();
@@ -486,6 +496,7 @@ namespace ROBot.Core.Twitch
             client.OnChatCommandReceived += OnCommandReceived;
             client.OnMessageReceived += OnMessageReceived;
             client.OnConnected += OnConnected;
+            client.OnConnectionError += Client_OnConnectionError;
             client.OnReconnected += OnReconnected;
             client.OnDisconnected += OnDisconnected;
             client.OnUserJoined += OnUserJoined;
@@ -499,6 +510,13 @@ namespace ROBot.Core.Twitch
             client.OnJoinedChannel += Client_OnJoinedChannel;
             client.OnLeftChannel += Client_OnLeftChannel;
             pubSubManager.OnChannelPointsRewardRedeemed += Pubsub_OnChannelPointsRewardRedeemed;
+        }
+
+        private void Client_OnConnectionError(object sender, OnConnectionErrorArgs e)
+        {
+            logger.LogError("[Twitch] Connection Error: " + e.Error.Message + " - Maybe time to refresh auth token?");
+
+            // Maybe its time to request a new Access Token?
         }
 
         private void Client_OnLeftChannel(object sender, OnLeftChannelArgs e)
@@ -544,6 +562,7 @@ namespace ROBot.Core.Twitch
             client.OnFailureToReceiveJoinConfirmation -= OnFailureToReceiveJoinConfirmation;
             client.OnJoinedChannel -= Client_OnJoinedChannel;
             client.OnLeftChannel -= Client_OnLeftChannel;
+            client.OnConnectionError -= Client_OnConnectionError;
             pubSubManager.OnChannelPointsRewardRedeemed -= Pubsub_OnChannelPointsRewardRedeemed;
         }
 

@@ -385,12 +385,17 @@ namespace RavenBot
             client.OnNewSubscriber += OnNewSub;
             client.OnReSubscriber += OnReSub;
             client.OnRaidNotification += OnRaidNotification;
-
+            client.OnConnectionError += OnConnectionError;
             pubsub.OnListenResponse += Pubsub_OnListenResponse;
             pubsub.OnPubSubServiceConnected += Pubsub_OnPubSubServiceConnected;
             pubsub.OnPubSubServiceError += Pubsub_OnPubSubServiceError;
             pubsub.OnPubSubServiceClosed += Pubsub_OnPubSubServiceClosed;
             pubsub.OnChannelPointsRewardRedeemed += Pubsub_OnChannelPointsRewardRedeemed;
+        }
+
+        private void OnConnectionError(object sender, OnConnectionErrorArgs e)
+        {
+            logger.WriteError("Error connecting to Twitch: " + e.Error + ". Maybe time to refresh the access token?");
         }
 
         private void Pubsub_OnPubSubServiceError(object sender, TwitchLib.PubSub.Events.OnPubSubServiceErrorArgs e)
@@ -465,6 +470,7 @@ namespace RavenBot
             client.OnReSubscriber -= OnReSub;
             client.OnRaidNotification -= OnRaidNotification;
 
+            client.OnConnectionError -= OnConnectionError;
             pubsub.OnChannelPointsRewardRedeemed -= Pubsub_OnChannelPointsRewardRedeemed;
         }
     }

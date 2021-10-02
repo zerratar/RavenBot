@@ -6,6 +6,9 @@ namespace RavenBot.Core.Ravenfall.Models
     {
         public Player()
         {
+            Username = "server-request";
+            DisplayName = "server-request";
+            UserId = "server-request";            
         }
 
         public Player(

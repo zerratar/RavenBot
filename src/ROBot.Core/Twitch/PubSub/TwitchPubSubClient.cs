@@ -61,7 +61,7 @@ namespace ROBot.Core.Twitch
 
             if (wasReady)
             {
-                logger.LogWarning("[Twitch] Trying to reconnect to PubSub for  " + token.UserName + "...");
+                logger.LogWarning("[Twitch] Trying to reconnect to PubSub for " + token.UserName + "...");
                 await Task.Delay(1000);
                 Connect();
             }
@@ -73,7 +73,7 @@ namespace ROBot.Core.Twitch
             receivesChannelPointRewardDetails = false;
             logger.LogError("[Twitch] PubSub Connection Closed for " + token.UserName);
 
-            logger.LogWarning("[Twitch] Trying to reconnect to PubSub for  " + token.UserName + "...");
+            logger.LogWarning("[Twitch] Trying to reconnect to PubSub for " + token.UserName + "...");
             await Task.Delay(1000);
             Connect();
         }

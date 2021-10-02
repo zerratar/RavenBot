@@ -4,9 +4,13 @@ using ROBot.Core.GameServer;
 using ROBot.Core.Twitch;
 using ROBot.Ravenfall;
 using System;
+using System.Linq;
 
 namespace ROBot
 {
+
+    // TODO: https://twitchtokengenerator.com/api/refresh/<refresh_token>
+
     public class StreamBotApp : IStreamBotApplication
     {
         private readonly Microsoft.Extensions.Logging.ILogger logger;
@@ -17,6 +21,8 @@ namespace ROBot
         private Shinobytes.Ravenfall.RavenNet.Core.ITimeoutHandle timeoutHandle;
         private bool disposed;
         private DateTime startedDateTime;
+        private long lastCmdCount;
+        private int highestDelta;
 
         public StreamBotApp(
             Microsoft.Extensions.Logging.ILogger logger,
@@ -53,15 +59,55 @@ namespace ROBot
 
         private void UpdateTitle()
         {
-            var title = "Ravenfall Centralized Bot ";
-            title += GetUptime();
-            //title += GetConnectionsCount();
-            //title += GetSessionCount();
-            title += GetSessionsAndConnections();
-            title += GetJoinedChannelCount();            
-            Console.Title = title;
-            if (this.disposed) { return; }
-            this.timeoutHandle = this.kernel.SetTimeout(UpdateTitle, 1000);
+            try
+            {
+                var title = "Ravenfall Centralized Bot ";
+                title += GetUptime();
+                //title += GetConnectionsCount();
+                //title += GetSessionCount();
+                title += GetSessionsAndConnections();
+                title += GetJoinedChannelCount();
+                title += GetTrackedPlayerCount();
+                title += GetCommandsPerSecond();
+                Console.Title = title;
+                if (this.disposed) { return; }
+                this.timeoutHandle = this.kernel.SetTimeout(UpdateTitle, 1000);
+            }
+            catch
+            {
+                // Setting title on th is platform probably not supported.
+            }
+        }
+        private string GetCommandsPerSecond()
+        {
+            var commandCount = twitch.GetCommandCount();
+            double secondsSinceStart = (DateTime.UtcNow - startedDateTime).TotalSeconds;
+            double delta = commandCount - lastCmdCount;
+            double csSinceStart = Math.Round(commandCount / secondsSinceStart, 2);
+            if (delta < csSinceStart)
+            {
+                delta = csSinceStart;
+            }
+
+            if (delta > highestDelta)
+            {
+                highestDelta = (int)delta;
+            }
+
+            lastCmdCount = commandCount;
+            return "[Total: " + commandCount + " C/S: " + delta + " Hi: " + highestDelta + "] ";
+        }
+
+        private string GetTrackedPlayerCount()
+        {
+            var sessions = sessionManager.All();
+            var userCount = 0;
+            if (sessions.Count > 0)
+            {
+                userCount = sessions.Sum(x => x.UserCount);
+            }
+
+            return "[Players: " + userCount + "] ";
         }
 
         private string GetJoinedChannelCount()
@@ -104,7 +150,7 @@ namespace ROBot
             }
             if (elapsed.Hours > 0)
             {
-                str += elapsed.Days + "h ";
+                str += elapsed.Hours + "h ";
             }
             if (elapsed.Minutes > 0)
             {

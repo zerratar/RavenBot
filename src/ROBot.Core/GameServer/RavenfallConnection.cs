@@ -9,6 +9,7 @@ using RavenBot.Core.Twitch;
 using Shinobytes.Ravenfall.RavenNet.Core;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -32,6 +33,8 @@ namespace ROBot.Core.GameServer
         private int pingSendIndex = 0;
         private int pongReceiveIndex = 0;
         private int missedPingCount = 0;
+        private bool disposed;
+        private readonly List<IMessageBusSubscription> subs = new List<IMessageBusSubscription>();
 
         public Guid InstanceId { get; } = Guid.NewGuid();
 
@@ -49,10 +52,10 @@ namespace ROBot.Core.GameServer
             this.playerProvider = playerProvider;
             this.messageBus = messageBus;
 
-            messageBus.Subscribe<ROBot.Core.Twitch.TwitchUserJoined>(nameof(TwitchUserJoined), OnUserJoined);
-            messageBus.Subscribe<ROBot.Core.Twitch.TwitchUserLeft>(nameof(TwitchUserLeft), OnUserLeft);
-            messageBus.Subscribe<ROBot.Core.Twitch.TwitchCheer>(nameof(TwitchCheer), OnUserCheer);
-            messageBus.Subscribe<ROBot.Core.Twitch.TwitchSubscription>(nameof(TwitchSubscription), OnUserSub);
+            this.subs.Add(messageBus.Subscribe<ROBot.Core.Twitch.TwitchUserJoined>(nameof(TwitchUserJoined), OnUserJoined));
+            this.subs.Add(messageBus.Subscribe<ROBot.Core.Twitch.TwitchUserLeft>(nameof(TwitchUserLeft), OnUserLeft));
+            this.subs.Add(messageBus.Subscribe<ROBot.Core.Twitch.TwitchCheer>(nameof(TwitchCheer), OnUserCheer));
+            this.subs.Add(messageBus.Subscribe<ROBot.Core.Twitch.TwitchSubscription>(nameof(TwitchSubscription), OnUserSub));
 
             this.client = client;
             this.client.Connected += Client_Connected;
@@ -102,6 +105,11 @@ namespace ROBot.Core.GameServer
             this.client.Subscribe("island_info", SendResponseToTwitchChat);
 
             this.client.Subscribe("message", SendResponseToTwitchChat);
+
+            if (this.client.IsConnected)
+            {
+                Client_Connected(this, EventArgs.Empty);
+            }
         }
 
 
@@ -290,15 +298,37 @@ namespace ROBot.Core.GameServer
         public Task LeaveOnsenAsync(Player player) => SendAsync("onsen_leave", player);
         public Task JoinOnsenAsync(Player player) => SendAsync("onsen_join", player);
         public Task GetRestedStatusAsync(Player player) => SendAsync("rested_status", player);
+
         public void Dispose()
         {
-            this.client.Connected -= Client_Connected;
-            this.client.Disconnected -= Client_Disconnected;
-            this.client.Dispose();
+            try
+            {
+                if (!this.disposed)
+                {
+                    if (subs.Count > 0)
+                    {
+                        subs.ForEach(x => x.Unsubscribe());
+                    }
+
+                    this.client.Connected -= Client_Connected;
+                    this.client.Disconnected -= Client_Disconnected;
+                    this.client.Dispose();
+                    disposed = true;
+                    return;
+                }
+            }
+            catch (Exception exc)
+            {
+                logger.LogError("[RVNFLL] Failed to Dispose Connection: " + exc);
+                return;
+            }
+
+            logger.LogError("[RVNFLL] Failed to Dispose Connection: Already Disposed");
         }
 
         private void Client_Disconnected(object sender, EventArgs e)
         {
+            Dispose();
             server.OnClientDisconnected(this);
             if (activePing != null)
             {
@@ -310,7 +340,9 @@ namespace ROBot.Core.GameServer
         {
             //server.OnClientConnected(this);
             this.endPoint = this.client.EndPoint;
-            activePing = kernel.SetTimeout(PingPong, 15000);
+            //activePing = kernel.SetTimeout(PingPong, 15000);
+            PingPong();
+
             while (requests.TryDequeue(out var request))
             {
                 await this.client.SendAsync(request);
@@ -333,8 +365,12 @@ namespace ROBot.Core.GameServer
                 }
             }
 
+            if (activePing != null)
+                kernel.ClearTimeout(activePing);
+
             Ping(pingSendIndex++);
-            activePing = kernel.SetTimeout(PingPong, 15000);
+
+            activePing = kernel.SetTimeout(() => PingPong(), 3000);
         }
 
         private async void OnUserCheer(ROBot.Core.Twitch.TwitchCheer obj)
@@ -342,7 +378,7 @@ namespace ROBot.Core.GameServer
             if (session == null || !session.Name.Equals(obj.Channel, StringComparison.OrdinalIgnoreCase))
                 return;
 
-            logger.LogDebug(obj.Bits + " bits cheered from " + obj.DisplayName + " to " + obj.Channel);
+            logger.LogDebug("[TWITCH] [" + obj.Channel + "] " + obj.Bits + " bits cheered from " + obj.DisplayName);
             await SendAsync("twitch_cheer", obj);
         }
 
@@ -351,7 +387,14 @@ namespace ROBot.Core.GameServer
             if (session == null || !session.Name.Equals(obj.Channel, StringComparison.OrdinalIgnoreCase))
                 return;
 
-            logger.LogDebug("Twitch sub from " + obj.DisplayName + " to " + obj.Channel);
+            var name = obj.ReceiverUserId;
+            var player = playerProvider.GetByUserId(obj.ReceiverUserId);
+            if (player != null)
+            {
+                name = player.DisplayName;
+            }
+
+            logger.LogDebug("[TWITCH] [" + obj.Channel + "] Sub from " + obj.DisplayName + " to " + name);
             await SendAsync("twitch_sub", obj);
         }
 
@@ -396,6 +439,19 @@ namespace ROBot.Core.GameServer
         public Task<bool> ProcessAsync(int serverPort)
         {
             return Task.FromResult(true);
+        }
+
+        public override string ToString()
+        {
+            var str = "";
+            if (this.session != null)
+            {
+
+                str += "Session Name: " + this.session.Name + " ";
+            }
+            str += "EndPoint: " + EndPointString;
+
+            return str;
         }
 
     }

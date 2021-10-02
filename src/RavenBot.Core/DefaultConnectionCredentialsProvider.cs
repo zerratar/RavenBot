@@ -1,4 +1,5 @@
-﻿using TwitchLib.Client.Models;
+﻿using System.Threading.Tasks;
+using TwitchLib.Client.Models;
 
 namespace RavenBot.Core
 {
@@ -16,5 +17,6 @@ namespace RavenBot.Core
                 settings.TwitchBotUsername,
                 settings.TwitchBotAuthToken);
         }
+
     }
 }

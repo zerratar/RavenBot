@@ -16,5 +16,6 @@ namespace ROBot.Core.GameServer
         IGameSession Get(Guid id);
         IGameSession GetByName(string twitchUserName);
         IGameSession GetByUserId(string session);
+        void ClearAll();
     }
 }
