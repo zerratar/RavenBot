@@ -237,6 +237,7 @@ namespace ROBot.Core.GameServer
         public Task ResetPetRacingAsync(Player player) => SendAsync("pet_race_reset", player);
         public Task PlayPetRacingAsync(Player player) => SendAsync("pet_race_play", player);
         public Task GetVillageBoostAsync(Player player) => SendAsync("get_village_boost", player);
+        public Task SetAllVillageHutsAsync(Player player, string skill) => SendAsync("set_village_huts", new PlayerStringRequest(player, skill));
         public Task ToggleDiaperModeAsync(Player player) => SendAsync("toggle_diaper_mode", player);
         public Task ToggleItemRequirementsAsync(Player player) => SendAsync("toggle_item_requirements", player);
         public Task SetExpMultiplierAsync(Player player, int number) => SendAsync("exp_multiplier", new SetExpMultiplierRequest(player, number));

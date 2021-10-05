@@ -145,6 +145,7 @@ namespace RavenBot.Core.Ravenfall
         public Task PlayerAppearanceUpdateAsync(Player player, string appearance) => SendAsync("change_appearance", new PlayerAppearanceRequest(player, appearance));
         public Task ToggleHelmetAsync(Player player) => SendAsync("toggle_helmet", player);
         public Task TogglePetAsync(Player player) => SendAsync("toggle_pet", player);
+        public Task SetAllVillageHutsAsync(Player player, string skill) => SendAsync("set_village_huts", new PlayerStringRequest(player, skill));
         public Task SellItemAsync(Player player, string itemQuery) => SendAsync("sell_item", new ItemQueryRequest(player, itemQuery));
         public Task BuyItemAsync(Player player, string itemQuery) => SendAsync("buy_item", new ItemQueryRequest(player, itemQuery));
         public Task GiftItemAsync(Player player, string itemQuery) => SendAsync("gift_item", new ItemQueryRequest(player, itemQuery));

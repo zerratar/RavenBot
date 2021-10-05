@@ -2,15 +2,14 @@
 
 namespace RavenBot.Core.Ravenfall.Requests
 {
-    public class PlayerStatsRequest
+    public class PlayerStringRequest : IBotRequest<string>
     {
         public Player Player { get; }
-        public string Skill { get; }
-
-        public PlayerStatsRequest(Player player, string skill)
+        public string Value { get; }
+        public PlayerStringRequest(Player player, string value)
         {
             Player = player;
-            Skill = skill;
+            Value = value;
         }
     }
 }

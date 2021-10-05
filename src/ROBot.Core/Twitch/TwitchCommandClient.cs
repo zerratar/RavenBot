@@ -199,8 +199,8 @@ namespace ROBot.Core.Twitch
                         else
                         {
                             logger.LogDebug("[Twitch] Joining Twitch Channel " + channel);
+                            joinedChannels.Add(channel);
                         }
-                        joinedChannels.Add(channel);
                     }
 
                     client.JoinChannel(channel);

@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using RavenBot.Core.Handlers;
-using RavenBot.Core.Net;
 
 namespace RavenBot.Core.Ravenfall.Commands
 {
@@ -23,6 +22,13 @@ namespace RavenBot.Core.Ravenfall.Commands
             }
 
             var player = playerProvider.Get(cmd.Sender);
+
+            if (!string.IsNullOrEmpty(cmd.Arguments))
+            {
+                await game.SetAllVillageHutsAsync(player, cmd.Arguments);
+                return;
+            }
+
             await game.GetVillageBoostAsync(player);
         }
     }

@@ -43,6 +43,7 @@ namespace RavenBot.Core.Ravenfall
         Task GetPetAsync(Player player);
         Task GetMaxMultiplierAsync(Player player);
         Task GetVillageBoostAsync(Player player);
+        Task SetAllVillageHutsAsync(Player player, string skill);
         Task JoinRaidAsync(Player player);
         Task StopRaidAsync(Player player);
         Task RaidStartAsync(Player player);

@@ -16,7 +16,14 @@ namespace ROBot.Core.Twitch.Commands
                 if (connection != null)
                 {
                     var player = session.Get(cmd.Sender);
-                    await connection.GetVillageBoostAsync(player);
+                    if (!string.IsNullOrEmpty(cmd.Arguments))
+                    {
+                        await connection.SetAllVillageHutsAsync(player, cmd.Arguments);
+                    }
+                    else
+                    {
+                        await connection.GetVillageBoostAsync(player);
+                    }
                 }
             }
         }
