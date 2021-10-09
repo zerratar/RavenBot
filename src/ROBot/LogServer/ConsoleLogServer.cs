@@ -58,7 +58,7 @@ namespace ROBot
             {
                 try
                 {
-                    const string logsDir = "logs";
+                    const string logsDir = "../logs";
                     var fn = DateTime.UtcNow.ToString("yyyy-MM-dd") + ".log";
 
                     if (!System.IO.Directory.Exists(logsDir))
