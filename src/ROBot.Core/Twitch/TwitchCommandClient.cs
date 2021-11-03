@@ -399,7 +399,7 @@ namespace ROBot.Core.Twitch
             if (string.IsNullOrWhiteSpace(format))
                 return;
 
-            var msg = messageFormatter.Format(format, args);
+            var msg = messageFormatter. Format(format, args);
             if (string.IsNullOrEmpty(msg))
                 return;
 

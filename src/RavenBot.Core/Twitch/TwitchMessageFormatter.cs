@@ -31,15 +31,14 @@ namespace RavenBot.Core.Twitch
             }
 
             var template = parser.Parse(message, options);
+            var str = stringProvider.Get(message);
+            if (str == message)
+            {
+                return processor.Process(template, args);
+            }
 
-            //var str = stringProvider.Get(message);
-            //if (str == message)
-            //{
-            return processor.Process(template, args);
-            //}
-
-            //var templateOverride = parser.Parse(str, options);
-            //return processor.Process(template, templateOverride, args);
+            var templateOverride = parser.Parse(str, options);
+            return processor.Process(template, templateOverride, args);
         }
 
         public void OverrideFormat(string oldValue, string newValue)

@@ -299,7 +299,7 @@ namespace ROBot.Core.GameServer
         public Task LeaveOnsenAsync(Player player) => SendAsync("onsen_leave", player);
         public Task JoinOnsenAsync(Player player) => SendAsync("onsen_join", player);
         public Task GetRestedStatusAsync(Player player) => SendAsync("rested_status", player);
-
+        public Task GetClientVersionAsync(Player player) => SendAsync("client_version", player);
         public void Dispose()
         {
             try

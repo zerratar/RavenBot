@@ -70,7 +70,7 @@ namespace RavenBot.Core.Ravenfall
         Task EmbarkFerryAsync(Player player);
         Task RequestTrainingInfoAsync(Player player);
         Task RaidStreamerAsync(Player target, bool isRaidWar);
-
+        Task GetClientVersionAsync(Player player);
 
         // ONSEN
         Task LeaveOnsenAsync(Player player);
@@ -85,7 +85,6 @@ namespace RavenBot.Core.Ravenfall
         Task ResetTicTacToeAsync(Player player);
         Task ResetPetRacingAsync(Player player);
         Task PlayPetRacingAsync(Player player);
-
 
         // KEEP ALIVE
         Task Ping(int correlationId);
