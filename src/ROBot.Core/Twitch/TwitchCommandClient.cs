@@ -45,6 +45,7 @@ namespace ROBot.Core.Twitch
             = new ConcurrentQueue<string>();
 
         private readonly HashSet<string> joinedChannels = new HashSet<string>();
+        private readonly HashSet<string> suspendedChannels = new HashSet<string>();
 
         private readonly object channelMutex = new object();
 
@@ -163,6 +164,11 @@ namespace ROBot.Core.Twitch
 
         public void JoinChannel(string channel)
         {
+            if (suspendedChannels.Contains(channel))
+            {
+                return;
+            }
+
             if (!isConnectedToTwitch)
             {
                 EnqueueJoin(channel);
@@ -399,7 +405,7 @@ namespace ROBot.Core.Twitch
             if (string.IsNullOrWhiteSpace(format))
                 return;
 
-            var msg = messageFormatter. Format(format, args);
+            var msg = messageFormatter.Format(format, args);
             if (string.IsNullOrEmpty(msg))
                 return;
 
@@ -463,8 +469,16 @@ namespace ROBot.Core.Twitch
         {
             var err = "";
             if (!string.IsNullOrEmpty(e.Exception.Details))
+            {
                 err = " with error: " + e.Exception.Details;
+                if (e.Exception.Details.Contains("suspended"))
+                {
+                    this.suspendedChannels.Add(e.Exception.Channel);
+                }
+            }
             logger.LogError("[Twitch] Failed to join channel: " + e.Exception.Channel + err);
+
+
             await Task.Delay(1000);
             JoinChannel(e.Exception.Channel);
         }
