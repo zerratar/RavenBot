@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -164,7 +165,16 @@ namespace RavenBot.Core.Net
 
         public Task SendAsync(string message)
         {
+            message = FixBadEncoding(message);
             return this.connection.SendAsync(message);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static string FixBadEncoding(string message)
+        {
+            var encoding = System.Text.Encoding.UTF8;
+            var bytes = encoding.GetBytes(message);
+            return encoding.GetString(bytes);
         }
 
         private class Subscription : IGameClientSubcription

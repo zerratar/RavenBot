@@ -1,5 +1,6 @@
 ﻿using RavenBot.Core.Handlers;
 using RavenBot.Core.Ravenfall.Models;
+using System.Runtime.CompilerServices;
 
 namespace RavenBot.Core.Ravenfall
 {
@@ -11,9 +12,19 @@ namespace RavenBot.Core.Ravenfall
         {
             this.Player = player;
             this.Sender = new RewardRedeemSender(player);
-            this.Arguments = arguments;
-            this.Command = command;
+            this.Arguments = FixBadEncoding(arguments);
+            this.Command = FixBadEncoding(command);
             this.Channel = channel;
+        }
+
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static string FixBadEncoding(string message)
+        {
+            if (string.IsNullOrEmpty(message)) return null;
+            var encoding = System.Text.Encoding.UTF8;
+            var bytes = encoding.GetBytes(message);
+            return encoding.GetString(bytes);
         }
 
         public ICommandSender Sender { get; }

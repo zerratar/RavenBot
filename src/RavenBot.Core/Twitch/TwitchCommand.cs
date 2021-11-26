@@ -2,6 +2,7 @@
 using RavenBot.Core.Handlers;
 using TwitchLib.Api.Helix.Models.StreamsMetadata;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace RavenBot.Core.Twitch
 {
@@ -137,9 +138,8 @@ namespace RavenBot.Core.Twitch
 
         public TwitchCommand(ChatCommand cmd, bool isGameAdmin = false, bool isGameModerator = false)
         {
-            this.Command = cmd.CommandText?.ToLower();
-
-            this.Arguments = cmd.ArgumentsAsString;
+            this.Command = FixBadEncoding(cmd.CommandText?.ToLower());
+            this.Arguments = FixBadEncoding(cmd.ArgumentsAsString);
 
             if (!string.IsNullOrEmpty(this.Arguments) && this.Arguments.Length > 0)
             {
@@ -170,6 +170,15 @@ namespace RavenBot.Core.Twitch
                 isVip,
                 isVerifiedBot,
                 cmd.ChatMessage.ColorHex);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static string FixBadEncoding(string message)
+        {
+            if (string.IsNullOrEmpty(message)) return null;
+            var encoding = System.Text.Encoding.UTF8;
+            var bytes = encoding.GetBytes(message);
+            return encoding.GetString(bytes);
         }
 
         public string Channel { get; }
