@@ -56,13 +56,13 @@ namespace ROBot.Core.Twitch
 
         public async Task<bool> HandleAsync(IBotServer game, ITwitchCommandClient twitch, ChatCommand command)
         {
-            var key = command.CommandText.ToLower();
             var session = game.GetSession(command.ChatMessage.Channel);
             var argString = !string.IsNullOrEmpty(command.ArgumentsAsString) ? " (args: " + command.ArgumentsAsString + ")" : "";
 
-            
             var uid = command.ChatMessage.UserId;
             var chatCmd = new TwitchCommand(command, userRoleManager.IsAdministrator(uid), userRoleManager.IsModerator(uid));
+
+            var key = chatCmd.Command.ToLower();
 
             if (session != null)
             {
@@ -180,6 +180,12 @@ namespace ROBot.Core.Twitch
 
         private async Task<bool> HandleAsync(IBotServer game, ITwitchCommandClient twitch, ICommand cmd)
         {
+            if (string.IsNullOrEmpty(cmd.Command))
+            {
+                logger.LogInformation("HandleAsync::Empty Command from " + cmd.Sender.Username + " in " + cmd.Channel);
+                return false;
+            }
+
             var handler = FindHandler(cmd.Command);
             if (handler == null)
             {
@@ -193,7 +199,7 @@ namespace ROBot.Core.Twitch
 
         private ITwitchCommandHandler FindHandler(string command)
         {
-            if (handlerLookup.TryGetValue(command, out var handlerType))
+            if (!string.IsNullOrEmpty(command) && handlerLookup.TryGetValue(command, out var handlerType))
             {
                 return ioc.Resolve(handlerType) as ITwitchCommandHandler;
             }

@@ -27,6 +27,11 @@ namespace RavenBot.Core.Handlers
 
         public async Task HandleAsync(IMessageChat listener, ICommand cmd)
         {
+            if (string.IsNullOrEmpty(cmd.Command))
+            {
+                return;
+            }
+
             if (commands.TryGetValue(cmd.Command, out var processor))
             {
                 var isChannelPointReward = cmd.GetType().Name.Contains("Reward");

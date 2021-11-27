@@ -142,13 +142,34 @@ namespace RavenBot.Core.Twitch
             this.Command = cmd.CommandText?.ToLower()?.AsUTF8();
             this.Arguments = cmd.ArgumentsAsString?.AsUTF8();
 
+            if (string.IsNullOrEmpty(this.Command) && !string.IsNullOrEmpty(this.Arguments))
+            {
+                this.Command = this.Arguments.Trim();
+                if (this.Command.Contains(' '))
+                {
+                    var cmdAndArgs = this.Command.Split(' ');
+                    this.Command = cmdAndArgs[0];
+                    this.Arguments = string.Join(" ", cmdAndArgs.Skip(1));
+                }
+                else
+                {
+                    this.Arguments = string.Empty;
+                }
+            }
+
             if (!string.IsNullOrEmpty(this.Arguments) && this.Arguments.Length > 0)
             {
                 var allowedCharacters = "_=qwertyuiopåasdfghj.,-%!\"+$€\\]:;|<>@£½§~¨^´`[klöäzxcvbnm1234567890".ToArray();
                 var lastChar = this.Arguments[this.Arguments.Length - 1];
+                var firstChar = this.Arguments[0];
                 if (!allowedCharacters.Contains(char.ToLower(lastChar)))
                 {
                     this.Arguments = this.Arguments.Trim(lastChar);
+                }
+
+                if (!allowedCharacters.Contains(char.ToLower(firstChar)))
+                {
+                    this.Arguments = this.Arguments.Trim(firstChar);
                 }
             }
 
