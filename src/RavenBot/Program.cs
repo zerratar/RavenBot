@@ -47,7 +47,7 @@ namespace RavenBot
 
             ioc.RegisterShared<IPlayerProvider, PlayerProvider>();
 
-            ioc.RegisterShared<IStringProvider, StringProvider>();
+            ioc.RegisterShared<IStringProvider, CachedStringProvider>();
             ioc.RegisterShared<IStringTemplateParser, StringTemplateParser>();
             ioc.RegisterShared<IStringTemplateProcessor, StringTemplateProcessor>();
             ioc.RegisterShared<ITwitchMessageFormatter, TwitchMessageFormatter>();

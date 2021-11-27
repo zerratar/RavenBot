@@ -11,6 +11,10 @@ namespace ROBot
 {
     public class ConsoleLogServer : ILogger, IDisposable
     {
+
+        const string logsDir = "../logs";
+        const double logsLifespanDays = 7;
+
         private readonly ConsoleLogger logger;
         private readonly IServer server;
         private readonly IMessageBus messageBus;
@@ -58,7 +62,6 @@ namespace ROBot
             {
                 try
                 {
-                    const string logsDir = "../logs";
                     var fn = DateTime.UtcNow.ToString("yyyy-MM-dd") + ".log";
 
                     if (!System.IO.Directory.Exists(logsDir))
@@ -81,7 +84,6 @@ namespace ROBot
 
         private void CleanupLogs()
         {
-            const string logsDir = "logs";
             if (!System.IO.Directory.Exists(logsDir))
             {
                 return;
@@ -93,7 +95,7 @@ namespace ROBot
                 try
                 {
                     var fi = new FileInfo(log);
-                    if (fi.CreationTimeUtc >= DateTime.UtcNow.AddDays(1.1))
+                    if (fi.CreationTimeUtc >= DateTime.UtcNow.AddDays(logsLifespanDays))
                     {
                         fi.Delete();
                     }
@@ -178,12 +180,6 @@ namespace ROBot
                     TrySaveLogToDisk();
                     messages.Clear();
                 }
-
-                //// relief some pressure on the queue so we dont grow out of memory at some point.
-                //while (messages.Count > maxMessageStack)
-                //{
-                //    messages.RemoveAt(0);
-                //}
             }
         }
 

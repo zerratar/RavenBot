@@ -31,6 +31,7 @@ namespace RavenBot.Core.Twitch
             }
 
             var template = parser.Parse(message, options);
+
             var str = stringProvider.Get(message);
             if (str == message)
             {

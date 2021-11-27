@@ -403,11 +403,17 @@ namespace ROBot.Core.Twitch
         public void Broadcast(string channel, string user, string format, params object[] args)
         {
             if (string.IsNullOrWhiteSpace(format))
+            {
+                logger.LogWarning($"[{channel}] (Broadcast Ignored) Empty message from game. Targeting user: {user}");
                 return;
+            }
 
             var msg = messageFormatter.Format(format, args);
             if (string.IsNullOrEmpty(msg))
+            {
+                logger.LogWarning($"[{channel}] (Broadcast Ignored) Message became empty after being formatted. Format: '{format}', Args: '{string.Join(",", args)}'");
                 return;
+            }
 
             if (!string.IsNullOrEmpty(user))
                 msg = user + ", " + msg;
