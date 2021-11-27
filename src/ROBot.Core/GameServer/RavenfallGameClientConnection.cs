@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using RavenBot.Core.Extensions;
 using RavenBot.Core.Net;
 using ROBot.Core.Twitch;
 using System;
@@ -176,7 +177,7 @@ namespace ROBot.Core.GameServer
         {
             if (this.disposed) return;
             readActive = false;
-            
+
             if (connection != null)
             {
                 try { writer.Dispose(); } catch { }
@@ -197,7 +198,7 @@ namespace ROBot.Core.GameServer
             {
                 if (this.writer.BaseStream.CanWrite)
                 {
-                    await this.writer.WriteLineAsync(message);
+                    await this.writer.WriteLineAsync(message.AsUTF8());
                     await this.writer.FlushAsync();
                     return;
                 }

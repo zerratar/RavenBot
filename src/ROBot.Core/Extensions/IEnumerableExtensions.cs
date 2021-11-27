@@ -13,6 +13,16 @@ namespace ROBot.Core.Extensions
             return Task.WhenAll(source.Select(action));
         }
     }
+    public static class EncodingExtensions
+    {
+        public static string AsUTF8(this string message)
+        {
+            if (string.IsNullOrEmpty(message)) return null;
+            var encoding = System.Text.Encoding.UTF8;
+            var bytes = encoding.GetBytes(message);
+            return encoding.GetString(bytes);
+        }
+    }
 
     public static class IEnumerableExtensions
     {

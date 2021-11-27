@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using RavenBot.Core.Extensions;
 
 namespace RavenBot.Core.Net
 {
@@ -165,18 +166,8 @@ namespace RavenBot.Core.Net
 
         public Task SendAsync(string message)
         {
-            message = FixBadEncoding(message);
-            return this.connection.SendAsync(message);
+            return this.connection.SendAsync(message.AsUTF8());
         }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static string FixBadEncoding(string message)
-        {
-            var encoding = System.Text.Encoding.UTF8;
-            var bytes = encoding.GetBytes(message);
-            return encoding.GetString(bytes);
-        }
-
         private class Subscription : IGameClientSubcription
         {
             public readonly string Identifier;

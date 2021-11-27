@@ -3,6 +3,7 @@ using RavenBot.Core.Handlers;
 using TwitchLib.Api.Helix.Models.StreamsMetadata;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using RavenBot.Core.Extensions;
 
 namespace RavenBot.Core.Twitch
 {
@@ -138,8 +139,8 @@ namespace RavenBot.Core.Twitch
 
         public TwitchCommand(ChatCommand cmd, bool isGameAdmin = false, bool isGameModerator = false)
         {
-            this.Command = FixBadEncoding(cmd.CommandText?.ToLower());
-            this.Arguments = FixBadEncoding(cmd.ArgumentsAsString);
+            this.Command = cmd.CommandText?.ToLower()?.AsUTF8();
+            this.Arguments = cmd.ArgumentsAsString?.AsUTF8();
 
             if (!string.IsNullOrEmpty(this.Arguments) && this.Arguments.Length > 0)
             {
