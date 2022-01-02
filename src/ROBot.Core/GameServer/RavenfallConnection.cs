@@ -354,7 +354,7 @@ namespace ROBot.Core.GameServer
         {
             if (pingSendIndex != pongReceiveIndex)
             {
-                logger.LogDebug("Connection has not sent any pong back. since last update. Ping " + pingSendIndex + ", Pong " + pongReceiveIndex);
+                logger.LogDebug("[RVNFALL] Connection has not sent any pong back. since last update. Ping " + pingSendIndex + ", Pong " + pongReceiveIndex);
                 // Do nothing as of for now. Since clients have not been updated.
                 // But otherwise we should have a fail count
                 missedPingCount++;
@@ -379,7 +379,7 @@ namespace ROBot.Core.GameServer
             if (session == null || !session.Name.Equals(obj.Channel, StringComparison.OrdinalIgnoreCase))
                 return;
 
-            logger.LogDebug("[TWITCH] [" + obj.Channel + "] " + obj.Bits + " bits cheered from " + obj.DisplayName);
+            logger.LogDebug("[TWITCH] Bits Cheered (Channel: " + obj.Channel + " Bits: " + obj.Bits + " From:" + obj.DisplayName + ")");
             await SendAsync("twitch_cheer", obj);
         }
 
@@ -395,12 +395,12 @@ namespace ROBot.Core.GameServer
                 name = player.DisplayName;
             }
 
-            logger.LogDebug("[TWITCH] [" + obj.Channel + "] Sub from " + obj.DisplayName + " to " + name);
+            logger.LogDebug("[TWITCH] Sub Recieved (Channel: " + obj.Channel + " From:" + obj.DisplayName + " To: " + name + ")");
             await SendAsync("twitch_sub", obj);
         }
 
-        private void OnUserLeft(ROBot.Core.Twitch.TwitchUserLeft obj) => logger.LogDebug(obj.Name + " left the channel");
-        private void OnUserJoined(ROBot.Core.Twitch.TwitchUserJoined obj) => logger.LogDebug(obj.Name + " joined the channel");
+        private void OnUserLeft(ROBot.Core.Twitch.TwitchUserLeft obj) => logger.LogDebug("[TWITCH] " + " User left the channel (User: " + obj.Name + ")");
+        private void OnUserJoined(ROBot.Core.Twitch.TwitchUserJoined obj) => logger.LogDebug("[TWITCH] " + " User joined the channel (User: " + obj.Name + ")");
 
         public void Close()
         {
@@ -423,7 +423,7 @@ namespace ROBot.Core.GameServer
             }
             catch (Exception exc)
             {
-                this.logger.LogError("Unable to send packet (" + name + "): to " + this.session?.Name + ", " + exc);
+                this.logger.LogError("[RVNFLL] Unable to send packet (" + name + "): to " + this.session?.Name + ", " + exc);
             }
         }
 

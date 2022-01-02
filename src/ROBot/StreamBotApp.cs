@@ -46,12 +46,12 @@ namespace ROBot
         {
             this.startedDateTime = DateTime.UtcNow;
 
-            logger.LogInformation("Application Started");
+            logger.LogInformation("[BOT] Application Started");
 
-            logger.LogInformation("Initializing Twitch Integration..");
+            logger.LogInformation("[BOT] Initializing Twitch Integration..");
             twitch.Start();
 
-            logger.LogInformation("Starting Bot Server..");
+            logger.LogInformation("[BOT] Starting Bot Server..");
             botServer.Start();
 
             UpdateTitle();
@@ -163,7 +163,7 @@ namespace ROBot
 
         public void Shutdown()
         {
-            logger.LogInformation("Application Shutdown initialized.");
+            logger.LogInformation("[BOT] Application Shutdown initialized.");
             Dispose();
         }
 
@@ -184,7 +184,7 @@ namespace ROBot
         {
             if (e.OldName != e.Session.Name)
             {
-                logger.LogWarning("[RVNFLL] Game Session Name Changed from " + e.OldName + " to " + e.Session.Name + ".");
+                logger.LogWarning("[RVNFLL] Game Session Name Changed (OldName: " + e.OldName + " New: " + e.Session.Name + ")");
                 twitch.LeaveChannel(e.OldName);
                 twitch.JoinChannel(e.Session.Name);
                 return;
@@ -198,13 +198,13 @@ namespace ROBot
 
         private void OnSessionStarted(object sender, IGameSession session)
         {
-            logger.LogDebug("[RVNFLL] Game Session " + session.Name + " Started!");
+            logger.LogDebug("[RVNFLL] Game Session Started (Name:" + session.Name + ")");
             twitch.JoinChannel(session.Name);
         }
 
         private void OnSessionEnded(object sender, IGameSession session)
         {
-            logger.LogDebug("[RVNFLL] Game Session " + session.Name + " Ended.");
+            logger.LogDebug("[RVNFLL] Game Session Ended (Name" + session.Name + ")");
             twitch.LeaveChannel(session.Name);
         }
     }

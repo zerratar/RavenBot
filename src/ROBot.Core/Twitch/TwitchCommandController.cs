@@ -46,7 +46,7 @@ namespace ROBot.Core.Twitch
 
             if (messageHandler == null)
             {
-                logger.LogInformation("HandleMessage: No message handler available.");
+                logger.LogInformation("[BOT] HandleMessage: No message handler available.");
                 return false;
             }
 
@@ -73,9 +73,9 @@ namespace ROBot.Core.Twitch
             if (await HandleAsync(game, twitch, chatCmd))
             {
                 if (session != null)
-                    logger.LogDebug("[" + session.Name + "] Command: " + key + argString + " from " + command.ChatMessage.Username);
+                    logger.LogDebug("[BOT] Twitch Command Recieved (SessionName: " + session.Name + " Command: " + key + argString + " From: " + command.ChatMessage.Username + ")");
                 else
-                    logger.LogDebug("Twitch Command Recieved: " + key + argString + " from " + command.ChatMessage.Username + " in #" + command.ChatMessage.Channel);
+                    logger.LogDebug("[BOT] Twitch Command Recieved (Command: " + key + argString + " From: " + command.ChatMessage.Username + " Channel: " + command.ChatMessage.Channel +")");
 
                 return true;
             }
@@ -132,7 +132,8 @@ namespace ROBot.Core.Twitch
                     processor = FindHandler(cmd);
                     if (processor == null)
                     {
-                        logger.LogError("Error redeeming reward: " + cmd + ", no handler found");
+                        logger.LogDebug("[BOT] Unknown Reward - No Handler Found (Command: " + cmd + ")"); 
+                        //Not an Error, expected to sometimes see rewards unrelated to Ravenfall
                         return false;
                     }
 
@@ -163,7 +164,7 @@ namespace ROBot.Core.Twitch
                     player = session.Get(new RewardRedeemUser(redeemer));
                     if (player == null)
                     {
-                        logger.LogError("Error redeeming reward: " + usedCommand + ", redeemer does not exist. (" + redeemer.Id + ")");
+                        logger.LogError("[BOT] Error Redeeming Reward - Redeemer Does not Exisit (Command: " + usedCommand + " Redeemer:" + redeemer.Id + ")");
                         return false;
                     }
                 }
@@ -173,7 +174,7 @@ namespace ROBot.Core.Twitch
             }
             catch (Exception exc)
             {
-                logger.LogError("Error redeeming reward:  " + usedCommand + ", " + exc.ToString());
+                logger.LogError("[BOT] Exception Redeeming Reward  (Command: " + usedCommand + " Exception: " + exc.ToString() +")");
                 return false;
             }
         }
@@ -182,7 +183,7 @@ namespace ROBot.Core.Twitch
         {
             if (string.IsNullOrEmpty(cmd.Command))
             {
-                logger.LogInformation("HandleAsync::Empty Command from " + cmd.Sender.Username + " in " + cmd.Channel);
+                logger.LogInformation("[BOT] HandleAsync::Empty Command (From: " + cmd.Sender.Username + " Channel: " + cmd.Channel +")");
                 return false;
             }
 
