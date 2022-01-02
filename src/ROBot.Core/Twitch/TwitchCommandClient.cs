@@ -57,6 +57,11 @@ namespace ROBot.Core.Twitch
         private bool isConnectedToTwitch;
         private long usedCommandCount = 0;
         private long messageCount = 0;
+        private bool hasConnectionError = false;
+        private long connectionErrorCount = 0;
+        private long connectionAttemptCount = 0;
+        private bool attemptingReconnection = false;
+
         public TwitchCommandClient(
             ILogger logger,
             IKernel kernel,
@@ -106,7 +111,6 @@ namespace ROBot.Core.Twitch
             EnsureInitialized();
             Subscribe();
             client.Connect();
-            RejoinChannels();
         }
 
         private void RejoinChannels()
@@ -117,6 +121,11 @@ namespace ROBot.Core.Twitch
                 {
                     JoinChannel(c);
                 }
+            }
+
+            while (channelJoinQueue.TryDequeue(out var channel))
+            {
+                JoinChannel(channel);
             }
         }
 
@@ -182,7 +191,7 @@ namespace ROBot.Core.Twitch
 
             if (string.IsNullOrEmpty(channel))
             {
-                logger.LogDebug("[Twitch] Trying to join a channel without a name.");
+                logger.LogError("[Twitch] Trying to join a channel without a name.");
                 return;
             }
 
@@ -200,7 +209,7 @@ namespace ROBot.Core.Twitch
                     {
                         if (joinedChannels.Contains(channel))
                         {
-                            logger.LogWarning("[Twitch] Retrying to join Twitch Channel " + channel);
+                            logger.LogDebug("[Twitch] Retrying to join Twitch Channel " + channel);
                         }
                         else
                         {
@@ -375,9 +384,21 @@ namespace ROBot.Core.Twitch
         private void OnDisconnected(object sender, OnDisconnectedEventArgs e)
         {
             this.isConnectedToTwitch = false;
-            logger.LogError("[Twitch] Disconnected from the Twitch IRC Server");
-            Reconnect();
-            client.Reconnect();
+            if (!allowReconnection)
+            {
+                logger.LogDebug("[Twitch] Disconnected from the Twitch IRC Server. Not attempting to reconnect. Most likely shutting down.");
+                return;
+            }
+
+            if(this.hasConnectionError)
+            {
+                logger.LogError("[Twitch] Disconnected from the Twitch IRC Server with errors.");
+            } else
+            {
+                logger.LogError("[Twitch] Disconnected from the Twitch IRC Server.");
+            }
+
+            TryToReconnect();
         }
 
         private void EnsureInitialized()
@@ -429,46 +450,89 @@ namespace ROBot.Core.Twitch
             client.AutoReListenOnException = true;
         }
 
-        private void Reconnect()
+        private void TryToReconnect() //prepare to be broa...reconnected
         {
+            if (this.attemptingReconnection)
+                return; //Avoid more than one reconnect attempt. (I.e. disconnect fired twice)
+
             try
             {
-                client.Connect();
                 usedCommandCount = 0;
                 messageCount = 0;
-                //if (client != null && client.IsConnected)
-                //    return;
-                //Unsubscribe();
-                //isInitialized = false;
-                //CreateTwitchClient();
-                //Start();
+
+                this.attemptingReconnection = true;
+                this.connectionAttemptCount = 0;
+
+                ReconnectAttempt();
+                testingConnection();
             }
             catch (Exception)
             {
-                //logger.LogInformation($"Failed to reconnect to the Twitch IRC Server. Retry in {reconnectDelay}ms");
-                //Task.Run(async () =>
-                //{
-                //    await Task.Delay(reconnectDelay);
-
-                //    if (!tryToReconnect)
-                //        return;
-
-                //    TryToReconnect();
-                //});
+                testingConnection();
+                
             }
+        }
+
+        private void ReconnectAttempt()
+        {
+            this.connectionAttemptCount++;
+            //client.Reconnect(); Abby: Seem to have a bug. Will Manually Do our own reconnect
+
+            if (client != null && client.IsConnected)
+            {
+                logger.LogError("[Twitch] Recieved a Disconnect Event. Still connected, disconnecting");
+                this.attemptingReconnection = true;
+                client.Disconnect(); //Thinks we're still connected after reciving Disconnection event, attempting to disconnect
+            }
+
+            logger.LogWarning($"[Twitch] Reconnecting, Attempt Number " + this.connectionAttemptCount);
+
+            Unsubscribe();
+            isInitialized = false;
+            CreateTwitchClient();
+            Start();
+        }
+
+        private void testingConnection() //Start timer to test for connection
+        {
+            try
+            {
+
+
+                Task.Run(async () =>
+                {
+                    await Task.Delay(reconnectDelay); //Should make it a variable delay, increasing from a small delay up to a cap. (1 minute?)
+
+                    if (!allowReconnection)
+                        return;
+
+
+                    if (isConnectedToTwitch && !this.hasConnectionError)
+                    {
+                        this.attemptingReconnection = false; //We did it!
+                    }
+                    else
+                    {
+                        ReconnectAttempt();
+                        testingConnection();
+                    }
+                });
+            } catch (Exception)
+            {
+                logger.LogError("Failed to start reconnection timer");
+            }
+
         }
 
         private void OnConnected(object sender, OnConnectedArgs e)
         {
             logger.LogDebug("[Twitch] Connected to Twitch IRC Server");
             this.isConnectedToTwitch = true;
+            this.connectionErrorCount = 0;
+            this.hasConnectionError = false;
 
             RejoinChannels();
 
-            while (channelJoinQueue.TryDequeue(out var channel))
-            {
-                JoinChannel(channel);
-            }
         }
 
         private async void OnFailureToReceiveJoinConfirmation(object sender, OnFailureToReceiveJoinConfirmationArgs e)
@@ -491,8 +555,16 @@ namespace ROBot.Core.Twitch
 
         private void OnReconnected(object sender, OnReconnectedEventArgs e)
         {
-            this.isConnectedToTwitch = true;
-            logger.LogDebug("[Twitch] Reconnected to Twitch IRC Server");
+            //This seems to get called regardless of actual connection to server
+            
+            //this.isConnectedToTwitch = true;
+            //logger.LogDebug("[Twitch] Reconnected to Twitch IRC Server");
+            //this.connectionErrorCount = 0;
+            //this.hasConnectionError = false;
+            //this.attemptingReconnection = false;
+
+            //RejoinChannels();
+
         }
 
         private void OnRaidNotification(object sender, OnRaidNotificationArgs e)
@@ -534,9 +606,10 @@ namespace ROBot.Core.Twitch
 
         private void Client_OnConnectionError(object sender, OnConnectionErrorArgs e)
         {
-            logger.LogError("[Twitch] Connection Error: " + e.Error.Message + " - Maybe time to refresh auth token?");
-
-            // Maybe its time to request a new Access Token?
+            logger.LogError("[Twitch] Connection Error: " + e.Error.Message);
+            this.connectionErrorCount++;
+            this.hasConnectionError = true;
+            isConnectedToTwitch = false;
         }
 
         private void Client_OnLeftChannel(object sender, OnLeftChannelArgs e)
