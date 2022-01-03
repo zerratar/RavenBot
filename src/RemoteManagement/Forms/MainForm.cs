@@ -182,7 +182,7 @@ namespace RemoteManagement
             message = message.TrimEnd('\r', '\n');
             BeginInvoke(() =>
             {
-                txtLog.AppendText(message + "<Recieved: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss K") + "> ");
+                txtLog.AppendText(message + " <Recieved: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss K") + "> " + Environment.NewLine);
             });
         }
         private void AppendLogLine(string message)
@@ -190,7 +190,7 @@ namespace RemoteManagement
             message = message.TrimEnd('\r', '\n');
             BeginInvoke(() =>
             {
-                txtLog.AppendText(message + "<Recieved: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss K") + "> " + Environment.NewLine);
+                txtLog.AppendText(message + " <Recieved: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss K") + "> " + Environment.NewLine);
             });
         }
 
