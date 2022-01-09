@@ -75,7 +75,7 @@ namespace ROBot.Core.Twitch
                 return;
             }
 
-            logger.LogDebug("[RVNFLL] Disconnected from PubSub: " + channel);
+            logger.LogDebug("[TWITCH] Disconnected from PubSub (Channel: " + channel + ")");
 
             client.OnChannelPointsRewardRedeemed -= Client_OnChannelPointsRewardRedeemed;
             pubsubClients.TryRemove(channel.ToLower(), out _);
@@ -101,7 +101,7 @@ namespace ROBot.Core.Twitch
             {
                 if (!client.IsReady || !client.IsConnected)
                 {
-                    logger.LogDebug("PubSub Client for  " + channel + " already exists. Connected: " + client.IsConnected + ",  Ready: " + client.IsReady);
+                    logger.LogDebug("[TWITCH] PubSub Client Already Exisits (Channel: " + channel + " Connected: " + client.IsConnected + "  Ready: " + client.IsReady +")");
                 }
                 return true;
             }

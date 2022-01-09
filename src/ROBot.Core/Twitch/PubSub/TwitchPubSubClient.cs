@@ -41,13 +41,13 @@ namespace ROBot.Core.Twitch
         {
             try
             {
-                logger.LogDebug("[Twitch] Connecting to PubSub for " + token.UserName + "...");
+                logger.LogDebug("[TWITCH] Connecting to PubSub (Username: " + token.UserName + ")");
                 client.ListenToChannelPoints(token.UserId);
                 client.Connect();
             }
             catch (Exception exc)
             {
-                logger.LogError("[Twitch] Unable to connect to pubsub for " + token.UserName + ": " + exc);
+                logger.LogError("[TWITCH] Unable to connect To pubsub (Username: " + token.UserName + " Error: " + exc + ")");
             }
         }
 
@@ -57,11 +57,11 @@ namespace ROBot.Core.Twitch
 
             isConnected = false;
             receivesChannelPointRewardDetails = false;
-            logger.LogError("[Twitch] PubSub ERROR for " + token.UserName + ": " + e.Exception.Message);
+            logger.LogError("[TWITCH] PubSub ERROR (Username: " + token.UserName + " Exception: " + e.Exception.Message + ")");
 
             if (wasReady)
             {
-                logger.LogWarning("[Twitch] Trying to reconnect to PubSub for " + token.UserName + "...");
+                logger.LogWarning("[TWITCH] Attempting to Reconnect to PubSub (Username: " + token.UserName + ")");
                 await Task.Delay(1000);
                 Connect();
             }
@@ -71,9 +71,9 @@ namespace ROBot.Core.Twitch
         {
             isConnected = false;
             receivesChannelPointRewardDetails = false;
-            logger.LogError("[Twitch] PubSub Connection Closed for " + token.UserName);
+            logger.LogError("[TWITCH] PubSub Connection Closed for " + token.UserName);
 
-            logger.LogWarning("[Twitch] Trying to reconnect to PubSub for " + token.UserName + "...");
+            logger.LogWarning("[TWITCH] Attempting to Reconnect to PubSub (Username: " + token.UserName + ")");
             await Task.Delay(1000);
             Connect();
         }
@@ -83,13 +83,13 @@ namespace ROBot.Core.Twitch
             try
             {
                 isConnected = true;
-                logger.LogDebug("[Twitch] Connected to PubSub (" + token.UserName + ")");
+                logger.LogDebug("[TWITCH] Connected To PubSub (Username: " + token.UserName + ")");
                 client.SendTopics(token.Token);
-                logger.LogDebug("[Twitch] Sent PubSub Topics for " + token.UserName + ": " + token.Token);
+                logger.LogDebug("[TWITCH] Sent PubSub Topics (Username: " + token.UserName + " Token:" + token.Token + ")");
             }
             catch (Exception exc)
             {
-                logger.LogError("[Twitch] Unable to send pubsub topics for " + token.UserName + ": " + exc);
+                logger.LogError("[TWITCH] Unable To Send PubSub Topics (Username: " + token.UserName + " Exception:" + exc + ")");
             }
         }
 
@@ -98,11 +98,11 @@ namespace ROBot.Core.Twitch
             if (e.Successful)
             {
                 receivesChannelPointRewardDetails = true;
-                logger.LogDebug("[Twitch] PubSub " + e.Topic + " Successfull for " + token.UserName);
+                logger.LogDebug("[TWITCH] PubSub Listen Success (Topic: " + e.Topic + " Username: " + token.UserName + ")");
             }
             else
             {
-                logger.LogError("[Twitch] Unable to listen to pubsub for " + token.UserName + ": " + e.Response.Error);
+                logger.LogError("[Twitch] PubSub Listen Unsuccessful  (Username:" + token.UserName + " Error:" + e.Response.Error + ")");
             }
         }
 
@@ -110,7 +110,7 @@ namespace ROBot.Core.Twitch
         {
             isConnected = true;
             receivesChannelPointRewardDetails = true;
-            logger.LogDebug("[Twitch] PubSub (" + token.UserName + ") Channel Point Reward Redeemed: " + e.RewardRedeemed.Redemption.Reward.Title);
+            logger.LogDebug("[TWITCH] PubSub Reward Redeemed (Channel: " + token.UserName + " Title: " + e.RewardRedeemed.Redemption.Reward.Title + ")");
             OnChannelPointsRewardRedeemed?.Invoke(this, e);
         }
 
@@ -123,7 +123,7 @@ namespace ROBot.Core.Twitch
 
             isConnected = false;
             receivesChannelPointRewardDetails = false;
-            logger.LogDebug("[Twitch] PubSub (" + token.UserName + ") disposed.");
+            logger.LogDebug("[Twitch] PubSub Disposed (Username: " + token.UserName + ")");
 
             client.OnPubSubServiceConnected -= Client_OnPubSubServiceConnected;
             client.OnChannelPointsRewardRedeemed -= Client_OnChannelPointsRewardRedeemed;

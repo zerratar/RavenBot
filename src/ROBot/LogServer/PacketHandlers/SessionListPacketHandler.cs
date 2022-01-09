@@ -19,7 +19,7 @@ namespace ROBot.LogServer.PacketHandlers
 
         public Task HandleAsync(INetworkClient client, ServerPacket packet)
         {
-            this.logger.LogDebug("Session List Packet Received");
+            this.logger.LogDebug("[LOG] Session List Packet Received");
 
             var allSessions = sessionManager.All();
 
@@ -28,6 +28,8 @@ namespace ROBot.LogServer.PacketHandlers
             var header = UTF8Encoding.UTF8.GetBytes("=+ Session List #" + allSessions.Count + System.Environment.NewLine);
             client.Send(header, 0, header.Length);
 
+            var data = UTF8Encoding.UTF8.GetBytes(ReturnSessionHeader() + System.Environment.NewLine);
+            client.Send(data, 0, data.Length);
 
             foreach (var session in allSessions)
             {
@@ -52,6 +54,20 @@ namespace ROBot.LogServer.PacketHandlers
             sb.Append(session.UserCount);
             sb.Append("\t");
             sb.Append(session.Created);
+            return sb.ToString();
+        }
+        private string ReturnSessionHeader()
+        {
+            var sb = new StringBuilder();
+            sb.Append("Id");
+            sb.Append("\t");
+            sb.Append("UserId");
+            sb.Append("\t");
+            sb.Append("Name");
+            sb.Append("\t");
+            sb.Append("UserCount");
+            sb.Append("\t");
+            sb.Append("Created");
             return sb.ToString();
         }
     }

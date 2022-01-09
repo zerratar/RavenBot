@@ -20,7 +20,7 @@ namespace ROBot.LogServer.PacketHandlers
         public Task HandleAsync(INetworkClient client, ServerPacket packet)
         {
             client.IsReady = true;
-            this.logger.LogDebug("Hello Packet Received");
+            this.logger.LogDebug("[LOG] Hello Packet Received");
             this.messageBus.Send("hello", client);
 
             return Task.CompletedTask;

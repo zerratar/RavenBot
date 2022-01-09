@@ -134,10 +134,10 @@ namespace ROBot.Core.GameServer
                 }
             }
             var fromStr = connection.Session?.Name ?? connection.EndPointString;
-            logger.LogDebug("[RVNFLL] [" + fromStr + "] Ravenfall client disconnected.");
+            logger.LogDebug("[RVNFLL] Ravenfall client disconnected. (EndPoint: " + fromStr + ")");
             if (badConnectionCount > 0)
             {
-                logger.LogDebug("[RVNFLL] Cleaned up " + badConnectionCount + " bad connections.");
+                logger.LogDebug("[RVNFLL] Cleaned up bad connections (Count: " + badConnectionCount + ")");
             }
         }
 
@@ -192,7 +192,7 @@ namespace ROBot.Core.GameServer
             }
             catch (Exception exc2)
             {
-                logger.LogError("[RVNFLL] Unable to recover from bad server state: " + exc2);
+                logger.LogError("[RVNFLL] Unable to recover from bad server state (Exception: " + exc2 + ")");
             }
             return false;
         }
@@ -216,7 +216,7 @@ namespace ROBot.Core.GameServer
                         return;
                     }
 
-                    logger.LogDebug("[RVNFLL] [" + connection.EndPointString + "] Ravenfall client connected.");
+                    logger.LogDebug("[RVNFLL] Ravenfall client connected. (EndPoint: " + connection.EndPointString + ")");
 
                     //lock (connectionMutex)
                     {
@@ -279,7 +279,7 @@ namespace ROBot.Core.GameServer
                         {
                             if (existingConnection.Session.Created > e.Created)
                             {
-                                logger.LogDebug("[RVNFLL] [" + connection.EndPointString + "] Ravenfall client sent a second auth with a created date less than current.");
+                                logger.LogDebug("[RVNFLL] Ravenfall client sent a second auth with a created date less than current. (EndPoint :" + connection.EndPointString + ")");
                                 return;
                             }
 
@@ -292,7 +292,7 @@ namespace ROBot.Core.GameServer
                     }
 
                     connection.Session = sessionManager.Add(this, e.SessionId, e.TwitchUserId, e.TwitchUserName, e.Created);
-                    logger.LogDebug("[RVNFLL] [" + connection.EndPointString + "] Ravenfall client authenticated. User: " + connection.Session.Name);
+                    logger.LogDebug("[RVNFLL] Ravenfall client authenticated. (User: " + connection.Session.Name +" EndPoint: " + connection.EndPointString + ")");
                 }
             }
         }

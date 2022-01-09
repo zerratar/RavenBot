@@ -61,14 +61,14 @@ namespace RemoteManagement
             if (await this.client.ConnectAsync(host, port, CancellationToken.None))
             {
                 SetStatusText("Client Connected");
-                AppendLogLine("[CLIENT] Connected");
+                AppendLogLine("[Information]: [LOCAL] Connected");
 
                 SendPacketType(PacketTypes.Hello);
             }
             else
             {
                 SetStatusText("Client Connection Failed");
-                AppendLogLine("Client connection failed");
+                AppendLogLine("[Information]: [LOCAL] Client connection failed");
             }
         }
 
@@ -97,7 +97,7 @@ namespace RemoteManagement
                 catch { }
                 SetupClient();
                 SetStatusText("Client Disconnected");
-                AppendLogLine("[CLIENT] Disconnected");
+                AppendLogLine("[Information] [LOCAL] Disconnected");
             }
         }
 
@@ -137,7 +137,7 @@ namespace RemoteManagement
 
             //    }
             //}
-            AppendLog("<-- " + data);
+            AppendLog(data);
         }
 
 
@@ -179,16 +179,18 @@ namespace RemoteManagement
 
         private void AppendLog(string message)
         {
+            message = message.TrimEnd('\r', '\n');
             BeginInvoke(() =>
             {
-                txtLog.AppendText("[" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "] " + message);
+                txtLog.AppendText(message + " <Recieved: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss K") + "> " + Environment.NewLine);
             });
         }
         private void AppendLogLine(string message)
         {
+            message = message.TrimEnd('\r', '\n');
             BeginInvoke(() =>
             {
-                txtLog.AppendText("[" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "] " + message + Environment.NewLine);
+                txtLog.AppendText(message + " <Recieved: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss K") + "> " + Environment.NewLine);
             });
         }
 

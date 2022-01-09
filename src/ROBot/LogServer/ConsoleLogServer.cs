@@ -52,8 +52,8 @@ namespace ROBot
             this.server.ClientConnected += Server_ClientConnected;
             this.server.ClientDisconnected += Server_ClientDisconnected;
             await server.StartAsync(CancellationToken.None);
-            logger.LogDebug("[Debug]: Log Server Started");
-            Broadcast("[Debug]: Log Server Started");
+            logger.LogInformation("[LOG] Log Server Started");
+            Broadcast("{Information}: [LOG] Log Server Started");
         }
 
         public void TrySaveLogToDisk()
@@ -128,7 +128,7 @@ namespace ROBot
             this.logger.Log<TState>(logLevel, eventId, state, exception, formatter);
 
             var message = formatter != null ? formatter(state, exception) : state.ToString();
-            Broadcast("[" + logLevel + "]: " + message);
+            Broadcast("{" + logLevel + "}: " + message);
         }
 
         public bool IsEnabled(LogLevel logLevel) => logger.IsEnabled(logLevel);
@@ -149,7 +149,7 @@ namespace ROBot
 
         private void Broadcast(string v)
         {
-            var str = $"[{DateTime.UtcNow:yyyy-MM-dd hh:mm:ss}]: {v}" + Environment.NewLine;
+            var str = $"[{DateTime.UtcNow:yyyy-MM-dd hh:mm:ss K}]: {v}" + Environment.NewLine;
             var connections = connectionManager.All();
 
             AddMessage(str);
@@ -191,14 +191,14 @@ namespace ROBot
             var packet = packetSerializer.Deserialize(e);
             if (e == null)
             {
-                WriteLine("[Debug]: Bad Packet Data recieved");
+                WriteLine("{Debug}: [LOG] Bad Packet Data recieved");
                 return;
             }
 
             var handler = packetHandler.Get(packet.Type);
             if (handler == null)
             {
-                WriteLine("[Debug]: No packet handler available for " + packet.Type);
+                WriteLine("{Debug}: [LOG] No packet handler available for " + packet.Type);
                 return;
             }
 

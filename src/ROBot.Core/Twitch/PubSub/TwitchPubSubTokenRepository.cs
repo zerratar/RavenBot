@@ -56,7 +56,7 @@ namespace ROBot.Core.Twitch
             }
             catch (Exception exc)
             {
-                logger.LogError("Unable to save " + PubSubTokenDb + ":" + exc);
+                logger.LogError("[TWITCH] Unable to Save (Token: " + PubSubTokenDb + " Exc: " + exc + ")");
             }
         }
 
@@ -72,17 +72,17 @@ namespace ROBot.Core.Twitch
                         var records = Newtonsoft.Json.JsonConvert.DeserializeObject<List<PubSubToken>>(data);
                         this.tokens.Clear();
                         this.tokens.AddRange(records);
-                        logger.LogDebug(records.Count + " pubsub records loaded.");
+                        logger.LogDebug("[TWITCH] PubSub Records Loaded (Count: " + records.Count + ")");
                     }
                     else
                     {
-                        logger.LogDebug(PubSubTokenDb + " does not exist. Skipping");
+                        logger.LogDebug("[TWITCH] PubSub Does Not Exisit. Skipping. (Token: "+ PubSubTokenDb + ")");
                     }
                 }
             }
             catch (Exception exc)
             {
-                logger.LogError("Unable to load " + PubSubTokenDb + ":" + exc);
+                logger.LogError("[TWITCH] Unable To Load (Token: " + PubSubTokenDb + " Exc: " + exc + ")");
             }
         }
 
