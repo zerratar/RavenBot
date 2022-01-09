@@ -23,8 +23,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shinobytes.Network", "src\S
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RemoteManagement", "src\RemoteManagement\RemoteManagement.csproj", "{B868055E-D1C8-4A15-A153-1FC5C3F65B1D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemoteManagementUI", "RemoteManagementUI\RemoteManagementUI.csproj", "{121B44B0-AD78-4ABD-93E8-406E25ED1A41}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -97,14 +95,6 @@ Global
 		{B868055E-D1C8-4A15-A153-1FC5C3F65B1D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B868055E-D1C8-4A15-A153-1FC5C3F65B1D}.Release|x64.ActiveCfg = Release|Any CPU
 		{B868055E-D1C8-4A15-A153-1FC5C3F65B1D}.Release|x64.Build.0 = Release|Any CPU
-		{121B44B0-AD78-4ABD-93E8-406E25ED1A41}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{121B44B0-AD78-4ABD-93E8-406E25ED1A41}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{121B44B0-AD78-4ABD-93E8-406E25ED1A41}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{121B44B0-AD78-4ABD-93E8-406E25ED1A41}.Debug|x64.Build.0 = Debug|Any CPU
-		{121B44B0-AD78-4ABD-93E8-406E25ED1A41}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{121B44B0-AD78-4ABD-93E8-406E25ED1A41}.Release|Any CPU.Build.0 = Release|Any CPU
-		{121B44B0-AD78-4ABD-93E8-406E25ED1A41}.Release|x64.ActiveCfg = Release|Any CPU
-		{121B44B0-AD78-4ABD-93E8-406E25ED1A41}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
