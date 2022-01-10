@@ -115,7 +115,7 @@ namespace ROBot.Core.Twitch
             }
             else
             {
-                logger.LogError("[Twitch] PubSub Listen Unsuccessful  (Username:" + token.UserName + " Error:" + e.Response.Error + ")");
+                logger.LogError("[TWITCH] PubSub Listen Unsuccessful  (Username:" + token.UserName + " Error:" + e.Response.Error + ")");
                 if (e.Response.Error == "ERR_BADAUTH")
                 {
                     badAuth = true;

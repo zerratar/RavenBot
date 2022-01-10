@@ -662,7 +662,9 @@ namespace ROBot.Core.Twitch
         private void Pubsub_OnListenFailBadAuth(object sender, OnListenResponseArgs e)
         {
             TwitchPubSubClient client = (TwitchPubSubClient)sender;
-            this.client.SendWhisper(client.getChannel(), "PubSub failed due to bad auth. To allow the bot to detect when channel points are used, run \"!pubsub activate\" in channel again. Thanks!");
+            //Commented to prevent spam until the pubsub reconnection is fixed. 
+            //this.client.SendWhisper(client.getChannel(), "PubSub failed due to bad auth. To allow the bot to detect when channel points are used, run \"!pubsub activate\" in channel again. Thanks!");
+            logger.LogDebug("[TWITCH] Auth Failed - Whisper sent (Name: " + client.getChannel());
             //TODO: Remove token or somehow mark token as bad (bad, baby, bad to the bone~) to prevent the bot from trying it again and again.
         }
 
