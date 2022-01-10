@@ -19,7 +19,7 @@ namespace ROBot.Core.Twitch
             LoadTokens();
         }
 
-        public PubSubToken AddOrUpdate(string userId, string userName, string token)
+        public PubSubToken AddOrUpdate(string userId, string userName, string token, bool? badAuth)
         {
             try
             {
@@ -34,14 +34,29 @@ namespace ROBot.Core.Twitch
                     }
                 }
 
+                //Update if there's a change
+                bool tokenChange = !existing.Token.Equals(token);
+
                 existing.Token = token;
                 existing.UserName = userName;
+
+
+                if (!badAuth is null)
+                    existing.BadAuth = badAuth;
+                if (tokenChange)
+                    existing.BadAuth = false; //Override previous flag because a different token need to be checked
+
                 return existing;
             }
             finally
             {
                 SaveTokens();
             }
+        }
+
+        public PubSubToken AddOrUpdate(string userId, string userName, string token)
+        {
+            return AddOrUpdate(userId, userName, token, null);
         }
 
         private void SaveTokens()
@@ -103,6 +118,9 @@ namespace ROBot.Core.Twitch
             }
         }
 
-        //Add Remove function for removing pubsub with ERR_BADAUTH
+        public PubSubToken GetToken(string channel, string userId)
+        {
+           return GetByUserName(channel) ?? GetById(userId);
+        }
     }
 }

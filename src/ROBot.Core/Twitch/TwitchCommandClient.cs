@@ -94,8 +94,8 @@ namespace ROBot.Core.Twitch
                 if (this.joinedChannels.Contains(obj.UserName))
                 {
                     logger.LogInformation("[RVNFLL] pubsub Token recieved for " + obj.UserName);
-                    pubSubManager.Connect(obj.UserName);
-                                    }
+                    pubSubManager.PubSubConnect(obj.UserName);
+                }
             }
         }
 
@@ -214,7 +214,7 @@ namespace ROBot.Core.Twitch
 
                     client.JoinChannel(channel);
 
-                    pubSubManager.Connect(channel);
+                    pubSubManager.PubSubConnect(channel);
                 }
                 else
                 {
@@ -664,8 +664,7 @@ namespace ROBot.Core.Twitch
             TwitchPubSubClient client = (TwitchPubSubClient)sender;
             //Commented to prevent spam until the pubsub reconnection is fixed. 
             //this.client.SendWhisper(client.getChannel(), "PubSub failed due to bad auth. To allow the bot to detect when channel points are used, run \"!pubsub activate\" in channel again. Thanks!");
-            logger.LogDebug("[TWITCH] Auth Failed - Whisper sent (Name: " + client.getChannel());
-            //TODO: Remove token or somehow mark token as bad (bad, baby, bad to the bone~) to prevent the bot from trying it again and again.
+            logger.LogDebug("[TWITCH] Auth Failed - (TODO SEND WHISPER) Whisper sent (Name: " + client.getChannel() + ")");
         }
 
         public void Dispose()

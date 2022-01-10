@@ -22,15 +22,13 @@ namespace ROBot.Core.Twitch
         public bool IsConnected => client != null && isConnected;
 
         public bool IsReady => client != null && isConnected && receivesChannelPointRewardDetails;
-
-        public bool badAuth { get; private set; }
+        public bool IsAuthOK => token != null && !token.BadAuth == true;
 
         public TwitchPubSubClient(ILogger logger, PubSubToken token)
         {
             this.logger = logger;
             this.token = token;
             this.client = new TwitchPubSub();
-            this.badAuth = false;
 
             client.OnPubSubServiceConnected += Client_OnPubSubServiceConnected;
             client.OnPubSubServiceClosed += Client_OnPubSubServiceClosed;
@@ -69,7 +67,7 @@ namespace ROBot.Core.Twitch
             receivesChannelPointRewardDetails = false;
             logger.LogError("[TWITCH] PubSub ERROR (Username: " + token.UserName + " Exception: " + e.Exception.Message + ")");
 
-            if (wasReady && !badAuth)
+            if (wasReady && token.BadAuth == true)
             {
                 logger.LogWarning("[TWITCH] Attempting to Reconnect to PubSub (Username: " + token.UserName + ")");
                 await Task.Delay(1000);
@@ -118,7 +116,7 @@ namespace ROBot.Core.Twitch
                 logger.LogError("[TWITCH] PubSub Listen Unsuccessful  (Username:" + token.UserName + " Error:" + e.Response.Error + ")");
                 if (e.Response.Error == "ERR_BADAUTH")
                 {
-                    badAuth = true;
+                    token.BadAuth = true;
                     OnListenFailBadAuth?.Invoke(this, e);   
                 }
             }
@@ -141,7 +139,7 @@ namespace ROBot.Core.Twitch
 
             isConnected = false;
             receivesChannelPointRewardDetails = false;
-            logger.LogDebug("[Twitch] PubSub Disposed (Username: " + token.UserName + ")");
+            logger.LogDebug("[TWITCH] PubSub Disposed (Username: " + token.UserName + ")");
 
             client.OnPubSubServiceConnected -= Client_OnPubSubServiceConnected;
             client.OnChannelPointsRewardRedeemed -= Client_OnChannelPointsRewardRedeemed;
