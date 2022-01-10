@@ -17,16 +17,20 @@ namespace ROBot.Core.Twitch
         private bool receivesChannelPointRewardDetails;
 
         public event EventHandler<OnChannelPointsRewardRedeemedArgs> OnChannelPointsRewardRedeemed;
+        public event EventHandler<OnListenResponseArgs> OnListenFailBadAuth;
 
         public bool IsConnected => client != null && isConnected;
 
         public bool IsReady => client != null && isConnected && receivesChannelPointRewardDetails;
+
+        public bool badAuth { get; private set; }
 
         public TwitchPubSubClient(ILogger logger, PubSubToken token)
         {
             this.logger = logger;
             this.token = token;
             this.client = new TwitchPubSub();
+            this.badAuth = false;
 
             client.OnPubSubServiceConnected += Client_OnPubSubServiceConnected;
             client.OnPubSubServiceClosed += Client_OnPubSubServiceClosed;
@@ -36,6 +40,12 @@ namespace ROBot.Core.Twitch
 
             Connect();
         }
+
+        public string getChannel()
+        {
+            return token.UserName;
+        }
+
 
         private void Connect()
         {
@@ -59,11 +69,14 @@ namespace ROBot.Core.Twitch
             receivesChannelPointRewardDetails = false;
             logger.LogError("[TWITCH] PubSub ERROR (Username: " + token.UserName + " Exception: " + e.Exception.Message + ")");
 
-            if (wasReady)
+            if (wasReady && !badAuth)
             {
                 logger.LogWarning("[TWITCH] Attempting to Reconnect to PubSub (Username: " + token.UserName + ")");
                 await Task.Delay(1000);
                 Connect();
+            } else
+            {
+                logger.LogWarning("[TWITCH] Rejecting Reconnect attempt to PubSub (Username: " + token.UserName + ")");
             }
         }
 
@@ -103,6 +116,11 @@ namespace ROBot.Core.Twitch
             else
             {
                 logger.LogError("[Twitch] PubSub Listen Unsuccessful  (Username:" + token.UserName + " Error:" + e.Response.Error + ")");
+                if (e.Response.Error == "ERR_BADAUTH")
+                {
+                    badAuth = true;
+                    OnListenFailBadAuth?.Invoke(this, e);   
+                }
             }
         }
 

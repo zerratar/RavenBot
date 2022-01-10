@@ -72,11 +72,12 @@ namespace ROBot.Core.Twitch
                         var records = Newtonsoft.Json.JsonConvert.DeserializeObject<List<PubSubToken>>(data);
                         this.tokens.Clear();
                         this.tokens.AddRange(records);
+
                         logger.LogDebug("[TWITCH] PubSub Records Loaded (Count: " + records.Count + ")");
                     }
                     else
                     {
-                        logger.LogDebug("[TWITCH] PubSub Does Not Exisit. Skipping. (Token: "+ PubSubTokenDb + ")");
+                        logger.LogDebug("[TWITCH] PubSub Does Not Exisit. Skipping. (Token: " + PubSubTokenDb + ")");
                     }
                 }
             }
@@ -101,5 +102,7 @@ namespace ROBot.Core.Twitch
                 return tokens.FirstOrDefault(x => x.UserName.Equals(channel, StringComparison.OrdinalIgnoreCase));
             }
         }
+
+        //Add Remove function for removing pubsub with ERR_BADAUTH
     }
 }

@@ -17,6 +17,7 @@ using TwitchLib.Communication.Enums;
 using TwitchLib.Communication.Events;
 using TwitchLib.Communication.Models;
 using TwitchLib.PubSub;
+using TwitchLib.PubSub.Events;
 
 namespace ROBot.Core.Twitch
 {
@@ -81,13 +82,6 @@ namespace ROBot.Core.Twitch
             this.credentialsProvider = credentialsProvider;
             this.pubSubManager = pubSubManager;
 
-            //// For the time being, pubsub will be disabled as it needs actual token for the person that wants to use it? worked in the old bot. but not here. Wutfacers
-            //// ugh...
-            //this.messageBus.Subscribe<string>("streamer_userid_acquired", userid =>
-            //{
-            //    ListenForChannelPoints(logger, userid);
-            //});
-
             this.messageBus.Subscribe<PubSubToken>("pubsub", OnPubSubTokenReceived);
 
             CreateTwitchClient();
@@ -99,9 +93,9 @@ namespace ROBot.Core.Twitch
             {
                 if (this.joinedChannels.Contains(obj.UserName))
                 {
+                    logger.LogInformation("[RVNFLL] pubsub Token recieved for " + obj.UserName);
                     pubSubManager.Connect(obj.UserName);
-                    //new TwitchLib.Api.Services.FollowerService()
-                }
+                                    }
             }
         }
 
@@ -410,9 +404,6 @@ namespace ROBot.Core.Twitch
             var credentials = credentialsProvider.Get();
             client.Initialize(credentials);
 
-            //var api = new TwitchLib.Api.TwitchAPI();
-            //api.Settings.ClientId = credentials.TwitchClientID
-
             isInitialized = true;
         }
 
@@ -571,17 +562,23 @@ namespace ROBot.Core.Twitch
         {
         }
 
-        private void Pubsub_OnListenResponse(object sender, TwitchLib.PubSub.Events.OnListenResponseArgs e)
-        {
-            if (!e.Successful)
-            {
-                logger.LogError("[TWITCH] PubSub Listen Response Error (Error: " + e.Response.Error + ")");
-            }
-            else
-            {
-                logger.LogDebug("[TWITCH] PubSub Listen OK");
-            }
-        }
+        //Abby: This damn code block had me running in circles. I will smite thee code block with the bonk stick and the fury of a thousand black holes!
+        //private void Pubsub_OnListenResponse(object sender, TwitchLib.PubSub.Events.OnListenResponseArgs e)
+        //{
+        //    if (!e.Successful)
+        //    {
+        //        if(e.Response.Error == "ERR_BADAUTH")
+        //        {
+        //            //alert user
+        //            //remove record for auth
+        //        }
+        //        logger.LogError("[TWITCH] PubSub Listen Response Error (Error: " + e.Response.Error + ")");
+        //    }
+        //    else
+        //    {
+        //        logger.LogDebug("[TWITCH] PubSub Listen OK");
+        //    }
+        //}
 
         private void Subscribe()
         {
@@ -602,6 +599,8 @@ namespace ROBot.Core.Twitch
             client.OnJoinedChannel += Client_OnJoinedChannel;
             client.OnLeftChannel += Client_OnLeftChannel;
             pubSubManager.OnChannelPointsRewardRedeemed += Pubsub_OnChannelPointsRewardRedeemed;
+            pubSubManager.OnListenFailBadAuth += Pubsub_OnListenFailBadAuth;
+
         }
 
         private void Client_OnConnectionError(object sender, OnConnectionErrorArgs e)
@@ -657,6 +656,14 @@ namespace ROBot.Core.Twitch
             client.OnLeftChannel -= Client_OnLeftChannel;
             client.OnConnectionError -= Client_OnConnectionError;
             pubSubManager.OnChannelPointsRewardRedeemed -= Pubsub_OnChannelPointsRewardRedeemed;
+            pubSubManager.OnListenFailBadAuth -= Pubsub_OnListenFailBadAuth;
+        }
+
+        private void Pubsub_OnListenFailBadAuth(object sender, OnListenResponseArgs e)
+        {
+            TwitchPubSubClient client = (TwitchPubSubClient)sender;
+            this.client.SendWhisper(client.getChannel(), "PubSub failed due to bad auth. To allow the bot to detect when channel points are used, run \"!pubsub activate\" in channel again. Thanks!");
+            //TODO: Remove token or somehow mark token as bad (bad, baby, bad to the bone~) to prevent the bot from trying it again and again.
         }
 
         public void Dispose()
