@@ -33,19 +33,22 @@ namespace ROBot.Core.Twitch
                         tokens.Add(existing);
                     }
                 }
+                logger.LogError("[ABBY DEBUG] Success1");
 
                 //Update if there's a change
                 bool tokenChange = !existing.Token.Equals(token);
 
+                logger.LogError("[ABBY DEBUG] Success2");
                 existing.Token = token;
                 existing.UserName = userName;
 
-
-                if (!badAuth is null)
+                logger.LogError("[ABBY DEBUG] Success3");
+                if (badAuth != null)
                     existing.BadAuth = badAuth;
+                logger.LogError("[ABBY DEBUG] Success4");
                 if (tokenChange)
                     existing.BadAuth = false; //Override previous flag because a different token need to be checked
-
+                logger.LogError("[ABBY DEBUG] Success5");
                 return existing;
             }
             finally
