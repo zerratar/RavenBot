@@ -69,14 +69,15 @@ namespace ROBot.Core.Twitch
             awaitingPubSubAccess.Clear();
         }
 
-        public void Disconnect(string channel)
+        public void Disconnect(string channel, bool rejected = false)
         {
             if (!pubsubClients.TryGetValue(channel.ToLower(), out var client))
             {
                 return;
             }
 
-            logger.LogDebug("[TWITCH] Disconnected from PubSub (Channel: " + channel + ")");
+            if(!rejected) //silent the disconnect debug. We don't disconnect if we never connected in the first place
+                logger.LogDebug("[TWITCH] Disconnected from PubSub (Channel: " + channel + ")");
 
             client.OnChannelPointsRewardRedeemed -= Client_OnChannelPointsRewardRedeemed;
             client.OnListenFailBadAuth -= Client_OnListenFailBadAuth;
@@ -96,12 +97,12 @@ namespace ROBot.Core.Twitch
             return true;
         }
 
-        public bool Connect(string channel)
+        public bool PubSubConnect(string channel)
         {
-            return Connect(channel, null);
+            return PubSubConnect(channel, null);
         }
 
-        public bool Connect(string channel, string twitchId)
+        public bool PubSubConnect(string channel, string twitchId)
         {
             var key = channel.ToLower();
             if (twitchId is null)
@@ -109,26 +110,39 @@ namespace ROBot.Core.Twitch
 
             if (pubsubClients.TryGetValue(key, out var client))
             {
+                if (!client.IsAuthOK)
+                {
+                    Disconnect(channel, true);
+                    return false;
+                }
+                    
                 if (!client.IsReady || !client.IsConnected)
                 {
                     bool usefulClient = false;
+                    logger.LogDebug("[TWITCH] PubSub Client Already Exisits (Channel: " + channel + " Connected: " + client.IsConnected + "  Ready: " + client.IsReady + ")");
+
                     if (client.IsConnected)
                         usefulClient = true; //Not sure if there's anything special with a not ready but connected PubSub Client is. (if isReady false, then isConnect will be false)
                     if (!client.IsReady)
-                        Disconnect(channel); //Remove from list
-
-                    logger.LogDebug("[TWITCH] PubSub Client Already Exisits (Channel: " + channel + " Connected: " + client.IsConnected + "  Ready: " + client.IsReady + ")");
+                        Disconnect(channel); //Remove from list to force it to reconnect.
+                    
                     return usefulClient;
 
                 }
                 return true;
             }
 
-            //Did we mean to use channel twice here? I suspect second check was meant to be on twitch or session id. 
-            var token = pubsubTokenRepo.GetByUserName(channel) ?? pubsubTokenRepo.GetById(twitchId);
+            var token = pubsubTokenRepo.GetToken(channel, twitchId);
+            
             if (token == null)
             {
                 logger.LogDebug("[RVNFLL] No Token Found (Channel: " + channel + " twitchId: " + twitchId + ")");
+                return false;
+            } 
+
+            if (token.BadAuth == true)
+            {
+                logger.LogDebug("[RVNFLL] Token Previously Failed Auth (Channel: " + channel + " twitchId: " + twitchId + ")");
                 return false;
             }
 
@@ -153,9 +167,8 @@ namespace ROBot.Core.Twitch
 
         private void Client_OnListenFailBadAuth(object sender, OnListenResponseArgs args)
         {
-            TwitchPubSubClient client = (TwitchPubSubClient)sender;
+            logger.LogDebug("[TWITCH] Auth Failed. Event Fired");
             OnListenFailBadAuth?.Invoke(this, args);
-            Disconnect(client.getChannel());
         }
 
     }

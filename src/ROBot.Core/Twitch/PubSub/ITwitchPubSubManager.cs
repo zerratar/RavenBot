@@ -9,8 +9,8 @@ namespace ROBot.Core.Twitch
         event EventHandler<OnListenResponseArgs> OnListenFailBadAuth;
 
         string GetActivationLink(string userId, string username);
-        bool Connect(string channel);
-        void Disconnect(string channel);
+        bool PubSubConnect(string channel);
+        void Disconnect(string channel, bool rejected=false);
         bool IsReady(string channel);
     }
 }
