@@ -67,7 +67,7 @@ namespace ROBot.Core.Twitch
             receivesChannelPointRewardDetails = false;
             logger.LogError("[TWITCH] PubSub ERROR (Username: " + token.UserName + " Exception: " + e.Exception.Message + ")");
 
-            if (wasReady && token.BadAuth == true)
+            if (wasReady && !token.BadAuth == true)
             {
                 logger.LogWarning("[TWITCH] Attempting to Reconnect to PubSub (Username: " + token.UserName + ")");
                 await Task.Delay(1000);
