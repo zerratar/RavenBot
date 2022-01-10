@@ -292,7 +292,7 @@ namespace ROBot.Core.GameServer
                     }
 
                     connection.Session = sessionManager.Add(this, e.SessionId, e.TwitchUserId, e.TwitchUserName, e.Created);
-                    logger.LogDebug("[RVNFLL] Ravenfall client authenticated. (User: " + connection.Session.Name +" EndPoint: " + connection.EndPointString + ")");
+                    logger.LogDebug("[RVNFLL] Ravenfall client authenticated. (TwitchName: "+ e.TwitchUserName + " User: " + connection.Session.Name +" EndPoint: " + connection.EndPointString + ")");
                 }
             }
         }

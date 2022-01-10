@@ -25,8 +25,8 @@ namespace ROBot.LogServer.PacketHandlers
             var header = UTF8Encoding.UTF8.GetBytes("=+ Connection List #" + allConnections.Count + System.Environment.NewLine);
             client.Send(header, 0, header.Length);
 
-            var data = UTF8Encoding.UTF8.GetBytes(ReturnConnectionHeader() + System.Environment.NewLine);
-            client.Send(data, 0, data.Length);
+            var rowheader = UTF8Encoding.UTF8.GetBytes(ReturnConnectionHeader() + System.Environment.NewLine);
+            client.Send(rowheader, 0, rowheader.Length);
 
             foreach (var connection in allConnections)
             {
