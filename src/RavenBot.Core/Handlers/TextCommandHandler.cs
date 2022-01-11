@@ -39,9 +39,6 @@ namespace RavenBot.Core.Handlers
 
                 var isGift = cmd.GetType().Name.Contains("Gift");
 
-                //TODO: IGNORE UNTIL FIXED. REMOVE WHEN FIXED TODO
-                if (isGift)
-                    return;
 
                 if (!isChannelPointReward)
                 {
