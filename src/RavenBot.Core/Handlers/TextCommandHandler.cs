@@ -31,10 +31,18 @@ namespace RavenBot.Core.Handlers
             {
                 return;
             }
+            
 
             if (commands.TryGetValue(cmd.Command, out var processor))
             {
                 var isChannelPointReward = cmd.GetType().Name.Contains("Reward");
+
+                var isGift = cmd.GetType().Name.Contains("Gift");
+
+                //TODO: IGNORE UNTIL FIXED. REMOVE WHEN FIXED TODO
+                if (isGift)
+                    return;
+
                 if (!isChannelPointReward)
                 {
                     if (!string.IsNullOrEmpty(cmd.Arguments))
