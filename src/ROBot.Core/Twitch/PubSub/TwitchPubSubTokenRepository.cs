@@ -33,10 +33,10 @@ namespace ROBot.Core.Twitch
                         tokens.Add(existing);
                     }
                 }
-                logger.LogError("[ABBY DEBUG] Success1");
+                logger.LogError("[ABBY DEBUG] Success1 :" + existing.ToString() + " " + token.ToString());
 
                 //Update if there's a change
-                bool tokenChange = !existing.Token.Equals(token);
+                bool tokenChange = (existing.Token != token);
 
                 logger.LogError("[ABBY DEBUG] Success2");
                 existing.Token = token;
