@@ -1,14 +1,13 @@
 ﻿using System.Threading.Tasks;
 using RavenBot.Core.Handlers;
-using RavenBot.Core.Net;
 
 namespace RavenBot.Core.Ravenfall.Commands
 {
-    public class PetCommandProcessor : Net.RavenfallCommandProcessor
+    public class EnchantCommandProcessor : Net.RavenfallCommandProcessor
     {
         private readonly IRavenfallClient game;
         private readonly IPlayerProvider playerProvider;
-        public PetCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
+        public EnchantCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
         {
             this.game = game;
             this.playerProvider = playerProvider;
@@ -26,14 +25,15 @@ namespace RavenBot.Core.Ravenfall.Commands
             var player = playerProvider.Get(cmd.Sender);
 
 
-            var pet = cmd.Arguments?.ToLower();
-            if (string.IsNullOrEmpty(pet))
-            {
-                await game.GetPetAsync(player);
-                return;
-            }
+            var item = cmd.Arguments?.ToLower();
+            //if (string.IsNullOrEmpty(item))
+            //{
 
-            await game.SetPetAsync(player, pet);
+            //    broadcaster.Broadcast(cmd.Sender.Username, "You have to use !equip <item name> or !equip all for equipping your best items.");
+            //    return;
+            //}
+
+            await game.EnchantAsync(player, item);
         }
     }
 }

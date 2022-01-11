@@ -62,6 +62,7 @@ namespace RavenBot
 
             Register<UnequipCommandProcessor>(commandBindingProvider.Get("unequip"));
             Register<EquipCommandProcessor>(commandBindingProvider.Get("equip"));
+            Register<EnchantCommandProcessor>(commandBindingProvider.Get("enchant"));
 
             Register<RaidCommandProcessor>(commandBindingProvider.Get("raid", "raidwar"));
 
