@@ -96,17 +96,17 @@ namespace ROBot
                     var logger = ioc.Resolve<ILogger>() as ConsoleLogServer;
                     if (logger != null)
                     {
-                        logger.LogError(e.ToString());
+                        logger.LogError("[SPECIAL] " + e.ToString() + " " + e.ExceptionObject.ToString()); 
                         logger.TrySaveLogToDisk();
                     }
                     else
                     {
-                        System.Console.WriteLine(e.ToString());
+                        System.Console.WriteLine("[UNSAVED] " + e.ToString() + " " + e.ExceptionObject.ToString());
                     }
                 }
                 catch (Exception exc)
                 {
-                    System.Console.WriteLine(exc.ToString());
+                    System.Console.WriteLine("[CAUGHT] " + exc.ToString());
                 }
             }
         }
