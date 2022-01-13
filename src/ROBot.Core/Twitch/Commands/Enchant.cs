@@ -1,11 +1,10 @@
 ﻿using RavenBot.Core.Handlers;
-using RavenBot.Core.Ravenfall.Commands;
 using ROBot.Core.GameServer;
 using System.Threading.Tasks;
 
 namespace ROBot.Core.Twitch.Commands
 {
-    public class Gift : TwitchCommandHandler
+    public class Enchant : TwitchCommandHandler
     {
         public override async Task HandleAsync(IBotServer game, ITwitchCommandClient twitch, ICommand cmd)
         {
@@ -16,15 +15,19 @@ namespace ROBot.Core.Twitch.Commands
                 var connection = game.GetConnection(session);
                 if (connection != null)
                 {
-                    if (string.IsNullOrEmpty(cmd.Arguments) || !cmd.Arguments.Trim().Contains(" "))
-                    {
-                        twitch.Broadcast(channel, cmd.Sender.Username, Localization.GIFT_HELP, cmd.Command);
-                        return;
-                    }
-
                     var player = session.Get(cmd.Sender);
-                    if (player != null)
-                        await connection.GiftItemAsync(player, cmd.Arguments);
+                    if (player == null)
+                        return;
+
+                    var item = cmd.Arguments?.ToLower();
+
+                    //if (string.IsNullOrEmpty(item))
+                    //{
+                    //    twitch.Broadcast(channel, cmd.Sender.Username, "You have to use !enchant <item name> to enchant an item.");
+                    //    return;
+                    //}
+
+                    await connection.EnchantAsync(player, item);
                 }
             }
         }

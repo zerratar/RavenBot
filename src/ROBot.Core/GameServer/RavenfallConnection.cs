@@ -258,6 +258,7 @@ namespace ROBot.Core.GameServer
         public Task ReloadGameAsync(Player player) => SendAsync("reload", player);
         public Task GetMaxMultiplierAsync(Player player) => SendAsync("multiplier", player);
         public Task EquipAsync(Player player, string pet) => SendAsync("equip", new ItemQueryRequest(player, pet));
+        public Task EnchantAsync(Player player, string pet) => SendAsync("enchant", new ItemQueryRequest(player, pet));
         public Task UnequipAsync(Player player, string pet) => SendAsync("unequip", new ItemQueryRequest(player, pet));
         public Task SetPetAsync(Player player, string pet) => SendAsync("set_pet", new SetPetRequest(player, pet));
         public Task GetPetAsync(Player player) => SendAsync("get_pet", new GetPetRequest(player));
