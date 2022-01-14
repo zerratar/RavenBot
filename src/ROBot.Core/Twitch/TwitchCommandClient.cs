@@ -430,6 +430,7 @@ namespace ROBot.Core.Twitch
             if (!string.IsNullOrEmpty(user))
                 msg = user + ", " + msg;
 
+            logger.LogDebug($"[TWITCH Broadcasting (Channel: {channel} Message:'{msg}'");
             SendChatMessage(channel, msg);
         }
 

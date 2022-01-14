@@ -204,7 +204,7 @@ namespace ROBot
 
         private void OnSessionEnded(object sender, IGameSession session)
         {
-            logger.LogDebug("[RVNFLL] Game Session Ended (Name" + session.Name + ")");
+            logger.LogDebug("[RVNFLL] Game Session Ended (Name: " + session.Name + ")");
             twitch.LeaveChannel(session.Name);
         }
     }
