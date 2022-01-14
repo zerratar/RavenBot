@@ -1,14 +1,13 @@
 ﻿using System.Threading.Tasks;
 using RavenBot.Core.Handlers;
-using RavenBot.Core.Net;
 
 namespace RavenBot.Core.Ravenfall.Commands
 {
-    public class PetCommandProcessor : Net.RavenfallCommandProcessor
+    public class UnequipCommandProcessor : Net.RavenfallCommandProcessor
     {
         private readonly IRavenfallClient game;
         private readonly IPlayerProvider playerProvider;
-        public PetCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
+        public UnequipCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
         {
             this.game = game;
             this.playerProvider = playerProvider;
@@ -26,14 +25,15 @@ namespace RavenBot.Core.Ravenfall.Commands
             var player = playerProvider.Get(cmd.Sender);
 
 
-            var pet = cmd.Arguments?.ToLower();
-            if (string.IsNullOrEmpty(pet))
+            var item = cmd.Arguments?.ToLower();
+            if (string.IsNullOrEmpty(item))
             {
-                await game.GetPetAsync(player);
+
+                broadcaster.Broadcast(cmd.Sender.Username, "You have to use !unequip <item name> or !unequip all for unequipping all your items.");
                 return;
             }
 
-            await game.SetPetAsync(player, pet);
+            await game.UnequipAsync(player, item);
         }
     }
 }
