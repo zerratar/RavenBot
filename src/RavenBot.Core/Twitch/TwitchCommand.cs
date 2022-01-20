@@ -1,6 +1,5 @@
 ﻿using TwitchLib.Client.Models;
 using RavenBot.Core.Handlers;
-using TwitchLib.Api.Helix.Models.StreamsMetadata;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using RavenBot.Core.Extensions;
