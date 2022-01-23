@@ -109,6 +109,10 @@ namespace ROBot
                     System.Console.WriteLine("[CAUGHT] " + exc.ToString());
                 }
             }
+            else
+            {
+                System.Console.WriteLine("[CAUGHT] with null ioc Error: " + e.ToString()+ " | " + e.ExceptionObject.ToString());
+            }
         }
 
         private static void CurrentDomain_ProcessExit(object sender, EventArgs e)
@@ -122,8 +126,10 @@ namespace ROBot
                     logger.TrySaveLogToDisk();
                 }
             }
-            catch
+            catch(Exception exc)
             {
+                System.Console.WriteLine("[CAUGHT] Exception trying to save logger Error: " + exc.ToString());
+                System.Console.WriteLine("[CAUGHT] extended info on EventArgs " + e.ToString());
             }
 
             isExiting = true;

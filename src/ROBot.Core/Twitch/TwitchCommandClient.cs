@@ -430,7 +430,7 @@ namespace ROBot.Core.Twitch
             if (!string.IsNullOrEmpty(user))
                 msg = user + ", " + msg;
 
-            logger.LogDebug($"[TWITCH Broadcasting (Channel: {channel} Message:'{msg}'");
+            logger.LogDebug($"[TWITCH Sending Message (Channel: {channel} Message:'{msg}'");
             SendChatMessage(channel, msg);
         }
 
@@ -599,9 +599,20 @@ namespace ROBot.Core.Twitch
             client.OnFailureToReceiveJoinConfirmation += OnFailureToReceiveJoinConfirmation;
             client.OnJoinedChannel += Client_OnJoinedChannel;
             client.OnLeftChannel += Client_OnLeftChannel;
+            client.OnError += Client_OnError;
+            client.OnLog += Client_OnLog;
             pubSubManager.OnChannelPointsRewardRedeemed += Pubsub_OnChannelPointsRewardRedeemed;
             pubSubManager.OnListenFailBadAuth += Pubsub_OnListenFailBadAuth;
+        }
 
+        private void Client_OnLog(object sender, TwitchLib.Client.Events.OnLogArgs e)
+        {
+            logger.LogDebug("[TWITCH] Connection Log (Log: " + e.Data.ToString() + ")");
+        }
+
+        private void Client_OnError(object sender, OnErrorEventArgs e)
+        {
+            logger.LogError("[TWITCH] Connection Error (Error: " + e.ToString() + ")");
         }
 
         private void Client_OnConnectionError(object sender, OnConnectionErrorArgs e)
@@ -656,6 +667,8 @@ namespace ROBot.Core.Twitch
             client.OnJoinedChannel -= Client_OnJoinedChannel;
             client.OnLeftChannel -= Client_OnLeftChannel;
             client.OnConnectionError -= Client_OnConnectionError;
+            client.OnError -= Client_OnError;
+            client.OnLog -= Client_OnLog;
             pubSubManager.OnChannelPointsRewardRedeemed -= Pubsub_OnChannelPointsRewardRedeemed;
             pubSubManager.OnListenFailBadAuth -= Pubsub_OnListenFailBadAuth;
         }
