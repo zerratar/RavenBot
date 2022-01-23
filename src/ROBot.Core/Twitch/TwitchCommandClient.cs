@@ -430,7 +430,7 @@ namespace ROBot.Core.Twitch
             if (!string.IsNullOrEmpty(user))
                 msg = user + ", " + msg;
 
-            logger.LogDebug($"[TWITCH Sending Message (Channel: {channel} Message:'{msg}'");
+            logger.LogDebug($"[TWITCH] Sending Message (Channel: {channel} Message: '{msg}')");
             SendChatMessage(channel, msg);
         }
 
@@ -607,7 +607,7 @@ namespace ROBot.Core.Twitch
 
         private void Client_OnLog(object sender, TwitchLib.Client.Events.OnLogArgs e)
         {
-            logger.LogDebug("[TWITCH] Connection Log (Log: " + e.Data.ToString() + ")");
+            logger.LogDebug("[TWITCH] Connection Log (Log: " + e.Data + ")");
         }
 
         private void Client_OnError(object sender, OnErrorEventArgs e)

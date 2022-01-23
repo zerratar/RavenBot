@@ -9,7 +9,12 @@ using System.Threading;
 
 namespace ROBot
 {
-    public class ConsoleLogServer : ILogger, IDisposable
+    public interface IExtendedLogger : ILogger
+    {
+
+    }
+
+    public class ConsoleLogServer : IExtendedLogger, IDisposable
     {
 
         const string logsDir = "../logs";
@@ -126,7 +131,6 @@ namespace ROBot
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
             this.logger.Log<TState>(logLevel, eventId, state, exception, formatter);
-
             var message = formatter != null ? formatter(state, exception) : state.ToString();
             Broadcast("{" + logLevel + "}: " + message);
         }
