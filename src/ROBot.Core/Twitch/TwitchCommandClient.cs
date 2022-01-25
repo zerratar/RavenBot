@@ -56,12 +56,14 @@ namespace ROBot.Core.Twitch
         private bool allowReconnection = true;
         private bool disposed;
         private bool isConnectedToTwitch;
-        private long usedCommandCount = 0;
-        private long messageCount = 0;
+        //private long usedCommandCount = 0;
+        //private long messageCount = 0;
         private bool hasConnectionError = false;
-        private long connectionErrorCount = 0;
-        private long connectionAttemptCount = 0;
+        //private long connectionCurrentErrorCount = 0;
+        //private long connectionCurrentAttemptCount = 0;
         private bool attemptingReconnection = false;
+
+        private TwitchStats stats = new TwitchStats();
 
         public TwitchCommandClient(
             ILogger logger,
@@ -105,6 +107,32 @@ namespace ROBot.Core.Twitch
             EnsureInitialized();
             Subscribe();
             client.Connect();
+        }
+
+        private void Subscribe()
+        {
+            //TwitchLib.Client
+            client.OnChatCommandReceived += OnCommandReceived;
+            client.OnMessageReceived += OnMessageReceived;
+            client.OnConnected += OnConnected;
+            client.OnConnectionError += Client_OnConnectionError;
+            client.OnReconnected += OnReconnected;
+            client.OnDisconnected += OnDisconnected;
+            client.OnUserJoined += OnUserJoined;
+            client.OnUserLeft += OnUserLeft;
+            client.OnGiftedSubscription += OnGiftedSub;
+            client.OnCommunitySubscription += OnPrimeSub;
+            client.OnNewSubscriber += OnNewSub;
+            client.OnReSubscriber += OnReSub;
+            client.OnRaidNotification += OnRaidNotification;
+            client.OnFailureToReceiveJoinConfirmation += OnFailureToReceiveJoinConfirmation;
+            client.OnJoinedChannel += Client_OnJoinedChannel;
+            client.OnLeftChannel += Client_OnLeftChannel;
+            client.OnError += Client_OnError;
+            client.OnLog += Client_OnLog;
+            //TwitchLib.PubSub
+            pubSubManager.OnChannelPointsRewardRedeemed += Pubsub_OnChannelPointsRewardRedeemed;
+            pubSubManager.OnListenFailBadAuth += Pubsub_OnListenFailBadAuth;
         }
 
         private void RejoinChannels()
@@ -203,7 +231,7 @@ namespace ROBot.Core.Twitch
                     {
                         if (joinedChannels.Contains(channel))
                         {
-                            logger.LogDebug("[TWITCH] Retrying to Join Channel (Channel: " + channel+ ")");
+                            logger.LogDebug("[TWITCH] Retrying to Join Channel (Channel: " + channel + ")");
                         }
                         else
                         {
@@ -281,12 +309,12 @@ namespace ROBot.Core.Twitch
 
         public long GetCommandCount()
         {
-            return usedCommandCount;
+            return stats.UserCommandCount;
         }
 
         public long GetMessageCount()
         {
-            return messageCount;
+            return stats.UserMsgCount;
         }
         private void OnUserLeft(object sender, OnUserLeftArgs e)
         {
@@ -300,7 +328,7 @@ namespace ROBot.Core.Twitch
         {
             if (await commandHandler.HandleAsync(game, this, e.ChatMessage))
             {
-                ++messageCount;
+                stats.AddMsgReceivedCount();
             }
         }
 
@@ -336,7 +364,7 @@ namespace ROBot.Core.Twitch
 
             if (await commandHandler.HandleAsync(game, this, e.Command))
             {
-                ++usedCommandCount;
+                stats.AddCommandCount();
             }
         }
 
@@ -384,10 +412,11 @@ namespace ROBot.Core.Twitch
                 return;
             }
 
-            if(this.hasConnectionError)
+            if (this.hasConnectionError)
             {
                 logger.LogError("[TWITCH] Disconnected with errors.");
-            } else
+            }
+            else
             {
                 logger.LogError("[TWITCH] Disconnected.");
             }
@@ -440,6 +469,7 @@ namespace ROBot.Core.Twitch
             isInitialized = false;
             client = new TwitchClient(new TcpClient(new ClientOptions { ClientType = ClientType.Chat }), TwitchLib.Client.Enums.ClientProtocol.TCP);
             client.AutoReListenOnException = true;
+            client.OverrideBeingHostedCheck = true; //Override if BeingHosted - https://swiftyspiffy.com/TwitchLib/Client/class_twitch_lib_1_1_client_1_1_twitch_client.html#a5705479689fa4c440e38d62b5d50660e
         }
 
         private void TryToReconnect() //prepare to be broa...reconnected
@@ -449,11 +479,9 @@ namespace ROBot.Core.Twitch
 
             try
             {
-                usedCommandCount = 0;
-                messageCount = 0;
+                stats.ResetReceivedCount();
 
                 this.attemptingReconnection = true;
-                this.connectionAttemptCount = 0;
 
                 ReconnectAttempt();
                 testingConnection();
@@ -461,13 +489,13 @@ namespace ROBot.Core.Twitch
             catch (Exception)
             {
                 testingConnection();
-                
+
             }
         }
 
         private void ReconnectAttempt()
         {
-            this.connectionAttemptCount++;
+            stats.AddTwitchAttempt();
             //client.Reconnect(); Abby: Seem to have a bug. Will Manually Do our own reconnect
 
             if (client != null && client.IsConnected)
@@ -477,7 +505,7 @@ namespace ROBot.Core.Twitch
                 client.Disconnect(); //Thinks we're still connected after reciving Disconnection event, attempting to disconnect
             }
 
-            logger.LogWarning($"[TWITCH] Reconnecting (Attempt: " + this.connectionAttemptCount + ")");
+            logger.LogWarning($"[TWITCH] Reconnecting (Attempt: " + stats.TwitchConnectionCurrentAttempt + ")");
 
             Unsubscribe();
             isInitialized = false;
@@ -509,7 +537,8 @@ namespace ROBot.Core.Twitch
                         testingConnection();
                     }
                 });
-            } catch (Exception)
+            }
+            catch (Exception)
             {
                 logger.LogError("[TWITCH] Failed To Start Reconnection Timer");
             }
@@ -520,8 +549,9 @@ namespace ROBot.Core.Twitch
         {
             logger.LogDebug("[TWITCH] Connected");
             this.isConnectedToTwitch = true;
-            this.connectionErrorCount = 0;
             this.hasConnectionError = false;
+            stats.AddTwitchSuccess();
+            stats.ResetTwitchAttempt();
 
             RejoinChannels();
 
@@ -548,7 +578,7 @@ namespace ROBot.Core.Twitch
         private void OnReconnected(object sender, OnReconnectedEventArgs e)
         {
             //This seems to get called regardless of actual connection to server
-            
+
             //this.isConnectedToTwitch = true;
             //logger.LogDebug("[Twitch] Reconnected to Twitch IRC Server");
             //this.connectionErrorCount = 0;
@@ -581,44 +611,21 @@ namespace ROBot.Core.Twitch
         //    }
         //}
 
-        private void Subscribe()
-        {
-            client.OnChatCommandReceived += OnCommandReceived;
-            client.OnMessageReceived += OnMessageReceived;
-            client.OnConnected += OnConnected;
-            client.OnConnectionError += Client_OnConnectionError;
-            client.OnReconnected += OnReconnected;
-            client.OnDisconnected += OnDisconnected;
-            client.OnUserJoined += OnUserJoined;
-            client.OnUserLeft += OnUserLeft;
-            client.OnGiftedSubscription += OnGiftedSub;
-            client.OnCommunitySubscription += OnPrimeSub;
-            client.OnNewSubscriber += OnNewSub;
-            client.OnReSubscriber += OnReSub;
-            client.OnRaidNotification += OnRaidNotification;
-            client.OnFailureToReceiveJoinConfirmation += OnFailureToReceiveJoinConfirmation;
-            client.OnJoinedChannel += Client_OnJoinedChannel;
-            client.OnLeftChannel += Client_OnLeftChannel;
-            client.OnError += Client_OnError;
-            client.OnLog += Client_OnLog;
-            pubSubManager.OnChannelPointsRewardRedeemed += Pubsub_OnChannelPointsRewardRedeemed;
-            pubSubManager.OnListenFailBadAuth += Pubsub_OnListenFailBadAuth;
-        }
-
         private void Client_OnLog(object sender, TwitchLib.Client.Events.OnLogArgs e)
         {
-            logger.LogDebug("[TWITCH] Connection Log (Log: " + e.Data + ")");
+            logger.LogDebug("[TWITCH] onLog (Log: " + e.Data + ")");
+
         }
 
         private void Client_OnError(object sender, OnErrorEventArgs e)
         {
-            logger.LogError("[TWITCH] Connection Error (Error: " + e.ToString() + ")");
+            logger.LogError("[TWITCH] onError (Error: " + e.ToString() + ")");
         }
 
         private void Client_OnConnectionError(object sender, OnConnectionErrorArgs e)
         {
-            logger.LogError("[TWITCH] Connection Error (Error: " + e.Error.Message + ")");
-            this.connectionErrorCount++;
+            logger.LogError("[TWITCH] OnConnectionError (Error: " + e.Error.Message + ")");
+            stats.AddTwitchError();
             this.hasConnectionError = true;
             isConnectedToTwitch = false;
         }
@@ -689,5 +696,128 @@ namespace ROBot.Core.Twitch
             Stop();
             disposed = true;
         }
+
+        /*
+         * TwitchStats - hold statistics to/from. 
+         */
+
+        private class TwitchStats
+        {
+            //Fields
+            //set alert threshold
+            //connectionGap
+            //msgGap
+            //avg connection time
+            //avg msg times
+            //
+
+            //Twitch Connection Stats
+            private long _twitchConnectionTotalErrorCount = 0;
+            private long _twitchConnectionTotalAttempt = 0;
+            private long _twitchConnectionTotalSuccess = 0;
+            private long _twitchConnectionTotalDisconnect = 0;
+            private long _twitchConnectionCurrentAttempt = 0;
+            private long _twitchConnectionCurrentErrorCount = 0;
+            private long _twitchConnectionReconnectCount = 0;
+
+            //User Connection Stats
+            private long _userConnectionTotalCount = 0;
+            private long _userConnectionTotalDisconnectCount = 0;
+            private long _userConnectionAttempt = 0;
+            private DateTime _lastConnectionSuccess;
+            //last 10 connection time
+
+            //Message Sent Stats
+            private long msgSendCount = 0;
+            private long msgSentCount = 0;
+            private DateTime _lastRecievedUserState;
+
+            //Recieved from User Stats
+            private long _userCommandCount = 0;
+            private long _userMsgCount = 0;
+
+            private long _userTotalCommandCount = 0;
+            private long _userTotalMsgCount = 0;
+
+            //Recieved Logs Stats (onLogs = event raised everytime TwitchLib.Clients logs something. Usually data from twitch.)
+            private DateTime lastRecievedLog;
+
+
+            //sortedList of top 10 idle times
+            //last 20 idleTimes
+
+            //use events?
+
+            //Properties 
+            public long UserCommandCount { get => _userCommandCount; }
+            public long UserMsgCount { get => _userMsgCount; }
+            public long UserTotalCommandCount { get => _userTotalCommandCount; }
+            public long UserTotalMsgCount { get => _userTotalMsgCount; }
+            public long TwitchConnectionTotalErrorCount { get => _twitchConnectionTotalErrorCount; }
+            public long TwitchConnectionTotalAttempt { get => _twitchConnectionTotalAttempt; }
+            public long TwitchConnectionTotalSuccess { get => _twitchConnectionTotalSuccess; }
+            public long TwitchConnectionTotalDisconnect { get => _twitchConnectionTotalDisconnect; }
+            public long TwitchConnectionCurrentAttempt { get => _twitchConnectionCurrentAttempt; }
+            public long TwitchConnectionCurrentErrorCount { get => _twitchConnectionCurrentErrorCount; }
+            public long TwitchConnectionReconnectCount { get => _twitchConnectionReconnectCount; }
+            public long UserConnectionCount { get => _userConnectionTotalCount; }
+            public long UserConnectionAttempt { get => _userConnectionAttempt; }
+            public DateTime LastConnectionSuccess { get => _lastConnectionSuccess; }
+            public long MsgSendCount { get => msgSendCount; }
+            public long MsgSentCount { get => msgSentCount; }
+            public DateTime LastRecievedUserState { get => _lastRecievedUserState; }
+            public long UserConnectionTotalDisconnectCount { get => _userConnectionTotalDisconnectCount; }
+
+            //Constructor
+            public TwitchStats()
+            {
+            }
+
+
+            //Methods
+            public void AddTwitchAttempt()
+            {
+                this._twitchConnectionCurrentAttempt++;
+                this._twitchConnectionTotalAttempt++;
+            }
+
+            public void AddTwitchError()
+            {
+                this._twitchConnectionTotalErrorCount++;
+                this._twitchConnectionCurrentErrorCount++;
+            }
+
+            public void AddTwitchSuccess()
+            {
+                this._twitchConnectionTotalSuccess++;
+            }
+
+            public void ResetTwitchAttempt()
+            {
+                this._twitchConnectionCurrentAttempt = 0;
+                this._twitchConnectionCurrentErrorCount = 0;
+            }
+
+            public void ResetReceivedCount()
+            {
+                this._userMsgCount = 0;
+                this._userCommandCount = 0;
+            }
+
+            public void AddCommandCount()
+            {
+                this._userCommandCount++;
+                this._userTotalCommandCount++;
+            }
+
+            internal void AddMsgReceivedCount()
+            {
+                this._userMsgCount++;
+                this._userTotalMsgCount++;
+            }
+        }
     }
+
+
 }
+
