@@ -203,7 +203,7 @@ namespace ROBot.Core.Twitch
                     {
                         if (joinedChannels.Contains(channel))
                         {
-                            logger.LogDebug("[TWITCH] Retrying to Join Channel (Channel: " + channel+ ")");
+                            logger.LogDebug("[TWITCH] Retrying to Join Channel (Channel: " + channel + ")");
                         }
                         else
                         {
@@ -306,6 +306,12 @@ namespace ROBot.Core.Twitch
 
         private async void OnCommandReceived(object sender, OnChatCommandReceivedArgs e)
         {
+            if (e == null || e.Command == null)
+            {
+                logger.LogError("[TWITCH] OnCommandReceived: Received a null command. ???");
+                return;
+            }
+
             if (!string.IsNullOrEmpty(e.Command.CommandText) && e.Command.CommandText.Equals("pubsub"))
             {
                 if (!e.Command.ChatMessage.IsBroadcaster)
@@ -384,10 +390,11 @@ namespace ROBot.Core.Twitch
                 return;
             }
 
-            if(this.hasConnectionError)
+            if (this.hasConnectionError)
             {
                 logger.LogError("[TWITCH] Disconnected with errors.");
-            } else
+            }
+            else
             {
                 logger.LogError("[TWITCH] Disconnected.");
             }
@@ -461,7 +468,7 @@ namespace ROBot.Core.Twitch
             catch (Exception)
             {
                 testingConnection();
-                
+
             }
         }
 
@@ -509,7 +516,8 @@ namespace ROBot.Core.Twitch
                         testingConnection();
                     }
                 });
-            } catch (Exception)
+            }
+            catch (Exception)
             {
                 logger.LogError("[TWITCH] Failed To Start Reconnection Timer");
             }
@@ -548,7 +556,7 @@ namespace ROBot.Core.Twitch
         private void OnReconnected(object sender, OnReconnectedEventArgs e)
         {
             //This seems to get called regardless of actual connection to server
-            
+
             //this.isConnectedToTwitch = true;
             //logger.LogDebug("[Twitch] Reconnected to Twitch IRC Server");
             //this.connectionErrorCount = 0;

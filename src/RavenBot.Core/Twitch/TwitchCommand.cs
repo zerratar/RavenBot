@@ -3,6 +3,7 @@ using RavenBot.Core.Handlers;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using RavenBot.Core.Extensions;
+using System;
 
 namespace RavenBot.Core.Twitch
 {
@@ -138,6 +139,9 @@ namespace RavenBot.Core.Twitch
 
         public TwitchCommand(ChatCommand cmd, bool isGameAdmin = false, bool isGameModerator = false)
         {
+            if (cmd == null) throw new ArgumentNullException(nameof(cmd));
+            if (cmd.ChatMessage == null) throw new ArgumentException("ChatMessage was null. Unable to parse chat command.", nameof(cmd));
+
             this.Command = cmd.CommandText?.ToLower()?.AsUTF8();
             this.Arguments = cmd.ArgumentsAsString?.AsUTF8();
 

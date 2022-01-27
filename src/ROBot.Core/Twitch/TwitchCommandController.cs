@@ -29,6 +29,8 @@ namespace ROBot.Core.Twitch
 
         public ICollection<Type> RegisteredCommandHandlers => handlerLookup.Values;
 
+
+
         public TwitchCommandController(
             ILogger logger,
             IoC ioc)
@@ -68,6 +70,19 @@ namespace ROBot.Core.Twitch
         {
             try
             {
+                if (command == null || string.IsNullOrEmpty(command.CommandText))
+                {
+                    if (command != null && command.ChatMessage != null)
+                    {
+                        logger.LogError("[BOT] Error handling command. Command is null. Message: " + command.ChatMessage.Username + ": " + command.ChatMessage.Message + " @" + command.ChatMessage.Channel);
+                    }
+                    else
+                    {
+                        logger.LogError("[BOT] Error handling command. Command is null.");
+                    }
+                    return false;
+                }
+
                 var session = game.GetSession(command.ChatMessage.Channel);
                 var argString = !string.IsNullOrEmpty(command.ArgumentsAsString) ? " (args: " + command.ArgumentsAsString + ")" : "";
 
@@ -195,6 +210,11 @@ namespace ROBot.Core.Twitch
                 logger.LogError("[BOT] Exception Redeeming Reward  (Command: " + usedCommand + " Exception: " + exc.ToString() + ")");
                 return false;
             }
+        }
+
+        public ITwitchCommandHandler GetHandler(string cmd)
+        {
+            return FindHandler(cmd);
         }
 
         private async Task<bool> HandleAsync(IBotServer game, ITwitchCommandClient twitch, ICommand cmd)

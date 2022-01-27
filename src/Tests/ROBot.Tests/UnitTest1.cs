@@ -2,8 +2,10 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RavenBot.Core.Ravenfall.Commands;
 using ROBot.Core.Twitch;
 using Shinobytes.Ravenfall.RavenNet.Core;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
+using TwitchLib.Client.Models;
 
 namespace ROBot.Tests
 {
@@ -56,8 +58,34 @@ namespace ROBot.Tests
             }
         }
 
+
+        //[TestMethod]
+        //public async Task InvokeAllChatCommands_CommandIsNull()
+        //{
+        //    var logger = new ConsoleLogger();
+
+        //    var ioc = new Shinobytes.Ravenfall.RavenNet.Core.IoC();
+        //    ioc.RegisterShared<IUserRoleManager, UserRoleManager>();
+        //    ioc.RegisterShared<IMessageBus, MessageBus>();
+
+        //    var server = new MockBotServer();
+        //    var client = new MockTwitchCommandClient();
+        //    var commandController = new TwitchCommandController(logger, ioc);
+
+        //    foreach (var cmds in commandController.RegisteredCommandHandlers)
+        //    {
+        //        var handler = commandController.GetHandler(cmds.Name.ToLower());
+        //        RavenBot.Core.Handlers.ICommand cmd = null;
+        //        try { await handler.HandleAsync(server, client, cmd); }
+        //        catch (Exception exc)
+        //        {
+        //            Assert.Fail(cmds.Name + " - Failed. " + exc);
+        //        }
+        //    }
+        //}
+
         [TestMethod]
-        public async Task InvokeAllChatCommands_Null()
+        public async Task InvokeAllChatCommands_ArgIsNull()
         {
             var logger = new ConsoleLogger();
 

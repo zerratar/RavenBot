@@ -13,5 +13,6 @@ namespace ROBot.Core.Twitch
         Task<bool> HandleAsync(IBotServer game, ITwitchCommandClient twitch, ChatMessage msg);
         Task<bool> HandleAsync(IBotServer game, ITwitchCommandClient twitch, OnChannelPointsRewardRedeemedArgs reward);
         ICollection<Type> RegisteredCommandHandlers { get; }
+        ITwitchCommandHandler GetHandler(string cmd);
     }
 }
