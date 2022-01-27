@@ -206,6 +206,10 @@ namespace RavenBot.Core.Twitch
         public ICommandSender Sender { get; }
         public string Command { get; }
         public string Arguments { get; }
+        public override string ToString()
+        {
+            return (Sender?.Username ?? "???") + ": #" + Channel + ", " + Command + " " + Arguments;
+        }
 
         private class TwitchCommandSender : ICommandSender
         {

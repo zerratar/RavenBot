@@ -185,44 +185,50 @@ namespace ROBot.Core.GameServer
 
         private void RegisterSessionOwner(IGameCommand obj)
         {
-            if (string.IsNullOrEmpty(obj.Args[0]))
-                return;
-
-            Guid sessionId = Guid.Empty;
-            if (obj.Args.Length > 2)
+            try
             {
-                Guid.TryParse(obj.Args[2], out sessionId);
+                if (string.IsNullOrEmpty(obj.Args[0]))
+                    return;
+
+                Guid sessionId = Guid.Empty;
+                if (obj.Args.Length > 2)
+                {
+                    Guid.TryParse(obj.Args[2], out sessionId);
+                }
+                var plr = playerProvider.Get(obj.Args[0], obj.Args[1]);
+                plr.IsBroadcaster = true;
+
+                DateTime time = DateTime.MinValue;
+                if (obj.Args.Length > 3)
+                {
+                    DateTime.TryParse(obj.Args[3], out time);
+                }
+
+                //if (internalSessionInfoReceived == null)
+                //{
+                //    queuedSessionInfo = sessionInfo;
+                //}
+                //else
+                //{
+                //    queuedSessionInfo = null;
+
+                if (internalSessionInfoReceived == null)
+                {
+                    return;
+                }
+
+                internalSessionInfoReceived.Invoke(this, new GameSessionInfo
+                {
+                    Created = time,
+                    SessionId = sessionId,
+                    TwitchUserId = plr.UserId,
+                    TwitchUserName = plr.Username
+                });
             }
-            var plr = playerProvider.Get(obj.Args[0], obj.Args[1]);
-            plr.IsBroadcaster = true;
-
-            DateTime time = DateTime.MinValue;
-            if (obj.Args.Length > 3)
+            catch (Exception exc)
             {
-                DateTime.TryParse(obj.Args[3], out time);
+                logger.LogError($"RegisterSessionOwner session: {Session?.Name}, failed: " + exc);
             }
-
-            //if (internalSessionInfoReceived == null)
-            //{
-            //    queuedSessionInfo = sessionInfo;
-            //}
-            //else
-            //{
-            //    queuedSessionInfo = null;
-
-            if (internalSessionInfoReceived == null)
-            {
-                return;
-            }
-
-            internalSessionInfoReceived.Invoke(this, new GameSessionInfo
-            {
-                Created = time,
-                SessionId = sessionId,
-                TwitchUserId = plr.UserId,
-                TwitchUserName = plr.Username
-            });
-            //}
         }
 
         public Task UnstuckAsync(Player player) => SendAsync("unstuck", player);
