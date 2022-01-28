@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using RavenBot.Core.Net;
 using RavenBot.Core.Ravenfall.Commands;
 using RavenBot.Core.Twitch;
+using ROBot.Core.Extensions;
 using ROBot.Core.GameServer;
 using Shinobytes.Ravenfall.RavenNet.Core;
 using TwitchLib.Client;
@@ -774,7 +775,7 @@ namespace ROBot.Core.Twitch
             //Message Sent Stats
             private ulong msgSendCount = 0;
             private ulong msgSentCount = 0;
-            private Dictionary<Object, DateTime> msgTimes = new Dictionary<Object, DateTime>();
+            private ConcurrentDictionary<object, DateTime> msgTimes = new ConcurrentDictionary<object, DateTime>();
             private ConcurrentQueue<TimeSpan> listMsgDelay = new ConcurrentQueue<TimeSpan>();
 
             //Recieved from User Stats
@@ -786,6 +787,7 @@ namespace ROBot.Core.Twitch
 
             //Recieved Logs Stats (onLogs = event raised everytime TwitchLib.Clients logs something. Usually data from twitch.)
             private DateTime lastRecievedLog;
+            private object msgTimesMutex;
 
 
             //sortedList of top 10 idle times
@@ -885,7 +887,7 @@ namespace ROBot.Core.Twitch
 
             public void AddMsgSend(string channel, string message)
             {
-                msgTimes.Add(GetObject(channel, message), DateTime.Now);
+                msgTimes.TryAdd(GetObject(channel, message), DateTime.Now);
             }
             public void AddMsgSent(string channel, string message)
             {
@@ -895,21 +897,30 @@ namespace ROBot.Core.Twitch
                 {
                     TimeSpan msgDelay = DateTime.Now - value;
                     AddMsgDelay(msgDelay);
-                    msgTimes.Remove(thisObj);
+                    msgTimes.TryRemove(thisObj, out _);
+                }
+
+                checkOldMsg();
+            }
+
+            private async void checkOldMsg()
+            {
+
+                foreach (var items in msgTimes)
+                {
+                    //items.Value
                 }
             }
 
-            public void avgMsgDelays()
+            public TimeSpan avgMsgDelays()
             {
-                var avgmsgdelays = msgTimes.ToList();
+                return TimeSpanExtensions.Average(listMsgDelay.AsEnumerable());
             }
 
             private void AddMsgDelay(TimeSpan msgDelay)
             {
                 if (listMsgDelay.Count == 100)
-                {
                     listMsgDelay.TryDequeue(out _);
-                }
 
                 listMsgDelay.Enqueue(msgDelay);
             }
@@ -922,20 +933,7 @@ namespace ROBot.Core.Twitch
                 return channel + message;
             }
         }
-        //TODO: Extension Method (Need to be in static class) https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/extension-methods
-        //
-        public static TimeSpan Average(this IEnumerable<TimeSpan> timeSpans)
-        {
-            IEnumerable<long> ticksPerTimeSpan = timeSpans.Select(t => t.Ticks);
-            double averageTicks = ticksPerTimeSpan.Average();
-            long averageTicksLong = Convert.ToInt64(averageTicks);
-
-            TimeSpan averageTimeSpan = TimeSpan.FromTicks(averageTicksLong);
-
-            return averageTimeSpan;
-        }
+        
     }
-
-
 }
 
