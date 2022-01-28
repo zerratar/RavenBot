@@ -59,6 +59,9 @@ namespace ROBot.Core.Twitch
         private long connectionAttemptCount = 0;
         private bool attemptingReconnection = false;
 
+        public event EventHandler<TwitchLib.Client.Events.OnLogArgs> OnTwitchLog;
+        public event EventHandler<TwitchLib.Communication.Events.OnErrorEventArgs> OnTwitchError;
+
         public TwitchCommandClient(
             ILogger logger,
             IKernel kernel,
@@ -606,15 +609,16 @@ namespace ROBot.Core.Twitch
             pubSubManager.OnChannelPointsRewardRedeemed += Pubsub_OnChannelPointsRewardRedeemed;
             pubSubManager.OnListenFailBadAuth += Pubsub_OnListenFailBadAuth;
         }
-
         private void Client_OnLog(object sender, TwitchLib.Client.Events.OnLogArgs e)
         {
             logger.LogDebug("[TWITCH] Connection Log (Log: " + e.Data + ")");
+            OnTwitchLog?.Invoke(this, e);
         }
 
         private void Client_OnError(object sender, OnErrorEventArgs e)
         {
             logger.LogError("[TWITCH] Connection Error (Error: " + e.ToString() + ")");
+            OnTwitchError?.Invoke(this, e);
         }
 
         private void Client_OnConnectionError(object sender, OnConnectionErrorArgs e)
