@@ -5,6 +5,7 @@ using ROBot.Core.Twitch;
 using ROBot.Ravenfall;
 using System;
 using System.Linq;
+using System.Net.Http;
 
 namespace ROBot
 {
@@ -23,6 +24,7 @@ namespace ROBot
         private DateTime startedDateTime;
         private long lastCmdCount;
         private int highestDelta;
+        private int detailsDelayTimer;
 
         public StreamBotApp(
             Microsoft.Extensions.Logging.ILogger logger,
@@ -71,6 +73,11 @@ namespace ROBot
                 title += GetCommandsPerSecond();
                 Console.Title = title;
                 if (this.disposed) { return; }
+
+                // Ping RavenNest with details.
+
+                SendDetailsToRavenNest();
+
                 this.timeoutHandle = this.kernel.SetTimeout(UpdateTitle, 1000);
             }
             catch
@@ -78,6 +85,28 @@ namespace ROBot
                 // Setting title on th is platform probably not supported.
             }
         }
+
+        private async void SendDetailsToRavenNest()
+        {
+            try
+            {
+                using (var www = new HttpClient())
+                using (var response = await www.GetAsync("https://www.ravenfall.stream/api/", HttpCompletionOption.ResponseHeadersRead))
+                {
+                    response.EnsureSuccessStatusCode();
+                }
+            }
+            catch
+            {
+                // Unable to send it to RavenNest. Next try should be delayed.
+                detailsDelayTimer += 1000;
+                if (detailsDelayTimer >= 30_000)
+                {
+                    detailsDelayTimer = 30_000;
+                }
+            }
+        }
+
         private string GetCommandsPerSecond()
         {
             var commandCount = twitch.GetCommandCount();

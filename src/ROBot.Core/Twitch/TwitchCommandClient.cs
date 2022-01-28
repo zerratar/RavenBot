@@ -33,9 +33,6 @@ namespace ROBot.Core.Twitch
         private readonly ITwitchPubSubManager pubSubManager;
         private IMessageBusSubscription broadcastSubscription;
 
-        //private readonly ConcurrentQueue<Tuple<string, string>> chatMessageQueue
-        //    = new ConcurrentQueue<Tuple<string, string>>();
-
         private readonly ConcurrentDictionary<string, ConcurrentQueue<string>> chatMessageQueue
                  = new ConcurrentDictionary<string, ConcurrentQueue<string>>();
 
@@ -51,7 +48,6 @@ namespace ROBot.Core.Twitch
         private readonly object channelMutex = new object();
 
         private TwitchClient client;
-        private bool isInitialized;
         private int reconnectDelay = 10000;
         private bool allowReconnection = true;
         private bool disposed;
@@ -83,8 +79,7 @@ namespace ROBot.Core.Twitch
             this.pubSubManager = pubSubManager;
 
             this.messageBus.Subscribe<PubSubToken>("pubsub", OnPubSubTokenReceived);
-
-            CreateTwitchClient();
+            this.broadcastSubscription = messageBus.Subscribe<IGameSessionCommand>(MessageBus.Broadcast, Broadcast);
         }
 
         private void OnPubSubTokenReceived(PubSubToken obj)
@@ -97,14 +92,6 @@ namespace ROBot.Core.Twitch
                     pubSubManager.PubSubConnect(obj.UserName);
                 }
             }
-        }
-
-        public void Start()
-        {
-            if (!kernel.Started) kernel.Start();
-            EnsureInitialized();
-            Subscribe();
-            client.Connect();
         }
 
         private void RejoinChannels()
@@ -402,18 +389,6 @@ namespace ROBot.Core.Twitch
             TryToReconnect();
         }
 
-        private void EnsureInitialized()
-        {
-            if (isInitialized) return;
-            if (this.broadcastSubscription == null)
-                this.broadcastSubscription = messageBus.Subscribe<IGameSessionCommand>(MessageBus.Broadcast, Broadcast);
-
-            var credentials = credentialsProvider.Get();
-            client.Initialize(credentials);
-
-            isInitialized = true;
-        }
-
         public void Broadcast(IGameSessionCommand message)
         {
             Broadcast(message.Session.Name, message.Receiver, message.Format, message.Args);
@@ -441,17 +416,41 @@ namespace ROBot.Core.Twitch
             SendChatMessage(channel, msg);
         }
 
-
-        private void CreateTwitchClient()
+        public void Start()
         {
-            isInitialized = false;
-            client = new TwitchClient(new TcpClient(new ClientOptions { ClientType = ClientType.Chat }), TwitchLib.Client.Enums.ClientProtocol.TCP);
-            client.AutoReListenOnException = true;
+            if (!kernel.Started) kernel.Start();
+
+            Unsubscribe();
+
+            try
+            {
+                client = //new TwitchClient(new TcpClient(new ClientOptions { ClientType = ClientType.Chat }), TwitchLib.Client.Enums.ClientProtocol.TCP);
+                    new TwitchClient(new WebSocketClient(new ClientOptions
+                    {
+                        ClientType = ClientType.Chat,
+                        MessagesAllowedInPeriod = 750,
+                        ThrottlingPeriod = TimeSpan.FromSeconds(30)
+                    }));
+
+                client.AutoReListenOnException = true;
+
+                var credentials = credentialsProvider.Get();
+
+                client.Initialize(credentials);
+
+                Subscribe();
+
+                client.Connect();
+            }
+            catch (Exception exc)
+            {
+                logger.LogError("[TWITCH] Unable to start Twitch Bot: " + exc);
+            }
         }
 
         private void TryToReconnect() //prepare to be broa...reconnected
         {
-            if (this.attemptingReconnection)
+            if (attemptingReconnection)
                 return; //Avoid more than one reconnect attempt. (I.e. disconnect fired twice)
 
             try
@@ -459,16 +458,18 @@ namespace ROBot.Core.Twitch
                 usedCommandCount = 0;
                 messageCount = 0;
 
-                this.attemptingReconnection = true;
-                this.connectionAttemptCount = 0;
+                attemptingReconnection = true;
+                connectionAttemptCount = 0;
 
                 ReconnectAttempt();
-                testingConnection();
             }
-            catch (Exception)
+            catch (Exception exc)
             {
-                testingConnection();
-
+                logger.LogError("[TWITCH] " + nameof(TryToReconnect) + " failed: " + exc);
+            }
+            finally
+            {
+                TestingConnection();
             }
         }
 
@@ -480,42 +481,35 @@ namespace ROBot.Core.Twitch
             if (client != null && client.IsConnected)
             {
                 logger.LogError("[TWITCH] Recieved a Disconnect Event. Still connected, disconnecting");
-                this.attemptingReconnection = true;
+                attemptingReconnection = true;
                 client.Disconnect(); //Thinks we're still connected after reciving Disconnection event, attempting to disconnect
             }
 
             logger.LogWarning($"[TWITCH] Reconnecting (Attempt: " + this.connectionAttemptCount + ")");
 
-            Unsubscribe();
-            isInitialized = false;
-            CreateTwitchClient();
             Start();
+
+            //Start();
         }
 
-        private void testingConnection() //Start timer to test for connection
+        private async void TestingConnection() //Start timer to test for connection
         {
             try
             {
+                await Task.Delay(reconnectDelay); //Should make it a variable delay, increasing from a small delay up to a cap. (1 minute?)
 
+                if (!allowReconnection)
+                    return;
 
-                Task.Run(async () =>
+                if (isConnectedToTwitch && !this.hasConnectionError)
                 {
-                    await Task.Delay(reconnectDelay); //Should make it a variable delay, increasing from a small delay up to a cap. (1 minute?)
-
-                    if (!allowReconnection)
-                        return;
-
-
-                    if (isConnectedToTwitch && !this.hasConnectionError)
-                    {
-                        this.attemptingReconnection = false; //We did it!
-                    }
-                    else
-                    {
-                        ReconnectAttempt();
-                        testingConnection();
-                    }
-                });
+                    this.attemptingReconnection = false; //We did it!
+                }
+                else
+                {
+                    ReconnectAttempt();
+                    TestingConnection();
+                }
             }
             catch (Exception)
             {
@@ -660,25 +654,31 @@ namespace ROBot.Core.Twitch
 
         private void Unsubscribe()
         {
-            client.OnChatCommandReceived -= OnCommandReceived;
-            client.OnMessageReceived -= OnMessageReceived;
-            client.OnConnected -= OnConnected;
-            client.OnDisconnected -= OnDisconnected;
-            client.OnUserJoined -= OnUserJoined;
-            client.OnUserLeft -= OnUserLeft;
-            client.OnGiftedSubscription -= OnGiftedSub;
-            client.OnCommunitySubscription -= OnPrimeSub;
-            client.OnNewSubscriber -= OnNewSub;
-            client.OnReSubscriber -= OnReSub;
-            client.OnRaidNotification -= OnRaidNotification;
-            client.OnFailureToReceiveJoinConfirmation -= OnFailureToReceiveJoinConfirmation;
-            client.OnJoinedChannel -= Client_OnJoinedChannel;
-            client.OnLeftChannel -= Client_OnLeftChannel;
-            client.OnConnectionError -= Client_OnConnectionError;
-            client.OnError -= Client_OnError;
-            client.OnLog -= Client_OnLog;
-            pubSubManager.OnChannelPointsRewardRedeemed -= Pubsub_OnChannelPointsRewardRedeemed;
-            pubSubManager.OnListenFailBadAuth -= Pubsub_OnListenFailBadAuth;
+            if (client != null)
+            {
+                client.OnChatCommandReceived -= OnCommandReceived;
+                client.OnMessageReceived -= OnMessageReceived;
+                client.OnConnected -= OnConnected;
+                client.OnDisconnected -= OnDisconnected;
+                client.OnUserJoined -= OnUserJoined;
+                client.OnUserLeft -= OnUserLeft;
+                client.OnGiftedSubscription -= OnGiftedSub;
+                client.OnCommunitySubscription -= OnPrimeSub;
+                client.OnNewSubscriber -= OnNewSub;
+                client.OnReSubscriber -= OnReSub;
+                client.OnRaidNotification -= OnRaidNotification;
+                client.OnFailureToReceiveJoinConfirmation -= OnFailureToReceiveJoinConfirmation;
+                client.OnJoinedChannel -= Client_OnJoinedChannel;
+                client.OnLeftChannel -= Client_OnLeftChannel;
+                client.OnConnectionError -= Client_OnConnectionError;
+                client.OnError -= Client_OnError;
+                client.OnLog -= Client_OnLog;
+            }
+            if (pubSubManager != null)
+            {
+                pubSubManager.OnChannelPointsRewardRedeemed -= Pubsub_OnChannelPointsRewardRedeemed;
+                pubSubManager.OnListenFailBadAuth -= Pubsub_OnListenFailBadAuth;
+            }
         }
 
         private void Pubsub_OnListenFailBadAuth(object sender, OnListenResponseArgs e)
