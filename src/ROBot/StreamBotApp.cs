@@ -136,8 +136,8 @@ namespace ROBot
                     handler.ClientCertificateOptions = ClientCertificateOption.Manual;
                     handler.ServerCertificateCustomValidationCallback = (httpRequestMessage, cert, cetChain, policyErrors) => true;
                     using (var www = new HttpClient(handler))
-                    //using (var response = await www.PostAsync("https://www.ravenfall.stream/api/robot/stats", statsData))
-                    using (var response = await www.PostAsync("https://localhost:5001/api/robot/stats", statsData))
+                    using (var response = await www.PostAsync("https://www.ravenfall.stream/api/robot/stats", statsData))
+                    //using (var response = await www.PostAsync("https://localhost:5001/api/robot/stats", statsData))
                     {
                         response.EnsureSuccessStatusCode();
                         detailsDelayTimer = 0;
