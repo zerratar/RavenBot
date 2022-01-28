@@ -117,14 +117,16 @@ namespace ROBot
                     }
                 }
             }
-            catch
+            catch (Exception ex)
             {
                 // Unable to send it to RavenNest. Next try should be delayed.
-                detailsDelayTimer += 1000;
+                detailsDelayTimer += 3000;
                 if (detailsDelayTimer >= 30_000)
                 {
                     detailsDelayTimer = 30_000;
                 }
+
+                logger.LogError("[BOT] Unable to send Details to RavenNest: " + ex);
             }
         }
 
