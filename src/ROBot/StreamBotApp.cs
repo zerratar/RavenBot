@@ -14,6 +14,7 @@ namespace ROBot
 
     public class StreamBotApp : IStreamBotApplication
     {
+        private readonly BotStats stats = new BotStats();
         private readonly Microsoft.Extensions.Logging.ILogger logger;
         private readonly Shinobytes.Ravenfall.RavenNet.Core.IKernel kernel;
         private readonly IGameSessionManager sessionManager;
@@ -25,7 +26,7 @@ namespace ROBot
         private long lastCmdCount;
         private int highestDelta;
         private int detailsDelayTimer;
-        private StreamBotStats stats;
+        private bool canUpdateCmdTitle = true;
 
         public StreamBotApp(
             Microsoft.Extensions.Logging.ILogger logger,
@@ -47,7 +48,7 @@ namespace ROBot
 
         public void Run()
         {
-            this.startedDateTime = DateTime.UtcNow;
+            stats.Started = this.startedDateTime = DateTime.UtcNow;
 
             logger.LogInformation("[BOT] Application Started");
 
@@ -72,19 +73,23 @@ namespace ROBot
                 title += GetJoinedChannelCount();
                 title += GetTrackedPlayerCount();
                 title += GetCommandsPerSecond();
+                if (this.disposed || !canUpdateCmdTitle) return;
                 Console.Title = title;
-                if (this.disposed) { return; }
-
                 // Ping RavenNest with details.
-
-                SendDetailsToRavenNest();
-
-                this.timeoutHandle = this.kernel.SetTimeout(UpdateTitle, 1000);
             }
             catch
             {
+                canUpdateCmdTitle = false;
                 // Setting title on th is platform probably not supported.
             }
+
+            try
+            {
+                SendDetailsToRavenNest();
+            }
+            catch { }
+
+            this.timeoutHandle = this.kernel.SetTimeout(UpdateTitle, 1000);
         }
 
         private async void SendDetailsToRavenNest()
@@ -95,6 +100,7 @@ namespace ROBot
                 var statsData = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
                 using (var www = new HttpClient())
                 using (var response = await www.PostAsync("https://www.ravenfall.stream/api/robot/stats", statsData))
+                //using (var response = await www.PostAsync("https://localhost:5001/api/robot/stats", statsData))
                 {
                     response.EnsureSuccessStatusCode();
                     detailsDelayTimer = 0;
@@ -126,6 +132,10 @@ namespace ROBot
             {
                 highestDelta = (int)delta;
             }
+
+            stats.TotalCommandCount = (UInt64)commandCount;
+            stats.CommandsPerSecondsDelta = delta;
+            stats.CommandsPerSecondsMax = (UInt32)highestDelta;
 
             lastCmdCount = commandCount;
             return "[Total: " + commandCount + " C/S: " + delta + " Hi: " + highestDelta + "] ";
@@ -222,21 +232,31 @@ namespace ROBot
         {
             logger.LogDebug("[RVNFLL] Game Session Started (Name:" + session.Name + ")");
             twitch.JoinChannel(session.Name);
+            stats.LastSessionStarted = DateTime.UtcNow;
         }
 
         private void OnSessionEnded(object sender, IGameSession session)
         {
             logger.LogDebug("[RVNFLL] Game Session Ended (Name: " + session.Name + ")");
             twitch.LeaveChannel(session.Name);
+            stats.LastSessionEnded = DateTime.UtcNow;
         }
     }
 
-    public struct StreamBotStats
+    public class BotStats
     {
+        public UInt32 CommandsPerSecondsMax;
         public UInt32 JoinedChannelsCount;
         public UInt32 UserCount;
-        internal uint ConnectionCount;
-        internal uint SessionCount;
-        internal TimeSpan Uptime;
+        public UInt32 ConnectionCount;
+        public UInt32 SessionCount;
+
+        public UInt64 TotalCommandCount;
+        public double CommandsPerSecondsDelta;
+
+        public TimeSpan Uptime;
+        public DateTime LastSessionStarted;
+        public DateTime LastSessionEnded;
+        public DateTime Started;
     }
 }
