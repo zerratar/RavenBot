@@ -107,13 +107,18 @@ namespace ROBot
                 var json = Newtonsoft.Json.JsonConvert.SerializeObject(stats);
                 var statsData = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
                 statsData.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-                using (var www = new HttpClient())
+                using (var handler = new HttpClientHandler())
                 {
-                    using (var response = await www.PostAsync("https://www.ravenfall.stream/api/robot/stats", statsData))
-                    //using (var response = await www.PostAsync("https://localhost:5001/api/robot/stats", statsData))
+                    handler.ClientCertificateOptions = ClientCertificateOption.Manual;
+                    handler.ServerCertificateCustomValidationCallback = (httpRequestMessage, cert, cetChain, policyErrors) => true;
+                    using (var www = new HttpClient(handler))
                     {
-                        response.EnsureSuccessStatusCode();
-                        detailsDelayTimer = 0;
+                        using (var response = await www.PostAsync("https://www.ravenfall.stream/api/robot/stats", statsData))
+                        //using (var response = await www.PostAsync("https://localhost:5001/api/robot/stats", statsData))
+                        {
+                            response.EnsureSuccessStatusCode();
+                            detailsDelayTimer = 0;
+                        }
                     }
                 }
             }
