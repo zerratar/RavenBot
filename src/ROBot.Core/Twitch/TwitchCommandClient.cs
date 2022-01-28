@@ -504,6 +504,12 @@ namespace ROBot.Core.Twitch
 
         private async void OnCommandReceived(object sender, OnChatCommandReceivedArgs e)
         {
+            if (e == null || e.Command == null)
+            {
+                logger.LogError("[TWITCH] OnCommandReceived: Received a null command. ???");
+                return;
+            }
+
             if (!string.IsNullOrEmpty(e.Command.CommandText) && e.Command.CommandText.Equals("pubsub"))
             {
                 if (!e.Command.ChatMessage.IsBroadcaster)

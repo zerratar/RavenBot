@@ -1,7 +1,7 @@
 ﻿using RavenBot.Core.Extensions;
 using RavenBot.Core.Handlers;
 using RavenBot.Core.Ravenfall.Models;
-using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace RavenBot.Core.Ravenfall
 {
@@ -22,6 +22,11 @@ namespace RavenBot.Core.Ravenfall
         public string Channel { get; }
         public string Command { get; }
         public string Arguments { get; }
+
+        public override string ToString()
+        {
+            return (Player?.Username ?? Sender?.Username ?? "???") + ": #" + Channel + ", " + Command + " " + Arguments;
+        }
 
         internal class RewardRedeemSender : ICommandSender
         {
@@ -54,5 +59,7 @@ namespace RavenBot.Core.Ravenfall
 
             public bool IsGameModerator => false;
         }
+
+
     }
 }

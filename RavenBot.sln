@@ -23,6 +23,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shinobytes.Network", "src\S
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RemoteManagement", "src\RemoteManagement\RemoteManagement.csproj", "{B868055E-D1C8-4A15-A153-1FC5C3F65B1D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ROBot.Tests", "src\Tests\ROBot.Tests\ROBot.Tests.csproj", "{288DA2E1-9873-4D5C-949A-C0B6DB7DF49F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -95,6 +97,14 @@ Global
 		{B868055E-D1C8-4A15-A153-1FC5C3F65B1D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B868055E-D1C8-4A15-A153-1FC5C3F65B1D}.Release|x64.ActiveCfg = Release|Any CPU
 		{B868055E-D1C8-4A15-A153-1FC5C3F65B1D}.Release|x64.Build.0 = Release|Any CPU
+		{288DA2E1-9873-4D5C-949A-C0B6DB7DF49F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{288DA2E1-9873-4D5C-949A-C0B6DB7DF49F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{288DA2E1-9873-4D5C-949A-C0B6DB7DF49F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{288DA2E1-9873-4D5C-949A-C0B6DB7DF49F}.Debug|x64.Build.0 = Debug|Any CPU
+		{288DA2E1-9873-4D5C-949A-C0B6DB7DF49F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{288DA2E1-9873-4D5C-949A-C0B6DB7DF49F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{288DA2E1-9873-4D5C-949A-C0B6DB7DF49F}.Release|x64.ActiveCfg = Release|Any CPU
+		{288DA2E1-9873-4D5C-949A-C0B6DB7DF49F}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -105,6 +115,7 @@ Global
 		{0F031BF8-3124-4366-A4CB-3352D42D94F2} = {95C93DB5-0C0C-4A4C-ABD5-B5377B73A22C}
 		{44B49434-E5EA-47D3-862C-76FB4FDF3597} = {95C93DB5-0C0C-4A4C-ABD5-B5377B73A22C}
 		{B1881613-C893-469D-B022-8EFC4C443B13} = {95C93DB5-0C0C-4A4C-ABD5-B5377B73A22C}
+		{288DA2E1-9873-4D5C-949A-C0B6DB7DF49F} = {FD642811-2025-4BA9-B5D0-06578DE16C36}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7ACE9C06-C6C2-490E-9DCF-292B46D496EF}

@@ -27,6 +27,10 @@ namespace ROBot.Core.Twitch
         private ITwitchChatMessageHandler messageHandler;
         private IUserRoleManager userRoleManager;
 
+        public ICollection<Type> RegisteredCommandHandlers => handlerLookup.Values;
+
+
+
         public TwitchCommandController(
             ILogger logger,
             IoC ioc)
@@ -41,46 +45,75 @@ namespace ROBot.Core.Twitch
 
         public async Task<bool> HandleAsync(IBotServer game, ITwitchCommandClient twitch, ChatMessage message)
         {
-            if (messageHandler == null)
-                messageHandler = ioc.Resolve<ITwitchChatMessageHandler>();
-
-            if (messageHandler == null)
+            try
             {
-                logger.LogInformation("[BOT] HandleMessage: No message handler available.");
+                if (messageHandler == null)
+                    messageHandler = ioc.Resolve<ITwitchChatMessageHandler>();
+
+                if (messageHandler == null)
+                {
+                    logger.LogInformation("[BOT] HandleMessage: No message handler available.");
+                    return false;
+                }
+
+                await messageHandler.HandleAsync(game, twitch, message);
+                return true;
+            }
+            catch (Exception exc)
+            {
+                logger.LogError("Error handling command: " + exc.ToString());
                 return false;
             }
-
-            await messageHandler.HandleAsync(game, twitch, message);
-            return true;
         }
 
         public async Task<bool> HandleAsync(IBotServer game, ITwitchCommandClient twitch, ChatCommand command)
         {
-            var session = game.GetSession(command.ChatMessage.Channel);
-            var argString = !string.IsNullOrEmpty(command.ArgumentsAsString) ? " (args: " + command.ArgumentsAsString + ")" : "";
-
-            var uid = command.ChatMessage.UserId;
-            var chatCmd = new TwitchCommand(command, userRoleManager.IsAdministrator(uid), userRoleManager.IsModerator(uid));
-
-            var key = chatCmd.Command.ToLower();
-
-            if (session != null)
+            try
             {
-                // add the user as part of this session
-                session.Get(chatCmd.Sender);
-            }
+                if (command == null || string.IsNullOrEmpty(command.CommandText))
+                {
+                    if (command != null && command.ChatMessage != null)
+                    {
+                        logger.LogError("[BOT] Error handling command. Command is null. Message: " + command.ChatMessage.Username + ": " + command.ChatMessage.Message + " @" + command.ChatMessage.Channel);
+                    }
+                    else
+                    {
+                        logger.LogError("[BOT] Error handling command. Command is null.");
+                    }
+                    return false;
+                }
 
-            if (await HandleAsync(game, twitch, chatCmd))
-            {
+                var session = game.GetSession(command.ChatMessage.Channel);
+                var argString = !string.IsNullOrEmpty(command.ArgumentsAsString) ? " (args: " + command.ArgumentsAsString + ")" : "";
+
+                var uid = command.ChatMessage.UserId;
+                var chatCmd = new TwitchCommand(command, userRoleManager.IsAdministrator(uid), userRoleManager.IsModerator(uid));
+
+                var key = chatCmd.Command.ToLower();
+
                 if (session != null)
-                    logger.LogDebug("[BOT] Twitch Command Recieved (SessionName: " + session.Name + " Command: " + key + argString + " From: " + command.ChatMessage.Username + ")");
-                else
-                    logger.LogDebug("[BOT] Twitch Command Recieved (Command: " + key + argString + " From: " + command.ChatMessage.Username + " Channel: " + command.ChatMessage.Channel +")");
+                {
+                    // add the user as part of this session
+                    session.Get(chatCmd.Sender);
+                }
 
-                return true;
+                if (await HandleAsync(game, twitch, chatCmd))
+                {
+                    if (session != null)
+                        logger.LogDebug("[BOT] Twitch Command Recieved (SessionName: " + session.Name + " Command: " + key + argString + " From: " + command.ChatMessage.Username + ")");
+                    else
+                        logger.LogDebug("[BOT] Twitch Command Recieved (Command: " + key + argString + " From: " + command.ChatMessage.Username + " Channel: " + command.ChatMessage.Channel + ")");
+
+                    return true;
+                }
+
+                return false;
             }
-
-            return false;
+            catch (Exception exc)
+            {
+                logger.LogError("[BOT] Error handling command (Command: " + command?.CommandText + " Exception: " + exc.ToString() + ")");
+                return false;
+            }
         }
 
         public async Task<bool> HandleAsync(IBotServer game, ITwitchCommandClient twitch, OnChannelPointsRewardRedeemedArgs reward)
@@ -132,7 +165,7 @@ namespace ROBot.Core.Twitch
                     processor = FindHandler(cmd);
                     if (processor == null)
                     {
-                        logger.LogDebug("[BOT] Unknown Reward - No Handler Found (Command: " + cmd + ")"); 
+                        logger.LogDebug("[BOT] Unknown Reward - No Handler Found (Command: " + cmd + ")");
                         //Not an Error, expected to sometimes see rewards unrelated to Ravenfall
                         return false;
                     }
@@ -174,28 +207,41 @@ namespace ROBot.Core.Twitch
             }
             catch (Exception exc)
             {
-                logger.LogError("[BOT] Exception Redeeming Reward  (Command: " + usedCommand + " Exception: " + exc.ToString() +")");
+                logger.LogError("[BOT] Exception Redeeming Reward  (Command: " + usedCommand + " Exception: " + exc.ToString() + ")");
                 return false;
             }
         }
 
+        public ITwitchCommandHandler GetHandler(string cmd)
+        {
+            return FindHandler(cmd);
+        }
+
         private async Task<bool> HandleAsync(IBotServer game, ITwitchCommandClient twitch, ICommand cmd)
         {
-            if (string.IsNullOrEmpty(cmd.Command))
+            try
             {
-                logger.LogInformation("[BOT] HandleAsync::Empty Command (From: " + cmd.Sender.Username + " Channel: " + cmd.Channel +")");
+                if (string.IsNullOrEmpty(cmd.Command))
+                {
+                    logger.LogInformation("[BOT] HandleAsync::Empty Command (From: " + cmd.Sender.Username + " Channel: " + cmd.Channel + ")");
+                    return false;
+                }
+
+                var handler = FindHandler(cmd.Command);
+                if (handler == null)
+                {
+                    //logger.LogInformation("HandleAsync::Unknown Command: " + cmd.Command + " - " + cmd.Arguments);
+                    return false;
+                }
+
+                await handler.HandleAsync(game, twitch, cmd);
+                return true;
+            }
+            catch (Exception exc)
+            {
+                logger.LogError("[BOT] Error handling command (Command: " + cmd + " Exception: " + exc.ToString() + ")");
                 return false;
             }
-
-            var handler = FindHandler(cmd.Command);
-            if (handler == null)
-            {
-                //logger.LogInformation("HandleAsync::Unknown Command: " + cmd.Command + " - " + cmd.Arguments);
-                return false;
-            }
-
-            await handler.HandleAsync(game, twitch, cmd);
-            return true;
         }
 
         private ITwitchCommandHandler FindHandler(string command)
