@@ -21,7 +21,7 @@ namespace ROBot
         private Shinobytes.Ravenfall.RavenNet.Core.ITimeoutHandle timeoutHandle;
         private bool disposed;
         private DateTime startedDateTime;
-        private long lastCmdCount;
+        private ulong lastCmdCount;
         private int highestDelta;
 
         public StreamBotApp(
@@ -80,7 +80,7 @@ namespace ROBot
         }
         private string GetCommandsPerSecond()
         {
-            var commandCount = twitch.GetCommandCount();
+            ulong commandCount = twitch.GetCommandCount();
             double secondsSinceStart = (DateTime.UtcNow - startedDateTime).TotalSeconds;
             double delta = commandCount - lastCmdCount;
             double csSinceStart = Math.Round(commandCount / secondsSinceStart, 2);
