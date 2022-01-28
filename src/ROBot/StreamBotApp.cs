@@ -6,6 +6,8 @@ using ROBot.Ravenfall;
 using System;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Threading.Tasks;
 
 namespace ROBot
 {
@@ -63,6 +65,7 @@ namespace ROBot
 
         private void UpdateTitle()
         {
+            var delay = canUpdateCmdTitle ? 1000 : 3000;
             try
             {
                 var title = "Ravenfall Centralized Bot ";
@@ -89,21 +92,29 @@ namespace ROBot
             }
             catch { }
 
-            this.timeoutHandle = this.kernel.SetTimeout(UpdateTitle, 1000);
+            this.timeoutHandle = this.kernel.SetTimeout(UpdateTitle, delay);
         }
 
         private async void SendDetailsToRavenNest()
         {
             try
             {
+                if (detailsDelayTimer > 0)
+                {
+                    await Task.Delay(detailsDelayTimer);
+                }
+
                 var json = Newtonsoft.Json.JsonConvert.SerializeObject(stats);
                 var statsData = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+                statsData.Headers.ContentType = new MediaTypeHeaderValue("application/json");
                 using (var www = new HttpClient())
-                using (var response = await www.PostAsync("https://www.ravenfall.stream/api/robot/stats", statsData))
-                //using (var response = await www.PostAsync("https://localhost:5001/api/robot/stats", statsData))
                 {
-                    response.EnsureSuccessStatusCode();
-                    detailsDelayTimer = 0;
+                    using (var response = await www.PostAsync("https://www.ravenfall.stream/api/robot/stats", statsData))
+                    //using (var response = await www.PostAsync("https://localhost:5001/api/robot/stats", statsData))
+                    {
+                        response.EnsureSuccessStatusCode();
+                        detailsDelayTimer = 0;
+                    }
                 }
             }
             catch
@@ -245,18 +256,19 @@ namespace ROBot
 
     public class BotStats
     {
-        public UInt32 CommandsPerSecondsMax;
-        public UInt32 JoinedChannelsCount;
-        public UInt32 UserCount;
-        public UInt32 ConnectionCount;
-        public UInt32 SessionCount;
+        public uint CommandsPerSecondsMax;
+        public uint JoinedChannelsCount;
+        public uint UserCount;
+        public uint ConnectionCount;
+        public uint SessionCount;
 
-        public UInt64 TotalCommandCount;
+        public ulong TotalCommandCount;
         public double CommandsPerSecondsDelta;
 
         public TimeSpan Uptime;
         public DateTime LastSessionStarted;
         public DateTime LastSessionEnded;
         public DateTime Started;
+        public DateTime LastUpdated;
     }
 }
