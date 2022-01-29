@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using ROBot.Core;
 using ROBot.Core.GameServer;
 using ROBot.Core.Twitch;
@@ -47,29 +46,6 @@ namespace ROBot
             sessionManager.SessionStarted += OnSessionStarted;
             sessionManager.SessionEnded += OnSessionEnded;
             sessionManager.SessionUpdated += OnSessionUpdated;
-
-            twitch.OnTwitchError += Twitch_OnTwitchError;
-            twitch.OnTwitchLog += Twitch_OnTwitchLog;
-        }
-
-        private void Twitch_OnTwitchLog(object sender, TwitchLib.Client.Events.OnLogArgs e)
-        {
-            try
-            {
-                stats.LastTwitchLibLogMessage = JsonConvert.SerializeObject(e);
-            }
-            catch { }
-        }
-
-        private void Twitch_OnTwitchError(object sender, TwitchLib.Communication.Events.OnErrorEventArgs e)
-        {
-            try
-            {
-                stats.TwitchLibErrorCount++;
-                stats.LastTwitchLibErrorMessage = e.Exception.ToString();
-                stats.LastTwitchLibError = DateTime.UtcNow;
-            }
-            catch { }
         }
 
         public void Run()
@@ -131,7 +107,7 @@ namespace ROBot
                 var json = Newtonsoft.Json.JsonConvert.SerializeObject(stats);
                 var statsData = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
                 statsData.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-                using var handler = new HttpClientHandler();
+                using (var handler = new HttpClientHandler())
                 {
                     handler.ClientCertificateOptions = ClientCertificateOption.Manual;
                     handler.ServerCertificateCustomValidationCallback = (httpRequestMessage, cert, cetChain, policyErrors) => true;
@@ -294,15 +270,10 @@ namespace ROBot
         public ulong TotalCommandCount;
         public double CommandsPerSecondsDelta;
 
-        public uint TwitchLibErrorCount;
-        public string LastTwitchLibErrorMessage;
-        public DateTime LastTwitchLibError;
-
-        public string LastTwitchLibLogMessage;
-
+        public TimeSpan Uptime;
         public DateTime LastSessionStarted;
         public DateTime LastSessionEnded;
         public DateTime Started;
-        public TimeSpan Uptime;
+        public DateTime LastUpdated;
     }
 }

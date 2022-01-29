@@ -167,6 +167,8 @@ namespace ROBot.Core.Twitch
                     }));
 
                 client.AutoReListenOnException = true;
+                client.OverrideBeingHostedCheck = true;
+
 
                 var credentials = credentialsProvider.Get();
 
@@ -339,7 +341,7 @@ namespace ROBot.Core.Twitch
                 return;
             }
 
-            if (currentlyJoiningChannels.TryGetValue(channel, out var isJoining) && (DateTime.UtcNow - isJoining) <= TimeSpan.FromSeconds(25))
+            if (currentlyJoiningChannels.TryGetValue(channel, out var isJoining) && (DateTime.UtcNow - isJoining) <= TimeSpan.FromSeconds(20))
             {
                 return;
             }

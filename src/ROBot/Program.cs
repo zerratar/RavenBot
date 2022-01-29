@@ -23,7 +23,7 @@ namespace ROBot
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
 
-            const int LogServerPort = 6767; 
+            const int LogServerPort = 6767;
             const int BotServerPort = 4041;
             const string ServerHost = "0.0.0.0";
 
