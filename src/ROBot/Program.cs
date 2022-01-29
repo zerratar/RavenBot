@@ -10,6 +10,7 @@ using RavenBot.Core.Twitch;
 using Shinobytes.Network;
 using RavenBot.Core.Ravenfall.Commands;
 using System.Net;
+using ROBot.Core.Stats;
 
 namespace ROBot
 {
@@ -61,6 +62,11 @@ namespace ROBot
 
             ioc.RegisterShared<ITwitchPubSubManager, TwitchPubSubManager>();
             ioc.RegisterShared<ITwitchPubSubTokenRepository, TwitchPubSubTokenRepository>();
+
+            //stats ... what the hell am I doing. Gawd.
+            object stats = new Stats();
+            ioc.RegisterCustomShared<IBotStats>(() => stats);
+            ioc.RegisterCustomShared<ITwitchStats>(() => stats);
 
 
             // Log extraction
