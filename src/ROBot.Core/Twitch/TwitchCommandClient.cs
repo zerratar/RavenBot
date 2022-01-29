@@ -34,9 +34,6 @@ namespace ROBot.Core.Twitch
         private readonly ITwitchPubSubManager pubSubManager;
         private IMessageBusSubscription broadcastSubscription;
 
-        //private readonly ConcurrentQueue<Tuple<string, string>> chatMessageQueue
-        //    = new ConcurrentQueue<Tuple<string, string>>();
-
         private readonly ConcurrentDictionary<string, ConcurrentQueue<string>> chatMessageQueue
                  = new ConcurrentDictionary<string, ConcurrentQueue<string>>();
 
@@ -51,7 +48,6 @@ namespace ROBot.Core.Twitch
         private readonly HashSet<string> suspendedChannels = new HashSet<string>();
 
         private TwitchClient client;
-        private bool isInitialized;
         private int reconnectDelay = 10000;
         private bool allowReconnection = true;
         private bool disposed;
@@ -62,7 +58,8 @@ namespace ROBot.Core.Twitch
         //private long connectionCurrentErrorCount = 0;
         //private long connectionCurrentAttemptCount = 0;
         private bool attemptingReconnection = false;
-
+        public event EventHandler<TwitchLib.Client.Events.OnLogArgs> OnTwitchLog;
+        public event EventHandler<TwitchLib.Communication.Events.OnErrorEventArgs> OnTwitchError;
         private TwitchStats stats = new TwitchStats();
 
         public TwitchCommandClient(
@@ -85,8 +82,7 @@ namespace ROBot.Core.Twitch
             this.pubSubManager = pubSubManager;
 
             this.messageBus.Subscribe<PubSubToken>("pubsub", OnPubSubTokenReceived);
-
-            CreateTwitchClient();
+            this.broadcastSubscription = messageBus.Subscribe<IGameSessionCommand>(MessageBus.Broadcast, Broadcast);
         }
 
         /*
@@ -153,38 +149,37 @@ namespace ROBot.Core.Twitch
             pubSubManager.OnListenFailBadAuth -= Pubsub_OnListenFailBadAuth;
         }
 
-        private void EnsureInitialized()
-        {
-            if (isInitialized) return;
-            if (this.broadcastSubscription == null)
-                this.broadcastSubscription = messageBus.Subscribe<IGameSessionCommand>(MessageBus.Broadcast, Broadcast);
-
-            var credentials = credentialsProvider.Get();
-            client.Initialize(credentials);
-
-            isInitialized = true;
-
-            Subscribe();
-        }
-
-        private void CreateTwitchClient()
-        {
-            isInitialized = false;
-            client = new TwitchClient(new TcpClient(new ClientOptions { ClientType = ClientType.Chat }), TwitchLib.Client.Enums.ClientProtocol.TCP)
-            {
-                AutoReListenOnException = true,
-                OverrideBeingHostedCheck = true //Override if BeingHosted - https://swiftyspiffy.com/TwitchLib/Client/class_twitch_lib_1_1_client_1_1_twitch_client.html#a5705479689fa4c440e38d62b5d50660e
-            };
-            client.OnLog += Client_OnLog;
-            client.OnError += Client_OnError;
-        }
 
         public void Start()
         {
             if (!kernel.Started) kernel.Start();
-            EnsureInitialized();
-            if (client.IsConnected)
+
+            Unsubscribe();
+
+            try
+            {
+                client = //new TwitchClient(new TcpClient(new ClientOptions { ClientType = ClientType.Chat }), TwitchLib.Client.Enums.ClientProtocol.TCP);
+                    new TwitchClient(new WebSocketClient(new ClientOptions
+                    {
+                        ClientType = ClientType.Chat,
+                        MessagesAllowedInPeriod = 750,
+                        ThrottlingPeriod = TimeSpan.FromSeconds(30)
+                    }));
+
+                client.AutoReListenOnException = true;
+
+                var credentials = credentialsProvider.Get();
+
+                client.Initialize(credentials);
+
+                Subscribe();
+
                 client.Connect();
+            }
+            catch (Exception exc)
+            {
+                logger.LogError("[TWITCH] Unable to start Twitch Bot: " + exc);
+            }
         }
 
         public void Stop()

@@ -1,10 +1,14 @@
 ﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using ROBot.Core;
 using ROBot.Core.GameServer;
 using ROBot.Core.Twitch;
 using ROBot.Ravenfall;
 using System;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Threading.Tasks;
 
 namespace ROBot
 {
@@ -13,6 +17,7 @@ namespace ROBot
 
     public class StreamBotApp : IStreamBotApplication
     {
+        private readonly BotStats stats = new BotStats();
         private readonly Microsoft.Extensions.Logging.ILogger logger;
         private readonly Shinobytes.Ravenfall.RavenNet.Core.IKernel kernel;
         private readonly IGameSessionManager sessionManager;
@@ -23,6 +28,8 @@ namespace ROBot
         private DateTime startedDateTime;
         private ulong lastCmdCount;
         private int highestDelta;
+        private int detailsDelayTimer;
+        private bool canUpdateCmdTitle = true;
 
         public StreamBotApp(
             Microsoft.Extensions.Logging.ILogger logger,
@@ -40,11 +47,34 @@ namespace ROBot
             sessionManager.SessionStarted += OnSessionStarted;
             sessionManager.SessionEnded += OnSessionEnded;
             sessionManager.SessionUpdated += OnSessionUpdated;
+
+            twitch.OnTwitchError += Twitch_OnTwitchError;
+            twitch.OnTwitchLog += Twitch_OnTwitchLog;
+        }
+
+        private void Twitch_OnTwitchLog(object sender, TwitchLib.Client.Events.OnLogArgs e)
+        {
+            try
+            {
+                stats.LastTwitchLibLogMessage = JsonConvert.SerializeObject(e);
+            }
+            catch { }
+        }
+
+        private void Twitch_OnTwitchError(object sender, TwitchLib.Communication.Events.OnErrorEventArgs e)
+        {
+            try
+            {
+                stats.TwitchLibErrorCount++;
+                stats.LastTwitchLibErrorMessage = e.Exception.ToString();
+                stats.LastTwitchLibError = DateTime.UtcNow;
+            }
+            catch { }
         }
 
         public void Run()
         {
-            this.startedDateTime = DateTime.UtcNow;
+            stats.Started = this.startedDateTime = DateTime.UtcNow;
 
             logger.LogInformation("[BOT] Application Started");
 
@@ -59,6 +89,7 @@ namespace ROBot
 
         private void UpdateTitle()
         {
+            var delay = canUpdateCmdTitle ? 1000 : 3000;
             try
             {
                 var title = "Ravenfall Centralized Bot ";
@@ -69,15 +100,63 @@ namespace ROBot
                 title += GetJoinedChannelCount();
                 title += GetTrackedPlayerCount();
                 title += GetCommandsPerSecond();
+                if (this.disposed || !canUpdateCmdTitle) return;
                 Console.Title = title;
-                if (this.disposed) { return; }
-                this.timeoutHandle = this.kernel.SetTimeout(UpdateTitle, 1000);
+                // Ping RavenNest with details.
             }
             catch
             {
+                canUpdateCmdTitle = false;
                 // Setting title on th is platform probably not supported.
             }
+
+            try
+            {
+                SendDetailsToRavenNest();
+            }
+            catch { }
+
+            this.timeoutHandle = this.kernel.SetTimeout(UpdateTitle, delay);
         }
+
+        private async void SendDetailsToRavenNest()
+        {
+            try
+            {
+                if (detailsDelayTimer > 0)
+                {
+                    await Task.Delay(detailsDelayTimer);
+                }
+
+                var json = Newtonsoft.Json.JsonConvert.SerializeObject(stats);
+                var statsData = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+                statsData.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                using var handler = new HttpClientHandler();
+                {
+                    handler.ClientCertificateOptions = ClientCertificateOption.Manual;
+                    handler.ServerCertificateCustomValidationCallback = (httpRequestMessage, cert, cetChain, policyErrors) => true;
+                    using (var www = new HttpClient(handler))
+                    using (var response = await www.PostAsync("https://www.ravenfall.stream/api/robot/stats", statsData))
+                    //using (var response = await www.PostAsync("https://localhost:5001/api/robot/stats", statsData))
+                    {
+                        response.EnsureSuccessStatusCode();
+                        detailsDelayTimer = 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Unable to send it to RavenNest. Next try should be delayed.
+                detailsDelayTimer += 3000;
+                if (detailsDelayTimer >= 30_000)
+                {
+                    detailsDelayTimer = 30_000;
+                }
+
+                logger.LogError("[BOT] Unable to send Details to RavenNest: " + ex);
+            }
+        }
+
         private string GetCommandsPerSecond()
         {
             ulong commandCount = twitch.GetCommandCount();
@@ -94,6 +173,10 @@ namespace ROBot
                 highestDelta = (int)delta;
             }
 
+            stats.TotalCommandCount = (UInt64)commandCount;
+            stats.CommandsPerSecondsDelta = delta;
+            stats.CommandsPerSecondsMax = (UInt32)highestDelta;
+
             lastCmdCount = commandCount;
             return "[Total: " + commandCount + " C/S: " + delta + " Hi: " + highestDelta + "] ";
         }
@@ -101,44 +184,33 @@ namespace ROBot
         private string GetTrackedPlayerCount()
         {
             var sessions = sessionManager.All();
-            var userCount = 0;
+
             if (sessions.Count > 0)
             {
-                userCount = sessions.Sum(x => x.UserCount);
+                stats.UserCount = (UInt32)sessions.Sum(x => x.UserCount);
             }
 
-            return "[Players: " + userCount + "] ";
+            return "[Players: " + stats.UserCount + "] ";
         }
 
         private string GetJoinedChannelCount()
         {
-            var sessionCount = twitch.JoinedChannels().Count;
-            return "[Joined: " + sessionCount + "] ";
+            stats.JoinedChannelsCount = (UInt32)twitch.JoinedChannels().Count;
+
+            return "[Joined: " + stats.JoinedChannelsCount + "] ";
         }
 
         private string GetSessionsAndConnections()
         {
-            var connectionCount = botServer.AllConnections().Count;
-            var sessionCount = sessionManager.All().Count;
-            return "[Clients: " + sessionCount + "/" + connectionCount + "] ";
-        }
-
-        private string GetConnectionsCount()
-        {
-            var sessionCount = botServer.AllConnections().Count;
-            return "[Connections: " + sessionCount + "] ";
-        }
-
-        private string GetSessionCount()
-        {
-            var sessionCount = sessionManager.All().Count;
-            return "[Sessions: " + sessionCount + "] ";
+            stats.ConnectionCount = (UInt32)botServer.AllConnections().Count;
+            stats.SessionCount = (UInt32)sessionManager.All().Count;
+            return "[Clients: " + stats.SessionCount + "/" + stats.ConnectionCount + "] ";
         }
 
         private string GetUptime()
         {
-            var elapsed = DateTime.UtcNow - startedDateTime;
-            return "[Uptime: " + FormatTimeSpan(elapsed) + "] ";
+            stats.Uptime = DateTime.UtcNow - startedDateTime;
+            return "[Uptime: " + FormatTimeSpan(stats.Uptime) + "] ";
         }
 
         private string FormatTimeSpan(TimeSpan elapsed)
@@ -200,12 +272,37 @@ namespace ROBot
         {
             logger.LogDebug("[RVNFLL] Game Session Started (Name:" + session.Name + ")");
             twitch.JoinChannel(session.Name);
+            stats.LastSessionStarted = DateTime.UtcNow;
         }
 
         private void OnSessionEnded(object sender, IGameSession session)
         {
             logger.LogDebug("[RVNFLL] Game Session Ended (Name: " + session.Name + ")");
             twitch.LeaveChannel(session.Name);
+            stats.LastSessionEnded = DateTime.UtcNow;
         }
+    }
+
+    public class BotStats
+    {
+        public uint CommandsPerSecondsMax;
+        public uint JoinedChannelsCount;
+        public uint UserCount;
+        public uint ConnectionCount;
+        public uint SessionCount;
+
+        public ulong TotalCommandCount;
+        public double CommandsPerSecondsDelta;
+
+        public uint TwitchLibErrorCount;
+        public string LastTwitchLibErrorMessage;
+        public DateTime LastTwitchLibError;
+
+        public string LastTwitchLibLogMessage;
+
+        public DateTime LastSessionStarted;
+        public DateTime LastSessionEnded;
+        public DateTime Started;
+        public TimeSpan Uptime;
     }
 }

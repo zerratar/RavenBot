@@ -1,11 +1,16 @@
 ﻿using ROBot.Core.Twitch;
 using System.Collections.Generic;
+using TwitchLib.Client.Events;
 using TwitchLib.Client.Models;
+using TwitchLib.Communication.Events;
 
 namespace ROBot.Tests
 {
     public class MockTwitchCommandClient : ITwitchCommandClient
     {
+        public event System.EventHandler<OnLogArgs> OnTwitchLog;
+        public event System.EventHandler<OnErrorEventArgs> OnTwitchError;
+
         public void Broadcast(IGameSessionCommand message)
         {
         }

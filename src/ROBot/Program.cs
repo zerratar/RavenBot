@@ -9,6 +9,7 @@ using IAppSettings = ROBot.Core.IAppSettings;
 using RavenBot.Core.Twitch;
 using Shinobytes.Network;
 using RavenBot.Core.Ravenfall.Commands;
+using System.Net;
 
 namespace ROBot
 {
@@ -20,8 +21,9 @@ namespace ROBot
         {
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomain_ProcessExit);
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
 
-            const int LogServerPort = 6767;
+            const int LogServerPort = 6767; 
             const int BotServerPort = 4041;
             const string ServerHost = "0.0.0.0";
 

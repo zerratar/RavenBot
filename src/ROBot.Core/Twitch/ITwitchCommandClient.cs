@@ -17,5 +17,8 @@ namespace ROBot.Core.Twitch
         IReadOnlyList<TwitchLib.Client.Models.JoinedChannel> JoinedChannels();
         ulong GetCommandCount();
         ulong GetMessageCount();
+
+        event EventHandler<TwitchLib.Client.Events.OnLogArgs> OnTwitchLog;
+        event EventHandler<TwitchLib.Communication.Events.OnErrorEventArgs> OnTwitchError;
     }
 }
