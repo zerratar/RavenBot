@@ -1,24 +1,32 @@
 ﻿using System;
 
-namespace ROBot
+namespace ROBot.Core.Stats
 {
     public interface IBotStats
     {
-        double CommandsPerSecondsDelta { get; set; }
-        uint CommandsPerSecondsMax { get; set; }
+        double CommandsPerSecondsDelta { get; }
+        uint CommandsPerSecondsMax { get; }
         uint ConnectionCount { get; set; }
-        uint JoinedChannelsCount { get; set; }
+        uint JoinedChannelsCount { get; }
         DateTime LastSessionEnded { get; set; }
         DateTime LastSessionStarted { get; set; }
-        DateTime LastTwitchLibError { get; set; }
-        string LastTwitchLibErrorMessage { get; set; }
-        string LastTwitchLibLogMessage { get; set; }
-        DateTime LastUpdated { get; set; }
+        DateTime LastTwitchLibError { get; }
+        string LastTwitchLibErrorMessage { get; }
+        DateTime LastRecievedLog { get; }
+        string LastTwitchLibLogMessage { get; }
+        DateTime LastRecievedRateLimitedLog { get; }
+        string LastRecievedRateLimitedMsg { get; }
+        DateTime LastUpdated { get; }
         uint SessionCount { get; set; }
         DateTime Started { get; set; }
-        ulong TotalCommandCount { get; set; }
-        ulong TwitchLibErrorCount { get; set; }
-        TimeSpan Uptime { get; set; }
+        ulong TotalCommandCount { get; }
+        ulong TwitchLibErrorCount { get; }
+        TimeSpan Uptime { get; }
         uint UserCount { get; set; }
+        System.Collections.Generic.IReadOnlyList<TwitchLib.Client.Models.JoinedChannel> ListOfCurrentlyJoinedChannel { get; }
+        string UserLastChannelJoined { get; }
+        string UserLastChannelLeft { get; }
+        TimeSpan AvgMsgDelay { get; }
+
     }
 }

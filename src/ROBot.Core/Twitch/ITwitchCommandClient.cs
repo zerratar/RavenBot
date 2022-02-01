@@ -14,8 +14,5 @@ namespace ROBot.Core.Twitch
         void JoinChannel(string channel);
         void LeaveChannel(string channel);
         bool InChannel(string name);
-        IReadOnlyList<TwitchLib.Client.Models.JoinedChannel> JoinedChannels();
-        ulong GetCommandCount();
-        ulong GetMessageCount();
     }
 }

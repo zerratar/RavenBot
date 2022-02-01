@@ -92,7 +92,6 @@ namespace ROBot.Core.Twitch
             //Twitch Connection events            
             client.OnConnected += OnConnected;
             client.OnConnectionError += OnConnectionError;
-            client.OnReconnected += OnReconnected;
             client.OnDisconnected += OnDisconnected;
             //in channel events
             client.OnChatCommandReceived += OnCommandReceived;
@@ -142,12 +141,9 @@ namespace ROBot.Core.Twitch
                 client.OnJoinedChannel -= Client_OnJoinedChannel;
                 client.OnLeftChannel -= Client_OnLeftChannel;
                 client.OnConnectionError -= OnConnectionError;
-
                 client.OnMessageSent -= Client_OnMessageSent;
                 client.OnUserStateChanged -= Client_OnUserStateChanged;
-                client.OnRateLimit -= Client_OnRateLimit;
-
-                
+                client.OnRateLimit -= Client_OnRateLimit;                
             }
             if (pubSubManager != null)
             {
@@ -272,7 +268,15 @@ namespace ROBot.Core.Twitch
 
             this.attemptingReconnection = true;
             logger.LogWarning($"[TWITCH] Reconnecting (wasConnected: " + wasConnected + " Attempt: " + stats.TwitchConnectionCurrentAttempt + ")");
-            client.Connect(); //Rather than restarting the whole process, will just redo a connection
+
+            if((stats.TwitchConnectionCurrentAttempt % 10) != 0)
+            {
+                client.Connect(); //Rather than restarting the whole process, will just redo a connection
+            } else
+            {
+                Start(); //Restart Process every 10 tries to see if this fix any connection issues
+            }
+            
         }
         private async void TestingConnection() //Start timer to test for connection
         {
@@ -363,6 +367,7 @@ namespace ROBot.Core.Twitch
                     }
 
                     logger.LogDebug("[TWITCH] Joining Channel (Channel: " + channel + " Rejoin: " + newChannel + ")");
+                    stats.AddChAttempt();
                     client.JoinChannel(channel);
                     pubSubManager.PubSubConnect(channel);
                 }
@@ -403,10 +408,6 @@ namespace ROBot.Core.Twitch
 
             pubSubManager.Disconnect(channel);
             client.LeaveChannel(channel);
-        }
-        public IReadOnlyList<TwitchLib.Client.Models.JoinedChannel> JoinedChannels()
-        {
-            return client.JoinedChannels;
         }
         public bool InChannel(string channel)
         {
@@ -617,6 +618,7 @@ namespace ROBot.Core.Twitch
 
         private void Client_OnRateLimit(object sender, OnRateLimitArgs e)
         {
+            stats.AddLastRateLimit(e);
             logger.LogError("[TWITCH] RateLimited (OnRateLimitArgs: " + e.ToString() + ")");
         }
 
@@ -627,14 +629,12 @@ namespace ROBot.Core.Twitch
             this.hasConnectionError = false;
             stats.AddTwitchSuccess();
             stats.ResetTwitchAttempt();
-
             RejoinChannels();
-
         }
 
         private async void OnFailureToReceiveJoinConfirmation(object sender, OnFailureToReceiveJoinConfirmationArgs e)
         {
-            stats.AddChDisconnect();
+            stats.AddChError();
             var err = "";
             if (!string.IsNullOrEmpty(e.Exception.Details))
             {
@@ -661,10 +661,6 @@ namespace ROBot.Core.Twitch
             JoinChannel(e.Exception.Channel);
         }
 
-        private void OnReconnected(object sender, OnReconnectedEventArgs e)
-        {
-        }
-
         private void OnRaidNotification(object sender, OnRaidNotificationArgs e)
         {
         }
@@ -674,26 +670,29 @@ namespace ROBot.Core.Twitch
             if (e == null)
                 return;
             if (e.Data.StartsWith("Received:"))
-                stats.ReceivedLog();
-            logger.LogDebug("[TWITCH] onLog (Log: " + e.Data + ")");
+                stats.ReceivedLog(e);
+            //logger.LogDebug("[TWITCH] onLog (Log: " + e.Data + ")");
         }
 
         private void OnError(object sender, OnErrorEventArgs e)
         {
             logger.LogError("[TWITCH] onError (Error: " + e.ToString() + ")");
+            stats.AddTwitchError(e);
         }
 
         private void OnConnectionError(object sender, OnConnectionErrorArgs e)
         {
             logger.LogError("[TWITCH] OnConnectionError (Error: " + e.Error.Message + ")");
-            stats.AddTwitchError();
+            stats.AddTwitchError(e);
             this.hasConnectionError = true;
             isConnectedToTwitch = false;
+
+            //TODO: Certain errors may require differnet actions - (example bad certs)
         }
 
         private void Client_OnLeftChannel(object sender, OnLeftChannelArgs e)
         {
-            stats.LeftChannel(e.Channel);
+            stats.LeftChannel(e.Channel, client.JoinedChannels);
             logger.LogWarning("[TWITCH] Left Channel (Channel: " + e.Channel + ")");
 
             currentlyJoiningChannels.TryRemove(e.Channel, out _);
@@ -701,7 +700,7 @@ namespace ROBot.Core.Twitch
 
         private void Client_OnJoinedChannel(object sender, OnJoinedChannelArgs e)
         {
-            stats.JoinedChannel(e.Channel);
+            stats.JoinedChannel(e.Channel, client.JoinedChannels);
             logger.LogInformation("[TWITCH] Joined (Channel: " + e.Channel + ")");
             if (chatMessageQueue.TryGetValue(e.Channel, out var queue))
             {
@@ -728,18 +727,6 @@ namespace ROBot.Core.Twitch
             //logger.LogDebug("[TWITCH] Auth Failed - (TODO SEND WHISPER) Whisper sent (Name: " + client.getChannel() + ")");
         }
 
-        /*
-         * Statistics
-         */
-        public ulong GetCommandCount()
-        {
-            return stats.UserCommandCount;
-        }
-        public ulong GetMessageCount()
-        {
-            return stats.UserMsgCount;
-        }
-        
     }
 }
 

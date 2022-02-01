@@ -29,16 +29,6 @@ namespace ROBot.Tests
         {
         }
 
-        public long GetCommandCount()
-        {
-            return 0;
-        }
-
-        public long GetMessageCount()
-        {
-            return 0;
-        }
-
         public bool InChannel(string name)
         {
             return true;
@@ -47,12 +37,6 @@ namespace ROBot.Tests
         public void JoinChannel(string channel)
         {
         }
-
-        public IReadOnlyList<JoinedChannel> JoinedChannels()
-        {
-            return new List<JoinedChannel>();
-        }
-
         public void LeaveChannel(string channel)
         {
         }

@@ -26,9 +26,6 @@ namespace ROBot
         private readonly ITwitchCommandClient twitch;
         private Shinobytes.Ravenfall.RavenNet.Core.ITimeoutHandle timeoutHandle;
         private bool disposed;
-        private DateTime startedDateTime;
-        private ulong lastCmdCount;
-        private int highestDelta;
         private int detailsDelayTimer;
         private bool canUpdateCmdTitle = true;
 
@@ -55,7 +52,7 @@ namespace ROBot
 
         public void Run()
         {
-            botStats.Started = this.startedDateTime = DateTime.UtcNow;
+            botStats.Started = DateTime.UtcNow;
 
             logger.LogInformation("[BOT] Application Started");
 
@@ -110,7 +107,6 @@ namespace ROBot
                 }
 
                 var json = Newtonsoft.Json.JsonConvert.SerializeObject(botStats);
-                logger.LogInformation(json.ToString());
                 var statsData = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
                 statsData.Headers.ContentType = new MediaTypeHeaderValue("application/json");
                 using var handler = new HttpClientHandler();
@@ -141,26 +137,7 @@ namespace ROBot
 
         private string GetCommandsPerSecond()
         {
-            var commandCount = twitch.GetCommandCount();
-            double secondsSinceStart = (DateTime.UtcNow - startedDateTime).TotalSeconds;
-            double delta = commandCount - lastCmdCount;
-            double csSinceStart = Math.Round(commandCount / secondsSinceStart, 2);
-            if (delta < csSinceStart)
-            {
-                delta = csSinceStart;
-            }
-
-            if (delta > highestDelta)
-            {
-                highestDelta = (int)delta;
-            }
-
-            botStats.TotalCommandCount = (UInt64)commandCount;
-            botStats.CommandsPerSecondsDelta = delta;
-            botStats.CommandsPerSecondsMax = (UInt32)highestDelta;
-
-            lastCmdCount = commandCount;
-            return "[Total: " + commandCount + " C/S: " + delta + " Hi: " + highestDelta + "] ";
+            return "[Total: " + botStats.TotalCommandCount + " C/S: " + botStats.CommandsPerSecondsDelta + " Hi: " + botStats.CommandsPerSecondsMax + "] ";
         }
 
         private string GetTrackedPlayerCount()
@@ -177,8 +154,6 @@ namespace ROBot
 
         private string GetJoinedChannelCount()
         {
-            botStats.JoinedChannelsCount = (UInt32)twitch.JoinedChannels().Count;
-
             return "[Joined: " + botStats.JoinedChannelsCount + "] ";
         }
 
@@ -191,7 +166,6 @@ namespace ROBot
 
         private string GetUptime()
         {
-            botStats.Uptime = DateTime.UtcNow - startedDateTime;
             return "[Uptime: " + FormatTimeSpan(botStats.Uptime) + "] ";
         }
 
