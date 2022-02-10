@@ -255,12 +255,12 @@ namespace ROBot.Core.GameServer
         public Task AcceptDuelRequestAsync(Player player) => SendAsync("duel_accept", player);
         public Task DeclineDuelRequestAsync(Player player) => SendAsync("duel_decline", player);
         public Task PlayerCountAsync(Player player) => SendAsync("player_count", player);
-        public Task JoinRaidAsync(Player player) => SendAsync("raid_join", player);
+        public Task JoinRaidAsync(EventJoinRequest player) => SendAsync("raid_join", player);
         public Task StopRaidAsync(Player player) => SendAsync("raid_stop", player);
         public Task RaidStartAsync(Player player) => SendAsync("raid_force", player);
         public Task DungeonStartAsync(Player player) => SendAsync("dungeon_force", player);
         public Task StopDungeonAsync(Player player) => SendAsync("dungeon_stop", player);
-        public Task JoinDungeonAsync(Player player) => SendAsync("dungeon_join", player);
+        public Task JoinDungeonAsync(EventJoinRequest player) => SendAsync("dungeon_join", player);
         public Task ReloadGameAsync(Player player) => SendAsync("reload", player);
         public Task GetMaxMultiplierAsync(Player player) => SendAsync("multiplier", player);
         public Task EquipAsync(Player player, string pet) => SendAsync("equip", new ItemQueryRequest(player, pet));

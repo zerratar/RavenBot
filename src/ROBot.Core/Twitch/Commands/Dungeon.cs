@@ -1,4 +1,5 @@
 ﻿using RavenBot.Core.Handlers;
+using RavenBot.Core.Ravenfall.Models;
 using ROBot.Core.GameServer;
 using System.Threading.Tasks;
 
@@ -19,7 +20,7 @@ namespace ROBot.Core.Twitch.Commands
 
                     if (string.IsNullOrEmpty(cmd.Arguments))
                     {
-                        await connection.JoinDungeonAsync(player);
+                        await connection.JoinDungeonAsync(new EventJoinRequest(player, null));
                         return;
                     }
                     else if (cmd.Arguments.Contains("stop", System.StringComparison.OrdinalIgnoreCase))

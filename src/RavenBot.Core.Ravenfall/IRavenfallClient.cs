@@ -45,11 +45,11 @@ namespace RavenBot.Core.Ravenfall
         Task GetMaxMultiplierAsync(Player player);
         Task GetVillageBoostAsync(Player player);
         Task SetAllVillageHutsAsync(Player player, string skill);
-        Task JoinRaidAsync(Player player);
+        Task JoinRaidAsync(EventJoinRequest player);
         Task StopRaidAsync(Player player);
         Task RaidStartAsync(Player player);
         Task DungeonStartAsync(Player player);
-        Task JoinDungeonAsync(Player player);
+        Task JoinDungeonAsync(EventJoinRequest player);
         Task StopDungeonAsync(Player player);
         Task CraftRequirementAsync(Player player, string itemName);
         Task RequestIslandInfoAsync(Player player);

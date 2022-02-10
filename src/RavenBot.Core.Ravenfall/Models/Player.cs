@@ -45,4 +45,19 @@ namespace RavenBot.Core.Ravenfall.Models
         public int SubTier { get; set; }
         public string Identifier { get; set; }
     }
+
+
+    public class EventJoinRequest
+    {
+        public EventJoinRequest(
+            Player player,
+            string code)
+        {
+            Player = player;
+            Code = code;
+        }
+
+        public Player Player { get; }
+        public string Code { get; }
+    }
 }

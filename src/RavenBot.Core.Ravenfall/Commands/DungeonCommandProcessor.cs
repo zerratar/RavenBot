@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using RavenBot.Core.Handlers;
+using RavenBot.Core.Ravenfall.Models;
 using TwitchLib.Api.Core.Models.Undocumented.TwitchPrimeOffers;
 
 namespace RavenBot.Core.Ravenfall.Commands
@@ -25,22 +26,25 @@ namespace RavenBot.Core.Ravenfall.Commands
 
             var player = playerProvider.Get(cmd.Sender);
 
-
             if (string.IsNullOrEmpty(cmd.Arguments))
             {
-                await this.game.JoinDungeonAsync(player);
+                await this.game.JoinDungeonAsync(new EventJoinRequest(player, null));
                 return;
             }
             else if (cmd.Arguments.Contains("stop", System.StringComparison.OrdinalIgnoreCase))
             {
                 if (player.IsBroadcaster || player.IsModerator)
                 {
-                    await this.game.StopDungeonAsync(player);                    
+                    await this.game.StopDungeonAsync(player);
                 }
+            }
+            else if (cmd.Arguments.Contains("start", System.StringComparison.OrdinalIgnoreCase))
+            {
+                await this.game.DungeonStartAsync(player);
             }
             else
             {
-                await this.game.DungeonStartAsync(player);
+                await this.game.JoinDungeonAsync(new EventJoinRequest(player, cmd.Arguments));
             }
         }
     }

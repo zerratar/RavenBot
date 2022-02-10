@@ -1,5 +1,6 @@
 ﻿using RavenBot.Core.Handlers;
 using RavenBot.Core.Ravenfall.Commands;
+using RavenBot.Core.Ravenfall.Models;
 using ROBot.Core.GameServer;
 using System;
 using System.Threading.Tasks;
@@ -26,7 +27,7 @@ namespace ROBot.Core.Twitch.Commands
                             return;
                         }
 
-                        await connection.JoinRaidAsync(player);
+                        await connection.JoinRaidAsync(new EventJoinRequest(player, null));
                         return;
                     }
 

@@ -167,6 +167,11 @@ namespace ROBot.Tests
             return Task.CompletedTask;
         }
 
+        public Task JoinDungeonAsync(EventJoinRequest player)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task JoinOnsenAsync(Player player)
         {
             return Task.CompletedTask;
@@ -175,6 +180,11 @@ namespace ROBot.Tests
         public Task JoinRaidAsync(Player player)
         {
             return Task.CompletedTask;
+        }
+
+        public Task JoinRaidAsync(EventJoinRequest player)
+        {
+            throw new NotImplementedException();
         }
 
         public Task KickAsync(Player targetPlayer)
