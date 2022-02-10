@@ -72,6 +72,7 @@ namespace RavenBot.Core.Twitch
             bool isVip,
             int bits)
         {
+            Channel = channel;
             UserId = userId;
             UserName = userName;
             IsModerator = isModerator;

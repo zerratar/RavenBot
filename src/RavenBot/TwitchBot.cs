@@ -249,7 +249,7 @@ namespace RavenBot
                     e.ReSubscriber.Months,
                     false));
 
-            this.Broadcast("", Localization.Twitch.THANK_YOU_RESUB, e.ReSubscriber.DisplayName);
+            //this.Broadcast("", Localization.Twitch.THANK_YOU_RESUB, e.ReSubscriber.DisplayName);
         }
 
         private void OnNewSub(object sender, OnNewSubscriberArgs e)
@@ -265,7 +265,7 @@ namespace RavenBot
                     e.Subscriber.IsSubscriber,
                     1, true));
 
-            this.Broadcast("", Localization.Twitch.THANK_YOU_SUB, e.Subscriber.DisplayName);
+            //this.Broadcast("", Localization.Twitch.THANK_YOU_SUB, e.Subscriber.DisplayName);
         }
 
         private void OnPrimeSub(object sender, OnCommunitySubscriptionArgs e)
@@ -281,7 +281,7 @@ namespace RavenBot
                     e.GiftedSubscription.IsSubscriber,
                     1, false));
 
-            this.Broadcast("", Localization.Twitch.THANK_YOU_SUB, e.GiftedSubscription.DisplayName);
+            //this.Broadcast("", Localization.Twitch.THANK_YOU_SUB, e.GiftedSubscription.DisplayName);
         }
 
         private void OnGiftedSub(object sender, OnGiftedSubscriptionArgs e)
@@ -297,7 +297,7 @@ namespace RavenBot
                 e.GiftedSubscription.IsSubscriber,
                 1,
                 false));
-            this.Broadcast("", Localization.Twitch.THANK_YOU_GIFT_SUB, e.GiftedSubscription.DisplayName);
+            //this.Broadcast("", Localization.Twitch.THANK_YOU_GIFT_SUB, e.GiftedSubscription.DisplayName);
         }
 
         private void OnDisconnected(object sender, OnDisconnectedEventArgs e)
