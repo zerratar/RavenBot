@@ -3,6 +3,7 @@ using ROBot.Core.Extensions;
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using TwitchLib.Client.Events;
 using TwitchLib.Client.Models;
 using TwitchLib.Communication.Events;
@@ -12,34 +13,17 @@ namespace ROBot.Core.Stats
     public class Stats : ITwitchStats, IBotStats
     {
         //Fields
-        //Twitch Connection Stats
-        private ulong _twitchConnectionTotalErrorCount = 0;
-        private ulong _twitchConnectionTotalAttempt = 0;
-        private ulong _twitchConnectionTotalSuccess = 0;
-        private ulong _twitchConnectionTotalDisconnect = 0;
-        private ulong _twitchConnectionCurrentAttempt = 0;
-        private ulong _twitchConnectionCurrentErrorCount = 0;
-        private ulong _twitchConnectionReconnectCount = 0;
-
         //Twitch User Channel Connection Stats
-        private ulong _userChConnectionErrorCount = 0;
-        private ulong _userChConnectionTotalErrorCount = 0;
-        private ulong _userChConnectionDisconnectCount = 0;
-        private ulong _userChConnectionTotalDisconnectCount = 0;
-        private ulong _userChConnectionSucesssCount = 0;
-        private ulong _userChConnectionTotalSucesssCount = 0;
         private ulong _userChConnectionAttempt = 0;
-        private string _userLastChannelJoined;
-        private string _userLastChannelLeft;
         private System.Collections.Generic.IReadOnlyList<JoinedChannel> _listOfCurrentlyJoinedChannel; //list of joined channels, as reported from twitch
 
         //Message Sent/Confirmed Stats
         private ulong _msgSendCount = 0; //Bot sent message
         private ulong _msgSentCount = 0; //Bot Successful Message Sent
         private double _oldMsgOffSet = 30; //Time in seconds when to assume message is lost
-        private ConcurrentDictionary<object, DateTime> msgTimes = new ConcurrentDictionary<object, DateTime>(); //list of Messages being tracked
-        private ConcurrentQueue<TimeSpan> listMsgDelay = new ConcurrentQueue<TimeSpan>(); //list of timespan on time sent to time of confirmed sent
-        
+        private readonly ConcurrentDictionary<string, DateTime> msgTimes = new ConcurrentDictionary<string, DateTime>(); //list of Messages being tracked
+        private readonly ConcurrentQueue<TimeSpan> listMsgDelay = new ConcurrentQueue<TimeSpan>(); //list of timespan on time sent to time of confirmed sent
+
         //Logs and Errors
         private DateTime _lastTwitchLibLog;
         private string _lastTwitchLibLogMessage;
@@ -71,26 +55,27 @@ namespace ROBot.Core.Stats
 
         //Properties 
         //Twitch Connection Stats
-        public ulong TwitchConnectionTotalErrorCount { get => _twitchConnectionTotalErrorCount; }
-        public ulong TwitchConnectionTotalAttempt { get => _twitchConnectionTotalAttempt; }
-        public ulong TwitchConnectionTotalSuccess { get => _twitchConnectionTotalSuccess; }
-        public ulong TwitchConnectionTotalDisconnect { get => _twitchConnectionTotalDisconnect; }
-        public ulong TwitchConnectionCurrentAttempt { get => _twitchConnectionCurrentAttempt; }
-        public ulong TwitchConnectionCurrentErrorCount { get => _twitchConnectionCurrentErrorCount; }
-        public ulong TwitchConnectionReconnectCount { get => _twitchConnectionReconnectCount; }
-        public ulong TwitchLibErrorCount { get => _twitchConnectionCurrentErrorCount; }
+        public ulong TwitchConnectionTotalErrorCount { get; private set; }
+        public ulong TwitchConnectionTotalAttempt { get; private set; }
+        public ulong TwitchConnectionTotalSuccess { get; private set; }
+        public ulong TwitchConnectionTotalDisconnect { get; private set; }
+        public ulong TwitchConnectionCurrentAttempt { get; private set; }
+        public ulong TwitchConnectionCurrentErrorCount { get; private set; }
+        public ulong TwitchConnectionReconnectCount { get; private set; }
+        public ulong TwitchLibErrorCount { get; private set; }
 
         //Twitch User Channel Connection Stats
-        public ulong UserChConnectionTotalDisconnectCount { get => _userChConnectionTotalDisconnectCount; }
-        public uint JoinedChannelsCount { get => (uint?)_listOfCurrentlyJoinedChannel?.Count ?? 0; }
-        public ulong UserChConnectionSucesssCount { get => _userChConnectionSucesssCount; }
-        public ulong UserChConnectionTotalSucesssCount { get => _userChConnectionTotalSucesssCount; }
-        public ulong UserChConnectionTotalErrorCount { get => _userChConnectionTotalErrorCount; }
-        public ulong UserChConnectionErrorCount { get => _userChConnectionErrorCount; }
-        public ulong UserChConnectionCount { get => _userChConnectionDisconnectCount; }
-        public string UserLastChannelJoined { get => _userLastChannelJoined; }
-        public string UserLastChannelLeft { get => _userLastChannelLeft; }
-        public System.Collections.Generic.IReadOnlyList<JoinedChannel> ListOfCurrentlyJoinedChannel { get => _listOfCurrentlyJoinedChannel; }
+        public ulong UserChConnectionTotalDisconnectCount { get; private set; }
+        public uint JoinedChannelsCount => (uint?)_listOfCurrentlyJoinedChannel?.Count ?? 0;
+        public ulong UserChConnectionSucesssCount { get; private set; }
+        public ulong UserChConnectionDisconnectCount { get; private set; }
+        public ulong UserChConnectionTotalSucesssCount { get; private set; }
+        public ulong UserChConnectionTotalErrorCount { get; private set; }
+        public ulong UserChConnectionErrorCount { get; private set; }
+        public ulong UserChConnectionCount { get; private set; }
+        public string UserLastChannelJoined { get; private set; }
+        public string UserLastChannelLeft { get; private set; }
+        public System.Collections.Generic.IReadOnlyList<JoinedChannel> ListOfCurrentlyJoinedChannel { get; private set; }
 
         //Message Sent/Confirmed Stats
         public ulong MsgSendCount { get => _msgSendCount; }
@@ -118,41 +103,30 @@ namespace ROBot.Core.Stats
         public DateTime LastUpdated { get => _lastUpdated; }
 
         //Commands Stat
-        public ulong UserCommandCount { get => _userRFCommandCount; }
-        public ulong UserMsgCount { get => _userMsgRFCmdCount; }
-        public ulong UserTotalCommandCount { get => _userTotalRFCommandCount; }
-        public ulong UserTotalMsgCount { get => _userTotalRFMsgCount; }
-        public ulong UserChConnectionAttempt { get => _userChConnectionAttempt; }
-        public uint CommandsPerSecondsMax { get => getCommandPerSecondMax(); }
-        public ulong TotalCommandCount { get => getTotalCommandCount(); }
-        public double CommandsPerSecondsDelta { get => getCommandPerSecondDelta(); }
-        
+        public ulong UserCommandCount => _userRFCommandCount;
+        public ulong UserMsgCount => _userMsgRFCmdCount;
+        public ulong UserTotalCommandCount => _userTotalRFCommandCount;
+        public ulong UserTotalMsgCount => _userTotalRFMsgCount;
+        public ulong UserChConnectionAttempt => _userChConnectionAttempt;
+        public uint CommandsPerSecondsMax => Calculate(ref _commandsPerSecondsMax);
+        public ulong TotalCommandCount => Calculate(ref _userTotalRFCommandCount);
+        public double CommandsPerSecondsDelta => Calculate(ref _commandsPerSecondsDelta);
+
         //Methods
 
-        private ulong getTotalCommandCount()
+        private T Calculate<T>(ref T value)
         {
             if (_lastCalculate > DateTime.UtcNow.AddSeconds(1))
                 Calculate();
-            return _userTotalRFCommandCount;
-        }
-        private double getCommandPerSecondDelta()
-        {
-            if (_lastCalculate > DateTime.UtcNow.AddSeconds(1))
-                Calculate();
-            return _commandsPerSecondsDelta;
-        }
-        private uint getCommandPerSecondMax()
-        {
-            if (_lastCalculate > DateTime.UtcNow.AddSeconds(1))
-                Calculate();
-            return _commandsPerSecondsMax;
+
+            return value;
         }
 
         //Couldn't decide when to Calculate values, on when values change(when values is ++)? Seem like it be too often. Upon request of value? would mean needing a check
         //but at least it won't check often. Hmm
         private void Calculate()
         {
-            _lastUpdated =_lastCalculate = DateTime.UtcNow;
+            _lastUpdated = _lastCalculate = DateTime.UtcNow;
 
             double secondsSinceStart = (_lastCalculate - _started).TotalSeconds;
             double delta = _userMsgRFCmdCount - _lastRFCmdCount;
@@ -183,7 +157,8 @@ namespace ROBot.Core.Stats
         {
             _lastUpdated = DateTime.UtcNow;
             //if we get two of the same message, it'll reject a second (or more), however it'll can make the avg lag at times inaccurate
-            msgTimes.TryAdd(GetObject(channel, message), DateTime.UtcNow); 
+
+            msgTimes[GetKey(channel, message)] = DateTime.UtcNow; // Note(zerratar): Access using Indexer will add or replace existing one.
             _msgSendCount++;
             CheckOldMsg();
         }
@@ -191,13 +166,12 @@ namespace ROBot.Core.Stats
         {
             _lastUpdated = DateTime.UtcNow;
             _msgSentCount++;
-            object thisObj = GetObject(channel, message);
-            DateTime value;
-            if (msgTimes.TryGetValue(thisObj, out value))
+
+            var key = GetKey(channel, message);
+            if (msgTimes.TryRemove(key, out var value))
             {
                 TimeSpan msgDelay = DateTime.UtcNow - value;
                 AddMsgDelay(msgDelay);
-                msgTimes.TryRemove(thisObj, out _);
             }
         }
 
@@ -210,27 +184,27 @@ namespace ROBot.Core.Stats
         public void AddTwitchAttempt()
         {
             _lastUpdated = DateTime.UtcNow;
-            _twitchConnectionCurrentAttempt++;
-            _twitchConnectionTotalAttempt++;
+            TwitchConnectionCurrentAttempt++;
+            TwitchConnectionTotalAttempt++;
         }
 
         public void AddTwitchDisconnect()
         {
             _lastUpdated = DateTime.UtcNow;
-            _twitchConnectionTotalDisconnect++;
+            TwitchConnectionTotalDisconnect++;
         }
 
         public void AddTwitchError()
         {
             _lastUpdated = DateTime.UtcNow;
-            _twitchConnectionTotalErrorCount++;
-            _twitchConnectionCurrentErrorCount++;
+            TwitchConnectionTotalErrorCount++;
+            TwitchConnectionCurrentErrorCount++;
         }
 
         public void AddTwitchSuccess()
         {
             _lastUpdated = DateTime.UtcNow;
-            _twitchConnectionTotalSuccess++;
+            TwitchConnectionTotalSuccess++;
         }
 
         //I suspect that when the bot is runnning well, the avg times is in the sub zero seconds range
@@ -241,18 +215,18 @@ namespace ROBot.Core.Stats
         public void JoinedChannel(string channel, System.Collections.Generic.IReadOnlyList<JoinedChannel> joinedChannels)
         {
             _lastUpdated = DateTime.UtcNow;
-            _userChConnectionSucesssCount++;
-            _userChConnectionTotalSucesssCount++;
-            _userLastChannelJoined = channel;
-            _listOfCurrentlyJoinedChannel = joinedChannels;
+            UserChConnectionSucesssCount++;
+            UserChConnectionTotalSucesssCount++;
+            UserLastChannelJoined = channel;
+            ListOfCurrentlyJoinedChannel = joinedChannels;
         }
 
         public void LeftChannel(string channel, System.Collections.Generic.IReadOnlyList<JoinedChannel> joinedChannels)
         {
             _lastUpdated = DateTime.UtcNow;
-            _userChConnectionTotalDisconnectCount++;
-            _userChConnectionDisconnectCount++;
-            _userLastChannelLeft = channel;
+            UserChConnectionTotalDisconnectCount++;
+            UserChConnectionDisconnectCount++;
+            UserLastChannelLeft = channel;
             _listOfCurrentlyJoinedChannel = joinedChannels;
         }
 
@@ -262,16 +236,16 @@ namespace ROBot.Core.Stats
             _userMsgRFCmdCount = 0;
             _userRFCommandCount = 0;
             _userChConnectionAttempt = 0;
-            _userChConnectionDisconnectCount = 0;
-            _userChConnectionSucesssCount = 0;
-            _userChConnectionErrorCount = 0;  
+            UserChConnectionDisconnectCount = 0;
+            UserChConnectionSucesssCount = 0;
+            UserChConnectionErrorCount = 0;
         }
 
         public void ResetTwitchAttempt()
         {
             _lastUpdated = DateTime.UtcNow;
-            _twitchConnectionCurrentAttempt = 0;
-            _twitchConnectionCurrentErrorCount = 0;
+            TwitchConnectionCurrentAttempt = 0;
+            TwitchConnectionCurrentErrorCount = 0;
         }
 
         private void AddMsgDelay(TimeSpan msgDelay)
@@ -284,23 +258,30 @@ namespace ROBot.Core.Stats
 
         private void CheckOldMsg()
         {
-            DateTime oldMsgTime = DateTime.UtcNow.AddSeconds(_oldMsgOffSet);
+            // Note(zerratar): ???? add seconds to current time will always be in the future.
+            //                 comparing the msgTime.value will always be false.            
+
+            // DateTime oldMsgTime = DateTime.UtcNow.AddSeconds(_oldMsgOffSet);
 
             foreach (var msgTime in msgTimes)
             {
-                if (msgTime.Value > oldMsgTime)
+                //if (msgTime.Value > oldMsgTime)
+                if (DateTime.UtcNow - msgTime.Value >= TimeSpan.FromSeconds(_oldMsgOffSet))
                 {
                     msgTimes.TryRemove(msgTime.Key, out _);
                     AddMsgDelay(TimeSpan.FromSeconds(30)); //May be inaccuate due to possible non-unique messages
                 }
-                    
+
             }
         }
 
-        private object GetObject(string channel, string message)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static string GetKey(string channel, string message)
         {
             channel = channel.ToLower().Trim();
             message = message.ToLower().Trim();
+
+            // Note(zerratar): since we are returning one and the same type always. Its better to use the type
 
             return channel + message;
         }
@@ -332,8 +313,8 @@ namespace ROBot.Core.Stats
         public void AddChError()
         {
             _lastUpdated = DateTime.UtcNow;
-            _userChConnectionErrorCount++;
-            _userChConnectionTotalErrorCount++;
+            UserChConnectionErrorCount++;
+            UserChConnectionTotalErrorCount++;
         }
 
         public void AddChAttempt()

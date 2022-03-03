@@ -34,7 +34,8 @@ namespace ROBot
             Shinobytes.Ravenfall.RavenNet.Core.IKernel kernel,
             IGameSessionManager sessionManager,
             IBotServer ravenfall,
-            ITwitchCommandClient twitch, IBotStats botStats)
+            ITwitchCommandClient twitch, 
+            IBotStats botStats)
         {
             this.logger = logger;
             this.kernel = kernel;
