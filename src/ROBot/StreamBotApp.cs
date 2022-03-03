@@ -4,6 +4,7 @@ using ROBot.Core;
 using ROBot.Core.GameServer;
 using ROBot.Core.Twitch;
 using ROBot.Ravenfall;
+using ROBot.Core.Stats;
 using System;
 using System.Linq;
 using System.Net.Http;
@@ -17,7 +18,7 @@ namespace ROBot
 
     public class StreamBotApp : IStreamBotApplication
     {
-        private readonly BotStats stats = new BotStats();
+        private readonly IBotStats botStats;
         private readonly Microsoft.Extensions.Logging.ILogger logger;
         private readonly Shinobytes.Ravenfall.RavenNet.Core.IKernel kernel;
         private readonly IGameSessionManager sessionManager;
@@ -25,56 +26,33 @@ namespace ROBot
         private readonly ITwitchCommandClient twitch;
         private Shinobytes.Ravenfall.RavenNet.Core.ITimeoutHandle timeoutHandle;
         private bool disposed;
-        private DateTime startedDateTime;
-        private long lastCmdCount;
-        private int highestDelta;
         private int detailsDelayTimer;
         private bool canUpdateCmdTitle = true;
 
         public StreamBotApp(
-            Microsoft.Extensions.Logging.ILogger logger,
+            ILogger logger,
             Shinobytes.Ravenfall.RavenNet.Core.IKernel kernel,
             IGameSessionManager sessionManager,
             IBotServer ravenfall,
-            ITwitchCommandClient twitch)
+            ITwitchCommandClient twitch, IBotStats botStats)
         {
             this.logger = logger;
             this.kernel = kernel;
             this.sessionManager = sessionManager;
             this.botServer = ravenfall;
             this.twitch = twitch;
+            this.botStats = botStats;
 
+
+            //Ravenfall Event
             sessionManager.SessionStarted += OnSessionStarted;
             sessionManager.SessionEnded += OnSessionEnded;
             sessionManager.SessionUpdated += OnSessionUpdated;
-
-            twitch.OnTwitchError += Twitch_OnTwitchError;
-            twitch.OnTwitchLog += Twitch_OnTwitchLog;
-        }
-
-        private void Twitch_OnTwitchLog(object sender, TwitchLib.Client.Events.OnLogArgs e)
-        {
-            try
-            {
-                stats.LastTwitchLibLogMessage = JsonConvert.SerializeObject(e);
-            }
-            catch { }
-        }
-
-        private void Twitch_OnTwitchError(object sender, TwitchLib.Communication.Events.OnErrorEventArgs e)
-        {
-            try
-            {
-                stats.TwitchLibErrorCount++;
-                stats.LastTwitchLibErrorMessage = e.Exception.ToString();
-                stats.LastTwitchLibError = DateTime.UtcNow;
-            }
-            catch { }
         }
 
         public void Run()
         {
-            stats.Started = this.startedDateTime = DateTime.UtcNow;
+            botStats.Started = DateTime.UtcNow;
 
             logger.LogInformation("[BOT] Application Started");
 
@@ -128,7 +106,7 @@ namespace ROBot
                     await Task.Delay(detailsDelayTimer);
                 }
 
-                var json = Newtonsoft.Json.JsonConvert.SerializeObject(stats);
+                var json = Newtonsoft.Json.JsonConvert.SerializeObject(botStats);
                 var statsData = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
                 statsData.Headers.ContentType = new MediaTypeHeaderValue("application/json");
                 using var handler = new HttpClientHandler();
@@ -159,26 +137,7 @@ namespace ROBot
 
         private string GetCommandsPerSecond()
         {
-            var commandCount = twitch.GetCommandCount();
-            double secondsSinceStart = (DateTime.UtcNow - startedDateTime).TotalSeconds;
-            double delta = commandCount - lastCmdCount;
-            double csSinceStart = Math.Round(commandCount / secondsSinceStart, 2);
-            if (delta < csSinceStart)
-            {
-                delta = csSinceStart;
-            }
-
-            if (delta > highestDelta)
-            {
-                highestDelta = (int)delta;
-            }
-
-            stats.TotalCommandCount = (UInt64)commandCount;
-            stats.CommandsPerSecondsDelta = delta;
-            stats.CommandsPerSecondsMax = (UInt32)highestDelta;
-
-            lastCmdCount = commandCount;
-            return "[Total: " + commandCount + " C/S: " + delta + " Hi: " + highestDelta + "] ";
+            return "[Total: " + botStats.TotalCommandCount + " C/S: " + botStats.CommandsPerSecondsDelta + " Hi: " + botStats.CommandsPerSecondsMax + "] ";
         }
 
         private string GetTrackedPlayerCount()
@@ -187,30 +146,27 @@ namespace ROBot
 
             if (sessions.Count > 0)
             {
-                stats.UserCount = (UInt32)sessions.Sum(x => x.UserCount);
+                botStats.UserCount = (UInt32)sessions.Sum(x => x.UserCount);
             }
 
-            return "[Players: " + stats.UserCount + "] ";
+            return "[Players: " + botStats.UserCount + "] ";
         }
 
         private string GetJoinedChannelCount()
         {
-            stats.JoinedChannelsCount = (UInt32)twitch.JoinedChannels().Count;
-
-            return "[Joined: " + stats.JoinedChannelsCount + "] ";
+            return "[Joined: " + botStats.JoinedChannelsCount + "] ";
         }
 
         private string GetSessionsAndConnections()
         {
-            stats.ConnectionCount = (UInt32)botServer.AllConnections().Count;
-            stats.SessionCount = (UInt32)sessionManager.All().Count;
-            return "[Clients: " + stats.SessionCount + "/" + stats.ConnectionCount + "] ";
+            botStats.ConnectionCount = (UInt32)botServer.AllConnections().Count;
+            botStats.SessionCount = (UInt32)sessionManager.All().Count;
+            return "[Clients: " + botStats.SessionCount + "/" + botStats.ConnectionCount + "] ";
         }
 
         private string GetUptime()
         {
-            stats.Uptime = DateTime.UtcNow - startedDateTime;
-            return "[Uptime: " + FormatTimeSpan(stats.Uptime) + "] ";
+            return "[Uptime: " + FormatTimeSpan(botStats.Uptime) + "] ";
         }
 
         private string FormatTimeSpan(TimeSpan elapsed)
@@ -272,37 +228,14 @@ namespace ROBot
         {
             logger.LogDebug("[RVNFLL] Game Session Started (Name:" + session.Name + ")");
             twitch.JoinChannel(session.Name);
-            stats.LastSessionStarted = DateTime.UtcNow;
+            botStats.LastSessionStarted = DateTime.UtcNow;
         }
 
         private void OnSessionEnded(object sender, IGameSession session)
         {
             logger.LogDebug("[RVNFLL] Game Session Ended (Name: " + session.Name + ")");
             twitch.LeaveChannel(session.Name);
-            stats.LastSessionEnded = DateTime.UtcNow;
+            botStats.LastSessionEnded = DateTime.UtcNow;
         }
-    }
-
-    public class BotStats
-    {
-        public uint CommandsPerSecondsMax;
-        public uint JoinedChannelsCount;
-        public uint UserCount;
-        public uint ConnectionCount;
-        public uint SessionCount;
-
-        public ulong TotalCommandCount;
-        public double CommandsPerSecondsDelta;
-
-        public uint TwitchLibErrorCount;
-        public string LastTwitchLibErrorMessage;
-        public DateTime LastTwitchLibError;
-
-        public string LastTwitchLibLogMessage;
-
-        public DateTime LastSessionStarted;
-        public DateTime LastSessionEnded;
-        public DateTime Started;
-        public TimeSpan Uptime;
     }
 }
