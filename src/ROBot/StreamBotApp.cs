@@ -28,13 +28,14 @@ namespace ROBot
         private bool disposed;
         private int detailsDelayTimer;
         private bool canUpdateCmdTitle = true;
+        private DateTime lastDetailsUpdate;
 
         public StreamBotApp(
             ILogger logger,
             Shinobytes.Ravenfall.RavenNet.Core.IKernel kernel,
             IGameSessionManager sessionManager,
             IBotServer ravenfall,
-            ITwitchCommandClient twitch, 
+            ITwitchCommandClient twitch,
             IBotStats botStats)
         {
             this.logger = logger;
@@ -102,6 +103,12 @@ namespace ROBot
         {
             try
             {
+                // no need for the bot to spam regarding details update.
+                if (DateTime.UtcNow - lastDetailsUpdate < TimeSpan.FromSeconds(2))
+                {
+                    return;
+                }
+
                 if (detailsDelayTimer > 0)
                 {
                     await Task.Delay(detailsDelayTimer);
@@ -122,6 +129,8 @@ namespace ROBot
                         detailsDelayTimer = 0;
                     }
                 }
+
+
             }
             catch (Exception ex)
             {
@@ -134,6 +143,8 @@ namespace ROBot
 
                 logger.LogError("[BOT] Unable to send Details to RavenNest: " + ex);
             }
+
+            lastDetailsUpdate = DateTime.UtcNow;
         }
 
         private string GetCommandsPerSecond()
