@@ -2,6 +2,7 @@
 using ROBot.Core.Extensions;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using TwitchLib.Client.Events;
@@ -66,7 +67,7 @@ namespace ROBot.Core.Stats
 
         //Twitch User Channel Connection Stats
         public ulong UserChConnectionTotalDisconnectCount { get; private set; }
-        public uint JoinedChannelsCount => (uint?)_listOfCurrentlyJoinedChannel?.Count ?? 0;
+        public uint JoinedChannelsCount => (uint?)ListOfCurrentlyJoinedChannel?.Count ?? 0;
         public ulong UserChConnectionSucesssCount { get; private set; }
         public ulong UserChConnectionDisconnectCount { get; private set; }
         public ulong UserChConnectionTotalSucesssCount { get; private set; }
@@ -75,7 +76,7 @@ namespace ROBot.Core.Stats
         public ulong UserChConnectionCount { get; private set; }
         public string UserLastChannelJoined { get; private set; }
         public string UserLastChannelLeft { get; private set; }
-        public System.Collections.Generic.IReadOnlyList<JoinedChannel> ListOfCurrentlyJoinedChannel { get; private set; }
+        public System.Collections.Generic.IReadOnlyList<string> ListOfCurrentlyJoinedChannel { get; set; }
 
         //Message Sent/Confirmed Stats
         public ulong MsgSendCount { get => _msgSendCount; }
@@ -218,7 +219,8 @@ namespace ROBot.Core.Stats
             UserChConnectionSucesssCount++;
             UserChConnectionTotalSucesssCount++;
             UserLastChannelJoined = channel;
-            ListOfCurrentlyJoinedChannel = joinedChannels;
+
+            SetJoinedChannelList(joinedChannels);
         }
 
         public void LeftChannel(string channel, System.Collections.Generic.IReadOnlyList<JoinedChannel> joinedChannels)
@@ -227,7 +229,7 @@ namespace ROBot.Core.Stats
             UserChConnectionTotalDisconnectCount++;
             UserChConnectionDisconnectCount++;
             UserLastChannelLeft = channel;
-            _listOfCurrentlyJoinedChannel = joinedChannels;
+            SetJoinedChannelList(joinedChannels);
         }
 
         public void ResetReceivedCount()
@@ -254,6 +256,19 @@ namespace ROBot.Core.Stats
                 listMsgDelay.TryDequeue(out _);
 
             listMsgDelay.Enqueue(msgDelay);
+        }
+
+        private void SetJoinedChannelList(IReadOnlyList<JoinedChannel> joinedChannels)
+        {
+            _listOfCurrentlyJoinedChannel = joinedChannels;
+            if (_listOfCurrentlyJoinedChannel == null)
+            {
+                ListOfCurrentlyJoinedChannel = new List<string>();
+            }
+            else
+            {
+                ListOfCurrentlyJoinedChannel = _listOfCurrentlyJoinedChannel.Select(x => x.Channel).ToList();
+            }
         }
 
         private void CheckOldMsg()

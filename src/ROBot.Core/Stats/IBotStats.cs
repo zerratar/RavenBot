@@ -23,7 +23,7 @@ namespace ROBot.Core.Stats
         ulong TwitchLibErrorCount { get; }
         TimeSpan Uptime { get; }
         uint UserCount { get; set; }
-        System.Collections.Generic.IReadOnlyList<TwitchLib.Client.Models.JoinedChannel> ListOfCurrentlyJoinedChannel { get; }
+        System.Collections.Generic.IReadOnlyList<string> ListOfCurrentlyJoinedChannel { get; }
         string UserLastChannelJoined { get; }
         string UserLastChannelLeft { get; }
         TimeSpan AvgMsgDelay { get; }
