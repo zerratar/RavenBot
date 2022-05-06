@@ -21,44 +21,24 @@ namespace ROBot
         const double logsLifespanDays = 7;
 
         private readonly ConsoleLogger logger;
-        private readonly IServer server;
         private readonly IMessageBus messageBus;
-        private readonly IServerConnectionManager connectionManager;
-        private readonly IServerPacketHandlerProvider packetHandler;
-        private readonly IServerPacketSerializer packetSerializer;
 
         private readonly object mutex = new object();
         private readonly List<string> messages = new List<string>();
-        private readonly int maxMessageStack = 1000;
 
         public ConsoleLogServer(
-            IServer server,
-            IMessageBus messageBus,
-            IServerConnectionManager connectionManager,
-            IServerPacketHandlerProvider packetHandler,
-            IServerPacketSerializer packetSerializer)
+            IMessageBus messageBus)
         {
             this.logger = new ConsoleLogger();
-            this.packetHandler = packetHandler;
-            this.packetSerializer = packetSerializer;
-            this.server = server;
             this.messageBus = messageBus;
-            this.connectionManager = connectionManager;
             SetupServer();
         }
-        private async void SetupServer()
+        private void SetupServer()
         {
             this.messageBus.Subscribe("exit", () =>
             {
                 TrySaveLogToDisk();
             });
-
-            this.messageBus.Subscribe<INetworkClient>("hello", OnHello);
-            this.server.ClientConnected += Server_ClientConnected;
-            this.server.ClientDisconnected += Server_ClientDisconnected;
-            await server.StartAsync(CancellationToken.None);
-            logger.LogInformation("[LOG] Log Server Started");
-            Broadcast("{Information}: [LOG] Log Server Started");
         }
 
         public void TrySaveLogToDisk()
@@ -109,30 +89,10 @@ namespace ROBot
             }
         }
 
-        private void OnHello(INetworkClient client)
-        {
-            lock (mutex)
-            {
-                foreach (var msg in messages)
-                {
-                    var data = UTF8Encoding.UTF8.GetBytes(msg);
-                    client.Send(data, 0, data.Length);
-                }
-            }
-        }
-
-        public void Dispose()
-        {
-            this.server.ClientConnected -= Server_ClientConnected;
-            this.server.ClientDisconnected -= Server_ClientDisconnected;
-            this.server.Dispose();
-        }
-
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
             this.logger.Log<TState>(logLevel, eventId, state, exception, formatter);
             var message = formatter != null ? formatter(state, exception) : state.ToString();
-            Broadcast("{" + logLevel + "}: " + message);
         }
 
         public bool IsEnabled(LogLevel logLevel) => logger.IsEnabled(logLevel);
@@ -142,84 +102,16 @@ namespace ROBot
         public void Write(string message)
         {
             this.logger.Write(message);
-            Broadcast(message);
         }
 
         public void WriteLine(string message)
         {
             this.logger.WriteLine(message);
-            Broadcast(message);
         }
 
-        private void Broadcast(string v)
+        public void Dispose()
         {
-            var str = $"[{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss K}]: {v}" + Environment.NewLine;
-            var connections = connectionManager.All();
-
-            AddMessage(str);
-
-            if (connections.Count == 0)
-            {
-                return;
-            }
-
-            var data = UTF8Encoding.UTF8.GetBytes(str);
-            foreach (var connection in connections)
-            {
-                if (connection.IsReady)
-                {
-                    connection.Send(data, 0, data.Length);
-                }
-            }
-        }
-
-        private void AddMessage(string str)
-        {
-            lock (mutex)
-            {
-                messages.Add(str);
-
-                if (messages.Count > maxMessageStack)
-                {
-                    TrySaveLogToDisk();
-                    messages.Clear();
-                }
-            }
-        }
-
-        private void ServerClient_DataReceived(object sender, DataPacket e)
-        {
-            //WriteLine("[Debug]: Log Server Recieved Data: " + e.Length);
-
-            var client = sender as INetworkClient;
-            var packet = packetSerializer.Deserialize(e);
-            if (e == null)
-            {
-                WriteLine("{Debug}: [LOG] Bad Packet Data recieved");
-                return;
-            }
-
-            var handler = packetHandler.Get(packet.Type);
-            if (handler == null)
-            {
-                WriteLine("{Debug}: [LOG] No packet handler available for " + packet.Type);
-                return;
-            }
-
-            handler.HandleAsync(client, packet);
-        }
-
-        private void Server_ClientDisconnected(object sender, ConnectionEventArgs e)
-        {
-            //WriteLine("[Debug]: Log Server Client disconnected");
-            e.Client.DataReceived -= ServerClient_DataReceived;
-        }
-
-        private void Server_ClientConnected(object sender, ConnectionEventArgs e)
-        {
-            //WriteLine("[Debug]: Log Server Client connected");
-            e.Client.DataReceived += ServerClient_DataReceived;
-
+            
         }
     }
 }

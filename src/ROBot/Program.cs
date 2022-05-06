@@ -24,7 +24,6 @@ namespace ROBot
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
 
-            const int LogServerPort = 6767;
             const int BotServerPort = 4041;
             const string ServerHost = "0.0.0.0";
 
@@ -69,14 +68,7 @@ namespace ROBot
             ioc.RegisterCustomShared<ITwitchStats>(() => stats);
 
 
-            // Log extraction
-            // Setting up the server
-            ioc.RegisterCustomShared<ServerSettings>(() => new ServerSettings(ServerHost, LogServerPort));
-            ioc.RegisterShared<IServer, TcpServer>();
-            ioc.RegisterShared<IServerConnectionManager, ServerConnectionManager>();
-            ioc.RegisterShared<IServerClientProvider, ServerClientProvider>();
-            ioc.RegisterShared<IServerPacketHandlerProvider, ServerPacketHandlerProvider>();
-            ioc.RegisterShared<IServerPacketSerializer, BinaryServerPacketSerializer>();
+            // Log Saving
             ioc.RegisterShared<ILogger, ConsoleLogServer>();
 
 
