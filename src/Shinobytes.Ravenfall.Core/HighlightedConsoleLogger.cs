@@ -37,7 +37,7 @@ namespace Shinobytes.Ravenfall.RavenNet.Core
         {
             var info = logLevelSeverityMapping[logLevel];
             var message = formatter != null ? formatter(state, exception) : state.ToString();
-            var msg = $"[{DateTime.UtcNow:yyyy-MM-dd hh:mm:ss K}] {{@{info.Item2}@{info.Item1}@{ConsoleColor.Gray}@}} @{info.Item3}@{message}";
+            var msg = $"[{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss K}] {{@{info.Item2}@{info.Item1}@{ConsoleColor.Gray}@}} @{info.Item3}@{message}";
             WriteLine(msg);
         }
 
@@ -240,7 +240,7 @@ namespace Shinobytes.Ravenfall.RavenNet.Core
                 Console.ForegroundColor = ConsoleColor.DarkGray;
                 Write("[");
                 Console.ForegroundColor = ConsoleColor.DarkMagenta;
-                Write($"{DateTime.UtcNow:yyyy-MM-dd hh:mm:ss K}");
+                Write($"{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss K}");
                 Console.ForegroundColor = ConsoleColor.DarkGray;
                 Write("] ");
                 Console.BackgroundColor = GetBackgroundColor(logLevel);

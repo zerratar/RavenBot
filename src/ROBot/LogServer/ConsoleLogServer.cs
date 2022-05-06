@@ -153,7 +153,7 @@ namespace ROBot
 
         private void Broadcast(string v)
         {
-            var str = $"[{DateTime.UtcNow:yyyy-MM-dd hh:mm:ss K}]: {v}" + Environment.NewLine;
+            var str = $"[{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss K}]: {v}" + Environment.NewLine;
             var connections = connectionManager.All();
 
             AddMessage(str);

@@ -32,7 +32,7 @@ namespace RavenBot.Core
             {
                 var now = DateTime.Now;
                 Console.ForegroundColor = foregroundColor;
-                Console.WriteLine($"[{now:yyyy-MM-dd hh:mm:ss}][{tag}]: {message}");
+                Console.WriteLine($"[{now:yyyy-MM-dd HH:mm:ss}][{tag}]: {message}");
                 Console.ResetColor();
             }
         }
