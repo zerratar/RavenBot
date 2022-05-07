@@ -21,6 +21,8 @@ namespace ROBot
         private readonly int maxMessageStack = 1000;
         private DateTime lastSave = DateTime.UtcNow;
         private TimeSpan maxTimeBetweenSave = TimeSpan.FromSeconds(5);
+        private LogLevel lastLogLevel = LogLevel.Debug;k
+        private string lastTag;
         public PersistedConsoleLogger(IMessageBus messageBus)
         {
             this.logger = new ConsoleLogger();
@@ -88,7 +90,25 @@ namespace ROBot
         {
             this.logger.Log<TState>(logLevel, eventId, state, exception, formatter);
             var message = formatter != null ? formatter(state, exception) : state.ToString();
-            PersistLine("{" + logLevel + "}: " + message);
+
+            var appendNewLine = lastLogLevel != logLevel;
+            if (!string.IsNullOrEmpty(message))
+            {
+                var bracketEnd = message.IndexOf(']');
+                var bracketStart = message.IndexOf('[');
+                if (bracketStart != -1 && bracketStart > bracketEnd)
+                {
+                    var tag = message.Split(']')[0].Split('[')[1];
+                    if (tag != lastTag)
+                    {
+                        appendNewLine = true;
+                    }
+                    lastTag = tag;
+                }
+            }
+
+            PersistLine("{" + logLevel + "}: " + message, appendNewLine);
+            lastLogLevel = logLevel;
         }
 
         public bool IsEnabled(LogLevel logLevel) => logger.IsEnabled(logLevel);
@@ -108,9 +128,10 @@ namespace ROBot
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void PersistLine(string v)
+        private void PersistLine(string str, bool appendNewLine = false)
         {
-            AddMessage($"[{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss K}]: {v}");
+            if (appendNewLine) AddMessage("");
+            AddMessage($"[{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss K}]: {str}");
         }
 
         private void AddMessage(string str)
