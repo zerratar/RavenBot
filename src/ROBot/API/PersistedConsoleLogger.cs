@@ -3,6 +3,7 @@ using Shinobytes.Ravenfall.RavenNet.Core;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.CompilerServices;
 
 namespace ROBot
 {
@@ -16,8 +17,10 @@ namespace ROBot
         private readonly List<IMessageBusSubscription> subscriptions;
         private readonly object mutex = new object();
         private readonly List<string> messages = new List<string>();
-        private readonly int maxMessageStack = 1000;
 
+        private readonly int maxMessageStack = 1000;
+        private DateTime lastSave = DateTime.UtcNow;
+        private TimeSpan maxTimeBetweenSave = TimeSpan.FromSeconds(5);
         public PersistedConsoleLogger(IMessageBus messageBus)
         {
             this.logger = new ConsoleLogger();
@@ -33,6 +36,7 @@ namespace ROBot
             {
                 try
                 {
+                    lastSave = DateTime.UtcNow;
                     var fn = DateTime.UtcNow.ToString("yyyy-MM-dd") + ".log";
 
                     if (!System.IO.Directory.Exists(logsDir))
@@ -103,6 +107,7 @@ namespace ROBot
             PersistLine(message);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void PersistLine(string v)
         {
             AddMessage($"[{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss K}]: {v}");
@@ -114,7 +119,7 @@ namespace ROBot
             {
                 messages.Add(str);
 
-                if (messages.Count > maxMessageStack)
+                if (messages.Count > maxMessageStack || (DateTime.UtcNow - lastSave) >= maxTimeBetweenSave)
                 {
                     TrySaveLogToDisk();
                     messages.Clear();
