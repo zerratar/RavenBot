@@ -73,13 +73,17 @@ namespace ROBot
             // Setting up the server
             ioc.RegisterCustomShared<ServerSettings>(() => new ServerSettings(ServerHost, LogServerPort));
             ioc.RegisterShared<IServer, TcpServer>();
+
             ioc.RegisterShared<IServerConnectionManager, ServerConnectionManager>();
             ioc.RegisterShared<IServerClientProvider, ServerClientProvider>();
             ioc.RegisterShared<IServerPacketHandlerProvider, ServerPacketHandlerProvider>();
             ioc.RegisterShared<IServerPacketSerializer, BinaryServerPacketSerializer>();
-            ioc.RegisterShared<ILogger, ConsoleLogServer>();
+            ioc.RegisterShared<IAdminAPIEndpointServer, AdminTcpAPIEndpointServer>();
 
-
+            ioc.RegisterShared<ILogger, PersistedConsoleLogger>();
+            
+            ioc.Resolve<IAdminAPIEndpointServer>();
+            
             var app = ioc.Resolve<IStreamBotApplication>();
             {
                 app.Run();
@@ -101,7 +105,7 @@ namespace ROBot
             {
                 try
                 {
-                    var logger = ioc.Resolve<ILogger>() as ConsoleLogServer;
+                    var logger = ioc.Resolve<ILogger>() as PersistedConsoleLogger;
                     if (logger != null)
                     {
                         logger.LogError("[SPECIAL] " + e.ToString() + " | " + e.ExceptionObject.ToString());
@@ -119,7 +123,7 @@ namespace ROBot
             }
             else
             {
-                System.Console.WriteLine("[CAUGHT] with null ioc Error: " + e.ToString()+ " | " + e.ExceptionObject.ToString());
+                System.Console.WriteLine("[CAUGHT] with null ioc Error: " + e.ToString() + " | " + e.ExceptionObject.ToString());
             }
         }
 
@@ -128,13 +132,13 @@ namespace ROBot
 
             try
             {
-                var logger = ioc.Resolve<ILogger>() as ConsoleLogServer;
+                var logger = ioc.Resolve<ILogger>() as PersistedConsoleLogger;
                 if (logger != null)
                 {
                     logger.TrySaveLogToDisk();
                 }
             }
-            catch(Exception exc)
+            catch (Exception exc)
             {
                 System.Console.WriteLine("[CAUGHT] Exception trying to save logger Error: " + exc.ToString());
                 System.Console.WriteLine("[CAUGHT] extended info on EventArgs " + e.ToString());

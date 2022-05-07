@@ -8,7 +8,8 @@ namespace Shinobytes.Network
     {
         event EventHandler<ConnectionEventArgs> ClientConnected;
         event EventHandler<ConnectionEventArgs> ClientDisconnected;
-        Task StartAsync(CancellationToken cancellationToken);
+        Task<bool> StartAsync(CancellationToken cancellationToken);
+        Exception LastException { get; }
         void Stop();
     }
 }

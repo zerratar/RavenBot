@@ -15,7 +15,6 @@ namespace ROBot
 {
 
     // TODO: https://twitchtokengenerator.com/api/refresh/<refresh_token>
-
     public class StreamBotApp : IStreamBotApplication
     {
         private readonly IBotStats botStats;
