@@ -13,7 +13,7 @@ namespace ROBot
 
         private readonly ConsoleLogger logger;
         private readonly IMessageBus messageBus;
-        private readonly IMessageBusSubscription subscription;
+        private readonly List<IMessageBusSubscription> subscriptions;
         private readonly object mutex = new object();
         private readonly List<string> messages = new List<string>();
         private readonly int maxMessageStack = 1000;
@@ -22,10 +22,9 @@ namespace ROBot
         {
             this.logger = new ConsoleLogger();
             this.messageBus = messageBus;
-            this.subscription = this.messageBus.Subscribe("exit", () =>
-            {
-                TrySaveLogToDisk();
-            });
+            this.subscriptions = new List<IMessageBusSubscription>();
+            this.subscriptions.Add(this.messageBus.Subscribe<string>(MessageBus.MessageBusException, str => this.LogError(str)));
+            this.subscriptions.Add(this.messageBus.Subscribe("exit", () => TrySaveLogToDisk()));
         }
 
         public void TrySaveLogToDisk()
@@ -78,7 +77,7 @@ namespace ROBot
 
         public void Dispose()
         {
-            subscription.Unsubscribe();
+            subscriptions.ForEach(x => x.Unsubscribe());
         }
 
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)

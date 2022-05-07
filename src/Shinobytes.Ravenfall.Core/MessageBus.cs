@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,6 +8,7 @@ namespace Shinobytes.Ravenfall.RavenNet.Core
     public class MessageBus : IMessageBus
     {
         public const string Broadcast = "broadcast";
+        public const string MessageBusException = "MessageBusException";
 
         private readonly object mutex = new object();
         private readonly List<Subscription> subscriptions = new List<Subscription>();
@@ -34,7 +36,9 @@ namespace Shinobytes.Ravenfall.RavenNet.Core
                     }
                     catch (Exception exc)
                     {
-                        Console.WriteLine(exc + " --- OnMessag Failed. Invalid type tried to be used");
+                        var errMessage = $"MessageBus Callback for '{key}' threw an Exception: " + exc;
+                        Console.WriteLine(errMessage);
+                        Send(MessageBusException, errMessage);
                     }
                 }, this);
                 this.subscriptions.Add(messageBusSubscription);
@@ -54,7 +58,9 @@ namespace Shinobytes.Ravenfall.RavenNet.Core
                     }
                     catch (Exception exc)
                     {
-                        Console.WriteLine(exc + " --- OnMessag Failed. Invalid type tried to be used");
+                        var errMessage = $"MessageBus Callback for '{key}' threw an Exception: " + exc;
+                        Console.WriteLine(errMessage);
+                        Send(MessageBusException, errMessage);
                     }
                 }, this);
                 this.subscriptions.Add(messageBusSubscription);
