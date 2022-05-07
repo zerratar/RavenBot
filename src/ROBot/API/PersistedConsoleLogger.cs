@@ -21,7 +21,7 @@ namespace ROBot
         private readonly int maxMessageStack = 1000;
         private DateTime lastSave = DateTime.UtcNow;
         private TimeSpan maxTimeBetweenSave = TimeSpan.FromSeconds(5);
-        private LogLevel lastLogLevel = LogLevel.Debug;k
+        private LogLevel lastLogLevel = LogLevel.Debug;
         private string lastTag;
         public PersistedConsoleLogger(IMessageBus messageBus)
         {
@@ -129,9 +129,9 @@ namespace ROBot
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void PersistLine(string str, bool appendNewLine = false)
-        {
-            if (appendNewLine) AddMessage("");
+        {            
             AddMessage($"[{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss K}]: {str}");
+            if (appendNewLine) AddMessage("");
         }
 
         private void AddMessage(string str)
