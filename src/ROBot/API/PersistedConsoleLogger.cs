@@ -96,7 +96,7 @@ namespace ROBot
             {
                 var bracketEnd = message.IndexOf(']');
                 var bracketStart = message.IndexOf('[');
-                if (bracketStart != -1 && bracketStart > bracketEnd)
+                if (bracketStart != -1 && bracketEnd > bracketStart)
                 {
                     var tag = message.Split(']')[0].Split('[')[1];
                     if (tag != lastTag)
