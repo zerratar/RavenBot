@@ -74,7 +74,6 @@ namespace ROBot
             ioc.RegisterCustomShared<ServerSettings>(() => new ServerSettings(ServerHost, LogServerPort));
             ioc.RegisterShared<IServer, TcpServer>();
 
-            ioc.RegisterShared<IServerConnectionManager, ServerConnectionManager>();
             ioc.RegisterShared<IServerClientProvider, ServerClientProvider>();
             ioc.RegisterShared<IServerPacketHandlerProvider, ServerPacketHandlerProvider>();
             ioc.RegisterShared<IServerPacketSerializer, BinaryServerPacketSerializer>();

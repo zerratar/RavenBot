@@ -2,8 +2,6 @@
 using Shinobytes.Network;
 using Shinobytes.Ravenfall.RavenNet.Core;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 
 namespace ROBot
@@ -14,13 +12,9 @@ namespace ROBot
 
         private readonly IServer server;
         private readonly IKernel kernel;
-        private readonly IMessageBus messageBus;
-        private readonly IServerConnectionManager connectionManager;
         private readonly IServerPacketHandlerProvider packetHandler;
         private readonly IServerPacketSerializer packetSerializer;
 
-        private readonly object mutex = new object();
-        private readonly List<string> messages = new List<string>();
         private int retryWaitSeconds = 3;
         private int retryWaitMaxSeconds = 30;
 
@@ -28,8 +22,6 @@ namespace ROBot
             ILogger logger,
             IServer server,
             IKernel kernel,
-            IMessageBus messageBus,
-            IServerConnectionManager connectionManager,
             IServerPacketHandlerProvider packetHandler,
             IServerPacketSerializer packetSerializer)
         {
@@ -38,8 +30,6 @@ namespace ROBot
             this.packetSerializer = packetSerializer;
             this.server = server;
             this.kernel = kernel;
-            this.messageBus = messageBus;
-            this.connectionManager = connectionManager;
 
             this.server.ClientConnected += Server_ClientConnected;
             this.server.ClientDisconnected += Server_ClientDisconnected;

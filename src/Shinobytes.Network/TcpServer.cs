@@ -16,7 +16,6 @@ namespace Shinobytes.Network
         private readonly ILogger logger;
         private readonly ServerSettings settings;
         private readonly IServerClientProvider clientProvider;
-        private readonly IServerConnectionManager connectionManager;
         private TcpListener tcpServer;
         private bool disposed;
         private CancellationToken cancellationToken;
@@ -24,13 +23,11 @@ namespace Shinobytes.Network
         public TcpServer(
             ILogger logger,
             ServerSettings settings,
-            IServerClientProvider clientProvider,
-            IServerConnectionManager connectionManager)
+            IServerClientProvider clientProvider)
         {
             this.logger = logger;
             this.settings = settings;
             this.clientProvider = clientProvider;
-            this.connectionManager = connectionManager;
             if (!IPAddress.TryParse(this.settings.host, out var ip))
             {
                 ip = IPAddress.Any;
@@ -102,7 +99,6 @@ namespace Shinobytes.Network
                 client = clientProvider.Get(tcpClient);
 
                 client.Disconnected += Client_Disconnected;
-                connectionManager.Add(client);
 
                 if (ClientConnected != null)
                 {
@@ -166,7 +162,6 @@ namespace Shinobytes.Network
         {
             var client = sender as INetworkClient;
             client.Disconnected -= Client_Disconnected;
-            connectionManager.Remove(client);
 
             if (ClientDisconnected != null)
             {
