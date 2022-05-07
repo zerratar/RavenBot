@@ -129,9 +129,9 @@ namespace ROBot
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void PersistLine(string str, bool appendNewLine = false)
-        {            
-            AddMessage($"[{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss K}]: {str}");
+        {
             if (appendNewLine) AddMessage("");
+            AddMessage($"[{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss K}]: {str}");
         }
 
         private void AddMessage(string str)
