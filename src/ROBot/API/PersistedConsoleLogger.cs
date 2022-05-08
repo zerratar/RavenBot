@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace ROBot
 {
@@ -40,13 +41,27 @@ namespace ROBot
                 {
                     lastSave = DateTime.UtcNow;
                     var fn = DateTime.UtcNow.ToString("yyyy-MM-dd") + ".log";
+                    var fullPathToFile = System.IO.Path.Combine(logsDir, fn);
 
                     if (!System.IO.Directory.Exists(logsDir))
                     {
                         System.IO.Directory.CreateDirectory(logsDir);
                     }
 
-                    System.IO.File.AppendAllLines(System.IO.Path.Combine(logsDir, fn), messages);
+                    //doesn't lock file when writing
+                    using (var outStream = new FileStream(fullPathToFile, FileMode.OpenOrCreate,
+                        FileAccess.Write, FileShare.ReadWrite))
+                    {
+                        byte[] b;
+                        byte[] newLine = new UTF8Encoding(true).GetBytes(Environment.NewLine);
+                        foreach (var message in messages)
+                        {
+                            b = new UTF8Encoding(true).GetBytes(message);
+                            outStream.Write(b, 0, b.Length);
+                            outStream.Write(newLine, 0, newLine.Length);
+                        }
+                    }
+
                 }
                 catch (System.Exception exc)
                 {
