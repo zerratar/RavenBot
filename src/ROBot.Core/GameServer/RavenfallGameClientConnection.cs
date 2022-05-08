@@ -136,7 +136,7 @@ namespace ROBot.Core.GameServer
                 }
                 catch (Exception exc)
                 {
-                    Console.WriteLine(exc.ToString());
+                    logger.LogError(exc.ToString());
                     await Task.Delay(1000);
                 }
             }

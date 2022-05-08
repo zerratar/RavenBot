@@ -13,21 +13,21 @@ namespace Shinobytes.Network
         public event EventHandler<ConnectionEventArgs> ClientConnected;
         public event EventHandler<ConnectionEventArgs> ClientDisconnected;
 
+        private readonly ILogger logger;
         private readonly ServerSettings settings;
         private readonly IServerClientProvider clientProvider;
-        private readonly IServerConnectionManager connectionManager;
         private TcpListener tcpServer;
         private bool disposed;
         private CancellationToken cancellationToken;
 
         public TcpServer(
+            ILogger logger,
             ServerSettings settings,
-            IServerClientProvider clientProvider,
-            IServerConnectionManager connectionManager)
+            IServerClientProvider clientProvider)
         {
+            this.logger = logger;
             this.settings = settings;
             this.clientProvider = clientProvider;
-            this.connectionManager = connectionManager;
             if (!IPAddress.TryParse(this.settings.host, out var ip))
             {
                 ip = IPAddress.Any;
@@ -35,6 +35,8 @@ namespace Shinobytes.Network
 
             this.tcpServer = new TcpListener(new IPEndPoint(ip, this.settings.port));
         }
+
+        public Exception LastException { get; private set; }
 
         public void Dispose()
         {
@@ -47,22 +49,31 @@ namespace Shinobytes.Network
             disposed = true;
         }
 
-        public Task StartAsync(CancellationToken cancellationToken)
+        public Task<bool> StartAsync(CancellationToken cancellationToken)
         {
-            if (disposed)
+            try
             {
-                throw new ObjectDisposedException(nameof(TcpServer));
-            }
+                if (disposed)
+                {
+                    throw new ObjectDisposedException(nameof(TcpServer));
+                }
 
-            if (this.tcpServer.Server.IsBound)
+                if (this.tcpServer.Server.IsBound)
+                {
+                    return Task.FromResult(false);
+                }
+
+                this.cancellationToken = cancellationToken;
+                this.tcpServer.Start();
+                this.tcpServer.BeginAcceptTcpClient(OnClientConnected, this.tcpServer);
+                return Task.FromResult(true);
+            }
+            catch (Exception exc)
             {
-                return Task.CompletedTask;
+                LastException = exc;
+                logger.LogError(exc.ToString());
+                return Task.FromResult(false);
             }
-
-            this.cancellationToken = cancellationToken;
-            this.tcpServer.Start();
-            this.tcpServer.BeginAcceptTcpClient(OnClientConnected, this.tcpServer);
-            return Task.CompletedTask;
         }
 
         private void OnClientConnected(IAsyncResult ar)
@@ -88,7 +99,6 @@ namespace Shinobytes.Network
                 client = clientProvider.Get(tcpClient);
 
                 client.Disconnected += Client_Disconnected;
-                connectionManager.Add(client);
 
                 if (ClientConnected != null)
                 {
@@ -97,9 +107,9 @@ namespace Shinobytes.Network
             }
             catch (Exception exc)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(exc.ToString());
-                Console.ResetColor();
+                LastException = exc;
+
+                logger.LogError(exc.ToString());
                 try
                 {
                     if (tcpClient != null && tcpClient.Connected)
@@ -114,9 +124,8 @@ namespace Shinobytes.Network
                 }
                 catch (Exception exc2)
                 {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine(exc2.ToString());
-                    Console.ResetColor();
+                    LastException = exc2;
+                    logger.LogError(exc.ToString());
                 }
             }
 
@@ -129,7 +138,7 @@ namespace Shinobytes.Network
             {
                 if (!this.tcpServer.Server.IsBound)
                 {
-                    Console.WriteLine("Restarting TCP Server...");
+                    logger.LogInformation($"Restarting TCP Server on port {this.settings.port}...");
                     if (!IPAddress.TryParse(this.settings.host, out var ip))
                     {
                         ip = IPAddress.Any;
@@ -144,9 +153,8 @@ namespace Shinobytes.Network
             }
             catch (Exception exc)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(exc.ToString());
-                Console.ResetColor();
+                LastException = exc;
+                logger.LogError(exc.ToString());
             }
         }
 
@@ -154,7 +162,6 @@ namespace Shinobytes.Network
         {
             var client = sender as INetworkClient;
             client.Disconnected -= Client_Disconnected;
-            connectionManager.Remove(client);
 
             if (ClientDisconnected != null)
             {
@@ -167,9 +174,8 @@ namespace Shinobytes.Network
             }
             catch (Exception exc)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(exc.ToString());
-                Console.ResetColor();
+                LastException = exc;
+                logger.LogError(exc.ToString());
             }
         }
 
