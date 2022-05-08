@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.Json;
 
 namespace ROBot
 {
@@ -49,7 +50,7 @@ namespace ROBot
                     }
 
                     //doesn't lock file when writing
-                    using (var outStream = new FileStream(fullPathToFile, FileMode.OpenOrCreate,
+                    using (var outStream = new FileStream(fullPathToFile, FileMode.Append,
                         FileAccess.Write, FileShare.ReadWrite))
                     {
                         byte[] b;
@@ -60,6 +61,7 @@ namespace ROBot
                             outStream.Write(b, 0, b.Length);
                             outStream.Write(newLine, 0, newLine.Length);
                         }
+                        
                     }
 
                 }
@@ -122,7 +124,7 @@ namespace ROBot
                 }
             }
 
-            PersistLine("{" + logLevel + "}: " + message, appendNewLine);
+            PersistLine(message, logLevel, appendNewLine);
             lastLogLevel = logLevel;
         }
 
@@ -143,24 +145,43 @@ namespace ROBot
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void PersistLine(string str, bool appendNewLine = false)
+        private void PersistLine(string str, LogLevel loglevel = LogLevel.None, bool appendNewLine = false)
         {
-            if (appendNewLine) AddMessage("");
-            AddMessage($"[{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss K}]: {str}");
+            if (appendNewLine) AddMessage(new LogObj());
+            AddMessage(new LogObj
+            {
+                LogDateTime = DateTime.UtcNow,
+                LogLevel = loglevel,
+                Message = str
+            }) ;
         }
 
-        private void AddMessage(string str)
+        private void AddMessage(LogObj log)
         {
             lock (mutex)
             {
-                messages.Add(str);
+                if(log.LogDateTime is null)
+                {
+                    //messages.Add(""); - Keeps adding blank
+                } else
+                {
+                    messages.Add(JsonSerializer.Serialize(log));
+                }
 
+                
                 if (messages.Count > maxMessageStack || (DateTime.UtcNow - lastSave) >= maxTimeBetweenSave)
                 {
                     TrySaveLogToDisk();
                     messages.Clear();
                 }
             }
+        }
+
+        private class LogObj
+        {
+            public DateTime? LogDateTime { get; set; }
+            public LogLevel? LogLevel { get; set; }
+            public string Message { get; set; } = "";
         }
     }
 }
