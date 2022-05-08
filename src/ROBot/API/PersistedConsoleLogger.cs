@@ -54,12 +54,12 @@ namespace ROBot
                         FileAccess.Write, FileShare.ReadWrite))
                     {
                         byte[] b;
-                        byte[] newLine = new UTF8Encoding(true).GetBytes(Environment.NewLine);
+                        byte[] newLineDelimiter = new UTF8Encoding(true).GetBytes("    " + Environment.NewLine);
                         foreach (var message in messages)
                         {
                             b = new UTF8Encoding(true).GetBytes(message);
                             outStream.Write(b, 0, b.Length);
-                            outStream.Write(newLine, 0, newLine.Length);
+                            outStream.Write(newLineDelimiter, 0, newLineDelimiter.Length);
                         }
                         
                     }
@@ -176,7 +176,7 @@ namespace ROBot
                 }
             }
         }
-
+        //TODO export out as model, copy also exisit in ServerServices in RavenNest.Blazor.Services
         private class LogObj
         {
             public DateTime? LogDateTime { get; set; }
