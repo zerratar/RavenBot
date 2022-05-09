@@ -54,7 +54,7 @@ namespace ROBot
                         FileAccess.Write, FileShare.ReadWrite))
                     {
                         byte[] b;
-                        byte[] newLineDelimiter = new UTF8Encoding(true).GetBytes("    " + Environment.NewLine);
+                        byte[] newLineDelimiter = new UTF8Encoding(true).GetBytes(Environment.NewLine);
                         foreach (var message in messages)
                         {
                             b = new UTF8Encoding(true).GetBytes(message);
@@ -162,7 +162,7 @@ namespace ROBot
             {
                 if(log.LogDateTime is null)
                 {
-                    //messages.Add(""); - Keeps adding blank
+                    //messages.Add(""); messes with json formatting
                 } else
                 {
                     messages.Add(JsonSerializer.Serialize(log));
