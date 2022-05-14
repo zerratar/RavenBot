@@ -23,8 +23,6 @@ namespace ROBot
         private readonly int maxMessageStack = 1000;
         private DateTime lastSave = DateTime.UtcNow;
         private TimeSpan maxTimeBetweenSave = TimeSpan.FromSeconds(5);
-        private LogLevel lastLogLevel = LogLevel.Debug;
-        private string lastTag;
         public PersistedConsoleLogger(IMessageBus messageBus)
         {
             this.logger = new ConsoleLogger();
@@ -50,18 +48,13 @@ namespace ROBot
                     }
 
                     //doesn't lock file when writing
-                    using (var outStream = new FileStream(fullPathToFile, FileMode.Append,
-                        FileAccess.Write, FileShare.ReadWrite))
+                    using (var outStream = new FileStream(fullPathToFile, FileMode.Append, FileAccess.Write, FileShare.ReadWrite))
+                    using (var output = new StreamWriter(outStream))
                     {
-                        byte[] b;
-                        byte[] newLineDelimiter = new UTF8Encoding(true).GetBytes(Environment.NewLine);
                         foreach (var message in messages)
                         {
-                            b = new UTF8Encoding(true).GetBytes(message);
-                            outStream.Write(b, 0, b.Length);
-                            outStream.Write(newLineDelimiter, 0, newLineDelimiter.Length);
+                            output.WriteLine(message);
                         }
-                        
                     }
 
                 }
@@ -107,25 +100,7 @@ namespace ROBot
         {
             this.logger.Log<TState>(logLevel, eventId, state, exception, formatter);
             var message = formatter != null ? formatter(state, exception) : state.ToString();
-
-            var appendNewLine = lastLogLevel != logLevel;
-            if (!string.IsNullOrEmpty(message))
-            {
-                var bracketEnd = message.IndexOf(']');
-                var bracketStart = message.IndexOf('[');
-                if (bracketStart != -1 && bracketEnd > bracketStart)
-                {
-                    var tag = message.Split(']')[0].Split('[')[1];
-                    if (tag != lastTag)
-                    {
-                        appendNewLine = true;
-                    }
-                    lastTag = tag;
-                }
-            }
-
-            PersistLine(message, logLevel, appendNewLine);
-            lastLogLevel = logLevel;
+            PersistLine(message, logLevel);
         }
 
         public bool IsEnabled(LogLevel logLevel) => logger.IsEnabled(logLevel);
@@ -145,30 +120,22 @@ namespace ROBot
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void PersistLine(string str, LogLevel loglevel = LogLevel.None, bool appendNewLine = false)
+        private void PersistLine(string str, LogLevel loglevel = LogLevel.None)
         {
-            if (appendNewLine) AddMessage(new LogObj());
-            AddMessage(new LogObj
+            AddMessage(new LogEntry
             {
                 LogDateTime = DateTime.UtcNow,
                 LogLevel = loglevel,
                 Message = str
-            }) ;
+            });
         }
 
-        private void AddMessage(LogObj log)
+        private void AddMessage(LogEntry log)
         {
             lock (mutex)
             {
-                if(log.LogDateTime is null)
-                {
-                    //messages.Add(""); messes with json formatting
-                } else
-                {
-                    messages.Add(JsonSerializer.Serialize(log));
-                }
+                messages.Add(JsonSerializer.Serialize(log));
 
-                
                 if (messages.Count > maxMessageStack || (DateTime.UtcNow - lastSave) >= maxTimeBetweenSave)
                 {
                     TrySaveLogToDisk();
@@ -176,12 +143,13 @@ namespace ROBot
                 }
             }
         }
+
         //TODO export out as model, copy also exisit in ServerServices in RavenNest.Blazor.Services
-        private class LogObj
+        private class LogEntry
         {
-            public DateTime? LogDateTime { get; set; }
-            public LogLevel? LogLevel { get; set; }
-            public string Message { get; set; } = "";
+            public DateTime LogDateTime { get; set; }
+            public LogLevel LogLevel { get; set; }
+            public string Message { get; set; }
         }
     }
 }
