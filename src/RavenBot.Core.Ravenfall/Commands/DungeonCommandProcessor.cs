@@ -38,13 +38,9 @@ namespace RavenBot.Core.Ravenfall.Commands
                     await this.game.StopDungeonAsync(player);
                 }
             }
-            else if (cmd.Arguments.Contains("start", System.StringComparison.OrdinalIgnoreCase))
-            {
-                await this.game.DungeonStartAsync(player);
-            }
             else
             {
-                await this.game.JoinDungeonAsync(new EventJoinRequest(player, cmd.Arguments));
+                await this.game.DungeonStartAsync(player);
             }
         }
     }
