@@ -124,7 +124,10 @@ namespace ROBot.Core.Twitch
             try
             {
                 var redeemer = reward.RewardRedeemed.Redemption.User;
-                var arguments = reward.RewardRedeemed.Redemption.Reward.Prompt?.Trim();
+                // Todo: Test to see if Prompt contains a valid username before setting arguments.
+                // Prompt also seem to be the channel reward description when set
+                //var arguments = reward.RewardRedeemed.Redemption.Reward.Prompt?.Trim();
+                var arguments = redeemer.Login;
                 var command = reward.RewardRedeemed.Redemption.Reward.Title;
                 var cmdParts = command.ToLower().Split(' ');
                 var session = game.GetSession(reward.ChannelId);
@@ -173,10 +176,10 @@ namespace ROBot.Core.Twitch
                     usedCommand = cmd;
                 }
 
-                if (string.IsNullOrEmpty(arguments))
-                {
-                    arguments = redeemer.Login;
-                }
+               if (string.IsNullOrEmpty(arguments))
+               {
+                   arguments = redeemer.Login;
+              }
 
                 //if (processor.RequiresBroadcaster)
                 //{
