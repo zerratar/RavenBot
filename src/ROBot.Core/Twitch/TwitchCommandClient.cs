@@ -604,7 +604,7 @@ namespace ROBot.Core.Twitch
 
         private void Client_OnUserStateChanged(object sender, OnUserStateChangedArgs e)
         {
-            logger.LogDebug("[TWITCH] Client_OnUserStateChanged: " + e.ToString());
+            //logger.LogDebug("[TWITCH] Client_OnUserStateChanged: " + e.ToString());
         }
 
         private void Client_OnMessageSent(object sender, OnMessageSentArgs e)
