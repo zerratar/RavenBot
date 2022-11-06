@@ -126,7 +126,8 @@ namespace ROBot.Core.Twitch
                 var redeemer = reward.RewardRedeemed.Redemption.User;
                 // Todo: Test to see if Prompt contains a valid username before setting arguments.
                 // Prompt also seem to be the channel reward description when set
-                var arguments = reward.RewardRedeemed.Redemption.Reward.Prompt?.Trim();
+                //var arguments = reward.RewardRedeemed.Redemption.Reward.Prompt?.Trim();
+                var arguments = redeemer.Login; //Will ignore anything from twitch
                 var command = reward.RewardRedeemed.Redemption.Reward.Title;
                 var cmdParts = command.ToLower().Split(' ');
                 var session = game.GetSession(reward.ChannelId);
