@@ -11,7 +11,8 @@ namespace ROBot.Core.Twitch
         private readonly object mutex = new object();
         private readonly ILogger logger;
 
-        private const string PubSubTokenDb = "pubsub-tokens.json";
+        public const string GeneratedData = "../generated-data";
+        private const string PubSubTokenDb = GeneratedData + "/pubsub-tokens.json";
 
         public TwitchPubSubTokenRepository(ILogger logger)
         {
