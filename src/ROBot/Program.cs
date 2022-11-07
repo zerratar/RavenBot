@@ -80,9 +80,9 @@ namespace ROBot
             ioc.RegisterShared<IAdminAPIEndpointServer, AdminTcpAPIEndpointServer>();
 
             ioc.RegisterShared<ILogger, PersistedConsoleLogger>();
-            
+
             ioc.Resolve<IAdminAPIEndpointServer>();
-            
+
             var app = ioc.Resolve<IStreamBotApplication>();
             {
                 app.Run();

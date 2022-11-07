@@ -26,10 +26,7 @@ namespace ROBot.Core.Twitch
 
         private ITwitchChatMessageHandler messageHandler;
         private IUserRoleManager userRoleManager;
-
         public ICollection<Type> RegisteredCommandHandlers => handlerLookup.Values;
-
-
 
         public TwitchCommandController(
             ILogger logger,
@@ -39,7 +36,6 @@ namespace ROBot.Core.Twitch
             this.ioc = ioc;
 
             RegisterCommandHandlers();
-
             userRoleManager = this.ioc.Resolve<IUserRoleManager>();
         }
 
@@ -124,6 +120,7 @@ namespace ROBot.Core.Twitch
             try
             {
                 var redeemer = reward.RewardRedeemed.Redemption.User;
+
                 // Todo: Test to see if Prompt contains a valid username before setting arguments.
                 // Prompt also seem to be the channel reward description when set
                 //var arguments = reward.RewardRedeemed.Redemption.Reward.Prompt?.Trim();
@@ -176,10 +173,10 @@ namespace ROBot.Core.Twitch
                     usedCommand = cmd;
                 }
 
-               if (string.IsNullOrEmpty(arguments))
-               {
-                   arguments = redeemer.Login;
-               }
+                if (string.IsNullOrEmpty(arguments))
+                {
+                    arguments = redeemer.Login;
+                }
 
                 //if (processor.RequiresBroadcaster)
                 //{
@@ -204,8 +201,9 @@ namespace ROBot.Core.Twitch
                         return false;
                     }
                 }
-                logger.LogDebug("[TWITCH] Reward Redeemed (Command: " + usedCommand + " | Redeemer: " + player.Username + " | Channel: " + reward.ChannelId + " | Arguments: " + arguments + " | Prompt: " + reward.RewardRedeemed.Redemption.Reward.Prompt?.Trim() + ")");
-                await processor.HandleAsync(game, twitch, new RewardRedeemCommand(player, reward.ChannelId, usedCommand, arguments));
+
+                logger.LogDebug("[TWITCH] Reward Redeemed (Command: " + usedCommand + " | Redeemer: " + player.Username + " | Channel: " + session.Name + " | Arguments: " + arguments + " | Prompt: " + reward.RewardRedeemed.Redemption.Reward.Prompt?.Trim() + ")");
+                await processor.HandleAsync(game, twitch, new RewardRedeemCommand(player, session.Name, usedCommand, arguments));
                 return true;
             }
             catch (Exception exc)

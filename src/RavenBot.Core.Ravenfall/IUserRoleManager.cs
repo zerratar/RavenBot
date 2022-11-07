@@ -6,7 +6,6 @@ namespace RavenBot.Core.Ravenfall.Commands
     {
         bool IsAdministrator(string userId);
         bool IsModerator(string userId);
-
         void SetRole(string userId, string role);
         string GetRole(string userId);
     }

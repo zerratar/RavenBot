@@ -4,6 +4,7 @@ using RavenBot.Core.Repositories;
 
 namespace RavenBot.Core.Twitch
 {
+
     public class TwitchUserStore : FileBasedRepository<TwitchUser>, ITwitchUserStore
     {
         public TwitchUserStore()
