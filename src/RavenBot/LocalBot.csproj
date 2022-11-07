@@ -5,6 +5,7 @@
 	<TargetFramework>net6.0-windows</TargetFramework>
     <!--<PublishTrimmed>true</PublishTrimmed>-->
 
+	<PublishSingleFile Condition="'$(Configuration)' == 'Release'">true</PublishSingleFile>
 	<UseWindowsForms>true</UseWindowsForms>
     <PublishReadyToRun>true</PublishReadyToRun>
     <PublishSingleFile>true</PublishSingleFile>
