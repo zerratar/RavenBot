@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using RavenBot.Core.Handlers;
 using RavenBot.Core.Ravenfall.Models;
-using TwitchLib.Api.Core.Models.Undocumented.TwitchPrimeOffers;
 
 namespace RavenBot.Core.Ravenfall.Commands
 {

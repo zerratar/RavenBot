@@ -171,7 +171,6 @@ namespace ROBot.Core.Twitch
                     }));
 
                 client.AutoReListenOnException = true;
-                client.OverrideBeingHostedCheck = true;
 
                 var credentials = credentialsProvider.Get();
 

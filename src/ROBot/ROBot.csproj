@@ -15,11 +15,11 @@
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.23.1" />
-    <PackageReference Include="TwitchLib.Api" Version="3.8.0-preview-d3099c4231a48ac6d19b203b638f0a12d0c55864" />
-    <PackageReference Include="TwitchLib.Api.Core" Version="3.8.0-preview-d3099c4231a48ac6d19b203b638f0a12d0c55864" />
-    <PackageReference Include="TwitchLib.Api.Helix" Version="3.8.0-preview-d3099c4231a48ac6d19b203b638f0a12d0c55864" />
-    <PackageReference Include="TwitchLib.Client" Version="3.2.7-preview-fe24087f8ba46baf2159bbb91f84c1125b66dfdf" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.25.0" />
+    <PackageReference Include="TwitchLib.Api" Version="3.8.0" />
+    <PackageReference Include="TwitchLib.Api.Core" Version="3.8.0" />
+    <PackageReference Include="TwitchLib.Api.Helix" Version="3.8.0" />
+    <PackageReference Include="TwitchLib.Client" Version="3.3.1" />
   </ItemGroup>
 
   <ItemGroup>
