@@ -20,17 +20,22 @@ namespace ROBot.Tests
             return new MockRavenfallConnection();
         }
 
+        public IRavenfallConnection GetConnectionByUserId(string sessionUserId)
+        {
+            return new MockRavenfallConnection();
+        }
+
         public IGameSession GetSession(string session)
         {
             return new MockGameSession(session);
         }
 
         public void OnClientDisconnected(IRavenfallConnection connection)
-        {            
+        {
         }
 
         public void Start()
-        {         
+        {
         }
     }
 
