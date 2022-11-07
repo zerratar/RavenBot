@@ -83,7 +83,7 @@ namespace ROBot.Core.Twitch
         {
             try
             {
-                if (token.BadAuth)
+                if (token.BadAuth || string.IsNullOrEmpty(token.Token))
                 {
                     return;
                 }
