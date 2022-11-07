@@ -132,7 +132,14 @@ namespace ROBot.Core.Twitch
             try
             {
                 state = PubSubState.Authenticating;
+
                 //logger.LogDebug("[TWITCH] Connected To PubSub (Username: " + token.UserName + ")");                
+                if (string.IsNullOrEmpty(token.Token))
+                {
+                    state = PubSubState.Connected;
+                    return;
+                }
+
                 client.SendTopics(token.Token);
                 logger.LogDebug("[TWITCH] Sent PubSub Topics (Username: " + token.UserName + " Token: " + token.Token + ")");
             }
