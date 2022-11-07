@@ -143,7 +143,7 @@ namespace ROBot.Core.Twitch
                 client.OnConnectionError -= OnConnectionError;
                 client.OnMessageSent -= Client_OnMessageSent;
                 client.OnUserStateChanged -= Client_OnUserStateChanged;
-                client.OnRateLimit -= Client_OnRateLimit;                
+                client.OnRateLimit -= Client_OnRateLimit;
             }
             if (pubSubManager != null)
             {
@@ -162,7 +162,7 @@ namespace ROBot.Core.Twitch
 
             try
             {
-                client = 
+                client =
                     new TwitchClient(new WebSocketClient(new ClientOptions
                     {
                         ClientType = ClientType.Chat,
@@ -269,14 +269,15 @@ namespace ROBot.Core.Twitch
             this.attemptingReconnection = true;
             logger.LogWarning($"[TWITCH] Reconnecting (wasConnected: " + wasConnected + " Attempt: " + stats.TwitchConnectionCurrentAttempt + ")");
 
-            if((stats.TwitchConnectionCurrentAttempt % 10) != 0)
+            if ((stats.TwitchConnectionCurrentAttempt % 10) != 0)
             {
                 client.Connect(); //Rather than restarting the whole process, will just redo a connection
-            } else
+            }
+            else
             {
                 Start(); //Restart Process every 10 tries to see if this fix any connection issues
             }
-            
+
         }
         private async void TestingConnection() //Start timer to test for connection
         {
@@ -609,7 +610,8 @@ namespace ROBot.Core.Twitch
 
         private void Client_OnMessageSent(object sender, OnMessageSentArgs e)
         {
-            logger.LogDebug("[TWITCH] OnMessageSent (To: " + e.SentMessage.Channel + " Message: '" + e.SentMessage.Message + "')");
+            // this is already being logged in SendChatMessage
+            //logger.LogDebug("[TWITCH] OnMessageSent (To: " + e.SentMessage.Channel + " Message: '" + e.SentMessage.Message + "')");
             if (e.SentMessage == null)
                 return;
 
@@ -721,7 +723,12 @@ namespace ROBot.Core.Twitch
         private void Pubsub_OnListenFailBadAuth(object sender, OnListenResponseArgs e)
         {
             //TODO: Event doesn't reach here - I'm doing something wrong, or missing something in my knowledge of firing events.
-            TwitchPubSubClient client = (TwitchPubSubClient)sender;
+
+            //var pubsubManager = (TwitchPubSubManager)sender;
+
+            logger.LogError($"[TWITCH] PubSub auth failed for channel with ID: '{e.ChannelId}', Topic: '{e.Topic}', Error: '" + e.Response?.Error + "'");
+
+            //TwitchPubSubClient client = (TwitchPubSubClient)sender;
             //Commented to prevent spam until the pubsub reconnection is fixed. 
             //this.client.SendWhisper(client.getChannel(), "PubSub failed due to bad auth. To allow the bot to detect when channel points are used, run \"!pubsub activate\" in channel again. Thanks!");
             //logger.LogDebug("[TWITCH] Auth Failed - (TODO SEND WHISPER) Whisper sent (Name: " + client.getChannel() + ")");

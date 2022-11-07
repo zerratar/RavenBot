@@ -200,7 +200,7 @@ namespace ROBot.Core.Twitch
                     player = session.Get(new RewardRedeemUser(redeemer));
                     if (player == null)
                     {
-                        logger.LogError("[BOT] Error Redeeming Reward - Redeemer Does not Exisit (Command: " + usedCommand + " Redeemer:" + redeemer.Id + ")");
+                        logger.LogError("[BOT] Error Redeeming Reward - Redeemer Does not Exisit (Command: " + usedCommand + " Redeemer: " + redeemer.Id + ")");
                         return false;
                     }
                 }

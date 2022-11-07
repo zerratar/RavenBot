@@ -386,7 +386,7 @@ namespace ROBot.Core.GameServer
             if (session == null || !session.Name.Equals(obj.Channel, StringComparison.OrdinalIgnoreCase))
                 return;
 
-            logger.LogDebug("[TWITCH] Bits Cheered (Channel: " + obj.Channel + " Bits: " + obj.Bits + " From:" + obj.DisplayName + ")");
+            logger.LogDebug("[TWITCH] Bits Cheered (Channel: " + obj.Channel + " Bits: " + obj.Bits + " From: " + obj.DisplayName + ")");
             await SendAsync("twitch_cheer", obj);
         }
 
@@ -402,7 +402,7 @@ namespace ROBot.Core.GameServer
                 name = player.DisplayName;
             }
 
-            logger.LogDebug("[TWITCH] Sub Recieved (Channel: " + obj.Channel + " From:" + obj.DisplayName + " To: " + name + ")");
+            logger.LogDebug("[TWITCH] Sub Recieved (Channel: " + obj.Channel + " From: " + obj.DisplayName + " To: " + name + ")");
             await SendAsync("twitch_sub", obj);
         }
 

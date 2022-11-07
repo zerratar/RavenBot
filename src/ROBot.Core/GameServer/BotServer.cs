@@ -279,7 +279,7 @@ namespace ROBot.Core.GameServer
                         {
                             if (existingConnection.Session.Created > e.Created)
                             {
-                                logger.LogDebug("[RVNFLL] Ravenfall client sent a second auth with a created date less than current. (EndPoint :" + connection.EndPointString + ")");
+                                logger.LogDebug("[RVNFLL] Ravenfall client sent a second auth with a created date less than current. (EndPoint: " + connection.EndPointString + ")");
                                 return;
                             }
 

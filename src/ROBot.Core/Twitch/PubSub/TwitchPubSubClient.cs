@@ -13,30 +13,65 @@ namespace ROBot.Core.Twitch
         private readonly ILogger logger;
         private readonly PubSubToken token;
 
-        private bool isConnected;
-        private bool receivesChannelPointRewardDetails;
+        private PubSubState state;
 
         public event EventHandler<OnChannelPointsRewardRedeemedArgs> OnChannelPointsRewardRedeemed;
         public event EventHandler<OnListenResponseArgs> OnListenFailBadAuth;
+        public bool IsConnected => client != null && state >= PubSubState.Connected;
+        public bool IsReady => client != null && state == PubSubState.Ready;
+        public bool IsAuthOK => token != null && !token.BadAuth;
 
-        public bool IsConnected => client != null && isConnected;
-
-        public bool IsReady => client != null && isConnected && receivesChannelPointRewardDetails;
-        public bool IsAuthOK => token != null && !token.BadAuth == true;
 
         public TwitchPubSubClient(ILogger logger, PubSubToken token)
         {
+            token.OnUpdated += OnTokenUpdated;
+
             this.logger = logger;
             this.token = token;
-            this.client = new TwitchPubSub();
 
+            CreateClient();
+            Connect();
+        }
+
+        private async void OnTokenUpdated(object sender, EventArgs e)
+        {
+            if (state == PubSubState.Connecting)
+            {
+                CreateClient();
+            }
+
+            if (state == PubSubState.Disconnected || state == PubSubState.Connected)
+            {
+                logger.LogWarning("[TWITCH] Recieved new pubsub token for (Username: '" + token.UserName + "') trying to reconnect.");
+                Connect();
+                await Task.Delay(1000);
+            }
+        }
+
+        private void CreateClient()
+        {
+            if (client != null)
+            {
+                // kill it with fire.
+                try
+                {
+                    UnsubscribeClient();
+
+                    if (state != PubSubState.Disconnected)
+                    {
+                        client.Disconnect();
+                    }
+                }
+                catch { }
+            }
+
+            this.client = new TwitchPubSub();
             client.OnPubSubServiceConnected += Client_OnPubSubServiceConnected;
             client.OnPubSubServiceClosed += Client_OnPubSubServiceClosed;
             client.OnPubSubServiceError += Client_OnPubSubServiceError;
             client.OnListenResponse += Client_OnListenResponse;
             client.OnChannelPointsRewardRedeemed += Client_OnChannelPointsRewardRedeemed;
-
-            Connect();
+            state = PubSubState.Disconnected;
         }
 
         public string getChannel()
@@ -44,11 +79,16 @@ namespace ROBot.Core.Twitch
             return token.UserName;
         }
 
-
         private void Connect()
         {
             try
             {
+                if (token.BadAuth)
+                {
+                    return;
+                }
+
+                state = PubSubState.Connecting;
                 logger.LogDebug("[TWITCH] Connecting to PubSub (Username: " + token.UserName + ")");
                 client.ListenToChannelPoints(token.UserId);
                 client.Connect();
@@ -63,16 +103,16 @@ namespace ROBot.Core.Twitch
         {
             var wasReady = IsReady;
 
-            isConnected = false;
-            receivesChannelPointRewardDetails = false;
+            state = PubSubState.Disconnected;
             logger.LogError("[TWITCH] PubSub ERROR (Username: " + token.UserName + " Exception: " + e.Exception.Message + ")");
 
-            if (wasReady && !token.BadAuth == true)
+            if (wasReady && !token.BadAuth)
             {
                 logger.LogWarning("[TWITCH] Attempting to Reconnect to PubSub (Username: " + token.UserName + ")");
                 await Task.Delay(1000);
                 Connect();
-            } else
+            }
+            else
             {
                 logger.LogWarning("[TWITCH] Rejecting Reconnect attempt to PubSub (Username: " + token.UserName + ")");
             }
@@ -80,10 +120,8 @@ namespace ROBot.Core.Twitch
 
         private async void Client_OnPubSubServiceClosed(object sender, EventArgs e)
         {
-            isConnected = false;
-            receivesChannelPointRewardDetails = false;
+            state = PubSubState.Disconnected;
             logger.LogError("[TWITCH] PubSub Connection Closed for " + token.UserName);
-
             logger.LogWarning("[TWITCH] Attempting to Reconnect to PubSub (Username: " + token.UserName + ")");
             await Task.Delay(1000);
             Connect();
@@ -93,14 +131,14 @@ namespace ROBot.Core.Twitch
         {
             try
             {
-                isConnected = true;
-                logger.LogDebug("[TWITCH] Connected To PubSub (Username: " + token.UserName + ")");
+                state = PubSubState.Authenticating;
+                //logger.LogDebug("[TWITCH] Connected To PubSub (Username: " + token.UserName + ")");                
                 client.SendTopics(token.Token);
-                logger.LogDebug("[TWITCH] Sent PubSub Topics (Username: " + token.UserName + " Token:" + token.Token + ")");
+                logger.LogDebug("[TWITCH] Sent PubSub Topics (Username: " + token.UserName + " Token: " + token.Token + ")");
             }
             catch (Exception exc)
             {
-                logger.LogError("[TWITCH] Unable To Send PubSub Topics (Username: " + token.UserName + " Exception:" + exc + ")");
+                logger.LogError("[TWITCH] Unable To Send PubSub Topics (Username: " + token.UserName + " Exception: " + exc + ")");
             }
         }
 
@@ -108,24 +146,27 @@ namespace ROBot.Core.Twitch
         {
             if (e.Successful)
             {
-                receivesChannelPointRewardDetails = true;
-                logger.LogDebug("[TWITCH] PubSub Listen Success (Topic: " + e.Topic + " Username: " + token.UserName + ")");
+                state = PubSubState.Ready;
+                token.UnverifiedToken = null;
+                logger.LogDebug("[TWITCH] PubSub Listen Success (Topic: '" + e.Topic + "' Username: '" + token.UserName + "')");
             }
             else
             {
-                logger.LogError("[TWITCH] PubSub Listen Unsuccessful  (Username:" + token.UserName + " Error:" + e.Response.Error + ")");
+                state = PubSubState.Connected;
+                logger.LogError("[TWITCH] PubSub Listen failed. (Topic: '" + e.Topic + "', Username: '" + token.UserName + "' Error: '" + e.Response.Error + "')");
                 if (e.Response.Error == "ERR_BADAUTH")
                 {
+                    // Remove the token, we don't want to use this one.
+                    token.Token = token.UnverifiedToken;
                     token.BadAuth = true;
-                    OnListenFailBadAuth?.Invoke(this, e);   
+                    OnListenFailBadAuth?.Invoke(this, e);
                 }
             }
         }
 
         private void Client_OnChannelPointsRewardRedeemed(object sender, OnChannelPointsRewardRedeemedArgs e)
         {
-            isConnected = true;
-            receivesChannelPointRewardDetails = true;
+            state = PubSubState.Ready;
             logger.LogDebug("[TWITCH] PubSub Reward Redeemed (Channel: " + token.UserName + " Title: " + e.RewardRedeemed.Redemption.Reward.Title + ")");
             OnChannelPointsRewardRedeemed?.Invoke(this, e);
         }
@@ -137,15 +178,13 @@ namespace ROBot.Core.Twitch
                 return;
             }
 
-            isConnected = false;
-            receivesChannelPointRewardDetails = false;
+            state = PubSubState.Disconnected;
             logger.LogDebug("[TWITCH] PubSub Disposed (Username: " + token.UserName + ")");
 
-            client.OnPubSubServiceConnected -= Client_OnPubSubServiceConnected;
-            client.OnChannelPointsRewardRedeemed -= Client_OnChannelPointsRewardRedeemed;
-            client.OnPubSubServiceClosed -= Client_OnPubSubServiceClosed;
-            client.OnPubSubServiceError -= Client_OnPubSubServiceError;
-            client.OnListenResponse -= Client_OnListenResponse;
+            token.OnUpdated -= OnTokenUpdated;
+
+            UnsubscribeClient();
+
             disposed = true;
             try
             {
@@ -155,5 +194,23 @@ namespace ROBot.Core.Twitch
             {
             }
         }
+
+        private void UnsubscribeClient()
+        {
+            client.OnPubSubServiceConnected -= Client_OnPubSubServiceConnected;
+            client.OnChannelPointsRewardRedeemed -= Client_OnChannelPointsRewardRedeemed;
+            client.OnPubSubServiceClosed -= Client_OnPubSubServiceClosed;
+            client.OnPubSubServiceError -= Client_OnPubSubServiceError;
+            client.OnListenResponse -= Client_OnListenResponse;
+        }
+    }
+
+    public enum PubSubState
+    {
+        Disconnected,
+        Connecting,
+        Connected,
+        Authenticating,
+        Ready
     }
 }

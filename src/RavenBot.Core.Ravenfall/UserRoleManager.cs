@@ -32,14 +32,14 @@ namespace RavenBot.Core.Ravenfall.Commands
 
         public void SetRole(string userId, string role)
         {
-            var oldRole = GetRole(userId);
-
+            //var oldRole = GetRole(userId);
             //if (oldRole != role)
             //{
             //    //logger.WriteDebug("User: " + userId + " changed role from " + oldRole + " to " + role);
             //}
 
             roles[userId] = role;
+
         }
     }
 }

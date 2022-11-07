@@ -34,14 +34,18 @@ namespace ROBot.Core.Twitch
                     }
                 }
 
-                //Update if there's a change
+                // Update if there's a change
                 bool tokenChange = (existing.Token != token);
-                existing.Token = token;
                 existing.UserName = userName;
-                if (badAuth != null)
-                    existing.BadAuth = badAuth;
-                if (tokenChange)
-                    existing.BadAuth = false; //Override previous flag because a different token need to be checked
+                existing.BadAuth = !tokenChange && badAuth.GetValueOrDefault();
+
+                if (string.IsNullOrEmpty(existing.Token))
+                {
+                    existing.Token = token;
+                }
+
+                existing.UnverifiedToken = token;
+                existing.Update();
 
                 return existing;
             }
@@ -53,7 +57,7 @@ namespace ROBot.Core.Twitch
 
         public PubSubToken AddOrUpdate(string userId, string userName, string token)
         {
-            return AddOrUpdate(userId, userName, token, null);
+            return AddOrUpdate(userId, userName, token, false);
         }
 
         private void SaveTokens()
@@ -68,7 +72,7 @@ namespace ROBot.Core.Twitch
             }
             catch (Exception exc)
             {
-                logger.LogError("[TWITCH] Unable to Save (Token: " + PubSubTokenDb + " Exc: " + exc + ")");
+                logger.LogError("[TWITCH] Unable to Save tokens (File: " + PubSubTokenDb + " Exc: " + exc + ")");
             }
         }
 
@@ -81,6 +85,10 @@ namespace ROBot.Core.Twitch
                     if (System.IO.File.Exists(PubSubTokenDb))
                     {
                         var data = System.IO.File.ReadAllText(PubSubTokenDb);
+
+                        // hax to allow making the nullable BadAuth into a normal bool.
+                        data = data.Replace("\"BadAuth\":null", "\"BadAuth\":false");
+
                         var records = Newtonsoft.Json.JsonConvert.DeserializeObject<List<PubSubToken>>(data);
                         this.tokens.Clear();
                         this.tokens.AddRange(records);
@@ -89,7 +97,7 @@ namespace ROBot.Core.Twitch
                     }
                     else
                     {
-                        logger.LogDebug("[TWITCH] PubSub Does Not Exisit. Skipping. (Token: " + PubSubTokenDb + ")");
+                        logger.LogDebug("[TWITCH] PubSub Does Not Exist. Skipping. (Token: " + PubSubTokenDb + ")");
                     }
                 }
             }
@@ -117,7 +125,7 @@ namespace ROBot.Core.Twitch
 
         public PubSubToken GetToken(string channel, string userId)
         {
-           return GetByUserName(channel) ?? GetById(userId);
+            return GetByUserName(channel) ?? GetById(userId);
         }
     }
 }

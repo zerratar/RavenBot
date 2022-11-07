@@ -76,7 +76,7 @@ namespace ROBot.Core.Twitch
                 return;
             }
 
-            if(!rejected) //silent the disconnect debug. We don't disconnect if we never connected in the first place
+            if (!rejected) //silent the disconnect debug. We don't disconnect if we never connected in the first place
                 logger.LogDebug("[TWITCH] Disconnected from PubSub (Channel: " + channel + ")");
 
             client.OnChannelPointsRewardRedeemed -= Client_OnChannelPointsRewardRedeemed;
@@ -115,17 +115,17 @@ namespace ROBot.Core.Twitch
                     Disconnect(channel, true);
                     return false;
                 }
-                    
+
                 if (!client.IsReady || !client.IsConnected)
                 {
                     bool usefulClient = false;
-                    logger.LogDebug("[TWITCH] PubSub Client Already Exisits (Channel: " + channel + " Connected: " + client.IsConnected + "  Ready: " + client.IsReady + ")");
+                    logger.LogDebug("[TWITCH] PubSub Client Already Exisits (Channel: " + channel + " Connected: " + client.IsConnected + " Ready: " + client.IsReady + ")");
 
                     if (client.IsConnected)
                         usefulClient = true; //Not sure if there's anything special with a not ready but connected PubSub Client is. (if isReady false, then isConnect will be false)
                     if (!client.IsReady)
                         Disconnect(channel); //Remove from list to force it to reconnect.
-                    
+
                     return usefulClient;
 
                 }
@@ -133,12 +133,12 @@ namespace ROBot.Core.Twitch
             }
 
             var token = pubsubTokenRepo.GetToken(channel, twitchId);
-            
+
             if (token == null)
             {
                 logger.LogDebug("[RVNFLL] No Token Found (Channel: " + channel + " twitchId: " + twitchId + ")");
                 return false;
-            } 
+            }
 
             if (token.BadAuth == true)
             {
@@ -167,7 +167,6 @@ namespace ROBot.Core.Twitch
 
         private void Client_OnListenFailBadAuth(object sender, OnListenResponseArgs args)
         {
-            logger.LogDebug("[TWITCH] Auth Failed. Event Fired");
             OnListenFailBadAuth?.Invoke(this, args);
         }
 

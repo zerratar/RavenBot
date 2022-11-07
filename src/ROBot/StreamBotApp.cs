@@ -237,7 +237,7 @@ namespace ROBot
 
         private void OnSessionStarted(object sender, IGameSession session)
         {
-            logger.LogDebug("[RVNFLL] Game Session Started (Name:" + session.Name + ")");
+            logger.LogDebug("[RVNFLL] Game Session Started (Name: " + session.Name + ")");
             twitch.JoinChannel(session.Name);
             botStats.LastSessionStarted = DateTime.UtcNow;
         }
