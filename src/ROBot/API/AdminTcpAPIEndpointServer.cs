@@ -60,8 +60,6 @@ namespace ROBot
 
         private void ServerClient_DataReceived(object sender, DataPacket e)
         {
-            //WriteLine("[Debug]: Log Server Recieved Data: " + e.Length);
-
             var client = sender as INetworkClient;
             var packet = packetSerializer.Deserialize(e);
             if (e == null)
@@ -77,6 +75,7 @@ namespace ROBot
                 return;
             }
 
+            logger.LogDebug("[Admin API] Data Received. Type=" + packet.Type + ", Size=" + packet.Data.Length);
             handler.HandleAsync(client, packet);
         }
 

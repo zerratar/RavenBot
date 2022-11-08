@@ -104,7 +104,11 @@ namespace ROBot.Core.Twitch
             var wasReady = IsReady;
 
             state = PubSubState.Disconnected;
-            logger.LogError("[TWITCH] PubSub ERROR (Username: " + token.UserName + " Exception: " + e.Exception.Message + ")");
+
+            if (e.Exception is not OperationCanceledException)
+            {
+                logger.LogError("[TWITCH] PubSub Error (Username: " + token.UserName + " Exception: " + e.Exception.Message + ")");
+            }
 
             if (wasReady && !token.BadAuth)
             {
