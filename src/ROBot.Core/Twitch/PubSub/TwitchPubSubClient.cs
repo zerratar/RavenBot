@@ -43,7 +43,7 @@ namespace ROBot.Core.Twitch
 
             if (state == PubSubState.Disconnected || state == PubSubState.Connected)
             {
-                logger.LogWarning("[TWITCH] Recieved new pubsub token for (Username: '" + token.UserName + "') trying to reconnect.");
+                logger.LogWarning("[TWITCH] Recieved new pubsub token for (Username: " + token.UserName + ") trying to reconnect.");
                 Connect();
                 await Task.Delay(1000);
             }
@@ -176,12 +176,12 @@ namespace ROBot.Core.Twitch
                 allowReconnect = true;
                 state = PubSubState.Ready;
                 token.UnverifiedToken = null;
-                logger.LogDebug("[TWITCH] PubSub Listen Success (Topic: '" + e.Topic + "' Username: '" + token.UserName + "')");
+                logger.LogDebug("[TWITCH] PubSub Listen Success (Topic: " + e.Topic + " Username: " + token.UserName + ")");
             }
             else
             {
                 state = PubSubState.Connected;
-                logger.LogError("[TWITCH] PubSub Listen failed. (Topic: '" + e.Topic + "', Username: '" + token.UserName + "' Error: '" + e.Response.Error + "')");
+                logger.LogError("[TWITCH] PubSub Listen failed. (Topic: " + e.Topic + ", Username: " + token.UserName + " Error: " + e.Response.Error + ")");
 
                 if (e.Response.Error == "ERR_BADAUTH")
                 {
