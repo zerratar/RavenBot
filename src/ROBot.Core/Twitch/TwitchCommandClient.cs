@@ -117,7 +117,6 @@ namespace ROBot.Core.Twitch
 
             /* TwitchLib.PubSub Events */
             pubSubManager.OnChannelPointsRewardRedeemed += Pubsub_OnChannelPointsRewardRedeemed;
-            pubSubManager.OnListenFailBadAuth += Pubsub_OnListenFailBadAuth;
         }
 
         private void Unsubscribe()
@@ -145,11 +144,11 @@ namespace ROBot.Core.Twitch
                 client.OnUserStateChanged -= Client_OnUserStateChanged;
                 client.OnRateLimit -= Client_OnRateLimit;
             }
+
             if (pubSubManager != null)
             {
                 //TwitchLib.PubSub
                 pubSubManager.OnChannelPointsRewardRedeemed -= Pubsub_OnChannelPointsRewardRedeemed;
-                pubSubManager.OnListenFailBadAuth -= Pubsub_OnListenFailBadAuth;
             }
         }
 
@@ -718,21 +717,6 @@ namespace ROBot.Core.Twitch
 
             currentlyJoiningChannels.TryRemove(e.Channel, out _);
         }
-
-        private void Pubsub_OnListenFailBadAuth(object sender, OnListenResponseArgs e)
-        {
-            //TODO: Event doesn't reach here - I'm doing something wrong, or missing something in my knowledge of firing events.
-
-            //var pubsubManager = (TwitchPubSubManager)sender;
-
-            logger.LogError($"[TWITCH] PubSub auth failed for channel with ID: '{e.ChannelId}', Topic: '{e.Topic}', Error: '" + e.Response?.Error + "'");
-
-            //TwitchPubSubClient client = (TwitchPubSubClient)sender;
-            //Commented to prevent spam until the pubsub reconnection is fixed. 
-            //this.client.SendWhisper(client.getChannel(), "PubSub failed due to bad auth. To allow the bot to detect when channel points are used, run \"!pubsub activate\" in channel again. Thanks!");
-            //logger.LogDebug("[TWITCH] Auth Failed - (TODO SEND WHISPER) Whisper sent (Name: " + client.getChannel() + ")");
-        }
-
     }
 }
 

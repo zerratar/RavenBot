@@ -23,7 +23,6 @@ namespace ROBot.Core.Twitch
             = new ConcurrentDictionary<string, TwitchPubSubClient>();
 
         public event EventHandler<OnChannelPointsRewardRedeemedArgs> OnChannelPointsRewardRedeemed;
-        public event EventHandler<OnListenResponseArgs> OnListenFailBadAuth;
 
         public TwitchPubSubManager(
             IMessageBus messageBus,
@@ -63,28 +62,31 @@ namespace ROBot.Core.Twitch
         {
             foreach (var i in pubsubClients.Values)
             {
+                i.OnDispose -= OnClientDisposed;
                 i.Dispose();
             }
+
             pubsubClients.Clear();
             awaitingPubSubAccess.Clear();
         }
 
-        public void Disconnect(string channel, bool rejected = false)
+        public void Disconnect(string channel, bool logRemoval = true)
         {
-            if (!pubsubClients.TryGetValue(channel.ToLower(), out var client))
+            if (!TryRemoveClient(channel, out var client))
             {
                 return;
             }
 
-            if (!rejected) //silent the disconnect debug. We don't disconnect if we never connected in the first place
+            if (logRemoval) //silent the disconnect debug. We don't disconnect if we never connected in the first place
+            {
                 logger.LogDebug("[TWITCH] Disconnected from PubSub (Channel: " + channel + ")");
+            }
 
-            client.OnChannelPointsRewardRedeemed -= Client_OnChannelPointsRewardRedeemed;
-            client.OnListenFailBadAuth -= Client_OnListenFailBadAuth;
-            pubsubClients.TryRemove(channel.ToLower(), out _);
-            client.Dispose();
+            if (client != null)
+            {
+                client.Dispose();
+            }
         }
-
 
         public bool IsReady(string channel)
         {
@@ -97,53 +99,33 @@ namespace ROBot.Core.Twitch
             return true;
         }
 
-        public bool PubSubConnect(string channel)
-        {
-            return PubSubConnect(channel, null);
-        }
-
-        public bool PubSubConnect(string channel, string twitchId)
+        public void PubSubConnect(string channel)
         {
             var key = channel.ToLower();
-            if (twitchId is null)
-                twitchId = "";
 
             if (pubsubClients.TryGetValue(key, out var client))
             {
-                if (!client.IsAuthOK)
+                if (!client.IsReady)
                 {
-                    Disconnect(channel, true);
-                    return false;
+                    logger.LogDebug("[TWITCH] PubSub Client Already Exists (Channel: " + channel + " Connected: " + client.IsConnected + " Ready: " + client.IsReady + ")");
+
+                    Disconnect(channel, client.IsAuthOK);
                 }
-
-                if (!client.IsReady || !client.IsConnected)
-                {
-                    bool usefulClient = false;
-                    logger.LogDebug("[TWITCH] PubSub Client Already Exisits (Channel: " + channel + " Connected: " + client.IsConnected + " Ready: " + client.IsReady + ")");
-
-                    if (client.IsConnected)
-                        usefulClient = true; //Not sure if there's anything special with a not ready but connected PubSub Client is. (if isReady false, then isConnect will be false)
-                    if (!client.IsReady)
-                        Disconnect(channel); //Remove from list to force it to reconnect.
-
-                    return usefulClient;
-
-                }
-                return true;
+                return;
             }
 
-            var token = pubsubTokenRepo.GetToken(channel, twitchId);
+            var token = pubsubTokenRepo.GetToken(channel);
 
             if (token == null)
             {
-                logger.LogDebug("[RVNFLL] No Token Found (Channel: " + channel + " twitchId: " + twitchId + ")");
-                return false;
+                logger.LogDebug("[RVNFLL] No Token Found (Channel: " + channel + ")");
+                return;
             }
 
-            if (token.BadAuth == true)
+            if (token.BadAuth)
             {
-                logger.LogDebug("[RVNFLL] Token Previously Failed Auth (Channel: " + channel + " twitchId: " + twitchId + ")");
-                return false;
+                logger.LogDebug("[RVNFLL] Token Previously Failed Auth (Channel: " + channel + ")");
+                return;
             }
 
             if (awaitingPubSubAccess.Contains(key))
@@ -154,10 +136,13 @@ namespace ROBot.Core.Twitch
 
             client = new TwitchPubSubClient(logger, token);
             client.OnChannelPointsRewardRedeemed += Client_OnChannelPointsRewardRedeemed;
-            client.OnListenFailBadAuth += Client_OnListenFailBadAuth;
-
+            client.OnDispose += OnClientDisposed;
             pubsubClients[channel.ToLower()] = client;
-            return true;
+        }
+
+        private void OnClientDisposed(object sender, TwitchPubSubClient e)
+        {
+            TryRemoveClient(e);
         }
 
         private void Client_OnChannelPointsRewardRedeemed(object sender, OnChannelPointsRewardRedeemedArgs e)
@@ -165,10 +150,22 @@ namespace ROBot.Core.Twitch
             OnChannelPointsRewardRedeemed?.Invoke(this, e);
         }
 
-        private void Client_OnListenFailBadAuth(object sender, OnListenResponseArgs args)
+        private bool TryRemoveClient(string channel, out TwitchPubSubClient client)
         {
-            OnListenFailBadAuth?.Invoke(this, args);
+            channel = channel.ToLower();
+            if (!pubsubClients.TryGetValue(channel, out client))
+            {
+                return false;
+            }
+
+            return TryRemoveClient(client);
         }
 
+        private bool TryRemoveClient(TwitchPubSubClient client)
+        {
+            client.OnChannelPointsRewardRedeemed -= Client_OnChannelPointsRewardRedeemed;
+            client.OnDispose -= OnClientDisposed;
+            return pubsubClients.TryRemove(client.Token.UserName.ToLower(), out _);
+        }
     }
 }

@@ -124,9 +124,9 @@ namespace ROBot.Core.Twitch
             }
         }
 
-        public PubSubToken GetToken(string channel, string userId)
+        public PubSubToken GetToken(string channelOrUserId)
         {
-            return GetByUserName(channel) ?? GetById(userId);
+            return GetByUserName(channelOrUserId) ?? GetById(channelOrUserId);
         }
     }
 }
