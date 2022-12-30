@@ -37,7 +37,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                     await this.game.StopDungeonAsync(player);
                 }
             }
-            else
+            else if (cmd.Arguments.Contains("start", System.StringComparison.OrdinalIgnoreCase))
             {
                 await this.game.DungeonStartAsync(player);
             }

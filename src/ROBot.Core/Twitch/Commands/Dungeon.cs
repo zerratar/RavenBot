@@ -30,7 +30,7 @@ namespace ROBot.Core.Twitch.Commands
                             await connection.StopDungeonAsync(player);
                         }
                     }
-                    else
+                    else if (cmd.Arguments.Contains("start", System.StringComparison.OrdinalIgnoreCase))
                     {
                         await connection.DungeonStartAsync(player);
                     }
