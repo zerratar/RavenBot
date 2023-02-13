@@ -17,8 +17,8 @@ namespace RavenBot.Core.Ravenfall.Commands
         private readonly string[] trainableSkills = new string[]
         {
             "all", "atk", "def", "str", "magic",
-            "ranged", "fishing", "cooking", "mining",
-            "crafting", "farming", "healing",
+            "ranged", "fishing", "cooking", "woodcutting",
+            "mining", "crafting", "farming", "healing",
         };
 
         public TrainCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider)

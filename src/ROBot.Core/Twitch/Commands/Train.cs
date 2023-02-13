@@ -14,7 +14,7 @@ namespace ROBot.Core.Twitch.Commands
         private readonly string[] trainableSkills = new string[]
         {
             "all", "atk", "def", "str", "magic",
-            "ranged", "fishing", "cooking", "mining",
+            "ranged", "fishing", "cooking", "woodcutting", "mining",
             "crafting", "farming", "healing",
         };
 
