@@ -13,7 +13,7 @@
         public const string HELP = "The commands are available in the panels below the stream :-) Too many commands.";
 
         public const string TASK_NO_ARG = "You need to specify a task, currently supported tasks: {tasks}";
-        public const string TRAIN_NO_ARG = "You need to specify a skill to train, currently supported skills: {skills}";
+        public const string TRAIN_NO_ARG = "You need to specify a skill to train, currently supported skills: {skills} or !sail for sailing.";
         public const string REDEEM_NO_ARG = "You need to specify what to redeem, like: item, exp. See the options available in the Tavern.";
         public const string TOGGLE_NO_ARG = "You need to specify what to toggle, like: helm or pet";
         public const string TRADE_NO_ARG = "{command} <item> (optional: <amount>, default 1) <price per item>";
