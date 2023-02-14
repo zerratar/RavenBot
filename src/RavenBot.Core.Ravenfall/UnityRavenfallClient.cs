@@ -135,6 +135,7 @@ namespace RavenBot.Core.Ravenfall
         public Task GetMaxMultiplierAsync(Player player) => SendAsync("multiplier", player);
         public Task EquipAsync(Player player, string pet) => SendAsync("equip", new ItemQueryRequest(player, pet));
         public Task EnchantAsync(Player player, string item) => SendAsync("enchant", new ItemQueryRequest(player, item));
+        public Task DisenchantAsync(Player player, string item) => SendAsync("disenchant", new ItemQueryRequest(player, item));
         public Task UnequipAsync(Player player, string item) => SendAsync("unequip", new ItemQueryRequest(player, item));
         public Task SetPetAsync(Player player, string item) => SendAsync("set_pet", new SetPetRequest(player, item));
         public Task GetPetAsync(Player player) => SendAsync("get_pet", new GetPetRequest(player));

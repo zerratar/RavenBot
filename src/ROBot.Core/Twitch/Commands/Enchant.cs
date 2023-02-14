@@ -21,6 +21,11 @@ namespace ROBot.Core.Twitch.Commands
 
                     var item = cmd.Arguments?.ToLower();
 
+                    if (!string.IsNullOrEmpty(item) && item.Split(' ')[0] == "remove")
+                    {
+                        await connection.DisenchantAsync(player, item.Replace("remove", "").Trim());
+                        return;
+                    }
                     //if (string.IsNullOrEmpty(item))
                     //{
                     //    twitch.Broadcast(channel, cmd.Sender.Username, "You have to use !enchant <item name> to enchant an item.");

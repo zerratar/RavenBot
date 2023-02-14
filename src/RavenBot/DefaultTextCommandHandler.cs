@@ -40,6 +40,8 @@ namespace RavenBot
             Register<TrainingInfoCommandProcessor>(commandBindingProvider.Get("training"));//"skill", "training"); 
 
             Register<VendorItemCommandProcessor>(commandBindingProvider.Get("vendor"));
+            Register<DisenchantItemCommandProcessor>(commandBindingProvider.Get("disenchant"));
+            
             Register<GiftItemCommandProcessor>(commandBindingProvider.Get("gift"));
             Register<ValueItemCommandProcessor>(commandBindingProvider.Get("value"));
             Register<CraftRequirementCommandProcessor>(commandBindingProvider.Get("req"));//, "requirement", "requirements");

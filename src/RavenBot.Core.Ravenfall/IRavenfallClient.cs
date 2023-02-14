@@ -40,6 +40,7 @@ namespace RavenBot.Core.Ravenfall
         Task UnequipAsync(Player player, string item);
         Task EquipAsync(Player player, string item);
         Task EnchantAsync(Player player, string item);
+        Task DisenchantAsync(Player player, string item);
         Task SetPetAsync(Player player, string pet);
         Task GetPetAsync(Player player);
         Task GetMaxMultiplierAsync(Player player);
