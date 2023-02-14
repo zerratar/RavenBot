@@ -146,7 +146,7 @@ namespace RavenBot.Core.Ravenfall
         public Task PlayerAppearanceUpdateAsync(Player player, string appearance) => SendAsync("change_appearance", new PlayerAppearanceRequest(player, appearance));
         public Task ToggleHelmetAsync(Player player) => SendAsync("toggle_helmet", player);
         public Task TogglePetAsync(Player player) => SendAsync("toggle_pet", player);
-        public Task SetAllVillageHutsAsync(Player player, string skill) => SendAsync("set_village_huts", new PlayerStringRequest(player, skill));
+        public Task SetAllVillageHutsAsync(Player player, string skill) => SendAsync("set_village_huts", new PlayerAndString(player, skill));
         public Task SellItemAsync(Player player, string itemQuery) => SendAsync("sell_item", new ItemQueryRequest(player, itemQuery));
         public Task BuyItemAsync(Player player, string itemQuery) => SendAsync("buy_item", new ItemQueryRequest(player, itemQuery));
         public Task GiftItemAsync(Player player, string itemQuery) => SendAsync("gift_item", new ItemQueryRequest(player, itemQuery));
@@ -159,7 +159,7 @@ namespace RavenBot.Core.Ravenfall
         public Task LeaveAsync(Player player) => SendAsync("leave", player);
         public Task StartArenaAsync(Player player) => SendAsync("arena_begin", player);
         public Task CancelArenaAsync(Player player) => SendAsync("arena_end", player);
-        public Task KickPlayerFromArenaAsync(Player player, Player targetPlayer) => SendAsync("arena_kick", new ArenaKickRequest(player, targetPlayer));
+        public Task KickPlayerFromArenaAsync(Player player, Player targetPlayer) => SendAsync("arena_kick", new PlayerAndPlayer(player, targetPlayer));
         public Task AddPlayerToArenaAsync(Player player, Player targetPlayer) => SendAsync("arena_add", new ArenaAddRequest(player, targetPlayer));
         public Task KickAsync(Player targetPlayer) => SendAsync("kick", targetPlayer);
         public Task CraftAsync(Player targetPlayer, string itemQuery) => SendAsync("craft", new ItemQueryRequest(targetPlayer, itemQuery));
@@ -178,6 +178,17 @@ namespace RavenBot.Core.Ravenfall
         public Task GetRestedStatusAsync(Player player) => SendAsync("rested_status", player);
         public Task StopRaidAsync(Player player) => SendAsync("raid_stop", player);
         public Task GetClientVersionAsync(Player player) => SendAsync("client_version", player);
+
+        public Task GetClanInfoAsync(Player player) => SendAsync("clan_info", player);
+        public Task GetClanStatsAsync(Player player) => SendAsync("clan_stats", player);
+        public Task JoinClanAsync(Player player, string arguments) => SendAsync("clan_join", player, arguments);
+        public Task LeaveClanAsync(Player player) => SendAsync("clan_leave", player);
+        public Task RemoveFromClanAsync(Player player, Player targetPlayer) => SendAsync("clan_remove", player, targetPlayer);
+        public Task SendClanInviteAsync(Player player, Player targetPlayer) => SendAsync("clan_invite", player, targetPlayer);
+        public Task AcceptClanInviteAsync(Player player, string argument) => SendAsync("clan_accept", player, argument);
+        public Task DeclineClanInviteAsync(Player player, string argument) => SendAsync("clan_decline", player, argument);
+        public Task PromoteClanMemberAsync(Player player, Player targetPlayer, string argument) => SendAsync("clan_promote", player, targetPlayer, argument);
+        public Task DemoteClanMemberAsync(Player player, Player targetPlayer, string argument) => SendAsync("clan_demote", player, targetPlayer, argument);
 
         public async Task RestartGameAsync(Player player)
         {
@@ -270,6 +281,26 @@ namespace RavenBot.Core.Ravenfall
             }
 
             await this.client.SendAsync(request);
+        }
+
+        private Task SendAsync(string name, Player player, Player arg0, string arg1)
+        {
+            return SendAsync(name, new PlayerPlayerAndString(player, arg0, arg1));
+        }
+
+        private Task SendAsync(string name, Player player, Player argument)
+        {
+            return SendAsync(name, new PlayerAndPlayer(player, argument));
+        }
+
+        private Task SendAsync(string name, Player player, string argument)
+        {
+            return SendAsync(name, new PlayerAndString(player, argument));
+        }
+
+        private Task SendAsync(string name, Player player, int argument)
+        {
+            return SendAsync(name, new PlayerAndNumber(player, argument));
         }
 
         private void SendResponseToTwitchChat(IGameCommand obj)

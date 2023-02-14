@@ -2,13 +2,15 @@
 
 namespace RavenBot.Core.Ravenfall.Requests
 {
-    public class PlayerStringRequest : IBotRequest<string>
+    public class PlayerPlayerAndString
     {
         public Player Player { get; }
+        public Player Target { get; }
         public string Value { get; }
-        public PlayerStringRequest(Player player, string value)
+        public PlayerPlayerAndString(Player player, Player target, string value)
         {
             Player = player;
+            Target = target;
             Value = value;
         }
     }

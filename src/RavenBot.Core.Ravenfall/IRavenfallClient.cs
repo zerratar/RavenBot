@@ -89,5 +89,37 @@ namespace RavenBot.Core.Ravenfall
 
         // KEEP ALIVE
         Task Ping(int correlationId);
+
+
+        // CLAN
+        /// <summary>
+        /// allow players to join clans that does not require invites.
+        /// </summary>
+        /// <param name="player"></param>
+        /// <param name="arguments">can be a required join code</param>
+        /// <returns></returns>
+        Task JoinClanAsync(Player player, string arguments);
+        Task LeaveClanAsync(Player player);
+        Task RemoveFromClanAsync(Player player, Player targetPlayer);
+        Task SendClanInviteAsync(Player player, Player targetPlayer);
+        Task AcceptClanInviteAsync(Player player, string argument);
+        Task DeclineClanInviteAsync(Player player, string argument);
+        Task PromoteClanMemberAsync(Player player, Player targetPlayer, string argument);
+        Task DemoteClanMemberAsync(Player player, Player targetPlayer, string argument);
+        /// <summary>
+        /// clan info, displays the current clan and clan level
+        /// </summary>
+        /// <param name="player"></param>
+        /// <returns></returns>
+        Task GetClanInfoAsync(Player player);
+
+        /// <summary>
+        /// gets some statistics for the clan
+        /// how many members, clan skill levels
+        /// how many members of each type
+        /// </summary>
+        /// <param name="player"></param>
+        /// <returns></returns>
+        Task GetClanStatsAsync(Player player);
     }
 }

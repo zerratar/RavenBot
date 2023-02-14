@@ -2,12 +2,12 @@
 
 namespace RavenBot.Core.Ravenfall.Requests
 {
-    public class ArenaKickRequest
+    public class PlayerAndPlayer
     {
         public Player Player { get; }
         public Player TargetPlayer { get; }
 
-        public ArenaKickRequest(Player player, Player targetPlayer)
+        public PlayerAndPlayer(Player player, Player targetPlayer)
         {
             Player = player;
             TargetPlayer = targetPlayer;

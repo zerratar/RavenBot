@@ -243,7 +243,7 @@ namespace ROBot.Core.GameServer
         public Task ResetPetRacingAsync(Player player) => SendAsync("pet_race_reset", player);
         public Task PlayPetRacingAsync(Player player) => SendAsync("pet_race_play", player);
         public Task GetVillageBoostAsync(Player player) => SendAsync("get_village_boost", player);
-        public Task SetAllVillageHutsAsync(Player player, string skill) => SendAsync("set_village_huts", new PlayerStringRequest(player, skill));
+        public Task SetAllVillageHutsAsync(Player player, string skill) => SendAsync("set_village_huts", new PlayerAndString(player, skill));
         public Task ToggleDiaperModeAsync(Player player) => SendAsync("toggle_diaper_mode", player);
         public Task ToggleItemRequirementsAsync(Player player) => SendAsync("toggle_item_requirements", player);
         public Task SetExpMultiplierAsync(Player player, int number) => SendAsync("exp_multiplier", new SetExpMultiplierRequest(player, number));
@@ -288,7 +288,7 @@ namespace ROBot.Core.GameServer
         public Task LeaveAsync(Player player) => SendAsync("leave", player);
         public Task StartArenaAsync(Player player) => SendAsync("arena_begin", player);
         public Task CancelArenaAsync(Player player) => SendAsync("arena_end", player);
-        public Task KickPlayerFromArenaAsync(Player player, Player targetPlayer) => SendAsync("arena_kick", new ArenaKickRequest(player, targetPlayer));
+        public Task KickPlayerFromArenaAsync(Player player, Player targetPlayer) => SendAsync("arena_kick", new PlayerAndPlayer(player, targetPlayer));
         public Task AddPlayerToArenaAsync(Player player, Player targetPlayer) => SendAsync("arena_add", new ArenaAddRequest(player, targetPlayer));
         public Task KickAsync(Player targetPlayer) => SendAsync("kick", targetPlayer);
         public Task CraftAsync(Player targetPlayer, string itemQuery) => SendAsync("craft", new ItemQueryRequest(targetPlayer, itemQuery));
@@ -307,6 +307,20 @@ namespace ROBot.Core.GameServer
         public Task JoinOnsenAsync(Player player) => SendAsync("onsen_join", player);
         public Task GetRestedStatusAsync(Player player) => SendAsync("rested_status", player);
         public Task GetClientVersionAsync(Player player) => SendAsync("client_version", player);
+
+
+        // CLAN
+        public Task GetClanInfoAsync(Player player) => SendAsync("clan_info", player);
+        public Task GetClanStatsAsync(Player player) => SendAsync("clan_stats", player);
+        public Task JoinClanAsync(Player player, string arguments) => SendAsync("clan_join", player, arguments);
+        public Task LeaveClanAsync(Player player) => SendAsync("clan_leave", player);
+        public Task RemoveFromClanAsync(Player player, Player targetPlayer) => SendAsync("clan_remove", player, targetPlayer);
+        public Task SendClanInviteAsync(Player player, Player targetPlayer) => SendAsync("clan_invite", player, targetPlayer);
+        public Task AcceptClanInviteAsync(Player player, string argument) => SendAsync("clan_accept", player, argument);
+        public Task DeclineClanInviteAsync(Player player, string argument) => SendAsync("clan_decline", player, argument);
+        public Task PromoteClanMemberAsync(Player player, Player targetPlayer, string argument) => SendAsync("clan_promote", player, targetPlayer, argument);
+        public Task DemoteClanMemberAsync(Player player, Player targetPlayer, string argument) => SendAsync("clan_demote", player, targetPlayer, argument);
+
         public void Dispose()
         {
             try
@@ -412,6 +426,26 @@ namespace ROBot.Core.GameServer
         public void Close()
         {
             this.client.Close();
+        }
+
+        private Task SendAsync(string name, Player player, Player arg0, string arg1)
+        {
+            return SendAsync(name, new PlayerPlayerAndString(player, arg0, arg1));
+        }
+
+        private Task SendAsync(string name, Player player, Player argument)
+        {
+            return SendAsync(name, new PlayerAndPlayer(player, argument));
+        }
+
+        private Task SendAsync(string name, Player player, string argument)
+        {
+            return SendAsync(name, new PlayerAndString(player, argument));
+        }
+
+        private Task SendAsync(string name, Player player, int argument)
+        {
+            return SendAsync(name, new PlayerAndNumber(player, argument));
         }
 
         private async Task SendAsync<T>(string name, T packet)

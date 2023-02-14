@@ -56,6 +56,8 @@ namespace RavenBot.Core.Ravenfall.Commands
 
             lock (mutex)
             {
+                if (string.IsNullOrEmpty(username)) return null;
+                if (username.StartsWith("@")) username = username.Substring(1);
                 var plr = createdPlayers.FirstOrDefault(x => x.Username == username);
                 if (plr != null) return plr;
                 plr = new Player(null, username, username, null, false, false, false, false, "1");
