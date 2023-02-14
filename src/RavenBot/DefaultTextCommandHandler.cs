@@ -24,6 +24,9 @@ namespace RavenBot
             Register<HighscoreSkillCommandProcessor>(commandBindingProvider.Get("leaderboard", "highscore", "hs"));//, "top");
             Register<DungeonCommandProcessor>(commandBindingProvider.Get("dungeon"));
 
+            Register<ClanCommandProcessor>(commandBindingProvider.Get("clan"));
+            
+
             Register<DuelCommandProcessor>(commandBindingProvider.Get("duel"));//, "fight");
             Register<KickCommandProcessor>(commandBindingProvider.Get("kick"));//);
             Register<ArenaCommandProcessor>(commandBindingProvider.Get("arena"));
