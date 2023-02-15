@@ -100,9 +100,9 @@ namespace RavenBot.Core.Ravenfall
         /// <param name="arguments">can be a required join code</param>
         /// <returns></returns>
         Task JoinClanAsync(Player player, string arguments);
-        Task LeaveClanAsync(Player player);
-        Task RemoveFromClanAsync(Player player, Player targetPlayer);
-        Task SendClanInviteAsync(Player player, Player targetPlayer);
+        Task LeaveClanAsync(Player player, string argument);
+        Task RemoveFromClanAsync(Player player, Player targetPlayer, string argument);
+        Task SendClanInviteAsync(Player player, Player targetPlayer, string argument);
         Task AcceptClanInviteAsync(Player player, string argument);
         Task DeclineClanInviteAsync(Player player, string argument);
         Task PromoteClanMemberAsync(Player player, Player targetPlayer, string argument);
@@ -112,7 +112,7 @@ namespace RavenBot.Core.Ravenfall
         /// </summary>
         /// <param name="player"></param>
         /// <returns></returns>
-        Task GetClanInfoAsync(Player player);
+        Task GetClanInfoAsync(Player player, string argument);
 
         /// <summary>
         /// gets some statistics for the clan
@@ -121,6 +121,6 @@ namespace RavenBot.Core.Ravenfall
         /// </summary>
         /// <param name="player"></param>
         /// <returns></returns>
-        Task GetClanStatsAsync(Player player);
+        Task GetClanStatsAsync(Player player, string argument);
     }
 }

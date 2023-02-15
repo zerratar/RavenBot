@@ -39,18 +39,18 @@ namespace RavenBot.Core.Ravenfall.Commands
             {
                 case "info":
                     // clan info, displays the current clan and clan level
-                    await game.GetClanInfoAsync(player);
+                    await game.GetClanInfoAsync(player, argument);
                     return;
 
                 case "stats":
                     // gets some statistics for the clan
                     // how many members, clan skill levels
                     // how many members of each type
-                    await game.GetClanStatsAsync(player);
+                    await game.GetClanStatsAsync(player, argument);
                     return;
 
                 case "leave":
-                    await game.LeaveClanAsync(player);
+                    await game.LeaveClanAsync(player, argument);
                     return;
 
                 case "join":
@@ -60,11 +60,11 @@ namespace RavenBot.Core.Ravenfall.Commands
 
                 case "remove":
                 case "kick":
-                    await game.RemoveFromClanAsync(player, targetPlayer);
+                    await game.RemoveFromClanAsync(player, targetPlayer, argument);
                     return;
 
                 case "invite":
-                    await game.SendClanInviteAsync(player, targetPlayer);
+                    await game.SendClanInviteAsync(player, targetPlayer, argument);
                     return;
 
                 case "accept":

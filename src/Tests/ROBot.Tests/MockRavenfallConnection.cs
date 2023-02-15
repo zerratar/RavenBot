@@ -19,6 +19,11 @@ namespace ROBot.Tests
 
         public event EventHandler<GameSessionInfo> OnSessionInfoReceived;
 
+        public Task AcceptClanInviteAsync(Player player, string argument)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task AcceptDuelRequestAsync(Player player)
         {
             return Task.CompletedTask;
@@ -63,14 +68,29 @@ namespace ROBot.Tests
             return Task.CompletedTask;
         }
 
+        public Task DeclineClanInviteAsync(Player player, string argument)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task DeclineDuelRequestAsync(Player player)
         {
             return Task.CompletedTask;
         }
 
+        public Task DemoteClanMemberAsync(Player player, Player targetPlayer, string argument)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task DisembarkFerryAsync(Player player)
         {
             return Task.CompletedTask;
+        }
+
+        public Task DisenchantAsync(Player player, string item)
+        {
+            throw new NotImplementedException();
         }
 
         public void Dispose()
@@ -100,6 +120,16 @@ namespace ROBot.Tests
         public Task EquipAsync(Player player, string item)
         {
             return Task.CompletedTask;
+        }
+
+        public Task GetClanInfoAsync(Player player, string argument)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task GetClanStatsAsync(Player player, string argument)
+        {
+            throw new NotImplementedException();
         }
 
         public Task GetClientVersionAsync(Player player)
@@ -162,6 +192,11 @@ namespace ROBot.Tests
             return Task.CompletedTask;
         }
 
+        public Task JoinClanAsync(Player player, string arguments)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task JoinDungeonAsync(Player player)
         {
             return Task.CompletedTask;
@@ -207,6 +242,11 @@ namespace ROBot.Tests
             return Task.CompletedTask;
         }
 
+        public Task LeaveClanAsync(Player player, string argument)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task LeaveOnsenAsync(Player player)
         {
             return Task.CompletedTask;
@@ -247,6 +287,11 @@ namespace ROBot.Tests
             return true;
         }
 
+        public Task PromoteClanMemberAsync(Player player, Player targetPlayer, string argument)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task RaidStartAsync(Player player)
         {
             return Task.CompletedTask;
@@ -265,6 +310,11 @@ namespace ROBot.Tests
         public Task ReloadGameAsync(Player player)
         {
             return Task.CompletedTask;
+        }
+
+        public Task RemoveFromClanAsync(Player player, Player targetPlayer, string argument)
+        {
+            throw new NotImplementedException();
         }
 
         public Task RequestHighestSkillAsync(Player player, string skill)
@@ -320,6 +370,11 @@ namespace ROBot.Tests
         public Task SellItemAsync(Player player, string itemQuery)
         {
             return Task.CompletedTask;
+        }
+
+        public Task SendClanInviteAsync(Player player, Player targetPlayer, string argument)
+        {
+            throw new NotImplementedException();
         }
 
         public Task SendPlayerTaskAsync(Player player, PlayerTask task, params string[] args)

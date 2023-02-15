@@ -41,18 +41,18 @@ namespace ROBot.Core.Twitch.Commands
             {
                 case "info":
                     // clan info, displays the current clan and clan level
-                    await connection.GetClanInfoAsync(player);
+                    await connection.GetClanInfoAsync(player, argument);
                     return;
 
                 case "stats":
                     // gets some statistics for the clan
                     // how many members, clan skill levels
                     // how many members of each type
-                    await connection.GetClanStatsAsync(player);
+                    await connection.GetClanStatsAsync(player, argument);
                     return;
 
                 case "leave":
-                    await connection.LeaveClanAsync(player);
+                    await connection.LeaveClanAsync(player, argument);
                     return;
 
                 case "join":
@@ -62,11 +62,11 @@ namespace ROBot.Core.Twitch.Commands
 
                 case "remove":
                 case "kick":
-                    await connection.RemoveFromClanAsync(player, targetPlayer);
+                    await connection.RemoveFromClanAsync(player, targetPlayer, argument);
                     return;
 
                 case "invite":
-                    await connection.SendClanInviteAsync(player, targetPlayer);
+                    await connection.SendClanInviteAsync(player, targetPlayer, argument);
                     return;
 
                 case "accept":
