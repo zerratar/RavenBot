@@ -418,6 +418,11 @@ namespace ROBot.Core.Twitch
          */
         public void Broadcast(IGameSessionCommand message)
         {
+            if (message == null || message.Session?.Name == null)
+            {
+                logger.LogError("Unable to broadcast message to " + message?.Receiver);
+                return;
+            }
             Broadcast(message.Session.Name, message.Receiver, message.Format, message.Args);
         }
         public void Broadcast(string channel, string user, string format, params object[] args)
