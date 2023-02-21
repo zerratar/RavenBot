@@ -317,6 +317,11 @@ namespace ROBot.Tests
             throw new NotImplementedException();
         }
 
+        public Task RemoveFromClanAsync(Player player, Player targetPlayer)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task RequestHighestSkillAsync(Player player, string skill)
         {
             return Task.CompletedTask;
@@ -373,6 +378,11 @@ namespace ROBot.Tests
         }
 
         public Task SendClanInviteAsync(Player player, Player targetPlayer, string argument)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task SendClanInviteAsync(Player player, Player targetPlayer)
         {
             throw new NotImplementedException();
         }
