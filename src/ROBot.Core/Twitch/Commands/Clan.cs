@@ -28,6 +28,11 @@ namespace ROBot.Core.Twitch.Commands
                 return;
             }
 
+            if (string.IsNullOrEmpty(cmd.Arguments))
+            {
+                return;
+            }
+
             var values = cmd.Arguments.Split(' ');
             if (values.Length <= 0)
                 return;

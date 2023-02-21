@@ -27,32 +27,38 @@ namespace RavenBot.Core.Handlers
 
         public async Task HandleAsync(IMessageChat listener, ICommand cmd)
         {
-            if (string.IsNullOrEmpty(cmd.Command))
+            try
             {
-                return;
-            }
-            
-
-            if (commands.TryGetValue(cmd.Command, out var processor))
-            {
-                var isChannelPointReward = cmd.GetType().Name.Contains("Reward");
-
-                var isGift = cmd.GetType().Name.Contains("Gift");
-
-
-                if (!isChannelPointReward)
+                if (string.IsNullOrEmpty(cmd.Command))
                 {
-                    if (!string.IsNullOrEmpty(cmd.Arguments))
-                    {
-                        logger.WriteDebug($"Command received: {cmd.Command} from {cmd.Sender.Username} with args: {cmd.Arguments}");
-                    }
-                    else
-                    {
-                        logger.WriteDebug($"Command received: {cmd.Command} from {cmd.Sender.Username}");
-                    }
+                    return;
                 }
 
-                await processor.ProcessAsync(listener, cmd);
+                if (commands.TryGetValue(cmd.Command, out var processor))
+                {
+                    var isChannelPointReward = cmd.GetType().Name.Contains("Reward");
+
+                    var isGift = cmd.GetType().Name.Contains("Gift");
+
+
+                    if (!isChannelPointReward)
+                    {
+                        if (!string.IsNullOrEmpty(cmd.Arguments))
+                        {
+                            logger.WriteDebug($"Command received: {cmd.Command} from {cmd.Sender.Username} with args: {cmd.Arguments}");
+                        }
+                        else
+                        {
+                            logger.WriteDebug($"Command received: {cmd.Command} from {cmd.Sender.Username}");
+                        }
+                    }
+
+                    await processor.ProcessAsync(listener, cmd);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger?.WriteError("Error handling command: " + ex);
             }
         }
 

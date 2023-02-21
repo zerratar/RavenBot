@@ -17,6 +17,9 @@ namespace RavenBot.Core.Ravenfall.Commands
 
         public override async Task ProcessAsync(IMessageChat broadcaster, ICommand cmd)
         {
+            if (string.IsNullOrEmpty(cmd.Arguments))
+                return;
+
             if (!await this.game.ProcessAsync(Settings.UNITY_SERVER_PORT))
             {
                 broadcaster.Broadcast(cmd.Sender.Username, Localization.GAME_NOT_STARTED);
