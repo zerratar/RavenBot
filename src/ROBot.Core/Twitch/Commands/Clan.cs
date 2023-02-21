@@ -67,11 +67,11 @@ namespace ROBot.Core.Twitch.Commands
 
                 case "remove":
                 case "kick":
-                    await connection.RemoveFromClanAsync(player, targetPlayer, argument);
+                    await connection.RemoveFromClanAsync(player, targetPlayer);
                     return;
 
                 case "invite":
-                    await connection.SendClanInviteAsync(player, targetPlayer, argument);
+                    await connection.SendClanInviteAsync(player, targetPlayer);
                     return;
 
                 case "accept":

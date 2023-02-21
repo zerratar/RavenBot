@@ -63,11 +63,11 @@ namespace RavenBot.Core.Ravenfall.Commands
 
                 case "remove":
                 case "kick":
-                    await game.RemoveFromClanAsync(player, targetPlayer, argument);
+                    await game.RemoveFromClanAsync(player, targetPlayer);
                     return;
 
                 case "invite":
-                    await game.SendClanInviteAsync(player, targetPlayer, argument);
+                    await game.SendClanInviteAsync(player, targetPlayer);
                     return;
 
                 case "accept":

@@ -315,8 +315,8 @@ namespace ROBot.Core.GameServer
         public Task GetClanStatsAsync(Player player, string arg) => SendAsync("clan_stats", player, arg);
         public Task JoinClanAsync(Player player, string arguments) => SendAsync("clan_join", player, arguments);
         public Task LeaveClanAsync(Player player, string argument) => SendAsync("clan_leave", player, argument);
-        public Task RemoveFromClanAsync(Player player, Player targetPlayer, string argument) => SendAsync("clan_remove", player, targetPlayer, argument);
-        public Task SendClanInviteAsync(Player player, Player targetPlayer, string argument) => SendAsync("clan_invite", player, targetPlayer, argument);
+        public Task RemoveFromClanAsync(Player player, Player targetPlayer) => SendAsync("clan_remove", player, targetPlayer);
+        public Task SendClanInviteAsync(Player player, Player targetPlayer) => SendAsync("clan_invite", player, targetPlayer);
         public Task AcceptClanInviteAsync(Player player, string argument) => SendAsync("clan_accept", player, argument);
         public Task DeclineClanInviteAsync(Player player, string argument) => SendAsync("clan_decline", player, argument);
         public Task PromoteClanMemberAsync(Player player, Player targetPlayer, string argument) => SendAsync("clan_promote", player, targetPlayer, argument);

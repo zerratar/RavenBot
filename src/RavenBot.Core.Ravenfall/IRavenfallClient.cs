@@ -101,8 +101,8 @@ namespace RavenBot.Core.Ravenfall
         /// <returns></returns>
         Task JoinClanAsync(Player player, string arguments);
         Task LeaveClanAsync(Player player, string argument);
-        Task RemoveFromClanAsync(Player player, Player targetPlayer, string argument);
-        Task SendClanInviteAsync(Player player, Player targetPlayer, string argument);
+        Task RemoveFromClanAsync(Player player, Player targetPlayer);
+        Task SendClanInviteAsync(Player player, Player targetPlayer);
         Task AcceptClanInviteAsync(Player player, string argument);
         Task DeclineClanInviteAsync(Player player, string argument);
         Task PromoteClanMemberAsync(Player player, Player targetPlayer, string argument);
