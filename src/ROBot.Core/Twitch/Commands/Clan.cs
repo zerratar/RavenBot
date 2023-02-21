@@ -42,6 +42,7 @@ namespace ROBot.Core.Twitch.Commands
             var action = values[0].ToLower();
             var targetPlayer = values.Length > 1 ? session.GetUserByName(values[1]) : null;
             var argument = values.Length > 1 && targetPlayer == null ? values[1] : values.Length > 2 ? values[2] : null;
+            if (string.IsNullOrEmpty(argument)) argument = "-";
             switch (action)
             {
                 case "info":
