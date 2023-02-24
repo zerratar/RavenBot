@@ -91,6 +91,7 @@ namespace RavenBot
             Register<OnsenCommandProcessor>(commandBindingProvider.Get("onsen", "rest"));
             Register<RestedCommandProcessor>(commandBindingProvider.Get("rested"));
             Register<VersionCommandProcessor>(commandBindingProvider.Get("version"));
+            Register<ItemCountCommandProcessor>(commandBindingProvider.Get("count", "items"));
 
             Register<VillageCommandProcessor>(commandBindingProvider.Get("village", "town"));
 

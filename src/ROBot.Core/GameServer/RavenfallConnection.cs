@@ -308,7 +308,7 @@ namespace ROBot.Core.GameServer
         public Task JoinOnsenAsync(Player player) => SendAsync("onsen_join", player);
         public Task GetRestedStatusAsync(Player player) => SendAsync("rested_status", player);
         public Task GetClientVersionAsync(Player player) => SendAsync("client_version", player);
-
+        public Task CountItemAsync(Player player, string item) => SendAsync("get_item_count", new ItemQueryRequest(player, item));
 
         // CLAN
         public Task GetClanInfoAsync(Player player, string arg) => SendAsync("clan_info", player, arg);

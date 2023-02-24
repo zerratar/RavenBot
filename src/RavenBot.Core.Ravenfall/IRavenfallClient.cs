@@ -53,6 +53,7 @@ namespace RavenBot.Core.Ravenfall
         Task JoinDungeonAsync(EventJoinRequest player);
         Task StopDungeonAsync(Player player);
         Task CraftRequirementAsync(Player player, string itemName);
+        Task CountItemAsync(Player player, string itemName);
         Task RequestIslandInfoAsync(Player player);
         Task RequestPlayerResourcesAsync(Player player);
         Task TravelAsync(Player player, string destination);
