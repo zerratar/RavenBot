@@ -7,7 +7,7 @@ namespace RavenBot.Core.Ravenfall.Commands
     {
         private readonly string file;
         private readonly ConcurrentDictionary<string, object> dict;
-
+        private readonly object ioMutex = new object();
         public UserSettings(string file, Dictionary<string, object> src)
         {
             this.file = file;
@@ -28,7 +28,23 @@ namespace RavenBot.Core.Ravenfall.Commands
 
         public ChatMessageTransformation ChatMessageTransformation
         {
-            get => Get<ChatMessageTransformation>(nameof(ChatMessageTransformation));
+            get
+            {
+                var value = Get<string>(nameof(ChatMessageTransformation));
+                if (System.Enum.TryParse<ChatMessageTransformation>(value, out var tr))
+                {
+                    return tr;
+                }
+
+
+                if (int.TryParse(value, out var n))
+                {
+                    return (ChatMessageTransformation)n;
+                }
+
+                return RavenBot.Core.Ravenfall.Commands.ChatMessageTransformation.Standard;
+            }
+
             set => Set(nameof(ChatMessageTransformation), value);
         }
 
@@ -40,16 +56,27 @@ namespace RavenBot.Core.Ravenfall.Commands
 
         public void Set<T>(string key, T value)
         {
+
             dict[key] = value;
 
             try
             {
-                System.IO.File.WriteAllText(file, Newtonsoft.Json.JsonConvert.SerializeObject(dict));
+                var dir = System.IO.Path.GetDirectoryName(file);
+                if (!System.IO.Directory.Exists(dir))
+                    System.IO.Directory.CreateDirectory(dir);
+
+                lock (ioMutex)
+                {
+                    System.IO.File.WriteAllText(file, Newtonsoft.Json.JsonConvert.SerializeObject(dict));
+                }
             }
             catch (System.Exception exc)
             {
                 // aww.
-                System.IO.File.WriteAllText(file + ".error", exc.ToString());
+                lock (ioMutex)
+                {
+                    System.IO.File.WriteAllText(file + ".error", exc.ToString());
+                }
             }
         }
 

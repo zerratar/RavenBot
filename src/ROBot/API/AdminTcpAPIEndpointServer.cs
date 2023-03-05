@@ -77,6 +77,7 @@ namespace ROBot
 
             logger.LogDebug("[Admin API] Data Received. Type=" + packet.Type + ", Size=" + packet.Data.Length);
             handler.HandleAsync(client, packet);
+            System.Threading.Thread.Sleep(20);
         }
 
         private void Server_ClientDisconnected(object sender, ConnectionEventArgs e)

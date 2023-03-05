@@ -68,6 +68,10 @@ namespace ROBot.Core.Twitch
                 lock (mutex)
                 {
                     var data = Newtonsoft.Json.JsonConvert.SerializeObject(tokens);
+                    var dir = System.IO.Path.GetDirectoryName(PubSubTokenDb);
+                    if (!System.IO.Directory.Exists(dir))
+                        System.IO.Directory.CreateDirectory(dir);
+
                     System.IO.File.WriteAllText(PubSubTokenDb, data);
                 }
             }
