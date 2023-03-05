@@ -139,7 +139,7 @@ namespace ROBot
                     detailsDelayTimer = 30_000;
                 }
 
-                logger.LogError("[BOT] Unable to send Details to RavenNest: " + ex);
+                logger.LogError("[BOT] Unable to send Details to RavenNest: " + ex.Message);
             }
 
             lastDetailsUpdate = DateTime.UtcNow;

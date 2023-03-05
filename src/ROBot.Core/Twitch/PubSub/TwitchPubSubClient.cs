@@ -108,7 +108,7 @@ namespace ROBot.Core.Twitch
             }
             catch (Exception exc)
             {
-                logger.LogError("[TWITCH] Unable to connect To pubsub (Username: " + token.UserName + " Error: " + exc + ")");
+                logger.LogError("[TWITCH] Unable to connect To pubsub (Username: " + token.UserName + " Error: " + exc.Message + ")");
             }
         }
 
