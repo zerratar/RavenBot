@@ -6,19 +6,26 @@ namespace RavenBot.Core.Ravenfall.Commands
     public class UserSettings
     {
         private readonly string file;
-        private readonly ConcurrentDictionary<string, object> dict;
         private readonly object ioMutex = new object();
+
+        private System.DateTime loadedTime;
+        private ConcurrentDictionary<string, object> dict;
+
         public UserSettings(string file, Dictionary<string, object> src)
         {
             this.file = file;
+            loadedTime = System.DateTime.UtcNow;
             dict = new ConcurrentDictionary<string, object>(src);
         }
 
         public UserSettings(string file)
         {
             this.file = file;
+            loadedTime = System.DateTime.UtcNow;
             dict = new ConcurrentDictionary<string, object>();
         }
+
+
 
         public int PatreonTierLevel
         {
@@ -56,7 +63,7 @@ namespace RavenBot.Core.Ravenfall.Commands
 
         public void Set<T>(string key, T value)
         {
-
+            ReloadIfNecessary();
             dict[key] = value;
 
             try
@@ -82,6 +89,9 @@ namespace RavenBot.Core.Ravenfall.Commands
 
         public bool TryGet<T>(string key, out T value)
         {
+            // check if new settings file available, then force reload.
+            ReloadIfNecessary();
+
             value = default(T);
             var obj = this[key];
             if (obj == null)
@@ -122,6 +132,24 @@ namespace RavenBot.Core.Ravenfall.Commands
             }
         }
 
+        private void ReloadIfNecessary()
+        {
+            try
+            {
+                lock (ioMutex)
+                {
+                    var lastWriteTime = System.IO.File.GetLastWriteTimeUtc(file);
+                    if (lastWriteTime >= loadedTime)
+                    {
+                        var json = System.IO.File.ReadAllText(file);
+                        dict = new ConcurrentDictionary<string, object>(Newtonsoft.Json.JsonConvert.DeserializeObject<ConcurrentDictionary<string, object>>(json));
+                        loadedTime = System.DateTime.UtcNow;
+                    }
+                }
+            }
+            catch { }
+        }
+
         public T Get<T>(string key, T defaultValue)
         {
             if (TryGet<T>(key, out var value))
@@ -140,6 +168,8 @@ namespace RavenBot.Core.Ravenfall.Commands
         {
             get
             {
+                ReloadIfNecessary();
+
                 if (dict.TryGetValue(key, out var value))
                 {
                     return value;
@@ -149,6 +179,8 @@ namespace RavenBot.Core.Ravenfall.Commands
             }
             set
             {
+                ReloadIfNecessary();
+
                 dict[key] = value;
             }
         }
