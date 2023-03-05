@@ -25,7 +25,9 @@ namespace ROBot.Core.Twitch
         private readonly IKernel kernel;
         private readonly IBotServer game;
         private readonly IMessageBus messageBus;
-        private readonly ITwitchMessageFormatter messageFormatter;
+        private readonly IUserSettingsManager settingsManager;
+        private readonly RavenBot.Core.IChatMessageFormatter messageFormatter;
+        private readonly RavenBot.Core.IChatMessageTransformer messageTransformer;
         private readonly ITwitchCommandController commandHandler;
         private readonly ITwitchCredentialsProvider credentialsProvider;
         private readonly ITwitchPubSubManager pubSubManager;
@@ -62,7 +64,9 @@ namespace ROBot.Core.Twitch
             IKernel kernel,
             IBotServer game,
             IMessageBus messageBus,
-            ITwitchMessageFormatter messageFormatter,
+            IUserSettingsManager settingsManager,
+            RavenBot.Core.IChatMessageFormatter messageFormatter,
+            RavenBot.Core.IChatMessageTransformer messageTransformer,
             ITwitchCommandController commandHandler,
             ITwitchCredentialsProvider credentialsProvider,
             ITwitchPubSubManager pubSubManager,
@@ -72,7 +76,9 @@ namespace ROBot.Core.Twitch
             this.kernel = kernel;
             this.game = game;
             this.messageBus = messageBus;
+            this.settingsManager = settingsManager;
             this.messageFormatter = messageFormatter;
+            this.messageTransformer = messageTransformer;
             this.commandHandler = commandHandler;
             this.credentialsProvider = credentialsProvider;
             this.pubSubManager = pubSubManager;
@@ -425,7 +431,7 @@ namespace ROBot.Core.Twitch
             }
             Broadcast(message.Session.Name, message.Receiver, message.Format, message.Args);
         }
-        public void Broadcast(string channel, string user, string format, params object[] args)
+        public async void Broadcast(string channel, string user, string format, params object[] args)
         {
             if (string.IsNullOrWhiteSpace(format))
             {
@@ -443,10 +449,9 @@ namespace ROBot.Core.Twitch
             if (!string.IsNullOrEmpty(user))
                 msg = user + ", " + msg;
 
-
-            SendChatMessage(channel, msg);
+            await SendChatMessageAsync(channel, msg);
         }
-        public void SendChatMessage(string channel, string message)
+        public async Task SendChatMessageAsync(string channel, string message)
         {
             if (!client.IsConnected)
             {
@@ -460,6 +465,29 @@ namespace ROBot.Core.Twitch
                 EnqueueChatMessage(channel, message);
                 JoinChannel(channel);
                 return;
+            }
+
+            // Process the chat message a final time before sending it off.
+
+            var session = game.GetSession(channel);
+
+            if (session != null && !string.IsNullOrEmpty(session.UserId))
+            {
+                var settings = settingsManager.Get(session.UserId);
+                var transform = settings.ChatMessageTransformation;
+
+                if (transform == ChatMessageTransformation.TranslateAndPersonalize)
+                {
+                    message = await messageTransformer.TranslateAndPersonalizeAsync(message, settings.ChatBotLanguage);
+                }
+                else if (transform == ChatMessageTransformation.Translate)
+                {
+                    message = await messageTransformer.TranslateAsync(message, settings.ChatBotLanguage);
+                }
+                if (transform == ChatMessageTransformation.Personalize)
+                {
+                    message = await messageTransformer.PersonalizeAsync(message);
+                }
             }
 
             logger.LogDebug($"[TWITCH] Sending Message (Channel: {channel} Message: {message})");
@@ -716,7 +744,7 @@ namespace ROBot.Core.Twitch
 
                 while (queue.TryDequeue(out var msg))
                 {
-                    SendChatMessage(e.Channel, msg);
+                    SendChatMessageAsync(e.Channel, msg);
                 }
             }
 

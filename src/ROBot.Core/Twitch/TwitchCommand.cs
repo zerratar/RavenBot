@@ -1,31 +1,7 @@
 ﻿
-using RavenBot.Core.Net;
 
 namespace ROBot.Core.Twitch
 {
-
-    public interface IGameSessionCommand : IGameCommand
-    {
-        IGameSession Session { get; }
-    }
-
-    public class GameSessionCommand : IGameSessionCommand
-    {
-        public GameSessionCommand(IGameSession session, string destination, string id, string message, params string[] args)
-        {
-            this.Session = session;
-            this.Receiver = destination;
-            this.Identifier = id;
-            this.Format = message;
-            this.Args = args;
-        }
-        public IGameSession Session { get; }
-        public string Receiver { get; }
-        public string Identifier { get; }
-        public string Format { get; }
-        public string[] Args { get; }
-    }
-
     public class TwitchChatMessagePart
     {
         public TwitchChatMessagePart(string type, string value)
@@ -79,6 +55,7 @@ namespace ROBot.Core.Twitch
             bool isVip,
             int bits)
         {
+            Channel = channel;
             UserId = userId;
             UserName = userName;
             IsModerator = isModerator;

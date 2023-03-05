@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
-namespace ROBot.Core.Twitch
+namespace ROBot.Core.Discord
 {
-    public interface ITwitchCommandClient : IDisposable
+    public interface IDiscordCommandClient : IDisposable
     {
         void Start();
         void Stop();
         void Broadcast(IGameSessionCommand message);
         void Broadcast(string channel, string user, string format, params object[] args);
-        Task SendChatMessageAsync(string channel, string message);
-        void JoinChannel(string channel);
-        void LeaveChannel(string channel);
-        bool InChannel(string name);
+        void SendChatMessage(string channel, string message);
     }
 }

@@ -9,5 +9,7 @@ namespace ROBot.Core
         string TwitchBotAuthRefreshToken { get; set; }
         string TwitchBotClientId { get; }
         DateTime TwitchBotAuthTokenGenerated { get; set; }
+        string OpenAIAuthToken { get; set; }
+        string DiscordAuthToken { get; set; }
     }
 }

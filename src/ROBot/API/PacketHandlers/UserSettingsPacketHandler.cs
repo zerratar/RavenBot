@@ -1,25 +1,24 @@
 ﻿using Microsoft.Extensions.Logging;
 using RavenBot.Core.Ravenfall.Commands;
-using ROBot.Core.Twitch;
 using Shinobytes.Network;
 using Shinobytes.Ravenfall.RavenNet.Core;
 using System.Threading.Tasks;
 
 namespace ROBot.LogServer.PacketHandlers
 {
-    public class UserRolePacketHandler : IServerPacketHandler
+    public class UserSettingsPacketHandler : IServerPacketHandler
     {
         private readonly ILogger logger;
-        private readonly IUserRoleManager roleManager;
+        private readonly IUserSettingsManager settingsManager;
         private readonly IMessageBus messageBus;
 
-        public UserRolePacketHandler(
+        public UserSettingsPacketHandler(
             ILogger logger,
-            IUserRoleManager roleManager,
+            IUserSettingsManager settingsManager,
             IMessageBus messageBus)
         {
             this.logger = logger;
-            this.roleManager = roleManager;
+            this.settingsManager = settingsManager;
             this.messageBus = messageBus;
         }
 
@@ -27,32 +26,31 @@ namespace ROBot.LogServer.PacketHandlers
         {
             if (packet.Data == null || (packet.Data.Buffer?.Length ?? 0) == 0)
             {
-                this.logger.LogError("An empty user role Packet Received");
+                this.logger.LogError("An empty user settings Packet Received");
                 return Task.CompletedTask;
             }
 
-            this.logger.LogDebug("User Role Packet Received");
+            this.logger.LogDebug("User Settings Packet Received");
 
             string userId = null;
-            string userName = null;
-            string role = null;
+            string key = null;
+            string value = null;
             try
             {
                 using (var reader = packet.Data.GetReader())
                 {
                     userId = reader.ReadString();
-                    userName = reader.ReadString();
-                    role = reader.ReadString();
-
-                    roleManager.SetRole(userId, role);
+                    key = reader.ReadString();
+                    value = reader.ReadString();
+                    settingsManager.Set(userId, key, value);
                 }
             }
             catch (System.Exception exc)
             {
-                this.logger.LogError("Bad user role data received: " + exc
+                this.logger.LogError("Bad user settings data received: " + exc
                     + ", userId: " + userId
-                    + ", userName: " + userName
-                    + ", role: " + role
+                    + ", key: " + key
+                    + ", key: " + value
                     );
             }
             return Task.CompletedTask;

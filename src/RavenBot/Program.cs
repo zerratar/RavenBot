@@ -30,6 +30,7 @@ namespace RavenBot
             ioc.RegisterShared<IKernel, Kernel>();
 
             ioc.RegisterShared<IUserRoleManager, UserRoleManager>();
+            ioc.RegisterShared<IUserSettingsManager, UserSettingsManager>();
             ioc.RegisterShared<ITwitchUserStore, TwitchUserStore>();
             ioc.RegisterCustomShared<IAppSettings>(() => new AppSettingsProvider().Get());
             ioc.Register<IGameConnection, TcpGameConnection>();
@@ -50,7 +51,7 @@ namespace RavenBot
             ioc.RegisterShared<IStringProvider, CachedStringProvider>();
             ioc.RegisterShared<IStringTemplateParser, StringTemplateParser>();
             ioc.RegisterShared<IStringTemplateProcessor, StringTemplateProcessor>();
-            ioc.RegisterShared<ITwitchMessageFormatter, TwitchMessageFormatter>();
+            ioc.RegisterShared<IChatMessageFormatter, ChatMessageFormatter>();
 
             ioc.RegisterShared<ICommandProvider, CommandProvider>();
 

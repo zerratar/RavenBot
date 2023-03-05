@@ -1,5 +1,7 @@
-﻿using ROBot.Core.Twitch;
+﻿using ROBot.Core;
+using ROBot.Core.Twitch;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using TwitchLib.Client.Events;
 using TwitchLib.Client.Models;
 using TwitchLib.Communication.Events;
@@ -11,10 +13,6 @@ namespace ROBot.Tests
         public event System.EventHandler<OnLogArgs> OnTwitchLog;
         public event System.EventHandler<OnErrorEventArgs> OnTwitchError;
 
-        public void Broadcast(IGameSessionCommand message)
-        {
-        }
-
         public void Broadcast(string channel, string user, string format, params object[] args)
         {
             var a = "";
@@ -23,6 +21,10 @@ namespace ROBot.Tests
                 a = string.Join(" ", args);
             }
             System.Console.WriteLine(user + ": " + format + ", @" + channel + " " + a);
+        }
+
+        public void Broadcast(IGameSessionCommand message)
+        {
         }
 
         public void Dispose()
@@ -43,6 +45,11 @@ namespace ROBot.Tests
 
         public void SendChatMessage(string channel, string message)
         {
+        }
+
+        public Task SendChatMessageAsync(string channel, string message)
+        {
+            throw new System.NotImplementedException();
         }
 
         public void Start()

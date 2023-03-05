@@ -21,7 +21,7 @@ namespace ROBot.Tests
 
         public Task AcceptClanInviteAsync(Player player, string argument)
         {
-            throw new NotImplementedException();
+            return Task.CompletedTask;
         }
 
         public Task AcceptDuelRequestAsync(Player player)
@@ -56,6 +56,11 @@ namespace ROBot.Tests
 
         public void Close()
         {
+        }
+
+        public Task CountItemAsync(Player player, string itemName)
+        {
+            throw new NotImplementedException();
         }
 
         public Task CraftAsync(Player targetPlayer, string itemQuery)
@@ -124,12 +129,12 @@ namespace ROBot.Tests
 
         public Task GetClanInfoAsync(Player player, string argument)
         {
-            throw new NotImplementedException();
+            return Task.CompletedTask;
         }
 
         public Task GetClanStatsAsync(Player player, string argument)
         {
-            throw new NotImplementedException();
+            return Task.CompletedTask;
         }
 
         public Task GetClientVersionAsync(Player player)
@@ -219,7 +224,7 @@ namespace ROBot.Tests
 
         public Task JoinRaidAsync(EventJoinRequest player)
         {
-            throw new NotImplementedException();
+            return Task.CompletedTask;
         }
 
         public Task KickAsync(Player targetPlayer)
@@ -244,7 +249,7 @@ namespace ROBot.Tests
 
         public Task LeaveClanAsync(Player player, string argument)
         {
-            throw new NotImplementedException();
+            return Task.CompletedTask;
         }
 
         public Task LeaveOnsenAsync(Player player)
@@ -289,7 +294,7 @@ namespace ROBot.Tests
 
         public Task PromoteClanMemberAsync(Player player, Player targetPlayer, string argument)
         {
-            throw new NotImplementedException();
+            return Task.CompletedTask;
         }
 
         public Task RaidStartAsync(Player player)
@@ -314,12 +319,12 @@ namespace ROBot.Tests
 
         public Task RemoveFromClanAsync(Player player, Player targetPlayer, string argument)
         {
-            throw new NotImplementedException();
+            return Task.CompletedTask;
         }
 
         public Task RemoveFromClanAsync(Player player, Player targetPlayer)
         {
-            throw new NotImplementedException();
+            return Task.CompletedTask;
         }
 
         public Task RequestHighestSkillAsync(Player player, string skill)
@@ -379,12 +384,12 @@ namespace ROBot.Tests
 
         public Task SendClanInviteAsync(Player player, Player targetPlayer, string argument)
         {
-            throw new NotImplementedException();
+            return Task.CompletedTask;
         }
 
         public Task SendClanInviteAsync(Player player, Player targetPlayer)
         {
-            throw new NotImplementedException();
+            return Task.CompletedTask;
         }
 
         public Task SendPlayerTaskAsync(Player player, PlayerTask task, params string[] args)

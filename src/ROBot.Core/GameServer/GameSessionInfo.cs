@@ -9,4 +9,5 @@ namespace ROBot.Core.GameServer
         public Guid SessionId { get; set; }
         public DateTime Created { get; set; }
     }
+
 }

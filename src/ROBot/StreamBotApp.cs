@@ -10,6 +10,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using ROBot.Core.Discord;
 
 namespace ROBot
 {
@@ -23,6 +24,7 @@ namespace ROBot
         private readonly IGameSessionManager sessionManager;
         private readonly IBotServer botServer;
         private readonly ITwitchCommandClient twitch;
+
         private Shinobytes.Ravenfall.RavenNet.Core.ITimeoutHandle timeoutHandle;
         private bool disposed;
         private int detailsDelayTimer;

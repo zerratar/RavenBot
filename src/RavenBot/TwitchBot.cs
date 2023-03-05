@@ -27,7 +27,7 @@ namespace RavenBot
         private readonly IRavenfallClient ravenfall;
         private readonly IPlayerProvider playerProvider;
         private readonly ITwitchUserStore userStore;
-        private readonly ITwitchMessageFormatter messageFormatter;
+        private readonly IChatMessageFormatter messageFormatter;
         private readonly IMessageBus messageBus;
         private readonly ICommandProvider commandProvider;
         private readonly ICommandHandler commandHandler;
@@ -52,7 +52,7 @@ namespace RavenBot
             IUserRoleManager userRoleManager,
             IRavenfallClient ravenfall,
             IPlayerProvider playerProvider,
-            ITwitchMessageFormatter localizer,
+            IChatMessageFormatter localizer,
             IMessageBus messageBus,
             ICommandProvider commandProvider,
             ICommandHandler commandHandler,

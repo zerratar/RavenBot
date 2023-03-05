@@ -2,13 +2,13 @@
 
 namespace RavenBot.Core.Twitch
 {
-    public class TwitchMessageFormatter : ITwitchMessageFormatter
+    public class ChatMessageFormatter : IChatMessageFormatter
     {
         private readonly IStringProvider stringProvider;
         private readonly IStringTemplateProcessor processor;
         private readonly IStringTemplateParser parser;
 
-        public TwitchMessageFormatter(
+        public ChatMessageFormatter(
             IStringProvider stringProvider,
             IStringTemplateProcessor processor,
             IStringTemplateParser parser)
