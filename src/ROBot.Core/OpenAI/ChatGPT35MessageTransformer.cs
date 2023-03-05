@@ -24,6 +24,11 @@ namespace ROBot.Core.OpenAI
 
         public async Task<string> TranslateAndPersonalizeAsync(string message, string language)
         {
+            if (string.IsNullOrEmpty(language) || language.StartsWith("none", System.StringComparison.OrdinalIgnoreCase))
+            {
+                return await PersonalizeAsync(message);
+            }
+
             var completion = await openAI.GetCompletionAsync(message, ChatMessage.Create("system", "You have to make sure that the given sentences are gramatically correct and personal, also take into consideration that any words wrapped with { } are variables and will be changed afterwards so do not remove those. Reply with only the improved result and nothing else. Do not wrap the result in \" even if the input has it.And make sure its translated into " + language + "."));
             if (completion == null) return message;
             return completion.Choices.FirstOrDefault()?.Message.Content ?? message;
@@ -31,6 +36,11 @@ namespace ROBot.Core.OpenAI
 
         public async Task<string> TranslateAsync(string message, string language)
         {
+            if (string.IsNullOrEmpty(language) || language.StartsWith("none", System.StringComparison.OrdinalIgnoreCase))
+            {
+                return message;
+            }
+
             var completion = await openAI.GetCompletionAsync(message, ChatMessage.Create("system", "Translate the given sentences into " + language + ", take into consideration that any words wrapped with { } are variables and will be changed afterwards so do not remove those. Reply with only the improved result and nothing else. Do not wrap the result in \" even if the input has it."));
             if (completion == null) return message;
             return completion.Choices.FirstOrDefault()?.Message.Content ?? message;

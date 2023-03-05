@@ -488,9 +488,15 @@ namespace ROBot.Core.Twitch
                 {
                     message = await messageTransformer.PersonalizeAsync(message);
                 }
+
+                logger.LogDebug($"[TWITCH] Sending Message (Channel: {channel} Message: {message} Language: {settings.ChatBotLanguage} Transformation: {transform})");
+            }
+            else
+            {
+                logger.LogDebug($"[TWITCH] Sending Message (Channel: {channel} Message: {message})");
             }
 
-            logger.LogDebug($"[TWITCH] Sending Message (Channel: {channel} Message: {message})");
+
             stats.AddMsgSend(channel, message);
             client.SendMessage(channel, message);
         }
