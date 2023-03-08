@@ -55,11 +55,11 @@ namespace ROBot.Core.GameServer
             }
         }
 
-        public IRavenfallConnection GetConnectionByUserId(string sessionUserId)
+        public IRavenfallConnection GetConnectionByUserId(Guid ravenfallId)
         {
             //lock (connectionMutex)
             {
-                if (string.IsNullOrEmpty(sessionUserId))
+                if (ravenfallId == Guid.Empty)
                 {
 #if DEBUG
                     logger.LogDebug("[RVNFLL] BotServer::GetConnectionByUserId Trying to get connection using null or empty user id.");
@@ -67,7 +67,7 @@ namespace ROBot.Core.GameServer
                     return null;
                 }
 
-                return connections.FirstOrDefault(x => x?.Session?.UserId == sessionUserId);
+                return connections.FirstOrDefault(x => x?.Session?.RavenfallUserId == ravenfallId);
             }
         }
 
@@ -269,12 +269,12 @@ namespace ROBot.Core.GameServer
                 if (sender is IRavenfallConnection connection)
                 {
                     // check for existing connections using the same session details
-                    var existingConnection = GetConnectionByUserId(e.TwitchUserId);
+                    var existingConnection = GetConnectionByUserId(e.UserId);
                     if (existingConnection != null)
                     {
                         if (existingConnection.Session != null)
                         {
-                            sessionManager.Update(existingConnection.Session.Id, e.TwitchUserId, e.TwitchUserName);
+                            sessionManager.Update(existingConnection.Session.Id, e.UserId, e.Owner);
                         }
 
                         if (existingConnection.InstanceId != connection.InstanceId)
@@ -293,8 +293,8 @@ namespace ROBot.Core.GameServer
                         }
                     }
 
-                    connection.Session = sessionManager.Add(this, e.SessionId, e.TwitchUserId, e.TwitchUserName, e.Created);
-                    logger.LogDebug("[RVNFLL] Ravenfall client authenticated. (TwitchName: " + e.TwitchUserName + " User: " + connection.Session.Name + " EndPoint: " + connection.EndPointString + ")");
+                    connection.Session = sessionManager.Add(this, e.SessionId, e.UserId, e.Owner, e.Created);
+                    logger.LogDebug("[RVNFLL] Ravenfall client authenticated. (TwitchName: " + e.Owner.Username + " User: " + connection.Session.Name + " EndPoint: " + connection.EndPointString + ")");
                 }
             }
         }
@@ -310,10 +310,7 @@ namespace ROBot.Core.GameServer
 
         public IGameSession GetSession(string session)
         {
-            var s = sessionManager.GetByName(session);
-            if (s == null)
-                return sessionManager.GetByUserId(session);
-            return s;
+            return sessionManager.GetByName(session);
         }
     }
 

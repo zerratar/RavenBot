@@ -29,10 +29,10 @@ namespace RavenBot.Core.Ravenfall
             this.playerProvider = playerProvider;
             this.messageBus = messageBus;
 
-            messageBus.Subscribe<TwitchUserJoined>(nameof(TwitchUserJoined), OnUserJoined);
-            messageBus.Subscribe<TwitchUserLeft>(nameof(TwitchUserLeft), OnUserLeft);
-            messageBus.Subscribe<TwitchCheer>(nameof(TwitchCheer), OnUserCheer);
-            messageBus.Subscribe<TwitchSubscription>(nameof(TwitchSubscription), OnUserSub);
+            messageBus.Subscribe<UserJoinedEvent>(nameof(UserJoinedEvent), OnUserJoined);
+            messageBus.Subscribe<UserLeftEvent>(nameof(UserLeftEvent), OnUserLeft);
+            messageBus.Subscribe<CheerBitsEvent>(nameof(CheerBitsEvent), OnUserCheer);
+            messageBus.Subscribe<UserSubscriptionEvent>(nameof(UserSubscriptionEvent), OnUserSub);
 
             this.client = client;
             this.client.Connected += Client_OnConnect;
@@ -100,7 +100,7 @@ namespace RavenBot.Core.Ravenfall
             var plr = playerProvider.Get(obj.Args[0], obj.Args[1]);
             plr.IsBroadcaster = true;
 
-            messageBus.Send("streamer_userid_acquired", plr.UserId);
+            messageBus.Send("streamer_userid_acquired", plr.PlatformId);
         }
 
         public Task UnstuckAsync(Player player) => SendAsync("unstuck", player);
@@ -267,10 +267,10 @@ namespace RavenBot.Core.Ravenfall
                 await this.client.SendAsync(request);
             }
         }
-        private async void OnUserCheer(TwitchCheer obj) => await SendAsync("twitch_cheer", obj);
-        private async void OnUserSub(TwitchSubscription obj) => await SendAsync("twitch_sub", obj);
-        private void OnUserLeft(TwitchUserLeft obj) => logger.WriteMessage(obj.Name + " left the channel");
-        private void OnUserJoined(TwitchUserJoined obj) => logger.WriteMessage(obj.Name + " joined the channel");
+        private async void OnUserCheer(CheerBitsEvent obj) => await SendAsync("twitch_cheer", obj);
+        private async void OnUserSub(UserSubscriptionEvent obj) => await SendAsync("twitch_sub", obj);
+        private void OnUserLeft(UserLeftEvent obj) => logger.WriteMessage(obj.Name + " left the channel");
+        private void OnUserJoined(UserJoinedEvent obj) => logger.WriteMessage(obj.Name + " joined the channel");
 
         private async Task SendAsync<T>(string name, T packet)
         {

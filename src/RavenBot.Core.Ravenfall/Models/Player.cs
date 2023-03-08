@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using RavenBot.Core.Ravenfall.Commands;
+using System;
 
 namespace RavenBot.Core.Ravenfall.Models
 {
@@ -8,14 +10,16 @@ namespace RavenBot.Core.Ravenfall.Models
         {
             Username = "server-request";
             DisplayName = "server-request";
-            UserId = "server-request";            
+            PlatformId = "server-request";
         }
 
         public Player(
-              string userId,
+              Guid id,
               string username,
               string displayName,
               string color,
+              string platform,
+              string platformId,
               bool isBroadcaster,
               bool isModerator,
               bool isSubscriber,
@@ -23,19 +27,22 @@ namespace RavenBot.Core.Ravenfall.Models
               string identifier)
         {
             if (string.IsNullOrEmpty(username)) throw new ArgumentNullException(nameof(username));
+            Id = id;
             Username = username.StartsWith("@") ? username.Substring(1) : username;
-            UserId = userId;
+            PlatformId = platformId;
             DisplayName = displayName;
             Color = color;
+            Platform = platform;
             IsBroadcaster = isBroadcaster;
             IsModerator = isModerator;
             IsSubscriber = isSubscriber;
             IsVip = isVip;
             Identifier = identifier;
         }
-
+        public Guid Id { get; set; }
+        public string Platform { get; set; }
+        public string PlatformId { get; set; }
         public string Username { get; set; }
-        public string UserId { get; set; }
         public string DisplayName { get; set; }
         public string Color { get; set; }
         public bool IsBroadcaster { get; set; }
@@ -44,6 +51,9 @@ namespace RavenBot.Core.Ravenfall.Models
         public bool IsVip { get; set; }
         public int SubTier { get; set; }
         public string Identifier { get; set; }
+
+        [JsonIgnore]
+        public UserSettings Settings { get; set; }
     }
 
 

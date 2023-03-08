@@ -1,4 +1,6 @@
-﻿using System;
+﻿using RavenBot.Core.Ravenfall.Commands;
+using RavenBot.Core.Ravenfall.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -8,10 +10,18 @@ namespace ROBot.Core.GameServer
     {
         private readonly List<IGameSession> sessions = new List<IGameSession>();
         private readonly object sessionMutex = new object();
+        private readonly IUserSettingsManager userSettingsManager;
+
         public event EventHandler<IGameSession> SessionStarted;
         public event EventHandler<IGameSession> SessionEnded;
         public event EventHandler<GameSessionUpdateEventArgs> SessionUpdated;
-        public IGameSession Add(IBotServer server, Guid sessionId, string userId, string username, DateTime created)
+
+        public GameSessionManager(IUserSettingsManager userSettingsManager)
+        {
+            this.userSettingsManager = userSettingsManager;
+        }
+
+        public IGameSession Add(IBotServer server, Guid sessionId, Guid userId, Player owner, DateTime created)
         {
             lock (sessionMutex)
             {
@@ -24,7 +34,7 @@ namespace ROBot.Core.GameServer
                     return existingSession;
                 }
 
-                var session = new RavenfallGameSession(server, sessionId, userId, username, created);
+                var session = new RavenfallGameSession(server, userSettingsManager, sessionId, userId, owner, created);
                 sessions.Add(session);
                 if (SessionStarted != null)
                     SessionStarted.Invoke(this, session);
@@ -32,12 +42,13 @@ namespace ROBot.Core.GameServer
             }
         }
 
-        public void Update(Guid sessionId, string twitchUserId, string newSessionName)
+        public void Update(Guid sessionId, Guid userId, Player newOwner)
         {
             var session = Get(sessionId);
             var oldName = session.Name;
-            session.UserId = twitchUserId;
-            session.Name = newSessionName;
+            session.RavenfallUserId = userId;
+            session.Owner = newOwner;
+            session.Name = newOwner.Username;
             SessionUpdated?.Invoke(this, new GameSessionUpdateEventArgs(session, oldName));
         }
 
@@ -85,11 +96,11 @@ namespace ROBot.Core.GameServer
         }
 
 
-        public IGameSession GetByUserId(string userId)
+        public IGameSession GetByUserId(Guid ravenfallUserId)
         {
             lock (sessionMutex)
             {
-                return sessions.FirstOrDefault(x => x.UserId.Equals(userId, StringComparison.OrdinalIgnoreCase));
+                return sessions.FirstOrDefault(x => x.RavenfallUserId == ravenfallUserId);
             }
         }
 

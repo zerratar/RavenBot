@@ -11,6 +11,6 @@ namespace ROBot.Core.GameServer
         IGameSession GetSession(string session);
         void OnClientDisconnected(IRavenfallConnection connection);
         IRavenfallConnection GetConnection(IGameSession ravenfallGameSession);
-        IRavenfallConnection GetConnectionByUserId(string sessionUserId);
+        IRavenfallConnection GetConnectionByUserId(Guid ravenfallUserId);
     }
 }

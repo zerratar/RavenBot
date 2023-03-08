@@ -446,7 +446,7 @@ namespace ROBot.Core.Twitch
                 return;
             }
 
-            if (!string.IsNullOrEmpty(user))
+            if (!string.IsNullOrEmpty(user) && msg.IndexOf(user) == -1)
                 msg = user + ", " + msg;
 
             await SendChatMessageAsync(channel, msg);
@@ -471,9 +471,9 @@ namespace ROBot.Core.Twitch
 
             var session = game.GetSession(channel);
 
-            if (session != null && !string.IsNullOrEmpty(session.UserId))
+            if (session != null && session.RavenfallUserId != Guid.Empty)
             {
-                var settings = settingsManager.Get(session.UserId);
+                var settings = settingsManager.Get(session.RavenfallUserId);
                 var transform = settings.ChatMessageTransformation;
 
                 if (transform == ChatMessageTransformation.TranslateAndPersonalize)

@@ -7,8 +7,9 @@ namespace ROBot.Core
     public interface IGameSession
     {
         Guid Id { get; }
+        Guid RavenfallUserId { get; set; }
+        Player Owner { get; set; }
         string Name { get; set; }
-        string UserId { get; set; }
         public DateTime Created { get; }
         Player GetBroadcaster();
         Player Get(string twitchId);

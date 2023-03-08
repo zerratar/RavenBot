@@ -36,8 +36,8 @@ namespace RavenBot.Core.Ravenfall
             {
                 this.player = player;
             }
-
-            public string UserId => player.UserId;
+            public string Platform => player.Platform;
+            public string UserId => player.PlatformId;
 
             public string Username => player.Username;
 

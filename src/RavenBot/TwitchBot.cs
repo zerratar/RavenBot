@@ -23,7 +23,7 @@ namespace RavenBot
     {
         private readonly ILogger logger;
         private readonly IKernel kernel;
-        private readonly IUserRoleManager userRoleManager;
+        private readonly IUserSettingsManager userSettingsManager;
         private readonly IRavenfallClient ravenfall;
         private readonly IPlayerProvider playerProvider;
         private readonly ITwitchUserStore userStore;
@@ -49,7 +49,7 @@ namespace RavenBot
         public TwitchBot(
             ILogger logger,
             IKernel kernel,
-            IUserRoleManager userRoleManager,
+            IUserSettingsManager userSettingsManager,
             IRavenfallClient ravenfall,
             IPlayerProvider playerProvider,
             IChatMessageFormatter localizer,
@@ -61,7 +61,7 @@ namespace RavenBot
         {
             this.logger = logger;
             this.kernel = kernel;
-            this.userRoleManager = userRoleManager;
+            this.userSettingsManager = userSettingsManager;
             this.ravenfall = ravenfall;
             this.playerProvider = playerProvider;
             this.messageFormatter = localizer;
@@ -152,7 +152,7 @@ namespace RavenBot
             if (!e.Channel.Contains(this.channelProvider.Get(), StringComparison.InvariantCultureIgnoreCase))
                 return;
 
-            this.messageBus.Send(nameof(TwitchUserLeft), new TwitchUserLeft(e.Username));
+            this.messageBus.Send(nameof(UserLeftEvent), new UserLeftEvent(e.Username));
         }
 
         private void OnUserJoined(object sender, OnUserJoinedArgs e)
@@ -160,7 +160,7 @@ namespace RavenBot
             if (!e.Channel.Contains(this.channelProvider.Get(), StringComparison.InvariantCultureIgnoreCase))
                 return;
 
-            this.messageBus.Send(nameof(TwitchUserJoined), new TwitchUserJoined(e.Username));
+            this.messageBus.Send(nameof(UserJoinedEvent), new UserJoinedEvent(e.Username));
         }
 
         private void OnMessageReceived(object sender, OnMessageReceivedArgs e)
@@ -168,8 +168,9 @@ namespace RavenBot
             if (e.ChatMessage.Bits == 0) return;
 
             this.messageBus.Send(
-                nameof(TwitchCheer),
-                new TwitchCheer(
+                nameof(CheerBitsEvent),
+                new CheerBitsEvent(
+                    "twitch",
                     e.ChatMessage.Channel,
                     e.ChatMessage.Id,
                     e.ChatMessage.Username,
@@ -186,7 +187,8 @@ namespace RavenBot
         private async void OnCommandReceived(object sender, OnChatCommandReceivedArgs e)
         {
             var uid = e.Command.ChatMessage.UserId;
-            await commandHandler.HandleAsync(this, new TwitchCommand(e.Command, userRoleManager.IsAdministrator(uid), userRoleManager.IsModerator(uid)));
+            var settings = userSettingsManager.Get(uid, "twitch");
+            await commandHandler.HandleAsync(this, new TwitchCommand(e.Command, settings.IsAdministrator, settings.IsModerator));
         }
 
         private void EnsureInitialized()
@@ -219,7 +221,7 @@ namespace RavenBot
             if (string.IsNullOrEmpty(msg))
                 return;
 
-            if (!string.IsNullOrEmpty(user))
+            if (!string.IsNullOrEmpty(user) && msg.IndexOf(user) == -1)
                 msg = user + ", " + msg;
 
             client.SendMessage(channel, msg);
@@ -237,8 +239,9 @@ namespace RavenBot
 
         private void OnReSub(object sender, OnReSubscriberArgs e)
         {
-            this.messageBus.Send(nameof(TwitchSubscription),
-                new TwitchSubscription(
+            this.messageBus.Send(nameof(UserSubscriptionEvent),
+                new UserSubscriptionEvent(
+                    "twitch",
                     e.Channel,
                     e.ReSubscriber.UserId,
                     e.ReSubscriber.Login,
@@ -254,8 +257,9 @@ namespace RavenBot
 
         private void OnNewSub(object sender, OnNewSubscriberArgs e)
         {
-            this.messageBus.Send(nameof(TwitchSubscription),
-                new TwitchSubscription(
+            this.messageBus.Send(nameof(UserSubscriptionEvent),
+                new UserSubscriptionEvent(
+                    "twitch",
                     e.Channel,
                     e.Subscriber.UserId,
                     e.Subscriber.Login,
@@ -270,8 +274,9 @@ namespace RavenBot
 
         private void OnPrimeSub(object sender, OnCommunitySubscriptionArgs e)
         {
-            this.messageBus.Send(nameof(TwitchSubscription),
-                new TwitchSubscription(
+            this.messageBus.Send(nameof(UserSubscriptionEvent),
+                new UserSubscriptionEvent(
+                    "twitch",
                     e.Channel,
                     e.GiftedSubscription.UserId,
                     e.GiftedSubscription.Login,
@@ -286,8 +291,8 @@ namespace RavenBot
 
         private void OnGiftedSub(object sender, OnGiftedSubscriptionArgs e)
         {
-            this.messageBus.Send(nameof(TwitchSubscription),
-            new TwitchSubscription(
+            this.messageBus.Send(nameof(UserSubscriptionEvent),
+            new UserSubscriptionEvent("twitch",
                 e.Channel,
                 e.GiftedSubscription.Id,
                 e.GiftedSubscription.Login,

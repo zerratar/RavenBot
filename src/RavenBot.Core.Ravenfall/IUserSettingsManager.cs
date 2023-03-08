@@ -1,11 +1,15 @@
-﻿namespace RavenBot.Core.Ravenfall.Commands
+﻿using System;
+namespace RavenBot.Core.Ravenfall.Commands
 {
     public interface IUserSettingsManager
     {
-        UserSettings Get(string userId);
-        T Get<T>(string userId, string key);
-        T Get<T>(string userId, string key, T defaultValue);
-        bool TryGet<T>(string userId, string key, out T value);
-        void Set<T>(string userId, string key, T value);
+        UserSettings Get(Guid userId);
+        T Get<T>(Guid userId, string key);
+        T Get<T>(Guid userId, string key, T defaultValue);
+        bool TryGet<T>(Guid userId, string key, out T value);
+        void Set<T>(Guid userId, string key, T value);
+
+        UserSettings Get(string platformId, string platform);
+        Guid ResolveAccountId(string platformId, string platform);
     }
 }

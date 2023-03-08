@@ -44,7 +44,6 @@ namespace ROBot
 
             ioc.RegisterShared<IMessageBus, MessageBus>();
 
-            ioc.RegisterShared<IUserRoleManager, UserRoleManager>();
             ioc.RegisterShared<IUserSettingsManager, UserSettingsManager>();
             ioc.RegisterShared<RavenBot.Core.IStringProvider, RavenBot.Core.StringProvider>();
             ioc.RegisterShared<RavenBot.Core.IStringTemplateParser, RavenBot.Core.StringTemplateParser>();

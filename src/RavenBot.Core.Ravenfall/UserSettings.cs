@@ -1,15 +1,23 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 namespace RavenBot.Core.Ravenfall.Commands
 {
     public class UserSettings
     {
+        public static readonly UserSettings Empty = new UserSettings();
+
         private readonly string file;
         private readonly object ioMutex = new object();
 
         private System.DateTime loadedTime;
         private ConcurrentDictionary<string, object> dict;
+
+        public UserSettings()
+        {
+            dict = new ConcurrentDictionary<string, object>();
+        }
 
         public UserSettings(string file, Dictionary<string, object> src)
         {
@@ -18,6 +26,8 @@ namespace RavenBot.Core.Ravenfall.Commands
             dict = new ConcurrentDictionary<string, object>(src);
         }
 
+        public bool HasValues => dict.Count > 0;
+
         public UserSettings(string file)
         {
             this.file = file;
@@ -25,7 +35,81 @@ namespace RavenBot.Core.Ravenfall.Commands
             dict = new ConcurrentDictionary<string, object>();
         }
 
+        public Guid RavenfallUserId
+        {
+            get => Get<Guid>("ravenfall_id");
+            set => Set("ravenfall_id", value);
+        }
 
+        public string RavenfallUserName
+        {
+            get => Get<string>("ravenfall_name");
+            set => Set("ravenfall_name", value);
+        }
+
+        public string TwitchPubSubToken
+        {
+            get => Get<string>("twitch_pubsub");
+            set => Set("twitch_pubsub", value);
+        }
+
+        public string TwitchUserId
+        {
+            get => Get<string>("twitch_id");
+            set => Set("twitch_id", value);
+        }
+
+        public string TwitchUserName
+        {
+            get => Get<string>("twitch_name");
+            set => Set("twitch_name", value);
+        }
+        public string KickUserId
+        {
+            get => Get<string>("kick_id");
+            set => Set("kick_id", value);
+        }
+
+        public string KickUserName
+        {
+            get => Get<string>("kick_name");
+            set => Set("kick_name", value);
+        }
+
+        public string DiscordUserId
+        {
+            get => Get<string>("discord_id");
+            set => Set("discord_id", value);
+        }
+        public string DiscordUserName
+        {
+            get => Get<string>("discord_name");
+            set => Set("discord_name", value);
+        }
+
+        public string YouTubeUserId
+        {
+            get => Get<string>("youtube_id");
+            set => Set("youtube_id", value);
+        }
+
+        public string YouTubeUserName
+        {
+            get => Get<string>("youtube_name");
+            set => Set("youtube_name", value);
+        }
+
+        public bool IsAdministrator
+        {
+            get => Get<bool>("is_administrator");
+            set => Set("is_administrator", value);
+        }
+
+        public bool IsModerator
+        {
+            get => Get<bool>("is_moderator");
+            set => Set("is_moderator", value);
+        }
 
         public int PatreonTierLevel
         {
@@ -113,6 +197,15 @@ namespace RavenBot.Core.Ravenfall.Commands
 
             if (obj is string str)
             {
+                if (typeof(T) == typeof(Guid))
+                {
+                    if (Guid.TryParse(str, out var res))
+                    {
+                        value = (T)(object)res;
+                        return true;
+                    }
+                }
+
                 try
                 {
                     value = Newtonsoft.Json.JsonConvert.DeserializeObject<T>(str);

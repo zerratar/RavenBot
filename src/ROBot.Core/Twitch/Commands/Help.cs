@@ -1,7 +1,6 @@
 ﻿using RavenBot.Core.Handlers;
 using ROBot.Core.GameServer;
 using System.Threading.Tasks;
-using TwitchLib.Client.Models;
 
 namespace ROBot.Core.Twitch.Commands
 {

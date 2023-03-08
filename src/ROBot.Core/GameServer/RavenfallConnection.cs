@@ -52,16 +52,17 @@ namespace ROBot.Core.GameServer
             this.playerProvider = playerProvider;
             this.messageBus = messageBus;
 
-            this.subs.Add(messageBus.Subscribe<ROBot.Core.Twitch.TwitchUserJoined>(nameof(TwitchUserJoined), OnUserJoined));
-            this.subs.Add(messageBus.Subscribe<ROBot.Core.Twitch.TwitchUserLeft>(nameof(TwitchUserLeft), OnUserLeft));
-            this.subs.Add(messageBus.Subscribe<ROBot.Core.Twitch.TwitchCheer>(nameof(TwitchCheer), OnUserCheer));
-            this.subs.Add(messageBus.Subscribe<ROBot.Core.Twitch.TwitchSubscription>(nameof(TwitchSubscription), OnUserSub));
+            this.subs.Add(messageBus.Subscribe<ROBot.Core.Twitch.TwitchUserJoined>(nameof(UserJoinedEvent), OnUserJoined));
+            this.subs.Add(messageBus.Subscribe<ROBot.Core.Twitch.TwitchUserLeft>(nameof(UserLeftEvent), OnUserLeft));
+            this.subs.Add(messageBus.Subscribe<ROBot.Core.Twitch.TwitchCheer>(nameof(CheerBitsEvent), OnUserCheer));
+            this.subs.Add(messageBus.Subscribe<ROBot.Core.Twitch.TwitchSubscription>(nameof(UserSubscriptionEvent), OnUserSub));
 
             this.client = client;
             this.client.Connected += Client_Connected;
             this.client.Disconnected += Client_Disconnected;
 
-            this.client.Subscribe("session_owner", RegisterSessionOwner);
+            this.client.Subscribe("session", RegisterSession);
+
             this.client.Subscribe("pong", PongReceived);
 
             this.client.Subscribe("join_failed", SendResponseToTwitchChat);
@@ -183,34 +184,17 @@ namespace ROBot.Core.GameServer
             missedPingCount = 0;
         }
 
-        private void RegisterSessionOwner(IGameCommand obj)
+
+        private void RegisterSession(IGameCommand obj)
         {
             try
             {
-                if (string.IsNullOrEmpty(obj.Args[0]))
-                    return;
+                Guid.TryParse(obj.Args[0], out var userId);
+                Guid.TryParse(obj.Args[1], out var sessionid);
+                DateTime.TryParse(obj.Args[2], out var sessionStart);
 
-                Guid sessionId = Guid.Empty;
-                if (obj.Args.Length > 2)
-                {
-                    Guid.TryParse(obj.Args[2], out sessionId);
-                }
-                var plr = playerProvider.Get(obj.Args[0], obj.Args[1]);
-                plr.IsBroadcaster = true;
-
-                DateTime time = DateTime.MinValue;
-                if (obj.Args.Length > 3)
-                {
-                    DateTime.TryParse(obj.Args[3], out time);
-                }
-
-                //if (internalSessionInfoReceived == null)
-                //{
-                //    queuedSessionInfo = sessionInfo;
-                //}
-                //else
-                //{
-                //    queuedSessionInfo = null;
+                var player = playerProvider.Get(userId);
+                player.IsBroadcaster = true;
 
                 if (internalSessionInfoReceived == null)
                 {
@@ -219,10 +203,10 @@ namespace ROBot.Core.GameServer
 
                 internalSessionInfoReceived.Invoke(this, new GameSessionInfo
                 {
-                    Created = time,
-                    SessionId = sessionId,
-                    TwitchUserId = plr.UserId,
-                    TwitchUserName = plr.Username
+                    Created = sessionStart,
+                    SessionId = sessionid,
+                    UserId = userId,
+                    Owner = player,
                 });
             }
             catch (Exception exc)

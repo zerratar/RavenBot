@@ -25,7 +25,8 @@ namespace ROBot.Core.Twitch
         private readonly ConcurrentDictionary<string, Type> handlerLookup = new ConcurrentDictionary<string, Type>();
 
         private ITwitchChatMessageHandler messageHandler;
-        private IUserRoleManager userRoleManager;
+        private IUserSettingsManager userSettingsManager;
+
         public ICollection<Type> RegisteredCommandHandlers => handlerLookup.Values;
 
         public TwitchCommandController(
@@ -36,10 +37,10 @@ namespace ROBot.Core.Twitch
             this.ioc = ioc;
 
             RegisterCommandHandlers();
-            userRoleManager = this.ioc.Resolve<IUserRoleManager>();
+            userSettingsManager = this.ioc.Resolve<IUserSettingsManager>();
         }
 
-        public async Task<bool> HandleAsync(IBotServer game, ITwitchCommandClient twitch, ChatMessage message)
+        public async Task<bool> HandleAsync(IBotServer game, ITwitchCommandClient twitch, TwitchLib.Client.Models.ChatMessage message)
         {
             try
             {
@@ -83,7 +84,8 @@ namespace ROBot.Core.Twitch
                 var argString = !string.IsNullOrEmpty(command.ArgumentsAsString) ? " (args: " + command.ArgumentsAsString + ")" : "";
 
                 var uid = command.ChatMessage.UserId;
-                var chatCmd = new TwitchCommand(command, userRoleManager.IsAdministrator(uid), userRoleManager.IsModerator(uid));
+                var settings = userSettingsManager.Get(uid, "twitch");
+                var chatCmd = new TwitchCommand(command, settings?.IsAdministrator ?? false, settings?.IsModerator ?? false);
 
                 var key = chatCmd.Command.ToLower();
 
@@ -194,7 +196,7 @@ namespace ROBot.Core.Twitch
                 }
                 else
                 {
-                    player = session.Get(new RewardRedeemUser(redeemer));
+                    player = session.Get(new TwitchRewardRedeemUser(redeemer));
                     if (player == null)
                     {
                         logger.LogError("[BOT] Error Redeeming Reward - Redeemer Does not Exisit (Command: " + usedCommand + " Redeemer: " + redeemer.Id + ")");
@@ -286,17 +288,17 @@ namespace ROBot.Core.Twitch
             }
         }
 
-        internal class RewardRedeemUser : ICommandSender
+        internal class TwitchRewardRedeemUser : ICommandSender
         {
             private readonly TwitchLib.PubSub.Models.Responses.Messages.User user;
 
-            public RewardRedeemUser(TwitchLib.PubSub.Models.Responses.Messages.User user)
+            public TwitchRewardRedeemUser(TwitchLib.PubSub.Models.Responses.Messages.User user)
             {
                 this.user = user;
             }
 
             public string UserId => user.Id;
-
+            public string Platform => "twitch";
             public string Username => user.Login;
 
             public string DisplayName => user.DisplayName;

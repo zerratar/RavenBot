@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RavenBot.Core.Ravenfall.Models;
+using System;
 using System.Collections.Generic;
 
 namespace ROBot.Core.GameServer
@@ -9,13 +10,13 @@ namespace ROBot.Core.GameServer
         event EventHandler<IGameSession> SessionStarted;
         event EventHandler<IGameSession> SessionEnded;
         event EventHandler<GameSessionUpdateEventArgs> SessionUpdated;
-        IGameSession Add(IBotServer server, Guid sessionId, string userId, string username, DateTime created);
+        IGameSession Add(IBotServer server, Guid sessionId, Guid ravenfallUserId, Player owner, DateTime created);
         void Remove(IGameSession session);
-        void Update(Guid sessionId, string twitchUserId, string twitchUserName);
+        void Update(Guid sessionId, Guid ravenfallUserId, Player owner);
         IReadOnlyList<IGameSession> All();
         IGameSession Get(Guid id);
-        IGameSession GetByName(string twitchUserName);
-        IGameSession GetByUserId(string session);
+        IGameSession GetByName(string name);
+        IGameSession GetByUserId(Guid ravenfallUserId);
         void ClearAll();
     }
 }

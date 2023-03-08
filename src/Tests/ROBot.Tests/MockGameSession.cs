@@ -20,6 +20,9 @@ namespace ROBot.Tests
 
         public int UserCount => 0;
 
+        public Guid RavenfallUserId { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public Player Owner { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
         public bool Contains(string userId)
         {
             return true;

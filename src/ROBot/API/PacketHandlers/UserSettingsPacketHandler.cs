@@ -42,7 +42,7 @@ namespace ROBot.LogServer.PacketHandlers
                     userId = reader.ReadString();
                     key = reader.ReadString();
                     value = reader.ReadString();
-                    settingsManager.Set(userId, key, value);
+                    settingsManager.Set(System.Guid.Parse(userId), key, value);
                 }
             }
             catch (System.Exception exc)

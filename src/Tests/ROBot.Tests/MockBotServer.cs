@@ -1,5 +1,6 @@
 ﻿using ROBot.Core;
 using ROBot.Core.GameServer;
+using System;
 using System.Collections.Generic;
 
 namespace ROBot.Tests
@@ -23,6 +24,11 @@ namespace ROBot.Tests
         public IRavenfallConnection GetConnectionByUserId(string sessionUserId)
         {
             return new MockRavenfallConnection();
+        }
+
+        public IRavenfallConnection GetConnectionByUserId(Guid ravenfallUserId)
+        {
+            throw new NotImplementedException();
         }
 
         public IGameSession GetSession(string session)

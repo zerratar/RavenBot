@@ -7,21 +7,21 @@ using System;
 
 namespace RavenBot.Core.Twitch
 {
-    public class TwitchChatMessage
+    public class ChatMessage
     {
-        public TwitchChatMessage(TwitchChatSender sender, TwitchChatMessagePart[] message)
+        public ChatMessage(ChatSender sender, ChatMessagePart[] message)
         {
             Sender = sender;
             Message = message;
         }
 
-        public TwitchChatSender Sender { get; }
-        public TwitchChatMessagePart[] Message { get; }
+        public ChatSender Sender { get; }
+        public ChatMessagePart[] Message { get; }
     }
 
-    public class TwitchChatMessagePart
+    public class ChatMessagePart
     {
-        public TwitchChatMessagePart(string type, string value)
+        public ChatMessagePart(string type, string value)
         {
             Type = type;
             Value = value;
@@ -31,30 +31,31 @@ namespace RavenBot.Core.Twitch
         public string Value { get; }
     }
 
-    public class TwitchUserLeft
+    public class UserLeftEvent
     {
         public string Name { get; }
 
-        public TwitchUserLeft(string name)
+        public UserLeftEvent(string name)
         {
             Name = name;
         }
     }
 
-    public class TwitchUserJoined
+    public class UserJoinedEvent
     {
         public string Name { get; }
 
-        public TwitchUserJoined(string name)
+        public UserJoinedEvent(string name)
         {
             Name = name;
         }
     }
 
-    public class TwitchCheer
+    public class CheerBitsEvent
     {
         public string Channel { get; }
         public string UserId { get; }
+        public string Platform { get; }
         public string UserName { get; }
         public string DisplayName { get; }
         public bool IsModerator { get; }
@@ -62,7 +63,8 @@ namespace RavenBot.Core.Twitch
         public bool IsVip { get; }
         public int Bits { get; }
 
-        public TwitchCheer(
+        public CheerBitsEvent(
+            string platform,
             string channel,
             string userId,
             string userName,
@@ -72,6 +74,7 @@ namespace RavenBot.Core.Twitch
             bool isVip,
             int bits)
         {
+            Platform = platform;
             Channel = channel;
             UserId = userId;
             UserName = userName;
@@ -83,10 +86,11 @@ namespace RavenBot.Core.Twitch
         }
     }
 
-    public class TwitchSubscription
+    public class UserSubscriptionEvent
     {
         public string Channel { get; }
         public string UserId { get; }
+        public string Platform { get; }
         public string ReceiverUserId { get; }
         public bool IsModerator { get; }
         public bool IsSubscriber { get; }
@@ -95,7 +99,8 @@ namespace RavenBot.Core.Twitch
         public int Months { get; }
         public bool IsNew { get; }
 
-        public TwitchSubscription(
+        public UserSubscriptionEvent(
+            string platform,
             string channel,
             string userId,
             string userName,
@@ -106,6 +111,7 @@ namespace RavenBot.Core.Twitch
             int months,
             bool isNew)
         {
+            Platform = platform;
             Channel = channel;
             UserId = userId;
             ReceiverUserId = receiverUserId;
@@ -119,9 +125,9 @@ namespace RavenBot.Core.Twitch
     }
 
 
-    public class TwitchChatSender
+    public class ChatSender
     {
-        public TwitchChatSender(string name, string nameColor)
+        public ChatSender(string name, string nameColor)
         {
             Name = name;
             NameColor = nameColor;
@@ -243,7 +249,7 @@ namespace RavenBot.Core.Twitch
                 ColorHex = colorHex;
                 IsVerifiedBot = isVerifiedBot;
             }
-
+            public string Platform => "twitch";
             public string UserId { get; }
             public string Username { get; }
             public string DisplayName { get; }

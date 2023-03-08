@@ -11,6 +11,7 @@
     public interface ICommandSender
     {
         string UserId { get; }
+        string Platform { get; }
         string Username { get; }
         string DisplayName { get; }
         bool IsGameAdmin { get; }

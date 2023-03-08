@@ -11,26 +11,29 @@ namespace ROBot.Core.GameServer
     {
         private readonly PlayerProvider playerProvider;
         private readonly IBotServer server;
+
         public RavenfallGameSession(
             IBotServer server,
+            IUserSettingsManager userSettingsManager,
             Guid id,
-            string userId,
-            string name,
+            Guid ravenfallUserId,
+            Player owner,
             DateTime created)
         {
-            this.playerProvider = new PlayerProvider();
+            this.playerProvider = new PlayerProvider(userSettingsManager);
             this.server = server;
             this.Id = id;
-            this.UserId = userId;
-            this.Name = name;
+            this.RavenfallUserId = ravenfallUserId;
+            this.Owner = owner;
+            this.Name = owner.Username;
             this.Created = created;
         }
 
         public Guid Id { get; }
-
+        public Guid RavenfallUserId { get; set; }
+        public Player Owner { get; set; }
         // mutable in case user changes name during active session
         public string Name { get; set; }
-        public string UserId { get; set; }
         public DateTime Created { get; }
 
         public int UserCount => playerProvider.Count;
@@ -90,19 +93,7 @@ namespace ROBot.Core.GameServer
 
         public Player GetBroadcaster()
         {
-            var broadcaster = playerProvider.GetById(UserId);
-            if (broadcaster == null)
-            {
-                broadcaster = playerProvider.GetBroadcaster();
-            }
-
-            if (broadcaster == null)
-            {
-                broadcaster = playerProvider.Get(UserId, Name);
-                broadcaster.IsBroadcaster = true;
-            }
-
-            return broadcaster;
+            return playerProvider.GetBroadcaster();
         }
 
         public bool ContainsUsername(string username)
