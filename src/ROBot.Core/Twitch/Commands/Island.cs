@@ -16,7 +16,7 @@ namespace ROBot.Core.Twitch.Commands
                 var connection = game.GetConnection(session);
                 if (connection != null)
                 {
-                    Player player = null;
+                    User player = null;
                     if (!string.IsNullOrEmpty(cmd.Arguments))
                     {
                         var username = cmd.Arguments;

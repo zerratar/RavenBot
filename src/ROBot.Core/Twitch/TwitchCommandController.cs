@@ -189,7 +189,7 @@ namespace ROBot.Core.Twitch
                 //    return new RewardRedeemCommand(redeemer, usedCommand, arguments);
                 //}
 
-                RavenBot.Core.Ravenfall.Models.Player player = null;
+                RavenBot.Core.Ravenfall.Models.User player = null;
                 if (processor.RequiresBroadcaster)
                 {
                     player = session.GetBroadcaster();

@@ -9,10 +9,10 @@ namespace RavenBot.Core.Ravenfall.Commands
     public class ObserveCommandProcessor : Net.RavenfallCommandProcessor
     {
         private readonly IRavenfallClient game;
-        private readonly IPlayerProvider playerProvider;
+        private readonly IUserProvider playerProvider;
         private readonly ITwitchUserStore userStore;
 
-        public ObserveCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider, ITwitchUserStore userStore)
+        public ObserveCommandProcessor(IRavenfallClient game, IUserProvider playerProvider, ITwitchUserStore userStore)
         {
             this.RequiresBroadcaster = true;
             this.game = game;
@@ -49,7 +49,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             }
 
             var targetPlayerName = cmd.Arguments?.Trim();
-            Models.Player player = null;
+            Models.User player = null;
             if (!string.IsNullOrEmpty(targetPlayerName))
             {
                 player = playerProvider.Get(targetPlayerName);

@@ -6,9 +6,9 @@ namespace RavenBot.Core.Ravenfall.Commands
     public class ScrollsCommandProcessor : Net.RavenfallCommandProcessor
     {
         private readonly IRavenfallClient game;
-        private readonly IPlayerProvider playerProvider;
+        private readonly IUserProvider playerProvider;
 
-        public ScrollsCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
+        public ScrollsCommandProcessor(IRavenfallClient game, IUserProvider playerProvider)
         {
             this.game = game;
             this.playerProvider = playerProvider;

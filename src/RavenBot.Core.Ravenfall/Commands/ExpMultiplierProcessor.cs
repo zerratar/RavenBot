@@ -7,9 +7,9 @@ namespace RavenBot.Core.Ravenfall.Commands
     public class ExpMultiplierProcessor : Net.RavenfallCommandProcessor
     {
         private readonly IRavenfallClient game;
-        private readonly IPlayerProvider playerProvider;
+        private readonly IUserProvider playerProvider;
 
-        public ExpMultiplierProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
+        public ExpMultiplierProcessor(IRavenfallClient game, IUserProvider playerProvider)
         {
             this.RequiresBroadcaster = true;
             this.game = game;

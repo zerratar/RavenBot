@@ -4,13 +4,13 @@ namespace RavenBot.Core.Ravenfall.Requests
 {
     public class HighestSkillRequest
     {
-        public HighestSkillRequest(Player player, string skill)
+        public HighestSkillRequest(User player, string skill)
         {
             Player = player;
             Skill = skill;
         }
 
-        public Player Player { get; }
+        public User Player { get; }
         public string Skill { get; }
     }
 }

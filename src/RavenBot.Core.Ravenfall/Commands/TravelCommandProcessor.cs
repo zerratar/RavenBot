@@ -7,8 +7,8 @@ namespace RavenBot.Core.Ravenfall.Commands
     public class TravelCommandProcessor : Net.RavenfallCommandProcessor
     {
         private readonly IRavenfallClient game;
-        private readonly IPlayerProvider playerProvider;
-        public TravelCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
+        private readonly IUserProvider playerProvider;
+        public TravelCommandProcessor(IRavenfallClient game, IUserProvider playerProvider)
         {
             this.game = game;
             this.playerProvider = playerProvider;

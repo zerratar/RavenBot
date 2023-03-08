@@ -7,8 +7,8 @@ namespace RavenBot.Core.Ravenfall.Commands
     public class PetCommandProcessor : Net.RavenfallCommandProcessor
     {
         private readonly IRavenfallClient game;
-        private readonly IPlayerProvider playerProvider;
-        public PetCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
+        private readonly IUserProvider playerProvider;
+        public PetCommandProcessor(IRavenfallClient game, IUserProvider playerProvider)
         {
             this.game = game;
             this.playerProvider = playerProvider;

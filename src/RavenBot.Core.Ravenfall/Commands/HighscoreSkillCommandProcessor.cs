@@ -7,9 +7,9 @@ namespace RavenBot.Core.Ravenfall.Commands
     public class HighscoreSkillCommandProcessor : Net.RavenfallCommandProcessor
     {
         private readonly IRavenfallClient game;
-        private readonly IPlayerProvider playerProvider;
+        private readonly IUserProvider playerProvider;
 
-        public HighscoreSkillCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
+        public HighscoreSkillCommandProcessor(IRavenfallClient game, IUserProvider playerProvider)
         {
             this.game = game;
             this.playerProvider = playerProvider;

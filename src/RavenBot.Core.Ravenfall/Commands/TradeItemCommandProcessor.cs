@@ -8,11 +8,11 @@ namespace RavenBot.Core.Ravenfall.Commands
     public class TradeItemCommandProcessor : Net.RavenfallCommandProcessor
     {
         private readonly IRavenfallClient game;
-        private readonly IPlayerProvider playerProvider;
+        private readonly IUserProvider playerProvider;
 
         public TradeItemCommandProcessor(
             IRavenfallClient game,
-            IPlayerProvider playerProvider)
+            IUserProvider playerProvider)
         {
             this.game = game;
             this.playerProvider = playerProvider;

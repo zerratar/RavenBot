@@ -9,18 +9,18 @@ namespace RavenBot.Core.Ravenfall
 {
     public class CommandProvider : ICommandProvider
     {
-        private readonly IPlayerProvider playerProvider;
+        private readonly IUserProvider playerProvider;
         private readonly ICommandHandler commandHandler;
 
         public CommandProvider(
-            IPlayerProvider playerProvider,
+            IUserProvider playerProvider,
             ICommandHandler commandHandler)
         {
             this.playerProvider = playerProvider;
             this.commandHandler = commandHandler;
         }
 
-        public ICommand GetCommand(Player redeemer, string channel, string command, string arguments)
+        public ICommand GetCommand(User redeemer, string channel, string command, string arguments)
         {
             try
             {

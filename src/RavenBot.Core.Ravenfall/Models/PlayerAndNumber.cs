@@ -2,13 +2,13 @@
 {
     public class PlayerAndNumber
     {
-        public PlayerAndNumber(Player player, int number)
+        public PlayerAndNumber(User player, int number)
         {
             Player = player;
             Number = number;
         }
 
-        public Player Player { get; }
+        public User Player { get; }
         public int Number { get; }
     }
 }

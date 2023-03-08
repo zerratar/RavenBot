@@ -4,13 +4,13 @@ namespace RavenBot.Core.Ravenfall.Requests
 {
     public class DuelPlayerRequest
     {
-        public DuelPlayerRequest(Player playerA, Player playerB)
+        public DuelPlayerRequest(User playerA, User playerB)
         {
             this.playerA = playerA;
             this.playerB = playerB;
         }
 
-        public Player playerA { get; }
-        public Player playerB { get; }
+        public User playerA { get; }
+        public User playerB { get; }
     }
 }

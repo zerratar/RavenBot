@@ -6,14 +6,14 @@ namespace RavenBot.Core.Ravenfall.Requests
     public class ItemQueryRequest
     {
         public ItemQueryRequest(
-            Player player,
+            User player,
             string itemQuery)
         {
             Player = player;
             ItemQuery = itemQuery;
         }
 
-        public Player Player { get; }
+        public User Player { get; }
         public string ItemQuery { get; }
     }
 }

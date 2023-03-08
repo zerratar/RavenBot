@@ -4,7 +4,7 @@ namespace RavenBot.Core.Ravenfall.Requests
 {
     public interface IBotRequest<TValueType>
     {
-        Player Player { get; }
+        User Player { get; }
         TValueType Value { get; }
     }
 }

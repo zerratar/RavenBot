@@ -8,18 +8,17 @@ namespace ROBot.Core
     {
         Guid Id { get; }
         Guid RavenfallUserId { get; set; }
-        Player Owner { get; set; }
+        User Owner { get; set; }
         string Name { get; set; }
         public DateTime Created { get; }
-        Player GetBroadcaster();
-        Player Get(string twitchId);
-        Player Get(ICommandSender user);
-        Player GetUserByName(string username);
-        Player Join(ICommandSender user, string identifier = "1");
+        User GetBroadcaster();
+        User Get(string twitchId);
+        User Get(ICommandSender user);
+        User GetUserByName(string username);
+        User Join(ICommandSender user, string identifier = "1");
         int UserCount { get; }
         bool Contains(string userId);
         bool ContainsUsername(string username);
         void Leave(string userId);
-        void SendChatMessage(string username, string message);
     }
 }

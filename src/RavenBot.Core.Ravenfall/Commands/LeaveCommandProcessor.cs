@@ -7,9 +7,9 @@ namespace RavenBot.Core.Ravenfall.Commands
     public class LeaveCommandProcessor : Net.RavenfallCommandProcessor
     {
         private readonly IRavenfallClient game;
-        private readonly IPlayerProvider playerProvider;
+        private readonly IUserProvider playerProvider;
 
-        public LeaveCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
+        public LeaveCommandProcessor(IRavenfallClient game, IUserProvider playerProvider)
         {
             this.game = game;
             this.playerProvider = playerProvider;

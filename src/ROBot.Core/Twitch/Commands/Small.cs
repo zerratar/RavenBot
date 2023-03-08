@@ -22,7 +22,7 @@ namespace ROBot.Core.Twitch.Commands
                 if (connection != null)
                 {
                     var targetPlayerName = cmd.Arguments?.Trim();
-                    Player player = null;
+                    User player = null;
                     if ((cmd.Sender.IsBroadcaster || cmd.Sender.IsModerator || cmd.Sender.IsGameAdmin || cmd.Sender.IsGameModerator) && !string.IsNullOrEmpty(targetPlayerName))
                     {
                         player = session.GetUserByName(targetPlayerName);

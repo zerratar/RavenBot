@@ -9,13 +9,13 @@ namespace ROBot.Core.GameServer
         private readonly Shinobytes.Ravenfall.RavenNet.Core.IMessageBus messageBus;
         private readonly Microsoft.Extensions.Logging.ILogger logger;
         private readonly Shinobytes.Ravenfall.RavenNet.Core.IKernel kernel;
-        private readonly IPlayerProvider playerProvider;
+        private readonly IUserProvider playerProvider;
 
         public RavenfallConnectionProvider(
             Shinobytes.Ravenfall.RavenNet.Core.IMessageBus messageBus,
             Microsoft.Extensions.Logging.ILogger logger,
             Shinobytes.Ravenfall.RavenNet.Core.IKernel kernel,
-            IPlayerProvider playerProvider)
+            IUserProvider playerProvider)
         {
             this.logger = logger;
             this.kernel = kernel;

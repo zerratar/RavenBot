@@ -25,7 +25,7 @@ namespace RavenBot
         private readonly IKernel kernel;
         private readonly IUserSettingsManager userSettingsManager;
         private readonly IRavenfallClient ravenfall;
-        private readonly IPlayerProvider playerProvider;
+        private readonly IUserProvider playerProvider;
         private readonly ITwitchUserStore userStore;
         private readonly IChatMessageFormatter messageFormatter;
         private readonly IMessageBus messageBus;
@@ -51,7 +51,7 @@ namespace RavenBot
             IKernel kernel,
             IUserSettingsManager userSettingsManager,
             IRavenfallClient ravenfall,
-            IPlayerProvider playerProvider,
+            IUserProvider playerProvider,
             IChatMessageFormatter localizer,
             IMessageBus messageBus,
             ICommandProvider commandProvider,

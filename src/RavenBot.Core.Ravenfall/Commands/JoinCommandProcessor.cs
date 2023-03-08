@@ -7,9 +7,9 @@ namespace RavenBot.Core.Ravenfall.Commands
     public class JoinCommandProcessor : Net.RavenfallCommandProcessor
     {
         private readonly IRavenfallClient game;
-        private readonly IPlayerProvider playerProvider;
+        private readonly IUserProvider playerProvider;
 
-        public JoinCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
+        public JoinCommandProcessor(IRavenfallClient game, IUserProvider playerProvider)
         {
             this.game = game;
             this.playerProvider = playerProvider;

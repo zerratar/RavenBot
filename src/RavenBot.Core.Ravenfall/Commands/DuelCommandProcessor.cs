@@ -8,9 +8,9 @@ namespace RavenBot.Core.Ravenfall.Commands
     public class DuelCommandProcessor : Net.RavenfallCommandProcessor
     {
         private readonly IRavenfallClient game;
-        private readonly IPlayerProvider playerProvider;
+        private readonly IUserProvider playerProvider;
 
-        public DuelCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
+        public DuelCommandProcessor(IRavenfallClient game, IUserProvider playerProvider)
         {
             this.game = game;
             this.playerProvider = playerProvider;

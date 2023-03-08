@@ -19,37 +19,37 @@ namespace ROBot.Tests
 
         public event EventHandler<GameSessionInfo> OnSessionInfoReceived;
 
-        public Task AcceptClanInviteAsync(Player player, string argument)
+        public Task AcceptClanInviteAsync(User player, string argument)
         {
             return Task.CompletedTask;
         }
 
-        public Task AcceptDuelRequestAsync(Player player)
+        public Task AcceptDuelRequestAsync(User player)
         {
             return Task.CompletedTask;
         }
 
-        public Task ActivateTicTacToeAsync(Player player)
+        public Task ActivateTicTacToeAsync(User player)
         {
             return Task.CompletedTask;
         }
 
-        public Task AddPlayerToArenaAsync(Player player, Player targetPlayer)
+        public Task AddPlayerToArenaAsync(User player, User targetPlayer)
         {
             return Task.CompletedTask;
         }
 
-        public Task BuyItemAsync(Player player, string itemQuery)
+        public Task BuyItemAsync(User player, string itemQuery)
         {
             return Task.CompletedTask;
         }
 
-        public Task CancelArenaAsync(Player player)
+        public Task CancelArenaAsync(User player)
         {
             return Task.CompletedTask;
         }
 
-        public Task CancelDuelRequestAsync(Player player)
+        public Task CancelDuelRequestAsync(User player)
         {
             return Task.CompletedTask;
         }
@@ -58,42 +58,42 @@ namespace ROBot.Tests
         {
         }
 
-        public Task CountItemAsync(Player player, string itemName)
+        public Task CountItemAsync(User player, string itemName)
         {
             throw new NotImplementedException();
         }
 
-        public Task CraftAsync(Player targetPlayer, string itemQuery)
+        public Task CraftAsync(User targetPlayer, string itemQuery)
         {
             return Task.CompletedTask;
         }
 
-        public Task CraftRequirementAsync(Player player, string itemName)
+        public Task CraftRequirementAsync(User player, string itemName)
         {
             return Task.CompletedTask;
         }
 
-        public Task DeclineClanInviteAsync(Player player, string argument)
+        public Task DeclineClanInviteAsync(User player, string argument)
         {
             throw new NotImplementedException();
         }
 
-        public Task DeclineDuelRequestAsync(Player player)
+        public Task DeclineDuelRequestAsync(User player)
         {
             return Task.CompletedTask;
         }
 
-        public Task DemoteClanMemberAsync(Player player, Player targetPlayer, string argument)
+        public Task DemoteClanMemberAsync(User player, User targetPlayer, string argument)
         {
             throw new NotImplementedException();
         }
 
-        public Task DisembarkFerryAsync(Player player)
+        public Task DisembarkFerryAsync(User player)
         {
             return Task.CompletedTask;
         }
 
-        public Task DisenchantAsync(Player player, string item)
+        public Task DisenchantAsync(User player, string item)
         {
             throw new NotImplementedException();
         }
@@ -102,107 +102,107 @@ namespace ROBot.Tests
         {
         }
 
-        public Task DuelRequestAsync(Player challenger, Player target)
+        public Task DuelRequestAsync(User challenger, User target)
         {
             return Task.CompletedTask;
         }
 
-        public Task DungeonStartAsync(Player player)
+        public Task DungeonStartAsync(User player)
         {
             return Task.CompletedTask;
         }
 
-        public Task EmbarkFerryAsync(Player player)
+        public Task EmbarkFerryAsync(User player)
         {
             return Task.CompletedTask;
         }
 
-        public Task EnchantAsync(Player player, string item)
+        public Task EnchantAsync(User player, string item)
         {
             return Task.CompletedTask;
         }
 
-        public Task EquipAsync(Player player, string item)
+        public Task EquipAsync(User player, string item)
         {
             return Task.CompletedTask;
         }
 
-        public Task GetClanInfoAsync(Player player, string argument)
+        public Task GetClanInfoAsync(User player, string argument)
         {
             return Task.CompletedTask;
         }
 
-        public Task GetClanStatsAsync(Player player, string argument)
+        public Task GetClanStatsAsync(User player, string argument)
         {
             return Task.CompletedTask;
         }
 
-        public Task GetClientVersionAsync(Player player)
+        public Task GetClientVersionAsync(User player)
         {
             return Task.CompletedTask;
         }
 
-        public Task GetMaxMultiplierAsync(Player player)
+        public Task GetMaxMultiplierAsync(User player)
         {
             return Task.CompletedTask;
         }
 
-        public Task GetPetAsync(Player player)
+        public Task GetPetAsync(User player)
         {
             return Task.CompletedTask;
         }
 
-        public Task GetRestedStatusAsync(Player player)
+        public Task GetRestedStatusAsync(User player)
         {
             return Task.CompletedTask;
         }
 
-        public Task GetScrollCountAsync(Player player)
+        public Task GetScrollCountAsync(User player)
         {
             return Task.CompletedTask;
         }
 
-        public Task GetStreamerTokenCountAsync(Player player)
+        public Task GetStreamerTokenCountAsync(User player)
         {
             return Task.CompletedTask;
         }
 
-        public Task GetVillageBoostAsync(Player player)
+        public Task GetVillageBoostAsync(User player)
         {
             return Task.CompletedTask;
         }
 
-        public Task GiftItemAsync(Player player, string itemQuery)
+        public Task GiftItemAsync(User player, string itemQuery)
         {
             return Task.CompletedTask;
         }
 
-        public Task InspectPlayerAsync(Player player)
+        public Task InspectPlayerAsync(User player)
         {
             return Task.CompletedTask;
         }
 
-        public Task ItemDropEventAsync(Player player, string item)
+        public Task ItemDropEventAsync(User player, string item)
         {
             return Task.CompletedTask;
         }
 
-        public Task JoinArenaAsync(Player player)
+        public Task JoinArenaAsync(User player)
         {
             return Task.CompletedTask;
         }
 
-        public Task JoinAsync(Player player)
+        public Task JoinAsync(User player)
         {
             return Task.CompletedTask;
         }
 
-        public Task JoinClanAsync(Player player, string arguments)
+        public Task JoinClanAsync(User player, string arguments)
         {
             throw new NotImplementedException();
         }
 
-        public Task JoinDungeonAsync(Player player)
+        public Task JoinDungeonAsync(User player)
         {
             return Task.CompletedTask;
         }
@@ -212,12 +212,12 @@ namespace ROBot.Tests
             throw new NotImplementedException();
         }
 
-        public Task JoinOnsenAsync(Player player)
+        public Task JoinOnsenAsync(User player)
         {
             return Task.CompletedTask;
         }
 
-        public Task JoinRaidAsync(Player player)
+        public Task JoinRaidAsync(User player)
         {
             return Task.CompletedTask;
         }
@@ -227,37 +227,37 @@ namespace ROBot.Tests
             return Task.CompletedTask;
         }
 
-        public Task KickAsync(Player targetPlayer)
+        public Task KickAsync(User targetPlayer)
         {
             return Task.CompletedTask;
         }
 
-        public Task KickPlayerFromArenaAsync(Player player, Player targetPlayer)
+        public Task KickPlayerFromArenaAsync(User player, User targetPlayer)
         {
             return Task.CompletedTask;
         }
 
-        public Task LeaveArenaAsync(Player player)
+        public Task LeaveArenaAsync(User player)
         {
             return Task.CompletedTask;
         }
 
-        public Task LeaveAsync(Player player)
+        public Task LeaveAsync(User player)
         {
             return Task.CompletedTask;
         }
 
-        public Task LeaveClanAsync(Player player, string argument)
+        public Task LeaveClanAsync(User player, string argument)
         {
             return Task.CompletedTask;
         }
 
-        public Task LeaveOnsenAsync(Player player)
+        public Task LeaveOnsenAsync(User player)
         {
             return Task.CompletedTask;
         }
 
-        public Task ObservePlayerAsync(Player player)
+        public Task ObservePlayerAsync(User player)
         {
             return Task.CompletedTask;
         }
@@ -267,22 +267,22 @@ namespace ROBot.Tests
             return Task.CompletedTask;
         }
 
-        public Task PlayerAppearanceUpdateAsync(Player player, string appearance)
+        public Task PlayerAppearanceUpdateAsync(User player, string appearance)
         {
             return Task.CompletedTask;
         }
 
-        public Task PlayerCountAsync(Player player)
+        public Task PlayerCountAsync(User player)
         {
             return Task.CompletedTask;
         }
 
-        public Task PlayPetRacingAsync(Player player)
+        public Task PlayPetRacingAsync(User player)
         {
             return Task.CompletedTask;
         }
 
-        public Task PlayTicTacToeAsync(Player player, int num)
+        public Task PlayTicTacToeAsync(User player, int num)
         {
             return Task.CompletedTask;
         }
@@ -292,202 +292,202 @@ namespace ROBot.Tests
             return true;
         }
 
-        public Task PromoteClanMemberAsync(Player player, Player targetPlayer, string argument)
+        public Task PromoteClanMemberAsync(User player, User targetPlayer, string argument)
         {
             return Task.CompletedTask;
         }
 
-        public Task RaidStartAsync(Player player)
+        public Task RaidStartAsync(User player)
         {
             return Task.CompletedTask;
         }
 
-        public Task RaidStreamerAsync(Player target, bool isRaidWar)
+        public Task RaidStreamerAsync(User target, bool isRaidWar)
         {
             return Task.CompletedTask;
         }
 
-        public Task RedeemStreamerTokenAsync(Player player, string query)
+        public Task RedeemStreamerTokenAsync(User player, string query)
         {
             return Task.CompletedTask;
         }
 
-        public Task ReloadGameAsync(Player player)
+        public Task ReloadGameAsync(User player)
         {
             return Task.CompletedTask;
         }
 
-        public Task RemoveFromClanAsync(Player player, Player targetPlayer, string argument)
+        public Task RemoveFromClanAsync(User player, User targetPlayer, string argument)
         {
             return Task.CompletedTask;
         }
 
-        public Task RemoveFromClanAsync(Player player, Player targetPlayer)
+        public Task RemoveFromClanAsync(User player, User targetPlayer)
         {
             return Task.CompletedTask;
         }
 
-        public Task RequestHighestSkillAsync(Player player, string skill)
+        public Task RequestHighestSkillAsync(User player, string skill)
         {
             return Task.CompletedTask;
         }
 
-        public Task RequestHighscoreAsync(Player player, string skill)
+        public Task RequestHighscoreAsync(User player, string skill)
         {
             return Task.CompletedTask;
         }
 
-        public Task RequestIslandInfoAsync(Player player)
+        public Task RequestIslandInfoAsync(User player)
         {
             return Task.CompletedTask;
         }
 
-        public Task RequestPlayerResourcesAsync(Player player)
+        public Task RequestPlayerResourcesAsync(User player)
         {
             return Task.CompletedTask;
         }
 
-        public Task RequestPlayerStatsAsync(Player player, string skill)
+        public Task RequestPlayerStatsAsync(User player, string skill)
         {
             return Task.CompletedTask;
         }
 
-        public Task RequestTrainingInfoAsync(Player player)
+        public Task RequestTrainingInfoAsync(User player)
         {
             return Task.CompletedTask;
         }
 
-        public Task ResetPetRacingAsync(Player player)
+        public Task ResetPetRacingAsync(User player)
         {
             return Task.CompletedTask;
         }
 
-        public Task ResetTicTacToeAsync(Player player)
+        public Task ResetTicTacToeAsync(User player)
         {
             return Task.CompletedTask;
         }
 
-        public Task RestartGameAsync(Player player)
+        public Task RestartGameAsync(User player)
         {
             return Task.CompletedTask;
         }
 
-        public Task ScalePlayerAsync(Player player, float v)
+        public Task ScalePlayerAsync(User player, float v)
         {
             return Task.CompletedTask;
         }
 
-        public Task SellItemAsync(Player player, string itemQuery)
+        public Task SellItemAsync(User player, string itemQuery)
         {
             return Task.CompletedTask;
         }
 
-        public Task SendClanInviteAsync(Player player, Player targetPlayer, string argument)
+        public Task SendClanInviteAsync(User player, User targetPlayer, string argument)
         {
             return Task.CompletedTask;
         }
 
-        public Task SendClanInviteAsync(Player player, Player targetPlayer)
+        public Task SendClanInviteAsync(User player, User targetPlayer)
         {
             return Task.CompletedTask;
         }
 
-        public Task SendPlayerTaskAsync(Player player, PlayerTask task, params string[] args)
+        public Task SendPlayerTaskAsync(User player, PlayerTask task, params string[] args)
         {
             return Task.CompletedTask;
         }
 
-        public Task SetAllVillageHutsAsync(Player player, string skill)
+        public Task SetAllVillageHutsAsync(User player, string skill)
         {
             return Task.CompletedTask;
         }
 
-        public Task SetExpMultiplierAsync(Player player, int number)
+        public Task SetExpMultiplierAsync(User player, int number)
         {
             return Task.CompletedTask;
         }
 
-        public Task SetExpMultiplierLimitAsync(Player player, int number)
+        public Task SetExpMultiplierLimitAsync(User player, int number)
         {
             return Task.CompletedTask;
         }
 
-        public Task SetPetAsync(Player player, string pet)
+        public Task SetPetAsync(User player, string pet)
         {
             return Task.CompletedTask;
         }
 
-        public Task SetTimeOfDayAsync(Player player, int totalTime, int freezeTime)
+        public Task SetTimeOfDayAsync(User player, int totalTime, int freezeTime)
         {
             return Task.CompletedTask;
         }
 
-        public Task StartArenaAsync(Player player)
+        public Task StartArenaAsync(User player)
         {
             return Task.CompletedTask;
         }
 
-        public Task StopDungeonAsync(Player player)
+        public Task StopDungeonAsync(User player)
         {
             return Task.CompletedTask;
         }
 
-        public Task StopRaidAsync(Player player)
+        public Task StopRaidAsync(User player)
         {
             return Task.CompletedTask;
         }
 
-        public Task ToggleDiaperModeAsync(Player player)
+        public Task ToggleDiaperModeAsync(User player)
         {
             return Task.CompletedTask;
         }
 
-        public Task ToggleHelmetAsync(Player player)
+        public Task ToggleHelmetAsync(User player)
         {
             return Task.CompletedTask;
         }
 
-        public Task ToggleItemRequirementsAsync(Player player)
+        public Task ToggleItemRequirementsAsync(User player)
         {
             return Task.CompletedTask;
         }
 
-        public Task TogglePetAsync(Player player)
+        public Task TogglePetAsync(User player)
         {
             return Task.CompletedTask;
         }
 
-        public Task TravelAsync(Player player, string destination)
+        public Task TravelAsync(User player, string destination)
         {
             return Task.CompletedTask;
         }
 
-        public Task TurnIntoMonsterAsync(Player player)
+        public Task TurnIntoMonsterAsync(User player)
         {
             return Task.CompletedTask;
         }
 
-        public Task UnequipAsync(Player player, string item)
+        public Task UnequipAsync(User player, string item)
         {
             return Task.CompletedTask;
         }
 
-        public Task UnstuckAsync(Player player)
+        public Task UnstuckAsync(User player)
         {
             return Task.CompletedTask;
         }
 
-        public Task UseExpMultiplierScrollAsync(Player player, int number)
+        public Task UseExpMultiplierScrollAsync(User player, int number)
         {
             return Task.CompletedTask;
         }
 
-        public Task ValueItemAsync(Player player, string itemQuery)
+        public Task ValueItemAsync(User player, string itemQuery)
         {
             return Task.CompletedTask;
         }
 
-        public Task VendorItemAsync(Player player, string itemQuery)
+        public Task VendorItemAsync(User player, string itemQuery)
         {
             return Task.CompletedTask;
         }

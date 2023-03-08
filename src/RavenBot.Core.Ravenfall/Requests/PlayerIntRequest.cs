@@ -4,9 +4,9 @@ namespace RavenBot.Core.Ravenfall.Requests
 {
     public class PlayerIntRequest : IBotRequest<int>
     {
-        public Player Player { get; }
+        public User Player { get; }
         public int Value { get; }
-        public PlayerIntRequest(Player player, int value)
+        public PlayerIntRequest(User player, int value)
         {
             Player = player;
             Value = value;

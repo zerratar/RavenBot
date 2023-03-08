@@ -6,9 +6,9 @@ namespace RavenBot.Core.Ravenfall.Commands
     public class SetNightCommandProcessor : Net.RavenfallCommandProcessor
     {
         private readonly IRavenfallClient game;
-        private readonly IPlayerProvider playerProvider;
+        private readonly IUserProvider playerProvider;
 
-        public SetNightCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
+        public SetNightCommandProcessor(IRavenfallClient game, IUserProvider playerProvider)
         {
             this.RequiresBroadcaster = true;
             this.game = game;

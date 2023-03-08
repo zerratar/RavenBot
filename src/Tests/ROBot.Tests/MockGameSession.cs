@@ -21,7 +21,7 @@ namespace ROBot.Tests
         public int UserCount => 0;
 
         public Guid RavenfallUserId { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public Player Owner { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public User Owner { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public bool Contains(string userId)
         {
@@ -33,29 +33,29 @@ namespace ROBot.Tests
             return true;
         }
 
-        public Player Get(string twitchId)
+        public User Get(string twitchId)
         {
-            return new Player();
+            return new User();
         }
 
-        public Player Get(ICommandSender user)
+        public User Get(ICommandSender user)
         {
-            return new Player();
+            return new User();
         }
 
-        public Player GetBroadcaster()
+        public User GetBroadcaster()
         {
-            return new Player();
+            return new User();
         }
 
-        public Player GetUserByName(string username)
+        public User GetUserByName(string username)
         {
-            return new Player();
+            return new User();
         }
 
-        public Player Join(ICommandSender user, string identifier = "1")
+        public User Join(ICommandSender user, string identifier = "1")
         {
-            return new Player();
+            return new User();
         }
 
         public void Leave(string userId)

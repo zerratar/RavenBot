@@ -4,7 +4,7 @@ namespace RavenBot.Core.Ravenfall.Requests
 {
     public class SetTimeOfDayRequest
     {
-        public SetTimeOfDayRequest(Player player, int totalTime, int freezeTime)
+        public SetTimeOfDayRequest(User player, int totalTime, int freezeTime)
         {
             this.Player = player;
             this.TotalTime = totalTime;
@@ -13,6 +13,6 @@ namespace RavenBot.Core.Ravenfall.Requests
 
         public int TotalTime { get; }
         public int FreezeTime { get; }
-        public Player Player { get; }
+        public User Player { get; }
     }
 }

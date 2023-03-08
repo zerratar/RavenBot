@@ -6,9 +6,9 @@ namespace RavenBot.Core.Ravenfall.Commands
     public class VersionCommandProcessor : Net.RavenfallCommandProcessor
     {
         private readonly IRavenfallClient game;
-        private readonly IPlayerProvider playerProvider;
+        private readonly IUserProvider playerProvider;
 
-        public VersionCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
+        public VersionCommandProcessor(IRavenfallClient game, IUserProvider playerProvider)
         {
             this.RequiresBroadcaster = true;
             this.game = game;

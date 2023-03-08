@@ -7,8 +7,8 @@ namespace RavenBot.Core.Ravenfall.Commands
     public class SailCommandProcessor : Net.RavenfallCommandProcessor
     {
         private readonly IRavenfallClient game;
-        private readonly IPlayerProvider playerProvider;
-        public SailCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
+        private readonly IUserProvider playerProvider;
+        public SailCommandProcessor(IRavenfallClient game, IUserProvider playerProvider)
         {
             this.game = game;
             this.playerProvider = playerProvider;

@@ -12,7 +12,7 @@ namespace RavenBot.Core.Ravenfall.Commands
         private const int ServerPort = 4040;
 
         private readonly IRavenfallClient game;
-        private readonly IPlayerProvider playerProvider;
+        private readonly IUserProvider playerProvider;
 
         private readonly string[] trainableSkills = new string[]
         {
@@ -21,7 +21,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             "mining", "crafting", "farming", "healing",
         };
 
-        public TrainCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
+        public TrainCommandProcessor(IRavenfallClient game, IUserProvider playerProvider)
         {
             this.game = game;
             this.playerProvider = playerProvider;

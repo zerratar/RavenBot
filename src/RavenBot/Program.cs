@@ -45,7 +45,7 @@ namespace RavenBot
             ioc.RegisterShared<IGameClient3, TcpGameClient>();
             ioc.RegisterShared<IGameClient4, TcpGameClient>();
 
-            ioc.RegisterShared<IPlayerProvider, PlayerProvider>();
+            ioc.RegisterShared<IUserProvider, UserProvider>();
 
             ioc.RegisterShared<IStringProvider, CachedStringProvider>();
             ioc.RegisterShared<IStringTemplateParser, StringTemplateParser>();

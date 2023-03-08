@@ -7,9 +7,9 @@ namespace RavenBot.Core.Ravenfall.Commands
     public class VendorItemCommandProcessor : Net.RavenfallCommandProcessor
     {
         private readonly IRavenfallClient game;
-        private readonly IPlayerProvider playerProvider;
+        private readonly IUserProvider playerProvider;
 
-        public VendorItemCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
+        public VendorItemCommandProcessor(IRavenfallClient game, IUserProvider playerProvider)
         {
             this.game = game;
             this.playerProvider = playerProvider;

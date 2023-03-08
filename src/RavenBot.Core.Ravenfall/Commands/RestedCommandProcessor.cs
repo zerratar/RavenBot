@@ -6,9 +6,9 @@ namespace RavenBot.Core.Ravenfall.Commands
     public class RestedCommandProcessor : Net.RavenfallCommandProcessor
     {
         private readonly IRavenfallClient game;
-        private readonly IPlayerProvider playerProvider;
+        private readonly IUserProvider playerProvider;
 
-        public RestedCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
+        public RestedCommandProcessor(IRavenfallClient game, IUserProvider playerProvider)
         {
             this.RequiresBroadcaster = true;
             this.game = game;

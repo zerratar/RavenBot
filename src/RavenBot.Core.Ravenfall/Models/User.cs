@@ -4,16 +4,16 @@ using System;
 
 namespace RavenBot.Core.Ravenfall.Models
 {
-    public class Player
+    public class User
     {
-        public Player()
+        public User()
         {
             Username = "server-request";
             DisplayName = "server-request";
             PlatformId = "server-request";
         }
 
-        public Player(
+        public User(
               Guid id,
               string username,
               string displayName,
@@ -60,14 +60,14 @@ namespace RavenBot.Core.Ravenfall.Models
     public class EventJoinRequest
     {
         public EventJoinRequest(
-            Player player,
+            User player,
             string code)
         {
             Player = player;
             Code = code;
         }
 
-        public Player Player { get; }
+        public User Player { get; }
         public string Code { get; }
     }
 }

@@ -7,9 +7,9 @@ namespace RavenBot.Core.Ravenfall.Commands
     public class SetDayCommandProcessor : Net.RavenfallCommandProcessor
     {
         private readonly IRavenfallClient game;
-        private readonly IPlayerProvider playerProvider;
+        private readonly IUserProvider playerProvider;
 
-        public SetDayCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
+        public SetDayCommandProcessor(IRavenfallClient game, IUserProvider playerProvider)
         {
             this.RequiresBroadcaster = true;
             this.game = game;

@@ -7,9 +7,9 @@ namespace RavenBot.Core.Ravenfall
 {
     public class RewardRedeemCommand : ICommand
     {
-        private Player Player;
+        private User Player;
 
-        public RewardRedeemCommand(Player player, string channel, string command, string arguments)
+        public RewardRedeemCommand(User player, string channel, string command, string arguments)
         {
             this.Player = player;
             this.Sender = new RewardRedeemSender(player);
@@ -30,9 +30,9 @@ namespace RavenBot.Core.Ravenfall
 
         internal class RewardRedeemSender : ICommandSender
         {
-            private Player player;
+            private User player;
 
-            public RewardRedeemSender(Player player)
+            public RewardRedeemSender(User player)
             {
                 this.player = player;
             }

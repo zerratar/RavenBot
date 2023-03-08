@@ -4,10 +4,10 @@ namespace RavenBot.Core.Ravenfall.Requests
 {
     public class SetPetRequest
     {
-        public Player Player { get; }
+        public User Player { get; }
         public string Pet { get; }
 
-        public SetPetRequest(Player player, string pet)
+        public SetPetRequest(User player, string pet)
         {
             Player = player;
             Pet = pet;

@@ -21,7 +21,7 @@ namespace ROBot.Core.GameServer
             this.userSettingsManager = userSettingsManager;
         }
 
-        public IGameSession Add(IBotServer server, Guid sessionId, Guid userId, Player owner, DateTime created)
+        public IGameSession Add(IBotServer server, Guid sessionId, Guid userId, User owner, DateTime created)
         {
             lock (sessionMutex)
             {
@@ -42,7 +42,7 @@ namespace ROBot.Core.GameServer
             }
         }
 
-        public void Update(Guid sessionId, Guid userId, Player newOwner)
+        public void Update(Guid sessionId, Guid userId, User newOwner)
         {
             var session = Get(sessionId);
             var oldName = session.Name;

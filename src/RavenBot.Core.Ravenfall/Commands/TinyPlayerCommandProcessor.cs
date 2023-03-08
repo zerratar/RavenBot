@@ -6,9 +6,9 @@ namespace RavenBot.Core.Ravenfall.Commands
     public class TinyPlayerCommandProcessor : Net.RavenfallCommandProcessor
     {
         private readonly IRavenfallClient game;
-        private readonly IPlayerProvider playerProvider;
+        private readonly IUserProvider playerProvider;
 
-        public TinyPlayerCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
+        public TinyPlayerCommandProcessor(IRavenfallClient game, IUserProvider playerProvider)
         {
             this.RequiresBroadcaster = true;
             this.game = game;
@@ -20,7 +20,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             var sender = playerProvider.Get(cmd.Sender);
 
             var targetPlayerName = cmd.Arguments?.Trim();
-            Models.Player player = null;
+            Models.User player = null;
             if (!string.IsNullOrEmpty(targetPlayerName) && (sender.IsBroadcaster || sender.IsModerator))
             {
                 player = playerProvider.Get(targetPlayerName);

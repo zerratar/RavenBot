@@ -4,10 +4,10 @@ namespace RavenBot.Core.Ravenfall.Requests
 {
     public class PlayerAndPlayer
     {
-        public Player Player { get; }
-        public Player TargetPlayer { get; }
+        public User Player { get; }
+        public User TargetPlayer { get; }
 
-        public PlayerAndPlayer(Player player, Player targetPlayer)
+        public PlayerAndPlayer(User player, User targetPlayer)
         {
             Player = player;
             TargetPlayer = targetPlayer;

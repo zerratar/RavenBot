@@ -15,13 +15,13 @@ namespace RavenBot.Core.Ravenfall
     {
         private readonly ConcurrentQueue<string> requests = new ConcurrentQueue<string>();
         private readonly ILogger logger;
-        private readonly IPlayerProvider playerProvider;
+        private readonly IUserProvider playerProvider;
         private readonly IMessageBus messageBus;
         private readonly IGameClient client;
 
         public UnityRavenfallClient(
             ILogger logger,
-            IPlayerProvider playerProvider,
+            IUserProvider playerProvider,
             IMessageBus messageBus,
             IGameClient2 client)
         {
@@ -103,96 +103,96 @@ namespace RavenBot.Core.Ravenfall
             messageBus.Send("streamer_userid_acquired", plr.PlatformId);
         }
 
-        public Task UnstuckAsync(Player player) => SendAsync("unstuck", player);
-        public Task JoinAsync(Player player) => SendAsync("join", player);
-        public Task InspectPlayerAsync(Player player) => SendAsync("inspect", player);
-        public Task GetStreamerTokenCountAsync(Player player) => SendAsync("token_count", player);
-        public Task GetScrollCountAsync(Player player) => SendAsync("scrolls_count", player);
-        public Task RedeemStreamerTokenAsync(Player player, string query) => SendAsync("redeem_tokens", new ItemQueryRequest(player, query));
-        public Task PlayTicTacToeAsync(Player player, int num) => SendAsync("ttt_play", new PlayerAndNumber(player, num));
-        public Task ActivateTicTacToeAsync(Player player) => SendAsync("ttt_activate", player);
-        public Task ResetTicTacToeAsync(Player player) => SendAsync("ttt_reset", player);
-        public Task ResetPetRacingAsync(Player player) => SendAsync("pet_race_reset", player);
-        public Task PlayPetRacingAsync(Player player) => SendAsync("pet_race_play", player);
-        public Task GetVillageBoostAsync(Player player) => SendAsync("get_village_boost", player);
-        public Task ToggleDiaperModeAsync(Player player) => SendAsync("toggle_diaper_mode", player);
-        public Task ToggleItemRequirementsAsync(Player player) => SendAsync("toggle_item_requirements", player);
-        public Task SetExpMultiplierAsync(Player player, int number) => SendAsync("exp_multiplier", new SetExpMultiplierRequest(player, number));
-        public Task UseExpMultiplierScrollAsync(Player player, int number) => SendAsync("use_exp_scroll", new SetExpMultiplierRequest(player, number));
-        public Task SetExpMultiplierLimitAsync(Player player, int number) => SendAsync("exp_multiplier_limit", new SetExpMultiplierRequest(player, number));
-        public Task SetTimeOfDayAsync(Player player, int totalTime, int freezeTime) => SendAsync("set_time", new SetTimeOfDayRequest(player, totalTime, freezeTime));
-        public Task DuelRequestAsync(Player challenger, Player target) => SendAsync("duel", new DuelPlayerRequest(challenger, target));
-        public Task CancelDuelRequestAsync(Player player) => SendAsync("duel_cancel", player);
-        public Task AcceptDuelRequestAsync(Player player) => SendAsync("duel_accept", player);
-        public Task DeclineDuelRequestAsync(Player player) => SendAsync("duel_decline", player);
-        public Task PlayerCountAsync(Player player) => SendAsync("player_count", player);
+        public Task UnstuckAsync(User player) => SendAsync("unstuck", player);
+        public Task JoinAsync(User player) => SendAsync("join", player);
+        public Task InspectPlayerAsync(User player) => SendAsync("inspect", player);
+        public Task GetStreamerTokenCountAsync(User player) => SendAsync("token_count", player);
+        public Task GetScrollCountAsync(User player) => SendAsync("scrolls_count", player);
+        public Task RedeemStreamerTokenAsync(User player, string query) => SendAsync("redeem_tokens", new ItemQueryRequest(player, query));
+        public Task PlayTicTacToeAsync(User player, int num) => SendAsync("ttt_play", new PlayerAndNumber(player, num));
+        public Task ActivateTicTacToeAsync(User player) => SendAsync("ttt_activate", player);
+        public Task ResetTicTacToeAsync(User player) => SendAsync("ttt_reset", player);
+        public Task ResetPetRacingAsync(User player) => SendAsync("pet_race_reset", player);
+        public Task PlayPetRacingAsync(User player) => SendAsync("pet_race_play", player);
+        public Task GetVillageBoostAsync(User player) => SendAsync("get_village_boost", player);
+        public Task ToggleDiaperModeAsync(User player) => SendAsync("toggle_diaper_mode", player);
+        public Task ToggleItemRequirementsAsync(User player) => SendAsync("toggle_item_requirements", player);
+        public Task SetExpMultiplierAsync(User player, int number) => SendAsync("exp_multiplier", new SetExpMultiplierRequest(player, number));
+        public Task UseExpMultiplierScrollAsync(User player, int number) => SendAsync("use_exp_scroll", new SetExpMultiplierRequest(player, number));
+        public Task SetExpMultiplierLimitAsync(User player, int number) => SendAsync("exp_multiplier_limit", new SetExpMultiplierRequest(player, number));
+        public Task SetTimeOfDayAsync(User player, int totalTime, int freezeTime) => SendAsync("set_time", new SetTimeOfDayRequest(player, totalTime, freezeTime));
+        public Task DuelRequestAsync(User challenger, User target) => SendAsync("duel", new DuelPlayerRequest(challenger, target));
+        public Task CancelDuelRequestAsync(User player) => SendAsync("duel_cancel", player);
+        public Task AcceptDuelRequestAsync(User player) => SendAsync("duel_accept", player);
+        public Task DeclineDuelRequestAsync(User player) => SendAsync("duel_decline", player);
+        public Task PlayerCountAsync(User player) => SendAsync("player_count", player);
         public Task JoinRaidAsync(EventJoinRequest player) => SendAsync("raid_join", player);
-        public Task RaidStartAsync(Player player) => SendAsync("raid_force", player);
-        public Task StopDungeonAsync(Player player) => SendAsync("dungeon_stop", player);
-        public Task DungeonStartAsync(Player player) => SendAsync("dungeon_force", player);
+        public Task RaidStartAsync(User player) => SendAsync("raid_force", player);
+        public Task StopDungeonAsync(User player) => SendAsync("dungeon_stop", player);
+        public Task DungeonStartAsync(User player) => SendAsync("dungeon_force", player);
         public Task JoinDungeonAsync(EventJoinRequest player) => SendAsync("dungeon_join", player);
-        public Task ReloadGameAsync(Player player) => SendAsync("reload", player);
-        public Task GetMaxMultiplierAsync(Player player) => SendAsync("multiplier", player);
-        public Task EquipAsync(Player player, string pet) => SendAsync("equip", new ItemQueryRequest(player, pet));
-        public Task EnchantAsync(Player player, string item) => SendAsync("enchant", new ItemQueryRequest(player, item));
-        public Task DisenchantAsync(Player player, string item) => SendAsync("disenchant", new ItemQueryRequest(player, item));
-        public Task CountItemAsync(Player player, string item) => SendAsync("get_item_count", new ItemQueryRequest(player, item));
-        public Task UnequipAsync(Player player, string item) => SendAsync("unequip", new ItemQueryRequest(player, item));
-        public Task SetPetAsync(Player player, string item) => SendAsync("set_pet", new SetPetRequest(player, item));
-        public Task GetPetAsync(Player player) => SendAsync("get_pet", new GetPetRequest(player));
-        public Task RequestPlayerStatsAsync(Player player, string skill) => SendAsync("player_stats", new PlayerStatsRequest(player, skill));
-        public Task RequestPlayerResourcesAsync(Player player) => SendAsync("player_resources", player);
-        public Task ScalePlayerAsync(Player player, float scale) => SendAsync("set_player_scale", new SetScaleRequest(player, scale));
-        public Task RequestHighscoreAsync(Player player, string skill) => SendAsync("highscore", new PlayerStatsRequest(player, skill));
-        public Task RequestHighestSkillAsync(Player player, string skill) => SendAsync("highest_skill", new HighestSkillRequest(player, skill));
-        public Task PlayerAppearanceUpdateAsync(Player player, string appearance) => SendAsync("change_appearance", new PlayerAppearanceRequest(player, appearance));
-        public Task ToggleHelmetAsync(Player player) => SendAsync("toggle_helmet", player);
-        public Task TogglePetAsync(Player player) => SendAsync("toggle_pet", player);
-        public Task SetAllVillageHutsAsync(Player player, string skill) => SendAsync("set_village_huts", new PlayerAndString(player, skill));
-        public Task SellItemAsync(Player player, string itemQuery) => SendAsync("sell_item", new ItemQueryRequest(player, itemQuery));
-        public Task BuyItemAsync(Player player, string itemQuery) => SendAsync("buy_item", new ItemQueryRequest(player, itemQuery));
-        public Task GiftItemAsync(Player player, string itemQuery) => SendAsync("gift_item", new ItemQueryRequest(player, itemQuery));
-        public Task VendorItemAsync(Player player, string itemQuery) => SendAsync("vendor_item", new ItemQueryRequest(player, itemQuery));
-        public Task ValueItemAsync(Player player, string itemQuery) => SendAsync("value_item", new ItemQueryRequest(player, itemQuery));
-        public Task CraftRequirementAsync(Player player, string itemName) => SendAsync("req_item", new ItemQueryRequest(player, itemName));
-        public Task SendPlayerTaskAsync(Player player, PlayerTask task, params string[] args) => SendAsync("task", new PlayerTaskRequest(player, task.ToString(), args));
-        public Task JoinArenaAsync(Player player) => SendAsync("arena_join", player);
-        public Task LeaveArenaAsync(Player player) => SendAsync("arena_leave", player);
-        public Task LeaveAsync(Player player) => SendAsync("leave", player);
-        public Task StartArenaAsync(Player player) => SendAsync("arena_begin", player);
-        public Task CancelArenaAsync(Player player) => SendAsync("arena_end", player);
-        public Task KickPlayerFromArenaAsync(Player player, Player targetPlayer) => SendAsync("arena_kick", new PlayerAndPlayer(player, targetPlayer));
-        public Task AddPlayerToArenaAsync(Player player, Player targetPlayer) => SendAsync("arena_add", new ArenaAddRequest(player, targetPlayer));
-        public Task KickAsync(Player targetPlayer) => SendAsync("kick", targetPlayer);
-        public Task CraftAsync(Player targetPlayer, string itemQuery) => SendAsync("craft", new ItemQueryRequest(targetPlayer, itemQuery));
-        public Task TravelAsync(Player player, string destination) => SendAsync("ferry_travel", new FerryTravelRequest(player, destination));
-        public Task DisembarkFerryAsync(Player player) => SendAsync("ferry_leave", player);
-        public Task EmbarkFerryAsync(Player player) => SendAsync("ferry_enter", player);
-        public Task ObservePlayerAsync(Player player) => SendAsync("observe", player);
-        public Task TurnIntoMonsterAsync(Player player) => SendAsync("monster", player);
-        public Task ItemDropEventAsync(Player player, string item) => SendAsync("item_drop_event", new ItemQueryRequest(player, item));
-        public Task RequestIslandInfoAsync(Player player) => SendAsync("island_info", player);
-        public Task RequestTrainingInfoAsync(Player player) => SendAsync("train_info", player);
-        public Task RaidStreamerAsync(Player target, bool isRaidWar) => SendAsync("raid_streamer", new StreamerRaid(target, isRaidWar));
-        public Task Ping(int correlationId) => SendAsync("ping", new PlayerAndNumber(new Player(), correlationId));
-        public Task LeaveOnsenAsync(Player player) => SendAsync("onsen_leave", player);
-        public Task JoinOnsenAsync(Player player) => SendAsync("onsen_join", player);
-        public Task GetRestedStatusAsync(Player player) => SendAsync("rested_status", player);
-        public Task StopRaidAsync(Player player) => SendAsync("raid_stop", player);
-        public Task GetClientVersionAsync(Player player) => SendAsync("client_version", player);
+        public Task ReloadGameAsync(User player) => SendAsync("reload", player);
+        public Task GetMaxMultiplierAsync(User player) => SendAsync("multiplier", player);
+        public Task EquipAsync(User player, string pet) => SendAsync("equip", new ItemQueryRequest(player, pet));
+        public Task EnchantAsync(User player, string item) => SendAsync("enchant", new ItemQueryRequest(player, item));
+        public Task DisenchantAsync(User player, string item) => SendAsync("disenchant", new ItemQueryRequest(player, item));
+        public Task CountItemAsync(User player, string item) => SendAsync("get_item_count", new ItemQueryRequest(player, item));
+        public Task UnequipAsync(User player, string item) => SendAsync("unequip", new ItemQueryRequest(player, item));
+        public Task SetPetAsync(User player, string item) => SendAsync("set_pet", new SetPetRequest(player, item));
+        public Task GetPetAsync(User player) => SendAsync("get_pet", new GetPetRequest(player));
+        public Task RequestPlayerStatsAsync(User player, string skill) => SendAsync("player_stats", new PlayerStatsRequest(player, skill));
+        public Task RequestPlayerResourcesAsync(User player) => SendAsync("player_resources", player);
+        public Task ScalePlayerAsync(User player, float scale) => SendAsync("set_player_scale", new SetScaleRequest(player, scale));
+        public Task RequestHighscoreAsync(User player, string skill) => SendAsync("highscore", new PlayerStatsRequest(player, skill));
+        public Task RequestHighestSkillAsync(User player, string skill) => SendAsync("highest_skill", new HighestSkillRequest(player, skill));
+        public Task PlayerAppearanceUpdateAsync(User player, string appearance) => SendAsync("change_appearance", new PlayerAppearanceRequest(player, appearance));
+        public Task ToggleHelmetAsync(User player) => SendAsync("toggle_helmet", player);
+        public Task TogglePetAsync(User player) => SendAsync("toggle_pet", player);
+        public Task SetAllVillageHutsAsync(User player, string skill) => SendAsync("set_village_huts", new PlayerAndString(player, skill));
+        public Task SellItemAsync(User player, string itemQuery) => SendAsync("sell_item", new ItemQueryRequest(player, itemQuery));
+        public Task BuyItemAsync(User player, string itemQuery) => SendAsync("buy_item", new ItemQueryRequest(player, itemQuery));
+        public Task GiftItemAsync(User player, string itemQuery) => SendAsync("gift_item", new ItemQueryRequest(player, itemQuery));
+        public Task VendorItemAsync(User player, string itemQuery) => SendAsync("vendor_item", new ItemQueryRequest(player, itemQuery));
+        public Task ValueItemAsync(User player, string itemQuery) => SendAsync("value_item", new ItemQueryRequest(player, itemQuery));
+        public Task CraftRequirementAsync(User player, string itemName) => SendAsync("req_item", new ItemQueryRequest(player, itemName));
+        public Task SendPlayerTaskAsync(User player, PlayerTask task, params string[] args) => SendAsync("task", new PlayerTaskRequest(player, task.ToString(), args));
+        public Task JoinArenaAsync(User player) => SendAsync("arena_join", player);
+        public Task LeaveArenaAsync(User player) => SendAsync("arena_leave", player);
+        public Task LeaveAsync(User player) => SendAsync("leave", player);
+        public Task StartArenaAsync(User player) => SendAsync("arena_begin", player);
+        public Task CancelArenaAsync(User player) => SendAsync("arena_end", player);
+        public Task KickPlayerFromArenaAsync(User player, User targetPlayer) => SendAsync("arena_kick", new PlayerAndPlayer(player, targetPlayer));
+        public Task AddPlayerToArenaAsync(User player, User targetPlayer) => SendAsync("arena_add", new ArenaAddRequest(player, targetPlayer));
+        public Task KickAsync(User targetPlayer) => SendAsync("kick", targetPlayer);
+        public Task CraftAsync(User targetPlayer, string itemQuery) => SendAsync("craft", new ItemQueryRequest(targetPlayer, itemQuery));
+        public Task TravelAsync(User player, string destination) => SendAsync("ferry_travel", new FerryTravelRequest(player, destination));
+        public Task DisembarkFerryAsync(User player) => SendAsync("ferry_leave", player);
+        public Task EmbarkFerryAsync(User player) => SendAsync("ferry_enter", player);
+        public Task ObservePlayerAsync(User player) => SendAsync("observe", player);
+        public Task TurnIntoMonsterAsync(User player) => SendAsync("monster", player);
+        public Task ItemDropEventAsync(User player, string item) => SendAsync("item_drop_event", new ItemQueryRequest(player, item));
+        public Task RequestIslandInfoAsync(User player) => SendAsync("island_info", player);
+        public Task RequestTrainingInfoAsync(User player) => SendAsync("train_info", player);
+        public Task RaidStreamerAsync(User target, bool isRaidWar) => SendAsync("raid_streamer", new StreamerRaid(target, isRaidWar));
+        public Task Ping(int correlationId) => SendAsync("ping", new PlayerAndNumber(new User(), correlationId));
+        public Task LeaveOnsenAsync(User player) => SendAsync("onsen_leave", player);
+        public Task JoinOnsenAsync(User player) => SendAsync("onsen_join", player);
+        public Task GetRestedStatusAsync(User player) => SendAsync("rested_status", player);
+        public Task StopRaidAsync(User player) => SendAsync("raid_stop", player);
+        public Task GetClientVersionAsync(User player) => SendAsync("client_version", player);
 
-        public Task GetClanInfoAsync(Player player, string arg) => SendAsync("clan_info", player, arg);
-        public Task GetClanStatsAsync(Player player, string arg) => SendAsync("clan_stats", player, arg);
-        public Task JoinClanAsync(Player player, string arguments) => SendAsync("clan_join", player, arguments);
-        public Task LeaveClanAsync(Player player, string argument) => SendAsync("clan_leave", player, argument);
-        public Task RemoveFromClanAsync(Player player, Player targetPlayer) => SendAsync("clan_remove", player, targetPlayer);
-        public Task SendClanInviteAsync(Player player, Player targetPlayer) => SendAsync("clan_invite", player, targetPlayer);
-        public Task AcceptClanInviteAsync(Player player, string argument) => SendAsync("clan_accept", player, argument);
-        public Task DeclineClanInviteAsync(Player player, string argument) => SendAsync("clan_decline", player, argument);
-        public Task PromoteClanMemberAsync(Player player, Player targetPlayer, string argument) => SendAsync("clan_promote", player, targetPlayer, argument);
-        public Task DemoteClanMemberAsync(Player player, Player targetPlayer, string argument) => SendAsync("clan_demote", player, targetPlayer, argument);
+        public Task GetClanInfoAsync(User player, string arg) => SendAsync("clan_info", player, arg);
+        public Task GetClanStatsAsync(User player, string arg) => SendAsync("clan_stats", player, arg);
+        public Task JoinClanAsync(User player, string arguments) => SendAsync("clan_join", player, arguments);
+        public Task LeaveClanAsync(User player, string argument) => SendAsync("clan_leave", player, argument);
+        public Task RemoveFromClanAsync(User player, User targetPlayer) => SendAsync("clan_remove", player, targetPlayer);
+        public Task SendClanInviteAsync(User player, User targetPlayer) => SendAsync("clan_invite", player, targetPlayer);
+        public Task AcceptClanInviteAsync(User player, string argument) => SendAsync("clan_accept", player, argument);
+        public Task DeclineClanInviteAsync(User player, string argument) => SendAsync("clan_decline", player, argument);
+        public Task PromoteClanMemberAsync(User player, User targetPlayer, string argument) => SendAsync("clan_promote", player, targetPlayer, argument);
+        public Task DemoteClanMemberAsync(User player, User targetPlayer, string argument) => SendAsync("clan_demote", player, targetPlayer, argument);
 
-        public async Task RestartGameAsync(Player player)
+        public async Task RestartGameAsync(User player)
         {
             string gamePath = GetRavenfallGamePath();
             if (string.IsNullOrEmpty(gamePath) || !System.IO.File.Exists(gamePath))
@@ -285,22 +285,22 @@ namespace RavenBot.Core.Ravenfall
             await this.client.SendAsync(request);
         }
 
-        private Task SendAsync(string name, Player player, Player arg0, string arg1)
+        private Task SendAsync(string name, User player, User arg0, string arg1)
         {
             return SendAsync(name, new PlayerPlayerAndString(player, arg0, arg1));
         }
 
-        private Task SendAsync(string name, Player player, Player argument)
+        private Task SendAsync(string name, User player, User argument)
         {
             return SendAsync(name, new PlayerAndPlayer(player, argument));
         }
 
-        private Task SendAsync(string name, Player player, string argument)
+        private Task SendAsync(string name, User player, string argument)
         {
             return SendAsync(name, new PlayerAndString(player, argument));
         }
 
-        private Task SendAsync(string name, Player player, int argument)
+        private Task SendAsync(string name, User player, int argument)
         {
             return SendAsync(name, new PlayerAndNumber(player, argument));
         }

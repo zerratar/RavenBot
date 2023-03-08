@@ -225,7 +225,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             }
         }
 
-        private void ReloadIfNecessary()
+        public void ReloadIfNecessary()
         {
             try
             {

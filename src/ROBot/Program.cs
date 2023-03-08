@@ -56,7 +56,7 @@ namespace ROBot
             ioc.RegisterShared<IBotServer, BotServer>();
             ioc.RegisterShared<IGameSessionManager, GameSessionManager>();
             ioc.RegisterShared<IRavenfallConnectionProvider, RavenfallConnectionProvider>();
-            ioc.RegisterShared<RavenBot.Core.Ravenfall.Commands.IPlayerProvider, RavenBot.Core.Ravenfall.Commands.PlayerProvider>();
+            ioc.RegisterShared<RavenBot.Core.Ravenfall.Commands.IUserProvider, RavenBot.Core.Ravenfall.Commands.UserProvider>();
 
             // Twitch stuff
             ioc.RegisterShared<ITwitchCredentialsProvider, TwitchCredentialsProvider>();

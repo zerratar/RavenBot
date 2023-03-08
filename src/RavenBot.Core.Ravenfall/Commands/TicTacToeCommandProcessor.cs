@@ -6,8 +6,8 @@ namespace RavenBot.Core.Ravenfall.Commands
     public class TicTacToeCommandProcessor : Net.RavenfallCommandProcessor
     {
         private readonly IRavenfallClient game;
-        private readonly IPlayerProvider playerProvider;
-        public TicTacToeCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
+        private readonly IUserProvider playerProvider;
+        public TicTacToeCommandProcessor(IRavenfallClient game, IUserProvider playerProvider)
         {
             this.game = game;
             this.playerProvider = playerProvider;

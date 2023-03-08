@@ -5,14 +5,14 @@ namespace RavenBot.Core.Ravenfall.Requests
     public class StreamerRaid
     {
         public StreamerRaid(
-            Player player,
+            User player,
             bool war)
         {
             Player = player;
             War = war;
         }
 
-        public Player Player { get; }
+        public User Player { get; }
         public bool War { get; }
     }
 }

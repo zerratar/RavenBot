@@ -6,8 +6,8 @@ namespace RavenBot.Core.Ravenfall.Commands
     public class UnequipCommandProcessor : Net.RavenfallCommandProcessor
     {
         private readonly IRavenfallClient game;
-        private readonly IPlayerProvider playerProvider;
-        public UnequipCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
+        private readonly IUserProvider playerProvider;
+        public UnequipCommandProcessor(IRavenfallClient game, IUserProvider playerProvider)
         {
             this.game = game;
             this.playerProvider = playerProvider;

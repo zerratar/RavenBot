@@ -8,6 +8,6 @@ namespace ROBot.Core.GameServer
         public Guid UserId { get; set; }
         public Guid SessionId { get; set; }
         public DateTime Created { get; set; }
-        public Player Owner { get; set; }
+        public User Owner { get; set; }
     }
 }

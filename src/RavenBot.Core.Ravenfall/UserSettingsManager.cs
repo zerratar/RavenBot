@@ -63,6 +63,11 @@ namespace RavenBot.Core.Ravenfall.Commands
 
         public UserSettings Get(string platformId, string platform)
         {
+            if (string.IsNullOrEmpty(platformId) || string.IsNullOrEmpty(platform))
+            {
+                return UserSettings.Empty;
+            }
+
             var id = ResolveAccountId(platformId, platform);
             if (id != Guid.Empty)
             {

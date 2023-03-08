@@ -9,7 +9,7 @@ namespace ROBot.Core.GameServer
 {
     public class RavenfallGameSession : IGameSession
     {
-        private readonly PlayerProvider playerProvider;
+        private readonly UserProvider playerProvider;
         private readonly IBotServer server;
 
         public RavenfallGameSession(
@@ -17,10 +17,10 @@ namespace ROBot.Core.GameServer
             IUserSettingsManager userSettingsManager,
             Guid id,
             Guid ravenfallUserId,
-            Player owner,
+            User owner,
             DateTime created)
         {
-            this.playerProvider = new PlayerProvider(userSettingsManager);
+            this.playerProvider = new UserProvider(userSettingsManager);
             this.server = server;
             this.Id = id;
             this.RavenfallUserId = ravenfallUserId;
@@ -31,14 +31,14 @@ namespace ROBot.Core.GameServer
 
         public Guid Id { get; }
         public Guid RavenfallUserId { get; set; }
-        public Player Owner { get; set; }
+        public User Owner { get; set; }
         // mutable in case user changes name during active session
         public string Name { get; set; }
         public DateTime Created { get; }
 
         public int UserCount => playerProvider.Count;
 
-        public Player Join(ICommandSender sender, string identifier = "1")
+        public User Join(ICommandSender sender, string identifier = "1")
         {
             var user = playerProvider.Get(sender, identifier);
             if (user == null) return null;
@@ -64,34 +64,22 @@ namespace ROBot.Core.GameServer
             //}, Shinobytes.Ravenfall.RavenNet.SendOption.Reliable);
         }
 
-        public void SendChatMessage(string username, string message)
-        {
-            var user = GetUserByName(username);
-            if (user == null) return;
-            //connection.Send(new BotPlayerMessage
-            //{
-            //    Session = Name,
-            //    Username = user.Username,
-            //    Message = message
-            //}, Shinobytes.Ravenfall.RavenNet.SendOption.Reliable);
-        }
-
-        public Player GetUserByName(string username)
+        public User GetUserByName(string username)
         {
             return playerProvider.Get(username);
         }
 
-        public Player Get(ICommandSender user)
+        public User Get(ICommandSender user)
         {
             return playerProvider.Get(user);
         }
 
-        public Player Get(string userId)
+        public User Get(string userId)
         {
             return playerProvider.GetById(userId);
         }
 
-        public Player GetBroadcaster()
+        public User GetBroadcaster()
         {
             return playerProvider.GetBroadcaster();
         }
@@ -106,7 +94,7 @@ namespace ROBot.Core.GameServer
             return Get(twitchId) != null;
         }
 
-        public bool Contains(Player user)
+        public bool Contains(User user)
         {
             return playerProvider.Contains(user);
         }

@@ -24,7 +24,7 @@ namespace ROBot.Core.Twitch
             var session = game.GetSession(channel);
             if (session != null)
             {
-                session.SendChatMessage(msg.Username, msg.Message);
+                //session.SendChatMessage(msg.Username, msg.Message);
                 if (msg.Bits > 0)
                 {
                     this.messageBus.Send(

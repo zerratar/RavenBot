@@ -8,9 +8,9 @@ namespace RavenBot.Core.Ravenfall.Commands
     public class ToggleCommandProcessor : Net.RavenfallCommandProcessor
     {
         private readonly IRavenfallClient game;
-        private readonly IPlayerProvider playerProvider;
+        private readonly IUserProvider playerProvider;
 
-        public ToggleCommandProcessor(IRavenfallClient game, IPlayerProvider playerProvider)
+        public ToggleCommandProcessor(IRavenfallClient game, IUserProvider playerProvider)
         {
             this.game = game;
             this.playerProvider = playerProvider;
