@@ -3,8 +3,9 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Reflection;
 
-namespace Shinobytes.Ravenfall.RavenNet.Core
+namespace Shinobytes.Core
 {
+
     public class IoC : IDisposable
     {
         private readonly ConcurrentDictionary<Type, object> instances
@@ -17,7 +18,7 @@ namespace Shinobytes.Ravenfall.RavenNet.Core
             = new ConcurrentDictionary<Type, Func<object>>();
 
         public void RegisterShared<TInterface, TImplementation>()
-            where TImplementation : TInterface
+        //where TImplementation : TInterface
         {
             typeLookup[typeof(TInterface)] = new TypeLookup(typeof(TImplementation), true);
         }
@@ -141,6 +142,20 @@ namespace Shinobytes.Ravenfall.RavenNet.Core
                     disposable.Dispose();
                 }
             }
+        }
+
+        public void ReplaceSharedInstance<T>(T newInstance)
+        {
+            typeLookup[typeof(T)] = new TypeLookup(typeof(T), true);
+            typeFactories[typeof(T)] = () => newInstance;
+            instances[typeof(T)] = newInstance;
+        }
+
+        public void ReplaceSharedInstance<T, T2>(T2 newInstance)
+        {
+            typeLookup[typeof(T)] = new TypeLookup(typeof(T2), true);
+            typeFactories[typeof(T)] = () => newInstance;
+            instances[typeof(T)] = newInstance;
         }
 
         private class TypeLookup

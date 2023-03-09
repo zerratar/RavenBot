@@ -1,6 +1,6 @@
 ﻿using RavenBot.Core.Ravenfall.Models;
 
-namespace RavenBot.Core.Ravenfall
+namespace RavenBot.Core.Ravenfall.Requests
 {
     public class FerryTravelRequest
     {
@@ -9,8 +9,8 @@ namespace RavenBot.Core.Ravenfall
 
         public FerryTravelRequest(User player, string destination)
         {
-            this.Player = player;
-            this.Destination = destination;
+            Player = player;
+            Destination = destination;
         }
     }
 }

@@ -2,12 +2,15 @@
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using RavenBot.Core;
+using RavenBot.Core.Chat.Twitch;
 using RavenBot.Core.Handlers;
 using RavenBot.Core.Net;
 using RavenBot.Core.Ravenfall;
-using RavenBot.Core.Ravenfall.Commands;
-using RavenBot.Core.Twitch;
+using RavenBot.Core.Templating;
 using RavenBot.Forms;
+using Shinobytes.Core;
+using ConsoleLogger = RavenBot.Core.ConsoleLogger;
+using IAppSettings = RavenBot.Core.IAppSettings;
 
 namespace RavenBot
 {

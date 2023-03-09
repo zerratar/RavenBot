@@ -1,7 +1,7 @@
 ﻿using Shinobytes.Network;
 using System.Threading.Tasks;
 
-namespace ROBot
+namespace ROBot.API
 {
     public interface IServerPacketHandler
     {

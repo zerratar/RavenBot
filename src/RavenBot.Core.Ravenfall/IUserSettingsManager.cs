@@ -1,5 +1,5 @@
 ﻿using System;
-namespace RavenBot.Core.Ravenfall.Commands
+namespace RavenBot.Core.Ravenfall
 {
     public interface IUserSettingsManager
     {

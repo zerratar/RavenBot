@@ -1,6 +1,6 @@
 ﻿using Shinobytes.Network;
 
-namespace ROBot.LogServer.PacketHandlers
+namespace ROBot.API
 {
     public static class DataPacketExtensions
     {

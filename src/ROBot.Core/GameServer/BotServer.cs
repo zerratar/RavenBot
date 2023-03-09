@@ -1,6 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using RavenBot.Core.Ravenfall.Commands;
-using RavenBot.Core.Twitch;
 using System;
 using System.Collections.Generic;
 using System.Linq;

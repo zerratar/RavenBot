@@ -3,7 +3,7 @@ using RavenBot.Core.Ravenfall.Models;
 using System;
 using System.Linq;
 
-namespace RavenBot.Core.Ravenfall.Commands
+namespace RavenBot.Core.Ravenfall
 {
     public class UserProvider : IUserProvider
     {

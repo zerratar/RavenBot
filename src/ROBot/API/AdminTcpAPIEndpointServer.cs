@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
+using Shinobytes.Core;
 using Shinobytes.Network;
-using Shinobytes.Ravenfall.RavenNet.Core;
 using System;
 using System.Threading;
 
-namespace ROBot
+namespace ROBot.API
 {
     public class AdminTcpAPIEndpointServer : IAdminAPIEndpointServer, IDisposable
     {
@@ -43,7 +43,7 @@ namespace ROBot
                 // reschedule the start.
                 logger.LogWarning("Failed to start Admin API Endpoint Server. Retrying in " + retryWaitSeconds + " seconds.");
                 kernel.SetTimeout(() => StartServer(), retryWaitSeconds * 1000);
-                retryWaitSeconds = System.Math.Min(retryWaitMaxSeconds, retryWaitSeconds + 1);
+                retryWaitSeconds = Math.Min(retryWaitMaxSeconds, retryWaitSeconds + 1);
                 return;
             }
 
@@ -53,9 +53,9 @@ namespace ROBot
 
         public void Dispose()
         {
-            this.server.ClientConnected -= Server_ClientConnected;
-            this.server.ClientDisconnected -= Server_ClientDisconnected;
-            this.server.Dispose();
+            server.ClientConnected -= Server_ClientConnected;
+            server.ClientDisconnected -= Server_ClientDisconnected;
+            server.Dispose();
         }
 
         private void ServerClient_DataReceived(object sender, DataPacket e)
@@ -77,7 +77,7 @@ namespace ROBot
 
             logger.LogDebug("[Admin API] Data Received. Type=" + packet.Type + ", Size=" + packet.Data.Length);
             handler.HandleAsync(client, packet);
-            System.Threading.Thread.Sleep(20);
+            Thread.Sleep(20);
         }
 
         private void Server_ClientDisconnected(object sender, ConnectionEventArgs e)

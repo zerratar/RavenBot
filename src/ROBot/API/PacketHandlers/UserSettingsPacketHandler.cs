@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
-using RavenBot.Core.Ravenfall.Commands;
+using RavenBot.Core.Ravenfall;
+using Shinobytes.Core;
 using Shinobytes.Network;
-using Shinobytes.Ravenfall.RavenNet.Core;
 using System.Threading.Tasks;
 
-namespace ROBot.LogServer.PacketHandlers
+namespace ROBot.API.PacketHandlers
 {
     public class UserSettingsPacketHandler : IServerPacketHandler
     {
@@ -26,11 +26,11 @@ namespace ROBot.LogServer.PacketHandlers
         {
             if (packet.Data == null || (packet.Data.Buffer?.Length ?? 0) == 0)
             {
-                this.logger.LogError("An empty user settings Packet Received");
+                logger.LogError("An empty user settings Packet Received");
                 return Task.CompletedTask;
             }
 
-            this.logger.LogDebug("User Settings Packet Received");
+            logger.LogDebug("User Settings Packet Received");
 
             string userId = null;
             string key = null;
@@ -47,7 +47,7 @@ namespace ROBot.LogServer.PacketHandlers
             }
             catch (System.Exception exc)
             {
-                this.logger.LogError("Bad user settings data received: " + exc
+                logger.LogError("Bad user settings data received: " + exc
                     + ", userId: " + userId
                     + ", key: " + key
                     + ", key: " + value

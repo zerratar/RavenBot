@@ -1,9 +1,7 @@
 ﻿using RavenBot.Core.Handlers;
-using RavenBot.Core.Ravenfall.Commands;
+using RavenBot.Core.Ravenfall;
 using RavenBot.Core.Ravenfall.Models;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace ROBot.Core.GameServer
 {
@@ -37,7 +35,6 @@ namespace ROBot.Core.GameServer
         public DateTime Created { get; }
 
         public int UserCount => playerProvider.Count;
-
         public User Join(ICommandSender sender, string identifier = "1")
         {
             var user = playerProvider.Get(sender, identifier);

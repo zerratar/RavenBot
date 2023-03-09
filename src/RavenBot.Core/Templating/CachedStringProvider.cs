@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 
-namespace RavenBot.Core
+namespace RavenBot.Core.Templating
 {
     public class CachedStringProvider : IStringProvider
     {

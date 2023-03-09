@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Shinobytes.Ravenfall.RavenNet.Core
+namespace Shinobytes.Core
 {
     public class HighlightedConsoleLogger : ILogger
     {
@@ -247,11 +247,11 @@ namespace Shinobytes.Ravenfall.RavenNet.Core
                 Console.ForegroundColor = GetForegroundColor(logLevel);
 
                 var text = HighlightedConsoleLogger.logLevelSeverityMapping[logLevel].Item1;
-                
-                Write("{"+text+"}");
+
+                Write("{" + text + "}");
 
                 Console.ResetColor();
-                
+
                 Write(" ");
 
                 if (message.Contains("[RVNFLL]"))

@@ -1,6 +1,7 @@
-﻿using System;
+﻿using RavenBot.Core.Templating;
+using System;
 
-namespace RavenBot.Core.Twitch
+namespace RavenBot.Core
 {
     public class ChatMessageFormatter : IChatMessageFormatter
     {

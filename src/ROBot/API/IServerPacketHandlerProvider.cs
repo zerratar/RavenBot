@@ -1,4 +1,4 @@
-﻿namespace ROBot
+﻿namespace ROBot.API
 {
     public interface IServerPacketHandlerProvider
     {

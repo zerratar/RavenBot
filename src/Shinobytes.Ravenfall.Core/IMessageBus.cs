@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Shinobytes.Ravenfall.RavenNet.Core
+namespace Shinobytes.Core
 {
     public interface IMessageBus
     {

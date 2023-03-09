@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ROBot.Core", "src\ROBot.Cor
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ROBot", "src\ROBot\ROBot.csproj", "{2E76A51E-0DD0-43BC-8E0B-1171D9A97316}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shinobytes.Ravenfall.Core", "src\Shinobytes.Ravenfall.Core\Shinobytes.Ravenfall.Core.csproj", "{44B49434-E5EA-47D3-862C-76FB4FDF3597}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shinobytes.Core", "src\Shinobytes.Ravenfall.Core\Shinobytes.Core.csproj", "{44B49434-E5EA-47D3-862C-76FB4FDF3597}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shinobytes.Network", "src\Shinobytes.Network\Shinobytes.Network.csproj", "{B1881613-C893-469D-B022-8EFC4C443B13}"
 EndProject

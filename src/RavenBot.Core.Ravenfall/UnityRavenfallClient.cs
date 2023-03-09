@@ -3,11 +3,12 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using RavenBot.Core.Chat;
+using RavenBot.Core.Chat.Twitch;
 using RavenBot.Core.Net;
-using RavenBot.Core.Ravenfall.Commands;
 using RavenBot.Core.Ravenfall.Models;
 using RavenBot.Core.Ravenfall.Requests;
-using RavenBot.Core.Twitch;
+using Shinobytes.Core;
 
 namespace RavenBot.Core.Ravenfall
 {

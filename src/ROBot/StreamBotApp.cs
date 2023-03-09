@@ -2,15 +2,15 @@
 using Newtonsoft.Json;
 using ROBot.Core;
 using ROBot.Core.GameServer;
-using ROBot.Core.Twitch;
-using ROBot.Ravenfall;
 using ROBot.Core.Stats;
 using System;
 using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using ROBot.Core.Discord;
+using IKernel = Shinobytes.Core.IKernel;
+using ROBot.Core.Chat.Discord;
+using ROBot.Core.Chat.Twitch;
+using Shinobytes.Core;
 
 namespace ROBot
 {
@@ -19,13 +19,15 @@ namespace ROBot
     public class StreamBotApp : IStreamBotApplication
     {
         private readonly IBotStats botStats;
-        private readonly Microsoft.Extensions.Logging.ILogger logger;
-        private readonly Shinobytes.Ravenfall.RavenNet.Core.IKernel kernel;
+        private readonly ILogger logger;
+        private readonly IKernel kernel;
         private readonly IGameSessionManager sessionManager;
         private readonly IBotServer botServer;
+
+        private readonly IDiscordCommandClient discord;
         private readonly ITwitchCommandClient twitch;
 
-        private Shinobytes.Ravenfall.RavenNet.Core.ITimeoutHandle timeoutHandle;
+        private ITimeoutHandle timeoutHandle;
         private bool disposed;
         private int detailsDelayTimer;
         private bool canUpdateCmdTitle = true;
@@ -34,10 +36,11 @@ namespace ROBot
 
         public StreamBotApp(
             ILogger logger,
-            Shinobytes.Ravenfall.RavenNet.Core.IKernel kernel,
+            IKernel kernel,
             IGameSessionManager sessionManager,
             IBotServer ravenfall,
             ITwitchCommandClient twitch,
+            IDiscordCommandClient discord,
             IBotStats botStats)
         {
             this.logger = logger;
@@ -45,6 +48,7 @@ namespace ROBot
             this.sessionManager = sessionManager;
             this.botServer = ravenfall;
             this.twitch = twitch;
+            this.discord = discord;
             this.botStats = botStats;
 
 
@@ -67,6 +71,9 @@ namespace ROBot
 
             logger.LogInformation("[BOT] Initializing Twitch Integration..");
             twitch.Start();
+
+            logger.LogInformation("[BOT] Initializing Discord Integration..");
+            discord.Start();
 
             logger.LogInformation("[BOT] Starting Bot Server..");
             botServer.Start();

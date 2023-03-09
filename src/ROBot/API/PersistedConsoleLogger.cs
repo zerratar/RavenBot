@@ -1,12 +1,12 @@
 ﻿using Microsoft.Extensions.Logging;
-using Shinobytes.Ravenfall.RavenNet.Core;
+using Shinobytes.Core;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 
-namespace ROBot
+namespace ROBot.API
 {
     public class PersistedConsoleLogger : ILogger, IDisposable
     {
@@ -24,11 +24,11 @@ namespace ROBot
         private TimeSpan maxTimeBetweenSave = TimeSpan.FromSeconds(5);
         public PersistedConsoleLogger(IMessageBus messageBus)
         {
-            this.logger = new ConsoleLogger();
+            logger = new ConsoleLogger();
             this.messageBus = messageBus;
-            this.subscriptions = new List<IMessageBusSubscription>();
-            this.subscriptions.Add(this.messageBus.Subscribe<string>(MessageBus.MessageBusException, str => this.LogError(str)));
-            this.subscriptions.Add(this.messageBus.Subscribe("exit", () => TrySaveLogToDisk()));
+            subscriptions = new List<IMessageBusSubscription>();
+            subscriptions.Add(this.messageBus.Subscribe<string>(MessageBus.MessageBusException, str => this.LogError(str)));
+            subscriptions.Add(this.messageBus.Subscribe("exit", () => TrySaveLogToDisk()));
         }
 
         public void TrySaveLogToDisk()
@@ -39,11 +39,11 @@ namespace ROBot
                 {
                     lastSave = DateTime.UtcNow;
                     var fn = DateTime.UtcNow.ToString("yyyy-MM-dd") + ".log";
-                    var fullPathToFile = System.IO.Path.Combine(logsDir, fn);
+                    var fullPathToFile = Path.Combine(logsDir, fn);
 
-                    if (!System.IO.Directory.Exists(logsDir))
+                    if (!Directory.Exists(logsDir))
                     {
-                        System.IO.Directory.CreateDirectory(logsDir);
+                        Directory.CreateDirectory(logsDir);
                     }
 
                     //doesn't lock file when writing
@@ -57,9 +57,9 @@ namespace ROBot
                     }
 
                 }
-                catch (System.Exception exc)
+                catch (Exception exc)
                 {
-                    System.Console.WriteLine(exc.ToString());
+                    Console.WriteLine(exc.ToString());
                 }
                 finally
                 {
@@ -70,12 +70,12 @@ namespace ROBot
 
         private void CleanupLogs()
         {
-            if (!System.IO.Directory.Exists(logsDir))
+            if (!Directory.Exists(logsDir))
             {
                 return;
             }
 
-            var logs = System.IO.Directory.GetFiles(logsDir, "*.log");
+            var logs = Directory.GetFiles(logsDir, "*.log");
             foreach (var log in logs)
             {
                 try
@@ -97,24 +97,24 @@ namespace ROBot
 
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
-            this.logger.Log<TState>(logLevel, eventId, state, exception, formatter);
+            logger.Log(logLevel, eventId, state, exception, formatter);
             var message = formatter != null ? formatter(state, exception) : state.ToString();
             PersistLine(message, logLevel);
         }
 
         public bool IsEnabled(LogLevel logLevel) => logger.IsEnabled(logLevel);
 
-        public IDisposable BeginScope<TState>(TState state) => logger.BeginScope<TState>(state);
+        public IDisposable BeginScope<TState>(TState state) => logger.BeginScope(state);
 
         public void Write(string message)
         {
-            this.logger.Write(message);
+            logger.Write(message);
             PersistLine(message);
         }
 
         public void WriteLine(string message)
         {
-            this.logger.WriteLine(message);
+            logger.WriteLine(message);
             PersistLine(message);
         }
 
@@ -135,7 +135,7 @@ namespace ROBot
             {
                 messages.Add(JsonSerializer.Serialize(log));
 
-                if (messages.Count > maxMessageStack || (DateTime.UtcNow - lastSave) >= maxTimeBetweenSave)
+                if (messages.Count > maxMessageStack || DateTime.UtcNow - lastSave >= maxTimeBetweenSave)
                 {
                     TrySaveLogToDisk();
                     messages.Clear();

@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using RavenBot.Core.Ravenfall.Commands;
 using System;
 
 namespace RavenBot.Core.Ravenfall.Models

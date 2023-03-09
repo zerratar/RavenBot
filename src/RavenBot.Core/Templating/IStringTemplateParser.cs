@@ -1,4 +1,4 @@
-﻿namespace RavenBot.Core
+﻿namespace RavenBot.Core.Templating
 {
     public interface IStringTemplateParser
     {

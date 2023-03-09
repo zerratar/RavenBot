@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace Shinobytes.Ravenfall.Core
+namespace Shinobytes.Core
 {
     public static class JSON
     {

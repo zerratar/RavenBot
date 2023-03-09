@@ -1,4 +1,4 @@
-﻿namespace Shinobytes.Ravenfall.RavenNet.Core
+﻿namespace Shinobytes.Core
 {
     public class AppSettings : IAppSettings
     {

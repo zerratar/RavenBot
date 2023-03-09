@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace GameServer
+namespace Shinobytes.Core
 {
     public static class Utility
     {

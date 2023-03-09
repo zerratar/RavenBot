@@ -1,12 +1,12 @@
 ﻿using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using RavenBot.Core.Chat;
+using RavenBot.Core.Chat.Twitch;
 using RavenBot.Core.Net;
 using RavenBot.Core.Ravenfall;
-using RavenBot.Core.Ravenfall.Commands;
 using RavenBot.Core.Ravenfall.Models;
 using RavenBot.Core.Ravenfall.Requests;
-using RavenBot.Core.Twitch;
-using Shinobytes.Ravenfall.RavenNet.Core;
+using Shinobytes.Core;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -52,10 +52,10 @@ namespace ROBot.Core.GameServer
             this.playerProvider = playerProvider;
             this.messageBus = messageBus;
 
-            this.subs.Add(messageBus.Subscribe<ROBot.Core.Twitch.TwitchUserJoined>(nameof(UserJoinedEvent), OnUserJoined));
-            this.subs.Add(messageBus.Subscribe<ROBot.Core.Twitch.TwitchUserLeft>(nameof(UserLeftEvent), OnUserLeft));
-            this.subs.Add(messageBus.Subscribe<ROBot.Core.Twitch.TwitchCheer>(nameof(CheerBitsEvent), OnUserCheer));
-            this.subs.Add(messageBus.Subscribe<ROBot.Core.Twitch.TwitchSubscription>(nameof(UserSubscriptionEvent), OnUserSub));
+            this.subs.Add(messageBus.Subscribe<UserJoinedEvent>(nameof(UserJoinedEvent), OnUserJoined));
+            this.subs.Add(messageBus.Subscribe<UserLeftEvent>(nameof(UserLeftEvent), OnUserLeft));
+            this.subs.Add(messageBus.Subscribe<CheerBitsEvent>(nameof(CheerBitsEvent), OnUserCheer));
+            this.subs.Add(messageBus.Subscribe<UserSubscriptionEvent>(nameof(UserSubscriptionEvent), OnUserSub));
 
             this.client = client;
             this.client.Connected += Client_Connected;
@@ -380,7 +380,7 @@ namespace ROBot.Core.GameServer
             activePing = kernel.SetTimeout(() => PingPong(), 3000);
         }
 
-        private async void OnUserCheer(ROBot.Core.Twitch.TwitchCheer obj)
+        private async void OnUserCheer(CheerBitsEvent obj)
         {
             if (session == null || !session.Name.Equals(obj.Channel, StringComparison.OrdinalIgnoreCase))
                 return;
@@ -389,7 +389,7 @@ namespace ROBot.Core.GameServer
             await SendAsync("twitch_cheer", obj);
         }
 
-        private async void OnUserSub(ROBot.Core.Twitch.TwitchSubscription obj)
+        private async void OnUserSub(UserSubscriptionEvent obj)
         {
             if (session == null || !session.Name.Equals(obj.Channel, StringComparison.OrdinalIgnoreCase))
                 return;
@@ -405,8 +405,8 @@ namespace ROBot.Core.GameServer
             await SendAsync("twitch_sub", obj);
         }
 
-        private void OnUserLeft(ROBot.Core.Twitch.TwitchUserLeft obj) => logger.LogDebug("[TWITCH] " + " User left the channel (User: " + obj.Name + ")");
-        private void OnUserJoined(ROBot.Core.Twitch.TwitchUserJoined obj) => logger.LogDebug("[TWITCH] " + " User joined the channel (User: " + obj.Name + ")");
+        private void OnUserLeft(UserLeftEvent obj) => logger.LogDebug("[TWITCH] " + " User left the channel (User: " + obj.Name + ")");
+        private void OnUserJoined(UserJoinedEvent obj) => logger.LogDebug("[TWITCH] " + " User joined the channel (User: " + obj.Name + ")");
 
         public void Close()
         {

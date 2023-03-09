@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 
-namespace RavenBot.Core.Ravenfall.Commands
+namespace RavenBot.Core.Ravenfall
 {
     public class UserSettings
     {
@@ -11,7 +11,7 @@ namespace RavenBot.Core.Ravenfall.Commands
         private readonly string file;
         private readonly object ioMutex = new object();
 
-        private System.DateTime loadedTime;
+        private DateTime loadedTime;
         private ConcurrentDictionary<string, object> dict;
 
         public UserSettings()
@@ -22,7 +22,7 @@ namespace RavenBot.Core.Ravenfall.Commands
         public UserSettings(string file, Dictionary<string, object> src)
         {
             this.file = file;
-            loadedTime = System.DateTime.UtcNow;
+            loadedTime = DateTime.UtcNow;
             dict = new ConcurrentDictionary<string, object>(src);
         }
 
@@ -31,7 +31,7 @@ namespace RavenBot.Core.Ravenfall.Commands
         public UserSettings(string file)
         {
             this.file = file;
-            loadedTime = System.DateTime.UtcNow;
+            loadedTime = DateTime.UtcNow;
             dict = new ConcurrentDictionary<string, object>();
         }
 
@@ -122,7 +122,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             get
             {
                 var value = Get<string>(nameof(ChatMessageTransformation));
-                if (System.Enum.TryParse<ChatMessageTransformation>(value, out var tr))
+                if (Enum.TryParse<ChatMessageTransformation>(value, out var tr))
                 {
                     return tr;
                 }
@@ -133,7 +133,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                     return (ChatMessageTransformation)n;
                 }
 
-                return RavenBot.Core.Ravenfall.Commands.ChatMessageTransformation.Standard;
+                return ChatMessageTransformation.Standard;
             }
 
             set => Set(nameof(ChatMessageTransformation), value);
@@ -161,7 +161,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                     System.IO.File.WriteAllText(file, Newtonsoft.Json.JsonConvert.SerializeObject(dict));
                 }
             }
-            catch (System.Exception exc)
+            catch (Exception exc)
             {
                 // aww.
                 lock (ioMutex)
@@ -176,7 +176,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             // check if new settings file available, then force reload.
             ReloadIfNecessary();
 
-            value = default(T);
+            value = default;
             var obj = this[key];
             if (obj == null)
             {
@@ -236,7 +236,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                     {
                         var json = System.IO.File.ReadAllText(file);
                         dict = new ConcurrentDictionary<string, object>(Newtonsoft.Json.JsonConvert.DeserializeObject<ConcurrentDictionary<string, object>>(json));
-                        loadedTime = System.DateTime.UtcNow;
+                        loadedTime = DateTime.UtcNow;
                     }
                 }
             }

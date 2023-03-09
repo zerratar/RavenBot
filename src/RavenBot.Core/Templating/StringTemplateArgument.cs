@@ -1,4 +1,4 @@
-﻿namespace RavenBot.Core
+﻿namespace RavenBot.Core.Templating
 {
     public class StringTemplateArgument<T> : IStringTemplateArgument<T>
     {

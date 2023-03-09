@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Shinobytes.Ravenfall.Core.RuleEngine
+namespace Shinobytes.Core.RuleEngine
 {
     public class Gambit<TKnowledgeBase> : IGambit<TKnowledgeBase>
     {

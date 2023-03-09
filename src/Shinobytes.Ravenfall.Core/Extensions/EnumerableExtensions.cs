@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 
-namespace Shinobytes.Ravenfall.RavenNet.Extensions
+namespace Shinobytes.Core.Extensions
 {
 
     public static class EnumerableExtensions
@@ -17,7 +17,7 @@ namespace Shinobytes.Ravenfall.RavenNet.Extensions
 
             public CircularEnumarator(IEnumerator wrapedEnumerator)
             {
-                this._wrapedEnumerator = wrapedEnumerator;
+                _wrapedEnumerator = wrapedEnumerator;
             }
 
             public object Current => _wrapedEnumerator.Current;

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
-namespace Shinobytes.Ravenfall.RavenNet.Core
+namespace Shinobytes.Core
 {
     public class Kernel : IKernel
     {
@@ -19,14 +19,14 @@ namespace Shinobytes.Ravenfall.RavenNet.Core
 
         public Kernel()
         {
-            this.cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource = new CancellationTokenSource();
         }
 
         public ITimeoutHandle SetTimeout(Action action, int timeoutMilliseconds)
         {
             lock (mutex)
             {
-                if (!this.started)
+                if (!started)
                 {
                     Start();
                 }
@@ -34,8 +34,8 @@ namespace Shinobytes.Ravenfall.RavenNet.Core
             lock (timeoutMutex)
             {
                 var timeout = new TimeoutCallbackHandle(action, timeoutMilliseconds);
-                this.timeouts.Add(timeout);
-                this.timeouts = this.timeouts.OrderBy(x => x.Timeout).ToList();
+                timeouts.Add(timeout);
+                timeouts = timeouts.OrderBy(x => x.Timeout).ToList();
                 return timeout;
             }
         }
@@ -44,7 +44,7 @@ namespace Shinobytes.Ravenfall.RavenNet.Core
         {
             lock (timeoutMutex)
             {
-                this.timeouts.Remove((TimeoutCallbackHandle)handle);
+                timeouts.Remove((TimeoutCallbackHandle)handle);
             }
         }
 
@@ -52,18 +52,18 @@ namespace Shinobytes.Ravenfall.RavenNet.Core
         {
             lock (mutex)
             {
-                if (this.started)
+                if (started)
                 {
                     return;
                 }
 
-                this.started = true;
-                this.kernelThread = new Thread(KernelProcess)
+                started = true;
+                kernelThread = new Thread(KernelProcess)
                 {
                     Name = "Kernel",
                     IsBackground = true
                 };
-                this.kernelThread.Start();
+                kernelThread.Start();
             }
         }
 
@@ -71,8 +71,8 @@ namespace Shinobytes.Ravenfall.RavenNet.Core
         {
             lock (mutex)
             {
-                this.started = false;
-                this.kernelThread.Join();
+                started = false;
+                kernelThread.Join();
             }
         }
 
@@ -84,7 +84,7 @@ namespace Shinobytes.Ravenfall.RavenNet.Core
             {
                 lock (mutex)
                 {
-                    if (!this.started)
+                    if (!started)
                     {
                         return;
                     }
@@ -101,7 +101,7 @@ namespace Shinobytes.Ravenfall.RavenNet.Core
                             tick.Invoke();
                         }
 
-                        var item = this.timeouts.OrderBy(x => x.Timeout).FirstOrDefault();
+                        var item = timeouts.OrderBy(x => x.Timeout).FirstOrDefault();
                         if (item != null)
                         {
                             if (DateTime.Now >= item.Registered.Add(item.Timeout))
@@ -117,7 +117,7 @@ namespace Shinobytes.Ravenfall.RavenNet.Core
                     // ignored, we can't have the kernel die due to an exception
                 }
 
-                System.Threading.Thread.Sleep(timeout);
+                Thread.Sleep(timeout);
             } while (!cancellationTokenSource.IsCancellationRequested);
         }
 
@@ -127,8 +127,8 @@ namespace Shinobytes.Ravenfall.RavenNet.Core
 
             lock (timeoutMutex)
             {
-                this.timeouts.Clear();
-                this.ticks.Clear();
+                timeouts.Clear();
+                ticks.Clear();
             }
             cancellationTokenSource.Cancel();
             kernelThread.Join();
@@ -139,7 +139,7 @@ namespace Shinobytes.Ravenfall.RavenNet.Core
         {
             lock (mutex)
             {
-                if (!this.started)
+                if (!started)
                 {
                     Start();
                 }
@@ -155,9 +155,9 @@ namespace Shinobytes.Ravenfall.RavenNet.Core
         {
             public TimeoutCallbackHandle(Action action, int timeout)
             {
-                this.Registered = DateTime.Now;
-                this.Timeout = TimeSpan.FromMilliseconds(timeout);
-                this.Action = action;
+                Registered = DateTime.Now;
+                Timeout = TimeSpan.FromMilliseconds(timeout);
+                Action = action;
             }
 
             public DateTime Registered { get; }
@@ -172,9 +172,9 @@ namespace Shinobytes.Ravenfall.RavenNet.Core
 
             public TickCallbackHandle(Action<TimeSpan> action, TimeSpan timeout)
             {
-                this.Timeout = timeout;
-                this.Action = action;
-                this.lastInvoke = DateTime.UtcNow;
+                Timeout = timeout;
+                Action = action;
+                lastInvoke = DateTime.UtcNow;
             }
 
             public TimeSpan Timeout { get; }

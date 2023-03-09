@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ROBot
+namespace ROBot.Core
 {
     public interface IApplication : IDisposable
     {

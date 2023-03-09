@@ -1,7 +1,6 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using RavenBot.Core.Handlers;
 using RavenBot.Core.Net;
-using RavenBot.Core.Ravenfall.Commands;
 using RavenBot.Core.Ravenfall.Models;
 using System.Linq;
 

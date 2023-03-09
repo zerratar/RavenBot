@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace RavenBot.Core
+namespace RavenBot.Core.Templating
 {
     public class StringTemplateBuilder : IStringTemplateBuilder
     {

@@ -3,7 +3,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Shinobytes.Ravenfall.Core.RuleEngine
+namespace Shinobytes.Core.RuleEngine
 {
     public class GambitRuleGenerator : IGambitRuleGenerator
     {
@@ -67,7 +67,7 @@ namespace Shinobytes.Ravenfall.Core.RuleEngine
                 IGambitRuleCondition<TKnowledgeBase> condition,
                 IGambitRuleAction<TKnowledgeBase> action)
             {
-                this.Name = name;
+                Name = name;
                 this.condition = condition;
                 this.action = action;
             }

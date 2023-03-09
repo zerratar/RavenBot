@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Shinobytes.Ravenfall.Core
+namespace Shinobytes.Core.Utilities
 {
     public static class GameMath
     {
@@ -53,7 +53,7 @@ namespace Shinobytes.Ravenfall.Core
             {
                 if (exp >= ExperienceArray[level])
                     continue;
-                return (level + 1);
+                return level + 1;
             }
             return MaxLevel;
         }
@@ -140,15 +140,15 @@ namespace Shinobytes.Ravenfall.Core
                              ? aWeaponPower
                              : aWeaponAim / 2.5d)
                          + (aCombatStyle == 1 && random.Next(0, 2) == 0 ? 4 : 0)
-                         + (random.Next(0, 100) <= 10 ? (aStrength / 5D) : 0)
-                         + (StyleBonus(aCombatStyle, 0) * 2));
+                         + (random.Next(0, 100) <= 10 ? aStrength / 5D : 0)
+                         + StyleBonus(aCombatStyle, 0) * 2);
 
             var defensePrayers = AddPrayers(burst, superhuman, ultimate);
 
             var newDef = (int)(defensePrayers
                          * ((random.Next(0, 100) <= 5 ? 0 : bDefense) * 1.1D)
-                         + ((random.Next(0, 100) <= 5 ? 0 : bArmorPower) / 2.75D)
-                         + (bStrength / 4D) + (StyleBonus(bCombatStyle, 1) * 2));
+                         + (random.Next(0, 100) <= 5 ? 0 : bArmorPower) / 2.75D
+                         + bStrength / 4D + StyleBonus(bCombatStyle, 1) * 2);
 
             var hitChance = random.Next(0, 100) + (newAtt - newDef);
 
@@ -178,25 +178,25 @@ namespace Shinobytes.Ravenfall.Core
                 lowHit += (int)Math.Round(shiftValue * 3.5, MidpointRounding.AwayFromZero);
 
                 var hitRange = random.Next(0, 100);
-                if (hitRange >= (100 - maxProb))
+                if (hitRange >= 100 - maxProb)
                 {
                     return max;
                 }
 
-                if (hitRange >= (100 - nearMaxProp))
+                if (hitRange >= 100 - nearMaxProp)
                 {
 
                     return (int)Math.Round(Math.Abs(max - max * (random.Next(0, 10) * 0.01D)), MidpointRounding.AwayFromZero);
                 }
 
-                if (hitRange >= (100 - avProb))
+                if (hitRange >= 100 - avProb)
                 {
-                    newMax = (int)Math.Round(max - (max * 0.1D));
+                    newMax = (int)Math.Round(max - max * 0.1D);
                     return (int)Math.Round(Math.Abs(newMax - newMax * (random.Next(0, 50) * 0.01D)), MidpointRounding.AwayFromZero);
                 }
 
                 newMax = (int)Math.Round(max - max * 0.5D);
-                return (int)Math.Round(Math.Abs((newMax - (newMax * (random.Next(0, 50) * 0.01D)))), MidpointRounding.AwayFromZero);
+                return (int)Math.Round(Math.Abs(newMax - newMax * (random.Next(0, 50) * 0.01D)), MidpointRounding.AwayFromZero);
 
                 //return (int)Math.Round(Math.Abs(newMax - newMax * (random.Next(0, 95) * 0.01D)), MidpointRounding.AwayFromZero);
             }
@@ -210,7 +210,7 @@ namespace Shinobytes.Ravenfall.Core
             var rangeLvl = rangedLevel;
             var armour = defenderArmorPower;
             var rangeEquip = 15f;
-            int armourRatio = (int)(60D + ((double)((rangeEquip * 3D) - armour) / 300D) * 40D);
+            int armourRatio = (int)(60D + (double)(rangeEquip * 3D - armour) / 300D * 40D);
 
             var randomValue = random.NextDouble();
             if (randomValue * 100f > armourRatio && randomValue <= 0.5)
@@ -218,9 +218,9 @@ namespace Shinobytes.Ravenfall.Core
                 return 0;
             }
 
-            int max = (int)(((double)rangeLvl * 0.15D) + 0.85D + power);
-            int peak = (int)(((double)max / 100D) * (double)armourRatio);
-            int dip = (int)(((double)peak / 3D) * 2D);
+            int max = (int)(rangeLvl * 0.15D + 0.85D + power);
+            int peak = (int)(max / 100D * armourRatio);
+            int dip = (int)(peak / 3D * 2D);
             return RandomWeighted(0, dip, peak, max);
         }
 
@@ -255,7 +255,7 @@ namespace Shinobytes.Ravenfall.Core
             total = 0;
             for (int x = 0; x < probArray.Length; x++)
             {
-                if (hit >= total && hit < (total + probArray[x]))
+                if (hit >= total && hit < total + probArray[x])
                 {
                     return x;
                 }
@@ -268,7 +268,7 @@ namespace Shinobytes.Ravenfall.Core
         {
             var style = attackerCombatStyle;
             if (style == 0) return 1;
-            return (skill == 0 && style == 2) || (skill == 1 && style == 3) || (skill == 2 && style == 1) ? 3 : 0;
+            return skill == 0 && style == 2 || skill == 1 && style == 3 || skill == 2 && style == 1 ? 3 : 0;
         }
     }
 }

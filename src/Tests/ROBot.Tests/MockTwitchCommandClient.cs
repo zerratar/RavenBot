@@ -1,5 +1,5 @@
 ﻿using ROBot.Core;
-using ROBot.Core.Twitch;
+using ROBot.Core.Chat.Twitch;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TwitchLib.Client.Events;

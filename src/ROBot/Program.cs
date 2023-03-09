@@ -1,17 +1,20 @@
 ﻿using System;
 using ROBot.Core;
-using ROBot.Core.Twitch;
-using Shinobytes.Ravenfall.RavenNet.Core;
 using Microsoft.Extensions.Logging;
-using ROBot.Ravenfall;
 using ROBot.Core.GameServer;
 using IAppSettings = ROBot.Core.IAppSettings;
-using RavenBot.Core.Twitch;
 using Shinobytes.Network;
-using RavenBot.Core.Ravenfall.Commands;
 using System.Net;
 using ROBot.Core.Stats;
 using ROBot.Core.OpenAI;
+using ROBot.Core.Chat.Twitch.PubSub;
+using ROBot.Core.Chat.Twitch;
+using ROBot.Core.Chat.Discord;
+using RavenBot.Core.Templating;
+using Shinobytes.Core;
+using ROBot.API;
+using RavenBot.Core.Ravenfall;
+//using RavenBot.Core;
 
 namespace ROBot
 {
@@ -45,10 +48,10 @@ namespace ROBot
             ioc.RegisterShared<IMessageBus, MessageBus>();
 
             ioc.RegisterShared<IUserSettingsManager, UserSettingsManager>();
-            ioc.RegisterShared<RavenBot.Core.IStringProvider, RavenBot.Core.StringProvider>();
-            ioc.RegisterShared<RavenBot.Core.IStringTemplateParser, RavenBot.Core.StringTemplateParser>();
-            ioc.RegisterShared<RavenBot.Core.IStringTemplateProcessor, RavenBot.Core.StringTemplateProcessor>();
-            ioc.RegisterShared<RavenBot.Core.IChatMessageFormatter, ChatMessageFormatter>();
+            ioc.RegisterShared<IStringProvider, StringProvider>();
+            ioc.RegisterShared<IStringTemplateParser, StringTemplateParser>();
+            ioc.RegisterShared<IStringTemplateProcessor, StringTemplateProcessor>();
+            ioc.RegisterShared<RavenBot.Core.IChatMessageFormatter, RavenBot.Core.ChatMessageFormatter>();
             ioc.RegisterShared<RavenBot.Core.IChatMessageTransformer, ChatGPT35MessageTransformer>();
 
 
@@ -56,7 +59,7 @@ namespace ROBot
             ioc.RegisterShared<IBotServer, BotServer>();
             ioc.RegisterShared<IGameSessionManager, GameSessionManager>();
             ioc.RegisterShared<IRavenfallConnectionProvider, RavenfallConnectionProvider>();
-            ioc.RegisterShared<RavenBot.Core.Ravenfall.Commands.IUserProvider, RavenBot.Core.Ravenfall.Commands.UserProvider>();
+            ioc.RegisterShared<IUserProvider, UserProvider>();
 
             // Twitch stuff
             ioc.RegisterShared<ITwitchCredentialsProvider, TwitchCredentialsProvider>();
@@ -65,6 +68,9 @@ namespace ROBot
 
             ioc.RegisterShared<ITwitchPubSubManager, TwitchPubSubManager>();
             ioc.RegisterShared<ITwitchPubSubTokenRepository, TwitchPubSubTokenRepository>();
+
+            ioc.RegisterShared<IDiscordCommandController, DiscordCommandController>();
+            ioc.RegisterShared<IDiscordCommandClient, DiscordCommandClient>();
 
             //stats ... what the hell am I doing. Gawd.
             object stats = new Stats();

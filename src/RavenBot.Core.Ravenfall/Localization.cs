@@ -1,4 +1,4 @@
-﻿namespace RavenBot.Core.Ravenfall.Commands
+﻿namespace RavenBot.Core.Ravenfall
 {
     public static class Settings
     {

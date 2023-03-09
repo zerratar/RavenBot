@@ -2,7 +2,7 @@
 using System;
 using System.IO;
 
-namespace ROBot.LogServer.PacketHandlers
+namespace ROBot.API
 {
     public class DataPacketReader : IDisposable
     {
@@ -12,8 +12,8 @@ namespace ROBot.LogServer.PacketHandlers
 
         public DataPacketReader(DataPacket dataPacket)
         {
-            this.memoryStream = new MemoryStream(dataPacket.Buffer, dataPacket.Offset, dataPacket.Length);
-            this.reader = new BinaryReader(memoryStream);
+            memoryStream = new MemoryStream(dataPacket.Buffer, dataPacket.Offset, dataPacket.Length);
+            reader = new BinaryReader(memoryStream);
         }
 
         public void Dispose()
@@ -25,13 +25,13 @@ namespace ROBot.LogServer.PacketHandlers
 
             try { reader.Dispose(); } catch { }
             try { memoryStream.Dispose(); } catch { }
-            this.disposed = true;
+            disposed = true;
         }
 
         public string ReadString()
         {
             var size = reader.ReadInt16();
-            return System.Text.UTF8Encoding.UTF8.GetString(reader.ReadBytes(size));
+            return System.Text.Encoding.UTF8.GetString(reader.ReadBytes(size));
         }
     }
 }

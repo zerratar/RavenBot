@@ -1,6 +1,7 @@
 ﻿using RavenBot.Core;
 using RavenBot.Core.Handlers;
 using RavenBot.Core.Ravenfall.Commands;
+using Shinobytes.Core;
 
 namespace RavenBot
 {

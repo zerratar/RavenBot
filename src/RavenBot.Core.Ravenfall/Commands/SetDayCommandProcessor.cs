@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using RavenBot.Core.Handlers;
-using RavenBot.Core.Twitch;
 
 namespace RavenBot.Core.Ravenfall.Commands
 {

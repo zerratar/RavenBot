@@ -2,7 +2,6 @@
 using Newtonsoft.Json;
 using RavenBot.Core.Extensions;
 using RavenBot.Core.Net;
-using ROBot.Core.Twitch;
 using System;
 using System.Collections.Generic;
 using System.IO;

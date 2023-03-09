@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Shinobytes.Ravenfall.RavenNet.Core
+namespace Shinobytes.Core
 {
     public class MessageBus : IMessageBus
     {
@@ -41,7 +41,7 @@ namespace Shinobytes.Ravenfall.RavenNet.Core
                         Send(MessageBusException, errMessage);
                     }
                 }, this);
-                this.subscriptions.Add(messageBusSubscription);
+                subscriptions.Add(messageBusSubscription);
                 return messageBusSubscription;
             }
         }
@@ -63,7 +63,7 @@ namespace Shinobytes.Ravenfall.RavenNet.Core
                         Send(MessageBusException, errMessage);
                     }
                 }, this);
-                this.subscriptions.Add(messageBusSubscription);
+                subscriptions.Add(messageBusSubscription);
                 return messageBusSubscription;
             }
         }
@@ -72,7 +72,7 @@ namespace Shinobytes.Ravenfall.RavenNet.Core
         {
             lock (mutex)
             {
-                this.subscriptions.Remove(subscription as Subscription);
+                subscriptions.Remove(subscription as Subscription);
             }
         }
 
@@ -83,7 +83,7 @@ namespace Shinobytes.Ravenfall.RavenNet.Core
 
             public Subscription(string key, Action<object> onMessage, MessageBus bus)
             {
-                this.Key = key;
+                Key = key;
                 this.onMessage = onMessage;
                 this.bus = bus;
             }

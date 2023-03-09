@@ -1,4 +1,4 @@
-﻿using RavenBot.Core.Ravenfall.Commands;
+﻿using RavenBot.Core.Ravenfall;
 using RavenBot.Core.Ravenfall.Models;
 using System;
 using System.Collections.Generic;

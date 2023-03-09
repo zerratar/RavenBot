@@ -1,17 +1,18 @@
-﻿using System;
+﻿using Shinobytes.Core;
+using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Reflection;
 
-namespace ROBot
+namespace ROBot.API
 {
     public class ServerPacketHandlerProvider : IServerPacketHandlerProvider
     {
-        private readonly Shinobytes.Ravenfall.RavenNet.Core.IoC ioc;
+        private readonly IoC ioc;
         private bool initialized;
         private ConcurrentDictionary<string, Type> handlers = new ConcurrentDictionary<string, Type>();
 
-        public ServerPacketHandlerProvider(Shinobytes.Ravenfall.RavenNet.Core.IoC ioc)
+        public ServerPacketHandlerProvider(IoC ioc)
         {
             this.ioc = ioc;
         }

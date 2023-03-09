@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
-using ROBot.Core.Twitch;
+using ROBot.Core.Chat.Twitch.PubSub;
+using Shinobytes.Core;
 using Shinobytes.Network;
-using Shinobytes.Ravenfall.RavenNet.Core;
 using System.Threading.Tasks;
 
-namespace ROBot.LogServer.PacketHandlers
+namespace ROBot.API.PacketHandlers
 {
     public class PubSubPacketHandler : IServerPacketHandler
     {
@@ -26,7 +26,7 @@ namespace ROBot.LogServer.PacketHandlers
         {
             if (packet.Data == null || (packet.Data.Buffer?.Length ?? 0) == 0)
             {
-                this.logger.LogError("[LOG] An empty PubSub Packet Recieved");
+                logger.LogError("[LOG] An empty PubSub Packet Recieved");
                 return Task.CompletedTask;
             }
 
@@ -39,12 +39,12 @@ namespace ROBot.LogServer.PacketHandlers
                 {
                     userId = reader.ReadString();
                     userName = reader.ReadString();
-                    token = reader.ReadString();                    
+                    token = reader.ReadString();
 
                     messageBus.Send("pubsub", pubSubRepo.AddOrUpdate(userId, userName, token));
                     if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(token))
                     {
-                        this.logger.LogError("[LOG] Bad pubsub data recieved: "
+                        logger.LogError("[LOG] Bad pubsub data recieved: "
                             + ", userId: " + userId
                             + ", userName: " + userName
                             + ", token: " + token
@@ -54,7 +54,7 @@ namespace ROBot.LogServer.PacketHandlers
             }
             catch (System.Exception exc)
             {
-                this.logger.LogError("[LOG] Bad pubsub data recieved: " + exc
+                logger.LogError("[LOG] Bad pubsub data recieved: " + exc
                     + ", userId: " + userId
                     + ", userName: " + userName
                     + ", token: " + token

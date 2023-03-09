@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using RavenBot.Core.Templating;
+using System.Threading.Tasks;
 
 namespace RavenBot.Core
 {

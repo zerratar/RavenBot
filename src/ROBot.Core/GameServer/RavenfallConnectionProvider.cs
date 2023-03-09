@@ -1,20 +1,21 @@
 ﻿using RavenBot.Core;
-using RavenBot.Core.Ravenfall.Commands;
+using RavenBot.Core.Ravenfall;
+using Shinobytes.Core;
 using System.Net.Sockets;
 
 namespace ROBot.Core.GameServer
 {
     public class RavenfallConnectionProvider : IRavenfallConnectionProvider
     {
-        private readonly Shinobytes.Ravenfall.RavenNet.Core.IMessageBus messageBus;
+        private readonly IMessageBus messageBus;
         private readonly Microsoft.Extensions.Logging.ILogger logger;
-        private readonly Shinobytes.Ravenfall.RavenNet.Core.IKernel kernel;
+        private readonly IKernel kernel;
         private readonly IUserProvider playerProvider;
 
         public RavenfallConnectionProvider(
-            Shinobytes.Ravenfall.RavenNet.Core.IMessageBus messageBus,
+            IMessageBus messageBus,
             Microsoft.Extensions.Logging.ILogger logger,
-            Shinobytes.Ravenfall.RavenNet.Core.IKernel kernel,
+            IKernel kernel,
             IUserProvider playerProvider)
         {
             this.logger = logger;

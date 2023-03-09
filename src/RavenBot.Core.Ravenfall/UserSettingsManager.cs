@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace RavenBot.Core.Ravenfall.Commands
+namespace RavenBot.Core.Ravenfall
 {
     public class UserSettingsManager : IUserSettingsManager
     {
@@ -28,36 +28,41 @@ namespace RavenBot.Core.Ravenfall.Commands
             {
                 try
                 {
-                    var accId = System.IO.Path.GetFileNameWithoutExtension(file);
-
-                    // no longer supported.
-                    if (!Guid.TryParse(accId, out var userId))
-                    {
-                        System.IO.File.Delete(file);
-                        continue;
-                    }
-
-                    var content = System.IO.File.ReadAllText(file);
-                    var values = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(content);
-                    var settings = new UserSettings(file, values);
-                    dict[userId] = settings;
-
-                    if (!string.IsNullOrEmpty(settings.DiscordUserId))
-                        idLookup["discord_" + settings.DiscordUserId.ToLower()] = settings.RavenfallUserId;
-
-                    if (!string.IsNullOrEmpty(settings.TwitchUserId))
-                        idLookup["twitch_" + settings.TwitchUserId.ToLower()] = settings.RavenfallUserId;
-
-                    if (!string.IsNullOrEmpty(settings.YouTubeUserId))
-                        idLookup["youtube_" + settings.YouTubeUserId.ToLower()] = settings.RavenfallUserId;
-
-                    if (!string.IsNullOrEmpty(settings.KickUserId))
-                        idLookup["kick_" + settings.KickUserId.ToLower()] = settings.RavenfallUserId;
+                    LoadSettingsFile(file);
                 }
-                catch (System.Exception exc)
+                catch (Exception exc)
                 {
                     System.IO.File.WriteAllText(file + ".error", exc.ToString());
                 }
+            }
+        }
+
+        private void LoadSettingsFile(string file)
+        {
+            var accId = System.IO.Path.GetFileNameWithoutExtension(file);
+            // no longer supported.
+            if (!Guid.TryParse(accId, out var userId))
+            {
+                System.IO.File.Delete(file);
+            }
+            else
+            {
+                var content = System.IO.File.ReadAllText(file);
+                var values = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(content);
+                var settings = new UserSettings(file, values);
+                dict[userId] = settings;
+
+                if (!string.IsNullOrEmpty(settings.DiscordUserId))
+                    idLookup["discord_" + settings.DiscordUserId.ToLower()] = settings.RavenfallUserId;
+
+                if (!string.IsNullOrEmpty(settings.TwitchUserId))
+                    idLookup["twitch_" + settings.TwitchUserId.ToLower()] = settings.RavenfallUserId;
+
+                if (!string.IsNullOrEmpty(settings.YouTubeUserId))
+                    idLookup["youtube_" + settings.YouTubeUserId.ToLower()] = settings.RavenfallUserId;
+
+                if (!string.IsNullOrEmpty(settings.KickUserId))
+                    idLookup["kick_" + settings.KickUserId.ToLower()] = settings.RavenfallUserId;
             }
         }
 
@@ -119,12 +124,12 @@ namespace RavenBot.Core.Ravenfall.Commands
 
         public T Get<T>(Guid userId, string key, T defaultValue)
         {
-            return Get(userId).Get<T>(key, defaultValue);
+            return Get(userId).Get(key, defaultValue);
         }
 
         public bool TryGet<T>(Guid userId, string key, out T value)
         {
-            return Get(userId).TryGet<T>(key, out value);
+            return Get(userId).TryGet(key, out value);
         }
 
         public void Set<T>(Guid userId, string key, T value)

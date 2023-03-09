@@ -1,4 +1,4 @@
-﻿namespace Shinobytes.Ravenfall.Core.RuleEngine
+﻿namespace Shinobytes.Core.RuleEngine
 {
     public class GambitGenerator : IGambitGenerator
     {

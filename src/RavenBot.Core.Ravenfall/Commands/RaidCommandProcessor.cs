@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
+using RavenBot.Core.Chat.Twitch;
 using RavenBot.Core.Handlers;
 using RavenBot.Core.Net;
 using RavenBot.Core.Ravenfall.Models;
-using RavenBot.Core.Twitch;
 
 namespace RavenBot.Core.Ravenfall.Commands
 {
