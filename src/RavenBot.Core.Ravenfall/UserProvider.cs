@@ -97,7 +97,7 @@ namespace RavenBot.Core.Ravenfall
             }
         }
 
-        public User Get(string userId, string username, string platform = "twitch")
+        public User Get(string userId, string username, string platform)
         {
             lock (mutex)
             {
@@ -116,14 +116,29 @@ namespace RavenBot.Core.Ravenfall
             }
         }
 
-        public User Get(string username, string platform = "twitch")
+        public User Get(string username)
+        {
+            lock (mutex)
+            {
+                if (string.IsNullOrEmpty(username)) return null;
+                if (username.StartsWith("@")) username = username.Substring(1);
+                var user = users.FirstOrDefault(x => x.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
+                if (user != null) return user;
+                user = CreateUser(username, null, null);
+                users.Add(user);
+                return user;
+            }
+        }
+
+        public User Get(string username, string platform)
         {
 
             lock (mutex)
             {
                 if (string.IsNullOrEmpty(username)) return null;
                 if (username.StartsWith("@")) username = username.Substring(1);
-                var user = users.FirstOrDefault(x => x.Username == username);
+                var user = users.FirstOrDefault(x => x.Username.Equals(username, StringComparison.OrdinalIgnoreCase)
+                && x.Platform.Equals(platform, StringComparison.OrdinalIgnoreCase));
                 if (user != null) return user;
 
                 user = CreateUser(username, null, platform);
@@ -181,7 +196,10 @@ namespace RavenBot.Core.Ravenfall
 
         private void LoadSettings(User user)
         {
-            var settings = user.Id != Guid.Empty ? settingsManager.Get(user.Id) : settingsManager.Get(user.PlatformId, user.Platform);
+            var settings = user.Id != Guid.Empty 
+                ? settingsManager.Get(user.Id) 
+                : settingsManager.Get(user.PlatformId, user.Platform);
+
             if (settings.HasValues)
             {
                 user.Settings = settings;

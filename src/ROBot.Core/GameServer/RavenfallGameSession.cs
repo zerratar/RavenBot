@@ -69,6 +69,11 @@ namespace ROBot.Core.GameServer
             return playerProvider.Get(username);
         }
 
+        public User GetUserByName(string username, string platform)
+        {
+            return playerProvider.Get(username, platform);
+        }
+
         public User Get(ICommandSender user)
         {
             return playerProvider.Get(user);

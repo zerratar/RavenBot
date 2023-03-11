@@ -91,6 +91,17 @@ namespace RavenBot.Core.Ravenfall
                 return id;
             }
 
+            // if null, check if there are new settings files to load in.
+            var settingsFiles = System.IO.Directory.GetFiles(SettingsDirectory, "*.json");
+            foreach (var file in settingsFiles)
+            {
+                var accId = System.IO.Path.GetFileNameWithoutExtension(file);
+                if (!Guid.TryParse(accId, out var uid) || dict.ContainsKey(uid))
+                    continue;
+
+                LoadSettingsFile(file);
+            }
+
             foreach (var settings in dict.Values.ToList())
             {
                 if (settings.TryGet<string>(platform.ToLower() + "_id", out var i) && i.Equals(platformId, StringComparison.OrdinalIgnoreCase))

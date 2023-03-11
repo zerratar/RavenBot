@@ -463,7 +463,14 @@ namespace ROBot.Core.Chat.Twitch
                         return;
                     }
 
-                    SendMessage(channel, message.Format, message.Args);
+                    if (!string.IsNullOrEmpty(message.Recipent.PlatformUserName))
+                    {
+                        SendMessage(channel, message.Recipent.PlatformUserName + " " + message.Format, message.Args);
+                    }
+                    else
+                    {
+                        SendMessage(channel, message.Format, message.Args);
+                    }
                 }
 
                 // ignore any platform that is not discord.

@@ -127,7 +127,15 @@ namespace ROBot.Core.Chat.Discord
                         return;
                     }
 
-                    SendMessage(channel, message.Format, message.Args);
+                    // if we can't reply we should mention the recipent.
+                    if (ulong.TryParse(message.Recipent.PlatformId, out var uid))
+                    {
+                        SendMessage(channel, MentionUtils.MentionUser(uid) + " " + message.Format, message.Args);
+                    }
+                    else
+                    {
+                        SendMessage(channel, message.Format, message.Args);
+                    }
                     return;
                 }
 
