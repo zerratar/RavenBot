@@ -59,7 +59,6 @@ namespace ROBot.Core.Chat.Discord
                 var channel = command.Channel;
                 var msg = command.CleanContent;
 
-                var session = game.GetSession(channel.Name);
 
                 /*
                     We might not be able to find a session using the discord channel. but we can try.
@@ -71,6 +70,8 @@ namespace ROBot.Core.Chat.Discord
 
                 var argString = !string.IsNullOrEmpty(cmd.Arguments) ? " (args: " + cmd.Arguments + ")" : "";
                 var key = cmd.Command.ToLower();
+
+                var session = game.GetSession(cmd.Channel);
 
                 if (await HandleAsync(game, chat, cmd))
                 {

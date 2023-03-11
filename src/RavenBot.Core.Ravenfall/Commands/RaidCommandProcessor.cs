@@ -18,15 +18,15 @@ namespace RavenBot.Core.Ravenfall.Commands
             this.playerProvider = playerProvider;
             this.userStore = userStore;
         }
-        public override async Task ProcessAsync(IMessageChat broadcaster, ICommand cmd)
+        public override async Task ProcessAsync(IMessageChat chat, ICommand cmd)
         {
             if (!await this.game.ProcessAsync(Settings.UNITY_SERVER_PORT))
             {
-                broadcaster.Broadcast(cmd.Sender.Username, Localization.GAME_NOT_STARTED);
+                chat.SendReply(cmd, Localization.GAME_NOT_STARTED);
                 return;
             }
 
-            var player = playerProvider.Get(cmd.Sender);
+            var player = playerProvider.Get(cmd);
             var isRaidWar = cmd.Command.Contains("war", StringComparison.OrdinalIgnoreCase);
             if (string.IsNullOrEmpty(cmd.Arguments))
             {
@@ -35,7 +35,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                     return;
                 }
 
-                await this.game.JoinRaidAsync(new EventJoinRequest(player, null));
+                await this.game.Reply(cmd.CorrelationId).JoinRaidAsync(player, null);
                 return;
             }
 
@@ -43,24 +43,25 @@ namespace RavenBot.Core.Ravenfall.Commands
             {
                 if (cmd.Arguments.Contains("start", StringComparison.OrdinalIgnoreCase))
                 {
-                    await this.game.RaidStartAsync(player);
+                    await this.game.Reply(cmd.CorrelationId).RaidStartAsync(player);
                     return;
                 }
 
                 if (cmd.Arguments.Contains("stop", StringComparison.OrdinalIgnoreCase))
                 {
-                    await this.game.StopRaidAsync(player);
+                    await this.game.Reply(cmd.CorrelationId).StopRaidAsync(player);
                     return;
                 }
 
                 if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsGameAdmin)
                 {
-                    broadcaster.Broadcast(cmd.Sender.Username, Localization.PERMISSION_DENIED);
+                    chat.SendReply(cmd, Localization.PERMISSION_DENIED);
                     return;
                 }
 
+                var sender = playerProvider.Get(cmd);
                 var target = playerProvider.Get(cmd.Arguments);
-                await this.game.RaidStreamerAsync(target, isRaidWar);
+                await this.game.Reply(cmd.CorrelationId).RaidStreamerAsync(sender, target, isRaidWar);
             }
         }
     }

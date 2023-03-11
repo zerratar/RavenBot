@@ -5,21 +5,21 @@ namespace RavenBot.Core.Ravenfall.Commands
 {
     public class PubSubActivateCommandProcessor : Net.RavenfallCommandProcessor
     {
-        public override async Task ProcessAsync(IMessageChat broadcaster, ICommand cmd)
+        public override async Task ProcessAsync(IMessageChat chat, ICommand cmd)
         {
-            if (broadcaster.CanRecieveChannelPointRewards)
+            if (chat.CanRecieveChannelPointRewards)
             {
-                broadcaster.Broadcast(cmd.Sender.Username, "Channel Point Rewards is all good SeemsGood");
+                chat.SendReply(cmd, "Channel Point Rewards is all good SeemsGood");
             }
             else
             {
                 if (cmd.Sender.IsBroadcaster)
                 {
-                    broadcaster.Broadcast(cmd.Sender.Username, "Channel Point Rewards does not seem to be activated. Please go to https://www.ravenfall.stream/api/auth/activate-pubsub to activate it.");
+                    chat.SendReply(cmd, "Channel Point Rewards does not seem to be activated. Please go to https://www.ravenfall.stream/api/auth/activate-pubsub to activate it.");
                 }
                 else
                 {
-                    broadcaster.Broadcast(cmd.Sender.Username, "Channel Point Rewards does not seem to be activated.");
+                    chat.SendReply(cmd, "Channel Point Rewards does not seem to be activated.");
                 }
             }
         }

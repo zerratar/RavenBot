@@ -15,10 +15,10 @@ namespace RavenBot.Core.Ravenfall.Commands
             this.playerProvider = playerProvider;
         }
 
-        public override async Task ProcessAsync(IMessageChat broadcaster, ICommand cmd)
+        public override async Task ProcessAsync(IMessageChat chat, ICommand cmd)
         {
-            var player = playerProvider.Get(cmd.Sender);
-            await game.SetTimeOfDayAsync(player, 0, 15);
+            var player = playerProvider.Get(cmd);
+            await this.game.Reply(cmd.CorrelationId).SetTimeOfDayAsync(player, 0, 15);
         }
     }
 }

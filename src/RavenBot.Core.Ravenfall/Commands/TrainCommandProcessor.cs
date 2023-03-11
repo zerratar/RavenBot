@@ -27,25 +27,25 @@ namespace RavenBot.Core.Ravenfall.Commands
             this.playerProvider = playerProvider;
         }
 
-        public override async Task ProcessAsync(IMessageChat broadcaster, ICommand cmd)
+        public override async Task ProcessAsync(IMessageChat chat, ICommand cmd)
         {
             if (!await this.game.ProcessAsync(ServerPort))
             {
-                broadcaster.Broadcast(cmd.Sender.Username, Localization.GAME_NOT_STARTED);
+                chat.SendReply(cmd, Localization.GAME_NOT_STARTED);
                 return;
             }
 
-            var player = playerProvider.Get(cmd.Sender);
+            var player = playerProvider.Get(cmd);
             if (GetCombatTypeFromString(cmd.Command) != -1)
             {
-                await game.SendPlayerTaskAsync(player, PlayerTask.Fighting, cmd.Command);
+                await this.game.Reply(cmd.CorrelationId).SendPlayerTaskAsync(player, PlayerTask.Fighting, cmd.Command);
                 return;
             }
 
             var commandSkillTarget = GetSkillTypeFromString(cmd.Command);
             if (commandSkillTarget != -1)
             {
-                await game.SendPlayerTaskAsync(player, (PlayerTask)commandSkillTarget, cmd.Command);
+                await this.game.Reply(cmd.CorrelationId).SendPlayerTaskAsync(player, (PlayerTask)commandSkillTarget, cmd.Command);
                 return;
             }
 
@@ -53,24 +53,24 @@ namespace RavenBot.Core.Ravenfall.Commands
             var skill = arg?.Split(' ').LastOrDefault();
             if (string.IsNullOrEmpty(skill))
             {
-                broadcaster.Broadcast(cmd.Sender.Username, Localization.TRAIN_NO_ARG, string.Join(", ", trainableSkills));
+                chat.SendReply(cmd, Localization.TRAIN_NO_ARG, string.Join(", ", trainableSkills));
                 return;
             }
 
             if (GetCombatTypeFromString(skill) != -1)
             {
-                await game.SendPlayerTaskAsync(player, PlayerTask.Fighting, skill);
+                await this.game.Reply(cmd.CorrelationId).SendPlayerTaskAsync(player, PlayerTask.Fighting, skill);
             }
             else
             {
                 var value = GetSkillTypeFromString(skill);
                 if (value == -1)
                 {
-                    broadcaster.Broadcast(cmd.Sender.Username, Localization.TRAIN_INVALID, skill);
+                    chat.SendReply(cmd, Localization.TRAIN_INVALID, skill);
                 }
                 else
                 {
-                    await game.SendPlayerTaskAsync(player, (PlayerTask)value, skill);
+                    await this.game.Reply(cmd.CorrelationId).SendPlayerTaskAsync(player, (PlayerTask)value, skill);
                 }
             }
         }

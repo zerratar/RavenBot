@@ -1,4 +1,5 @@
-﻿using RavenBot.Core.Extensions;
+﻿using RavenBot.Core.Chat.Twitch;
+using RavenBot.Core.Extensions;
 using RavenBot.Core.Handlers;
 using RavenBot.Core.Ravenfall.Models;
 using System.Text;
@@ -15,14 +16,15 @@ namespace RavenBot.Core.Ravenfall
             this.Sender = new RewardRedeemSender(player);
             this.Arguments = arguments.AsUTF8();
             this.Command = command.AsUTF8();
-            this.Channel = channel;
+            this.Channel = new TwitchCommand.TwitchChannel(channel);
+            this.CorrelationId = player.PlatformId;
         }
 
         public ICommandSender Sender { get; }
-        public string Channel { get; }
+        public ICommandChannel Channel { get; }
         public string Command { get; }
         public string Arguments { get; }
-
+        public string CorrelationId { get; set; }
         public override string ToString()
         {
             return (Player?.Username ?? Sender?.Username ?? "???") + ": #" + Channel + ", " + Command + " " + Arguments;

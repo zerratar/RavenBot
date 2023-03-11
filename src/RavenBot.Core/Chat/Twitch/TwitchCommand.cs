@@ -7,7 +7,6 @@ using System;
 
 namespace RavenBot.Core.Chat.Twitch
 {
-
     public class TwitchCommand : ICommand
     {
         public TwitchCommand(ChatCommand cmd, bool isGameAdmin = false, bool isGameModerator = false)
@@ -49,13 +48,14 @@ namespace RavenBot.Core.Chat.Twitch
                 }
             }
 
-            Channel = cmd.ChatMessage.Channel;
+            Channel = new TwitchChannel(cmd.ChatMessage.Channel);
 
             var isModerator = cmd.ChatMessage.IsModerator;
             var isSubscriber = cmd.ChatMessage.IsSubscriber;
             var isBroadcaster = cmd.ChatMessage.IsBroadcaster;
-            var isVip = false;
+            var isVip = cmd.ChatMessage.IsVip;
             var isVerifiedBot = false;
+
             Sender = new TwitchCommandSender(
                 cmd.ChatMessage.UserId,
                 cmd.ChatMessage.Username,
@@ -68,7 +68,11 @@ namespace RavenBot.Core.Chat.Twitch
                 isVip,
                 isVerifiedBot,
                 cmd.ChatMessage.ColorHex);
+
+            CorrelationId = cmd.ChatMessage.Id;
         }
+
+        public string CorrelationId { get; set; }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static string FixBadEncoding(string message)
@@ -79,7 +83,7 @@ namespace RavenBot.Core.Chat.Twitch
             return encoding.GetString(bytes);
         }
 
-        public string Channel { get; }
+        public ICommandChannel Channel { get; }
         public ICommandSender Sender { get; }
         public string Command { get; }
         public string Arguments { get; }
@@ -87,8 +91,22 @@ namespace RavenBot.Core.Chat.Twitch
         {
             return (Sender?.Username ?? "???") + ": #" + Channel + ", " + Command + " " + Arguments;
         }
+        public class TwitchChannel : ICommandChannel
+        {
+            public ulong Id => 0;
 
-        private class TwitchCommandSender : ICommandSender
+            public string Name { get; }
+
+            public TwitchChannel(string name)
+            {
+                Name = name;
+            }
+            public override string ToString()
+            {
+                return Name;
+            }
+        }
+        public class TwitchCommandSender : ICommandSender
         {
             public TwitchCommandSender(
                 string userId,

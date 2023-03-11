@@ -16,18 +16,18 @@ namespace ROBot.Core.Chat.Commands
                 var connection = game.GetConnection(session);
                 if (connection != null)
                 {
-                    var player = session.Get(cmd.Sender);
+                    var player = session.Get(cmd);
                     if (player == null)
                         return;
 
                     var item = cmd.Arguments?.ToLower();
                     if (string.IsNullOrEmpty(item))
                     {
-                        chat.Broadcast(channel, cmd.Sender.Username, "You have to use !equip <item name> or !equip all for equipping your best items.");
+                        chat.SendReply(cmd, "You have to use !equip <item name> or !equip all for equipping your best items.");
                         return;
                     }
 
-                    await connection.UnequipAsync(player, item);
+                    await connection.Reply(cmd.CorrelationId).UnequipAsync(player, item);
                 }
             }
         }

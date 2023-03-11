@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using RavenBot.Core.Handlers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -306,9 +307,16 @@ namespace ROBot.Core.GameServer
             this.state = ServerState.Disposed;
         }
 
-        public IGameSession GetSession(string session)
+        public IGameSession GetSession(ICommandChannel channel)
         {
-            return sessionManager.GetByName(session);
+            var s = sessionManager.GetByName(channel.Name);
+            if (s != null)
+            {
+                s.Channel = channel;
+                return s;
+            }
+
+            return null;
         }
     }
 

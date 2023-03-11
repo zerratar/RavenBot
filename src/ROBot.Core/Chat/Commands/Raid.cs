@@ -19,7 +19,7 @@ namespace ROBot.Core.Chat.Commands
                 var connection = game.GetConnection(session);
                 if (connection != null)
                 {
-                    var player = session.Get(cmd.Sender);
+                    var player = session.Get(cmd);
                     var isRaidWar = cmd.Command.Contains("war", StringComparison.OrdinalIgnoreCase);
                     if (string.IsNullOrEmpty(cmd.Arguments))
                     {
@@ -28,7 +28,7 @@ namespace ROBot.Core.Chat.Commands
                             return;
                         }
 
-                        await connection.JoinRaidAsync(new EventJoinRequest(player, null));
+                        await connection.Reply(cmd.CorrelationId).JoinRaidAsync(player, null);
                         return;
                     }
 
@@ -36,24 +36,24 @@ namespace ROBot.Core.Chat.Commands
                     {
                         if (cmd.Arguments.Contains("start", StringComparison.OrdinalIgnoreCase))
                         {
-                            await connection.RaidStartAsync(player);
+                            await connection.Reply(cmd.CorrelationId).RaidStartAsync(player);
                             return;
                         }
 
                         if (cmd.Arguments.Contains("stop", StringComparison.OrdinalIgnoreCase))
                         {
-                            await connection.StopRaidAsync(player);
+                            await connection.Reply(cmd.CorrelationId).StopRaidAsync(player);
                             return;
                         }
 
                         if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsGameAdmin)
                         {
-                            chat.Broadcast(channel, cmd.Sender.Username, Localization.PERMISSION_DENIED);
+                            chat.SendReply(cmd, Localization.PERMISSION_DENIED);
                             return;
                         }
 
                         var target = session.GetUserByName(cmd.Arguments);
-                        await connection.RaidStreamerAsync(target, isRaidWar);
+                        await connection.Reply(cmd.CorrelationId).RaidStreamerAsync(player, target, isRaidWar);
                     }
                 }
             }

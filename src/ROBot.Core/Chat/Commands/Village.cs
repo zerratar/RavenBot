@@ -16,14 +16,14 @@ namespace ROBot.Core.Chat.Commands
                 var connection = game.GetConnection(session);
                 if (connection != null)
                 {
-                    var player = session.Get(cmd.Sender);
+                    var player = session.Get(cmd);
                     if (!string.IsNullOrEmpty(cmd.Arguments))
                     {
-                        await connection.SetAllVillageHutsAsync(player, cmd.Arguments);
+                        await connection.Reply(cmd.CorrelationId).SetAllVillageHutsAsync(player, cmd.Arguments);
                     }
                     else
                     {
-                        await connection.GetVillageBoostAsync(player);
+                        await connection.Reply(cmd.CorrelationId).GetVillageBoostAsync(player);
                     }
                 }
             }

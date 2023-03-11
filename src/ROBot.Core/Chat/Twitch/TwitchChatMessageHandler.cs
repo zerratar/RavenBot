@@ -1,4 +1,5 @@
 ﻿using RavenBot.Core.Chat;
+using RavenBot.Core.Chat.Twitch;
 using ROBot.Core.GameServer;
 using Shinobytes.Core;
 using System.Threading.Tasks;
@@ -25,7 +26,7 @@ namespace ROBot.Core.Chat.Twitch
             TwitchLib.Client.Models.ChatMessage msg)
         {
             var channel = msg.Channel;
-            var session = game.GetSession(channel);
+            var session = game.GetSession(new TwitchCommand.TwitchChannel(channel));
             if (session != null)
             {
                 //session.SendChatMessage(msg.Username, msg.Message);

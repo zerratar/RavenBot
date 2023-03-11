@@ -23,7 +23,7 @@ namespace ROBot.Core.Chat.Commands
                 return;
             }
 
-            var player = session.Get(cmd.Sender);
+            var player = session.Get(cmd);
             if (player == null)
             {
                 return;
@@ -48,48 +48,48 @@ namespace ROBot.Core.Chat.Commands
             {
                 case "info":
                     // clan info, displays the current clan and clan level
-                    await connection.GetClanInfoAsync(player, argument);
+                    await connection.Reply(cmd.CorrelationId).GetClanInfoAsync(player, argument);
                     return;
 
                 case "stats":
                     // gets some statistics for the clan
                     // how many members, clan skill levels
                     // how many members of each type
-                    await connection.GetClanStatsAsync(player, argument);
+                    await connection.Reply(cmd.CorrelationId).GetClanStatsAsync(player, argument);
                     return;
 
                 case "leave":
-                    await connection.LeaveClanAsync(player, argument);
+                    await connection.Reply(cmd.CorrelationId).LeaveClanAsync(player, argument);
                     return;
 
                 case "join":
                     // allow players to join clans that does not require invites.
-                    await connection.JoinClanAsync(player, argument);
+                    await connection.Reply(cmd.CorrelationId).JoinClanAsync(player, argument);
                     return;
 
                 case "remove":
                 case "kick":
-                    await connection.RemoveFromClanAsync(player, targetPlayer);
+                    await connection.Reply(cmd.CorrelationId).RemoveFromClanAsync(player, targetPlayer);
                     return;
 
                 case "invite":
-                    await connection.SendClanInviteAsync(player, targetPlayer);
+                    await connection.Reply(cmd.CorrelationId).SendClanInviteAsync(player, targetPlayer);
                     return;
 
                 case "accept":
-                    await connection.AcceptClanInviteAsync(player, argument);
+                    await connection.Reply(cmd.CorrelationId).AcceptClanInviteAsync(player, argument);
                     return;
 
                 case "decline":
-                    await connection.DeclineClanInviteAsync(player, argument);
+                    await connection.Reply(cmd.CorrelationId).DeclineClanInviteAsync(player, argument);
                     return;
 
                 case "promote":
-                    await connection.PromoteClanMemberAsync(player, targetPlayer, argument);
+                    await connection.Reply(cmd.CorrelationId).PromoteClanMemberAsync(player, targetPlayer, argument);
                     return;
 
                 case "demote":
-                    await connection.DemoteClanMemberAsync(player, targetPlayer, argument);
+                    await connection.Reply(cmd.CorrelationId).DemoteClanMemberAsync(player, targetPlayer, argument);
                     return;
             }
         }

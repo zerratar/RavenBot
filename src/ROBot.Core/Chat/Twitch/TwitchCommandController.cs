@@ -77,20 +77,20 @@ namespace ROBot.Core.Chat.Twitch
                     }
                     return false;
                 }
-
-                var session = game.GetSession(command.ChatMessage.Channel);
                 var argString = !string.IsNullOrEmpty(command.ArgumentsAsString) ? " (args: " + command.ArgumentsAsString + ")" : "";
 
                 var uid = command.ChatMessage.UserId;
                 var settings = userSettingsManager.Get(uid, "twitch");
                 var cmd = new TwitchCommand(command, settings?.IsAdministrator ?? false, settings?.IsModerator ?? false);
 
+                var session = game.GetSession(cmd.Channel);
+
                 var key = cmd.Command.ToLower();
 
                 if (session != null)
                 {
                     // add the user as part of this session
-                    session.Get(cmd.Sender);
+                    session.Get(cmd);
                 }
 
                 if (await HandleAsync(game, chat as ITwitchCommandClient, cmd))
@@ -127,7 +127,7 @@ namespace ROBot.Core.Chat.Twitch
                 var arguments = redeemer.Login; //Will ignore anything from twitch
                 var command = reward.RewardRedeemed.Redemption.Reward.Title;
                 var cmdParts = command.ToLower().Split(' ');
-                var session = game.GetSession(reward.ChannelId);
+                var session = game.GetSession(new TwitchCommand.TwitchChannel(reward.ChannelId));
 
                 // In case we use brackets to identify a command
                 cmd = cmdParts.FirstOrDefault(x => x.Contains("["));

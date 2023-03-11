@@ -19,18 +19,20 @@ namespace ROBot.Core.Chat.Commands
                 {
                     if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator && !cmd.Sender.IsGameAdmin && !cmd.Sender.IsGameModerator)
                     {
-                        chat.Broadcast(channel, cmd.Sender.Username, Localization.KICK_PERM);
+                        chat.SendReply(cmd, Localization.KICK_PERM);
                         return;
                     }
 
                     var targetPlayerName = cmd.Arguments?.Trim();
                     if (string.IsNullOrEmpty(targetPlayerName))
                     {
-                        chat.Broadcast(channel, cmd.Sender.Username, Localization.KICK_NO_USER);
+                        chat.SendReply(cmd, Localization.KICK_NO_USER);
                         return;
                     }
 
-                    await connection.KickAsync(session.GetUserByName(targetPlayerName));
+                    var sender = session.Get(cmd);
+                    var target = session.GetUserByName(targetPlayerName);
+                    await connection.Reply(cmd.CorrelationId).KickAsync(sender, target);
                 }
             }
         }

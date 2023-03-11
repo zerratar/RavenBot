@@ -18,8 +18,12 @@ namespace ROBot.Core.Chat.Commands
                 if (connection != null)
                 {
                     var player = session.Join(cmd.Sender, cmd.Arguments);
-                    await connection.JoinAsync(player);
+                    await connection.Reply(cmd.CorrelationId).JoinAsync(player);
                 }
+            }
+            else if (chat is Discord.DiscordCommandClient) // only for discord
+            {
+                chat.SendReply(cmd, "There are currently no active Ravenfall game sessions in this channel.");
             }
         }
     }

@@ -16,38 +16,38 @@ namespace RavenBot.Core.Ravenfall.Commands
             this.playerProvider = playerProvider;
         }
 
-        public override async Task ProcessAsync(IMessageChat broadcaster, ICommand cmd)
+        public override async Task ProcessAsync(IMessageChat chat, ICommand cmd)
         {
             if (!await this.game.ProcessAsync(Settings.UNITY_SERVER_PORT))
             {
-                broadcaster.Broadcast(cmd.Sender.Username, Localization.GAME_NOT_STARTED);
+                chat.SendReply(cmd, Localization.GAME_NOT_STARTED);
                 return;
             }
 
             var sub = cmd.Arguments?.Trim();
             if (string.IsNullOrEmpty(sub))
             {
-                broadcaster.Broadcast(cmd.Sender.Username,
+                chat.SendReply(cmd,
                     "To duel a player you need to specify their name. ex: '!duel JohnDoe', to accept or decline a duel request use '!duel accept' or '!duel decline'. You may also cancel an ongoing request by using '!duel cancel'");
                 return;
             }
 
-            var player = playerProvider.Get(cmd.Sender);
+            var player = playerProvider.Get(cmd);
             if (sub.Equals("cancel", StringComparison.InvariantCultureIgnoreCase))
             {
-                await this.game.CancelDuelRequestAsync(player);
+                await this.game.Reply(cmd.CorrelationId).CancelDuelRequestAsync(player);
             }
             else if (sub.Equals("accept", StringComparison.InvariantCultureIgnoreCase))
             {
-                await this.game.AcceptDuelRequestAsync(player);
+                await this.game.Reply(cmd.CorrelationId).AcceptDuelRequestAsync(player);
             }
             else if (sub.Equals("decline", StringComparison.InvariantCultureIgnoreCase))
             {
-                await this.game.DeclineDuelRequestAsync(player);
+                await this.game.Reply(cmd.CorrelationId).DeclineDuelRequestAsync(player);
             }
             else
             {
-                await this.game.DuelRequestAsync(player, playerProvider.Get(sub));
+                await this.game.Reply(cmd.CorrelationId).DuelRequestAsync(player, playerProvider.Get(sub));
             }
         }
     }

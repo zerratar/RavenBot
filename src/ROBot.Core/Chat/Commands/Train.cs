@@ -27,18 +27,18 @@ namespace ROBot.Core.Chat.Commands
                 var connection = game.GetConnection(session);
                 if (connection != null)
                 {
-                    var player = session.Get(cmd.Sender);
+                    var player = session.Get(cmd);
 
                     if (GetCombatTypeFromString(cmd.Command) != -1)
                     {
-                        await connection.SendPlayerTaskAsync(player, PlayerTask.Fighting, cmd.Command);
+                        await connection.Reply(cmd.CorrelationId).SendPlayerTaskAsync(player, PlayerTask.Fighting, cmd.Command);
                         return;
                     }
 
                     var commandSkillTarget = GetSkillTypeFromString(cmd.Command);
                     if (commandSkillTarget != -1)
                     {
-                        await connection.SendPlayerTaskAsync(player, (PlayerTask)commandSkillTarget, cmd.Command);
+                        await connection.Reply(cmd.CorrelationId).SendPlayerTaskAsync(player, (PlayerTask)commandSkillTarget, cmd.Command);
                         return;
                     }
 
@@ -46,24 +46,24 @@ namespace ROBot.Core.Chat.Commands
                     var skill = arg?.Split(' ').LastOrDefault();
                     if (string.IsNullOrEmpty(skill))
                     {
-                        chat.Broadcast(channel, cmd.Sender.Username, Localization.TRAIN_NO_ARG, string.Join(", ", trainableSkills));
+                        chat.SendReply(cmd, Localization.TRAIN_NO_ARG, string.Join(", ", trainableSkills));
                         return;
                     }
 
                     if (GetCombatTypeFromString(skill) != -1)
                     {
-                        await connection.SendPlayerTaskAsync(player, PlayerTask.Fighting, skill);
+                        await connection.Reply(cmd.CorrelationId).SendPlayerTaskAsync(player, PlayerTask.Fighting, skill);
                     }
                     else
                     {
                         var value = GetSkillTypeFromString(skill);
                         if (value == -1)
                         {
-                            chat.Broadcast(channel, cmd.Sender.Username, Localization.TRAIN_INVALID, skill);
+                            chat.SendReply(cmd, Localization.TRAIN_INVALID, skill);
                         }
                         else
                         {
-                            await connection.SendPlayerTaskAsync(player, (PlayerTask)value, skill);
+                            await connection.Reply(cmd.CorrelationId).SendPlayerTaskAsync(player, (PlayerTask)value, skill);
                         }
                     }
                 }

@@ -1,4 +1,5 @@
-﻿using ROBot.Core;
+﻿using RavenBot.Core.Handlers;
+using ROBot.Core;
 using ROBot.Core.Chat.Twitch;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -23,8 +24,14 @@ namespace ROBot.Tests
             System.Console.WriteLine(user + ": " + format + ", @" + channel + " " + a);
         }
 
-        public void Broadcast(IGameSessionCommand message)
+        public void Broadcast(ICommandChannel channel, string user, string format, params object[] args)
         {
+            throw new System.NotImplementedException();
+        }
+
+        public void Broadcast(SessionGameMessageResponse message)
+        {
+            throw new System.NotImplementedException();
         }
 
         public void Dispose()
@@ -48,6 +55,21 @@ namespace ROBot.Tests
         }
 
         public Task SendChatMessageAsync(string channel, string message)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task SendChatMessageAsync(ICommandChannel channel, string message)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void SendMessage(ICommandChannel channel, string format, object[] args)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void SendReply(ICommand command, string format, params object[] args)
         {
             throw new System.NotImplementedException();
         }

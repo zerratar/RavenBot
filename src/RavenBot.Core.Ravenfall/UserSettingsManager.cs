@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RavenBot.Core.Ravenfall.Models;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;

@@ -14,11 +14,11 @@ namespace RavenBot.Core.Ravenfall.Commands
             this.playerProvider = playerProvider;
         }
 
-        public override async Task ProcessAsync(IMessageChat broadcaster, ICommand cmd)
+        public override async Task ProcessAsync(IMessageChat chat, ICommand cmd)
         {
-            if (!await game.ProcessAsync(Settings.UNITY_SERVER_PORT))
+            if (!await this.game.ProcessAsync(Settings.UNITY_SERVER_PORT))
             {
-                broadcaster.Broadcast(cmd.Sender.Username, Localization.GAME_NOT_STARTED);
+                chat.SendReply(cmd, Localization.GAME_NOT_STARTED);
                 return;
             }
 
@@ -26,12 +26,12 @@ namespace RavenBot.Core.Ravenfall.Commands
             {
                 var player = playerProvider.Get(cmd.Arguments);
                 if (player != null)
-                    await game.UnstuckAsync(player);
+                    await this.game.Reply(cmd.CorrelationId).UnstuckAsync(player);
             }
             else
             {
                 var player = playerProvider.Get(cmd.Sender, cmd.Arguments);
-                await game.UnstuckAsync(player);
+                await this.game.Reply(cmd.CorrelationId).UnstuckAsync(player);
             }
 
         }

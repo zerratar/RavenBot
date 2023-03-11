@@ -18,30 +18,30 @@ namespace RavenBot.Core.Ravenfall.Commands
             this.playerProvider = playerProvider;
 
         }
-        public override async Task ProcessAsync(IMessageChat broadcaster, ICommand cmd)
+        public override async Task ProcessAsync(IMessageChat chat, ICommand cmd)
         {
             if (!await this.game.ProcessAsync(Settings.UNITY_SERVER_PORT))
             {
-                broadcaster.Broadcast(cmd.Sender.Username, Localization.GAME_NOT_STARTED);
+                chat.SendReply(cmd, Localization.GAME_NOT_STARTED);
                 return;
             }
 
 
             if (string.IsNullOrEmpty(cmd.Arguments) || !cmd.Arguments.Trim().Contains(" "))
             {
-                broadcaster.Broadcast(cmd.Sender.Username, Localization.TRADE_NO_ARG, cmd.Command);
+                chat.SendReply(cmd, Localization.TRADE_NO_ARG, cmd.Command);
                 return;
             }
 
-            var player = playerProvider.Get(cmd.Sender);
+            var player = playerProvider.Get(cmd);
             if (cmd.Command.Equals("sell", StringComparison.OrdinalIgnoreCase))
             {
-                await this.game.SellItemAsync(player, cmd.Arguments);
+                await this.game.Reply(cmd.CorrelationId).SellItemAsync(player, cmd.Arguments);
             }
             else if (cmd.Command.Equals("buy", StringComparison.OrdinalIgnoreCase))
             {
 
-                await this.game.BuyItemAsync(player, cmd.Arguments);
+                await this.game.Reply(cmd.CorrelationId).BuyItemAsync(player, cmd.Arguments);
             }
         }
     }

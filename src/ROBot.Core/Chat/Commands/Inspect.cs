@@ -16,13 +16,13 @@ namespace ROBot.Core.Chat.Commands
                 var connection = game.GetConnection(session);
                 if (connection != null)
                 {
-                    var player = session.Get(cmd.Sender);
+                    var player = session.Get(cmd);
                     if (!string.IsNullOrEmpty(cmd.Arguments))
                     {
                         player = session.GetUserByName(cmd.Arguments);
                     }
 
-                    await connection.InspectPlayerAsync(player);
+                    await connection.Reply(cmd.CorrelationId).InspectPlayerAsync(player);
                 }
             }
         }

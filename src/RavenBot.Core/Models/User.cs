@@ -5,6 +5,7 @@ namespace RavenBot.Core.Ravenfall.Models
 {
     public class User
     {
+        public static User ServerRequest { get; } = new User();
         public User()
         {
             Username = "server-request";
@@ -53,20 +54,5 @@ namespace RavenBot.Core.Ravenfall.Models
 
         [JsonIgnore]
         public UserSettings Settings { get; set; }
-    }
-
-
-    public class EventJoinRequest
-    {
-        public EventJoinRequest(
-            User player,
-            string code)
-        {
-            Player = player;
-            Code = code;
-        }
-
-        public User Player { get; }
-        public string Code { get; }
     }
 }

@@ -15,9 +15,9 @@ namespace RavenBot.Core.Ravenfall.Commands
             this.playerProvider = playerProvider;
         }
 
-        public override async Task ProcessAsync(IMessageChat broadcaster, ICommand cmd)
+        public override async Task ProcessAsync(IMessageChat chat, ICommand cmd)
         {
-            var sender = playerProvider.Get(cmd.Sender);
+            var sender = playerProvider.Get(cmd);
             
             var targetPlayerName = cmd.Arguments?.Trim();
             Models.User player = null;
@@ -28,10 +28,10 @@ namespace RavenBot.Core.Ravenfall.Commands
             }
             else
             {
-                player = playerProvider.Get(cmd.Sender);
+                player = playerProvider.Get(cmd);
             }
 
-            await game.ScalePlayerAsync(player, 3f);
+            await this.game.Reply(cmd.CorrelationId).ScalePlayerAsync(player, 3f);
         }
     }
 }

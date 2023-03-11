@@ -16,7 +16,7 @@ namespace ROBot.Core.Chat.Commands
                 var connection = game.GetConnection(session);
                 if (connection != null)
                 {
-                    var player = session.Get(cmd.Sender);
+                    var player = session.Get(cmd);
 
                     var numOfSubs = 1;
                     if (!string.IsNullOrEmpty(cmd.Arguments))
@@ -25,7 +25,7 @@ namespace ROBot.Core.Chat.Commands
                     }
                     if (numOfSubs < 15) return;
 
-                    await connection.SetExpMultiplierLimitAsync(player, numOfSubs);
+                    await connection.Reply(cmd.CorrelationId).SetExpMultiplierLimitAsync(player, numOfSubs);
                 }
             }
         }

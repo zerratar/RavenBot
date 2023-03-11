@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RavenBot.Core.Ravenfall.Models;
+using System;
 namespace RavenBot.Core.Ravenfall
 {
     public interface IUserSettingsManager

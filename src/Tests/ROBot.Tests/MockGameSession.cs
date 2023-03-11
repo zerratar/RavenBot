@@ -19,9 +19,9 @@ namespace ROBot.Tests
         public DateTime Created => DateTime.UtcNow;
 
         public int UserCount => 0;
-
         public Guid RavenfallUserId { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public User Owner { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public ICommandChannel Channel { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public bool Contains(string userId)
         {
@@ -36,6 +36,11 @@ namespace ROBot.Tests
         public User Get(string twitchId)
         {
             return new User();
+        }
+
+        public User Get(ICommand user)
+        {
+            return null;
         }
 
         public User Get(ICommandSender user)

@@ -16,22 +16,22 @@ namespace ROBot.Core.Chat.Commands
                 var connection = game.GetConnection(session);
                 if (connection != null)
                 {
-                    var player = session.Get(cmd.Sender);
+                    var player = session.Get(cmd);
                     if (string.IsNullOrEmpty(cmd.Arguments))
                     {
-                        await connection.ActivateTicTacToeAsync(player);
+                        await connection.Reply(cmd.CorrelationId).ActivateTicTacToeAsync(player);
                         return;
                     }
 
                     if (cmd.Arguments.Trim().Equals("reset", System.StringComparison.OrdinalIgnoreCase))
                     {
-                        await connection.ResetTicTacToeAsync(player);
+                        await connection.Reply(cmd.CorrelationId).ResetTicTacToeAsync(player);
                         return;
                     }
 
                     if (int.TryParse(cmd.Arguments.Trim(), out var num))
                     {
-                        await connection.PlayTicTacToeAsync(player, num);
+                        await connection.Reply(cmd.CorrelationId).PlayTicTacToeAsync(player, num);
                     }
                 }
             }

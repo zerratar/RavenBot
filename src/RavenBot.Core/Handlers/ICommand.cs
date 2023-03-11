@@ -1,11 +1,19 @@
 ﻿namespace RavenBot.Core.Handlers
 {
+
     public interface ICommand
     {
         ICommandSender Sender { get; }
-        string Channel { get; }
+        ICommandChannel Channel { get; }
         string Command { get; }
         string Arguments { get; }
+        string CorrelationId { get; }
+    }
+
+    public interface ICommandChannel
+    {
+        public ulong Id { get; }
+        public string Name { get; }
     }
 
     public interface ICommandSender

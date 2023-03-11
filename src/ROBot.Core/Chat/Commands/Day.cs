@@ -16,9 +16,9 @@ namespace ROBot.Core.Chat.Commands
                 var connection = game.GetConnection(session);
                 if (connection != null)
                 {
-                    var player = session.Get(cmd.Sender);
+                    var player = session.Get(cmd);
                     if (player != null)
-                        await connection.SetTimeOfDayAsync(player, 0, 15);
+                        await connection.Reply(cmd.CorrelationId).SetTimeOfDayAsync(player, 0, 15);
                 }
             }
         }

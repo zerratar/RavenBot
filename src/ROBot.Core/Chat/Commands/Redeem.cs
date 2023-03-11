@@ -17,14 +17,14 @@ namespace ROBot.Core.Chat.Commands
                 var connection = game.GetConnection(session);
                 if (connection != null)
                 {
-                    var player = session.Get(cmd.Sender);
+                    var player = session.Get(cmd);
                     if (string.IsNullOrEmpty(cmd.Arguments))
                     {
-                        chat.Broadcast(channel, cmd.Sender.Username, Localization.REDEEM_NO_ARG);
+                        chat.SendReply(cmd, Localization.REDEEM_NO_ARG);
                         return;
                     }
 
-                    await connection.RedeemStreamerTokenAsync(player, cmd.Arguments);
+                    await connection.Reply(cmd.CorrelationId).RedeemStreamerTokenAsync(player, cmd.Arguments);
                 }
             }
         }

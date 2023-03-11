@@ -6,6 +6,7 @@ namespace RavenBot.Core.Ravenfall
     public interface IUserProvider
     {
         int Count { get; }
+        User Get(ICommand cmd);
         User Get(System.Guid userId);
         User Get(string userId, string username, string platform = "twitch");
         User Get(ICommandSender sender, string identifier = null);

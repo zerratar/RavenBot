@@ -9,10 +9,13 @@ namespace ROBot.Core.GameServer
     public interface IRavenfallConnection : IRavenfallClient, IDisposable
     {
         Guid InstanceId { get; }
+
         event EventHandler<GameSessionInfo> OnSessionInfoReceived;
         IGameSession Session { get; set; }
         IPEndPoint EndPoint { get; }
         string EndPointString { get; }
+        IRavenfallApi Api { get; }
+        IRavenfallApi Reply(string correlationId);
         void Close();
     }
 }

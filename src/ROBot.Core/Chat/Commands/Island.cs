@@ -30,12 +30,12 @@ namespace ROBot.Core.Chat.Commands
 
                     if (player == null)
                     {
-                        player = session.Get(cmd.Sender);
+                        player = session.Get(cmd);
                     }
 
                     if (player != null)
                     {
-                        await connection.RequestIslandInfoAsync(player);
+                        await connection.Reply(cmd.CorrelationId).RequestIslandInfoAsync(player);
                     }
                 }
             }

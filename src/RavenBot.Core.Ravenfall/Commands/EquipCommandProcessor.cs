@@ -13,27 +13,27 @@ namespace RavenBot.Core.Ravenfall.Commands
             this.playerProvider = playerProvider;
         }
 
-        public override async Task ProcessAsync(IMessageChat broadcaster, ICommand cmd)
+        public override async Task ProcessAsync(IMessageChat chat, ICommand cmd)
         {
 
             if (!await this.game.ProcessAsync(Settings.UNITY_SERVER_PORT))
             {
-                broadcaster.Broadcast(cmd.Sender.Username, Localization.GAME_NOT_STARTED);
+                chat.SendReply(cmd, Localization.GAME_NOT_STARTED);
                 return;
             }
 
-            var player = playerProvider.Get(cmd.Sender);
+            var player = playerProvider.Get(cmd);
 
 
             var item = cmd.Arguments?.ToLower();
             if (string.IsNullOrEmpty(item))
             {
 
-                broadcaster.Broadcast(cmd.Sender.Username, "You have to use !equip <item name> or !equip all for equipping your best items.");
+                chat.SendReply(cmd, "You have to use !equip <item name> or !equip all for equipping your best items.");
                 return;
             }
 
-            await game.EquipAsync(player, item);
+            await this.game.Reply(cmd.CorrelationId).EquipAsync(player, item);
         }
     }
 }

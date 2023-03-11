@@ -17,23 +17,23 @@ namespace ROBot.Core.Chat.Commands
                 var connection = game.GetConnection(session);
                 if (connection != null)
                 {
-                    var player = session.Get(cmd.Sender);
+                    var player = session.Get(cmd);
 
                     if (string.IsNullOrEmpty(cmd.Arguments))
                     {
-                        await connection.JoinDungeonAsync(new EventJoinRequest(player, null));
+                        await connection.Reply(cmd.CorrelationId).JoinDungeonAsync(player, null);
                         return;
                     }
                     else if (cmd.Arguments.Contains("stop", System.StringComparison.OrdinalIgnoreCase))
                     {
                         if (player.IsBroadcaster || player.IsModerator)
                         {
-                            await connection.StopDungeonAsync(player);
+                            await connection.Reply(cmd.CorrelationId).StopDungeonAsync(player);
                         }
                     }
                     else if (cmd.Arguments.Contains("start", System.StringComparison.OrdinalIgnoreCase))
                     {
-                        await connection.DungeonStartAsync(player);
+                        await connection.Reply(cmd.CorrelationId).DungeonStartAsync(player);
                     }
                 }
             }

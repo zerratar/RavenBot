@@ -16,18 +16,18 @@ namespace ROBot.Core.Chat.Commands
                 var connection = game.GetConnection(session);
                 if (connection != null)
                 {
-                    var player = session.Get(cmd.Sender);
+                    var player = session.Get(cmd);
                     if (player == null)
                         return;
 
                     var pet = cmd.Arguments?.ToLower();
                     if (string.IsNullOrEmpty(pet))
                     {
-                        await connection.GetPetAsync(player);
+                        await connection.Reply(cmd.CorrelationId).GetPetAsync(player);
                         return;
                     }
 
-                    await connection.SetPetAsync(player, pet);
+                    await connection.Reply(cmd.CorrelationId).SetPetAsync(player, pet);
                 }
             }
         }

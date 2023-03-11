@@ -5,7 +5,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using RavenBot.Core.Chat;
+using RavenBot.Core.Chat.Twitch;
+using RavenBot.Core.Handlers;
 using RavenBot.Core.Ravenfall;
+using RavenBot.Core.Ravenfall.Models;
 using ROBot.Core.Chat.Twitch.PubSub;
 using ROBot.Core.GameServer;
 using ROBot.Core.Stats;
@@ -87,7 +90,7 @@ namespace ROBot.Core.Chat.Twitch
             stats = twitchStats;
 
             this.messageBus.Subscribe<PubSubToken>("pubsub", OnPubSubTokenReceived);
-            broadcastSubscription = messageBus.Subscribe<IGameSessionCommand>(MessageBus.Broadcast, Broadcast);
+            broadcastSubscription = messageBus.Subscribe<SessionGameMessageResponse>(MessageBus.Broadcast, Broadcast);
         }
 
         /*
@@ -166,7 +169,10 @@ namespace ROBot.Core.Chat.Twitch
             if (!kernel.Started) kernel.Start();
 
             Unsubscribe(); //Abby: I don't understand why we're unsubscribing, hee
-
+                           //Karl: It is to make sure we there are no references left dangling
+                           //      Older version of .NET used to cause the client object to never
+                           //      be garbage collected since there were references to a live object (this class's methods)
+                           // one option is to never create a new client here
             try
             {
                 client =
@@ -424,36 +430,82 @@ namespace ROBot.Core.Chat.Twitch
         /*
          * Sending
          */
-        public void Broadcast(IGameSessionCommand message)
+        public void Broadcast(SessionGameMessageResponse cmd)
         {
-            if (message == null || message.Session?.Name == null)
+            if (cmd == null || cmd.Session?.Name == null)
             {
-                logger.LogError("Unable to broadcast message to " + message?.Receiver);
+                logger.LogError("Unable to broadcast message to " + cmd?.Message.Recipent.PlatformUserName);
                 return;
             }
-            Broadcast(message.Session.Name, message.Receiver, message.Format, message.Args);
+
+            var channel = cmd.Session.Channel;
+            if (channel == null)
+            {
+                // gotta find a channel.
+                // ...
+            }
+
+            if (channel != null)
+            {
+                var message = cmd.Message;
+                if (message.Recipent.Platform == "system")
+                {
+                    // system message
+                    SendMessage(channel, message.Format, message.Args);
+                    return;
+                }
+
+                if (message.Recipent.Platform == "twitch")
+                {
+                    if (!string.IsNullOrEmpty(message.CorrelationId))
+                    {
+                        SendReply(channel, message.Format, message.Args, message.CorrelationId);
+                        return;
+                    }
+
+                    SendMessage(channel, message.Format, message.Args);
+                }
+
+                // ignore any platform that is not discord.
+                // SendMessage(channel, message.Format, message.Args);
+                //Broadcast(channel, message.Receiver, message.Format, message.Args);
+            }
         }
-        public async void Broadcast(string channel, string user, string format, params object[] args)
+        public async void SendMessage(ICommandChannel channel, string format, object[] args)
         {
             if (string.IsNullOrWhiteSpace(format))
-            {
-                //logger.LogWarning($"[TWITCH] Broadcast Ignored - Empty Message (Channel: {channel} User: {user}");
                 return;
-            }
 
             var msg = messageFormatter.Format(format, args);
             if (string.IsNullOrEmpty(msg))
-            {
-                //logger.LogWarning($"[TWITCH] Broadcast Ignored - Message became empty after formatting (Channel: {channel} Format: '{format}' Args: '{string.Join(",", args)}')");
                 return;
-            }
 
-            if (!string.IsNullOrEmpty(user) && msg.IndexOf(user) == -1)
-                msg = user + ", " + msg;
-
-            await SendChatMessageAsync(channel, msg);
+            await SendMessageAsync(channel, msg);
         }
-        public async Task SendChatMessageAsync(string channel, string message)
+
+        public async void SendReply(ICommandChannel channel, string format, object[] args, string correlationId)
+        {
+            if (string.IsNullOrWhiteSpace(format))
+                return;
+
+            var msg = messageFormatter.Format(format, args);
+            if (string.IsNullOrEmpty(msg))
+                return;
+
+            await SendMessageAsync(channel, msg, correlationId);
+        }
+
+        public void SendReply(ICommand command, string format, params object[] args)
+        {
+            SendReply(command.Channel, format, args, command.CorrelationId);
+        }
+
+        public Task SendMessageAsync(ICommandChannel channel, string message)
+        {
+            return SendMessageAsync(channel, message, null);
+        }
+
+        public async Task SendMessageAsync(ICommandChannel channel, string message, string correlationId)
         {
             if (!client.IsConnected)
             {
@@ -462,17 +514,30 @@ namespace ROBot.Core.Chat.Twitch
                 return;
             }
 
-            if (!InChannel(channel))
+            var channelName = channel.Name;
+            if (!InChannel(channelName))
             {
                 EnqueueChatMessage(channel, message);
-                JoinChannel(channel);
+                JoinChannel(channelName);
                 return;
             }
 
             // Process the chat message a final time before sending it off.
+            message = await ApplyMessageTransformationAsync(channel, message);
+            logger.LogDebug($"[TWITCH] Sending Message (Channel: {channel.Name} Message: {message})");
+            stats.AddMsgSend(channel.Name, message);
 
+            if (string.IsNullOrEmpty(correlationId))
+            {
+                client.SendMessage(channel.Name, message);
+                return;
+            }
+
+            client.SendReply(channel.Name, correlationId, message);
+        }
+        private async Task<string> ApplyMessageTransformationAsync(ICommandChannel channel, string message)
+        {
             var session = game.GetSession(channel);
-
             if (session != null && session.RavenfallUserId != Guid.Empty)
             {
                 var settings = settingsManager.Get(session.RavenfallUserId);
@@ -490,23 +555,17 @@ namespace ROBot.Core.Chat.Twitch
                 {
                     message = await messageTransformer.PersonalizeAsync(message);
                 }
-
-                logger.LogDebug($"[TWITCH] Sending Message (Channel: {channel} Message: {message} Language: {settings.ChatBotLanguage} Transformation: {transform})");
-            }
-            else
-            {
-                logger.LogDebug($"[TWITCH] Sending Message (Channel: {channel} Message: {message})");
+                //logger.LogDebug($"[TWITCH] Sending Message (Channel: {channel} Message: {message} Language: {settings.ChatBotLanguage} Transformation: {transform})");
             }
 
-
-            stats.AddMsgSend(channel, message);
-            client.SendMessage(channel, message);
+            return message;
         }
-        private void EnqueueChatMessage(string channel, string message)
+
+        private void EnqueueChatMessage(ICommandChannel channel, string message)
         {
-            if (!chatMessageQueue.TryGetValue(channel, out var queue))
+            if (!chatMessageQueue.TryGetValue(channel.Name, out var queue))
             {
-                chatMessageQueue[channel] = queue = new ConcurrentQueue<string>();
+                chatMessageQueue[channel.Name] = queue = new ConcurrentQueue<string>();
             }
             queue.Enqueue(message);
         }
@@ -744,7 +803,7 @@ namespace ROBot.Core.Chat.Twitch
             currentlyJoiningChannels.TryRemove(e.Channel, out _);
         }
 
-        private void Client_OnJoinedChannel(object sender, OnJoinedChannelArgs e)
+        private async void Client_OnJoinedChannel(object sender, OnJoinedChannelArgs e)
         {
             stats.JoinedChannel(e.Channel, client.JoinedChannels);
             logger.LogInformation("[TWITCH] Joined (Channel: " + e.Channel + ")");
@@ -757,7 +816,7 @@ namespace ROBot.Core.Chat.Twitch
 
                 while (queue.TryDequeue(out var msg))
                 {
-                    SendChatMessageAsync(e.Channel, msg);
+                    await SendMessageAsync(new TwitchCommand.TwitchChannel(e.Channel), msg);
                 }
             }
 

@@ -17,16 +17,16 @@ namespace ROBot.Core.Chat.Commands
                 var connection = game.GetConnection(session);
                 if (connection != null)
                 {
-                    var player = session.Get(cmd.Sender);
+                    var player = session.Get(cmd);
 
                     var leaveOnsen = !string.IsNullOrEmpty(cmd.Arguments) && cmd.Arguments.Contains("leave", StringComparison.OrdinalIgnoreCase);
                     if (leaveOnsen)
                     {
-                        await connection.LeaveOnsenAsync(player);
+                        await connection.Reply(cmd.CorrelationId).LeaveOnsenAsync(player);
                     }
                     else
                     {
-                        await connection.JoinOnsenAsync(player);
+                        await connection.Reply(cmd.CorrelationId).JoinOnsenAsync(player);
                     }
                 }
             }

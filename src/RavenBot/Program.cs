@@ -44,9 +44,6 @@ namespace RavenBot
             ioc.RegisterShared<ICommandHandler, DefaultTextCommandHandler>();
 
             ioc.RegisterShared<IGameClient, TcpGameClient>();
-            ioc.RegisterShared<IGameClient2, TcpGameClient>();
-            ioc.RegisterShared<IGameClient3, TcpGameClient>();
-            ioc.RegisterShared<IGameClient4, TcpGameClient>();
 
             ioc.RegisterShared<IUserProvider, UserProvider>();
 

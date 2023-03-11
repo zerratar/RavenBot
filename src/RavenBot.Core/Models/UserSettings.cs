@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 
-namespace RavenBot.Core.Ravenfall
+namespace RavenBot.Core.Ravenfall.Models
 {
     public class UserSettings
     {
@@ -229,6 +229,11 @@ namespace RavenBot.Core.Ravenfall
         {
             try
             {
+                if (string.IsNullOrEmpty(file))
+                {
+                    return; //this is a empty settings file when no settings are available.
+                }
+
                 lock (ioMutex)
                 {
                     var lastWriteTime = System.IO.File.GetLastWriteTimeUtc(file);
@@ -277,13 +282,5 @@ namespace RavenBot.Core.Ravenfall
                 dict[key] = value;
             }
         }
-    }
-
-    public enum ChatMessageTransformation : uint
-    {
-        Standard = 0,
-        Personalize = 1,
-        Translate = 2,
-        TranslateAndPersonalize = 3
     }
 }

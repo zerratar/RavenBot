@@ -15,22 +15,22 @@ namespace RavenBot.Core.Ravenfall.Commands
             this.playerProvider = playerProvider;
         }
 
-        public override async Task ProcessAsync(IMessageChat broadcaster, ICommand cmd)
+        public override async Task ProcessAsync(IMessageChat chat, ICommand cmd)
         {
-            if (!await game.ProcessAsync(Settings.UNITY_SERVER_PORT))
+            if (!await this.game.ProcessAsync(Settings.UNITY_SERVER_PORT))
             {
-                broadcaster.Broadcast(cmd.Sender.Username, Localization.GAME_NOT_STARTED);
+                chat.SendReply(cmd, Localization.GAME_NOT_STARTED);
                 return;
             }
 
-            var player = playerProvider.Get(cmd.Sender);
+            var player = playerProvider.Get(cmd);
             if (string.IsNullOrEmpty(cmd.Arguments))
             {
-                broadcaster.Broadcast(cmd.Sender.Username, Localization.REDEEM_NO_ARG);
+                chat.SendReply(cmd, Localization.REDEEM_NO_ARG);
                 return;
             }
 
-            await game.RedeemStreamerTokenAsync(player, cmd.Arguments);
+            await this.game.Reply(cmd.CorrelationId).RedeemStreamerTokenAsync(player, cmd.Arguments);
         }
     }
 }

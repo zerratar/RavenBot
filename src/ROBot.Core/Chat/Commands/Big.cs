@@ -29,10 +29,10 @@ namespace ROBot.Core.Chat.Commands
                     }
                     else
                     {
-                        player = session.Get(cmd.Sender);
+                        player = session.Get(cmd);
                     }
 
-                    await connection.ScalePlayerAsync(player, 3f);
+                    await connection.Reply(cmd.CorrelationId).ScalePlayerAsync(player, 3f);
                 }
             }
         }

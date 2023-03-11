@@ -182,7 +182,7 @@ namespace RavenBot
                     e.ChatMessage.Bits)
             );
 
-            this.Broadcast("", Localization.Twitch.THANK_YOU_BITS, e.ChatMessage.DisplayName, e.ChatMessage.Bits);
+            this.Announce(Localization.Twitch.THANK_YOU_BITS, e.ChatMessage.DisplayName, e.ChatMessage.Bits);
         }
 
         private async void OnCommandReceived(object sender, OnChatCommandReceivedArgs e)
@@ -196,25 +196,54 @@ namespace RavenBot
         {
             if (isInitialized) return;
             if (this.broadcastSubscription == null)
-                this.broadcastSubscription = messageBus.Subscribe<IGameCommand>(MessageBus.Broadcast, Broadcast);
+                this.broadcastSubscription = messageBus.Subscribe<GameMessageResponse>(MessageBus.Broadcast, Broadcast);
 
             client.Initialize(credentialsProvider.Get(), channelProvider.Get());
 
             isInitialized = true;
         }
 
-        public void Broadcast(IGameCommand message)
+        public void Broadcast(GameMessageResponse message)
         {
-            Broadcast(message.Receiver, message.Format, message.Args);
+            if (message.Recipent.Platform == "system")
+            {
+                // system message
+                SendMessage(message.Format, message.Args);
+                return;
+            }
+
+            if (message.Recipent.Platform == "twitch")
+            {
+                if (!string.IsNullOrEmpty(message.CorrelationId))
+                {
+                    SendReply(message.Format, message.Args, message.CorrelationId);
+                    return;
+                }
+
+                SendMessage(message.Format, message.Args);
+            }
+
+            // Ignore other platforms for now.
+            // that way we don't get spam from all platforms in all chats.
+            //  SendMessage(message.Format, message.Args);
         }
 
-        public void Broadcast(string user, string format, params object[] args)
+        public void Announce(string format, params object[] args)
+        {
+            SendMessage(format, args);
+        }
+
+        public void SendReply(ICommand cmd, string message, params object[] args)
+        {
+            SendReply(message, args, cmd.CorrelationId);
+        }
+
+        public void SendReply(string format, object[] args, string correlationId)
         {
             if (!this.client.IsConnected || string.IsNullOrWhiteSpace(format))
                 return;
 
             var channel = this.channelProvider.Get();
-
             if (client.JoinedChannels.Count == 0)
                 client.JoinChannel(channel);
 
@@ -222,8 +251,26 @@ namespace RavenBot
             if (string.IsNullOrEmpty(msg))
                 return;
 
-            if (!string.IsNullOrEmpty(user) && msg.IndexOf(user) == -1)
-                msg = user + ", " + msg;
+            client.SendReply(channel, correlationId, msg);
+        }
+
+        public void SendMessage(string format, object[] args)
+        {
+            if (!this.client.IsConnected || string.IsNullOrWhiteSpace(format))
+                return;
+
+            var msg = messageFormatter.Format(format, args);
+            if (string.IsNullOrEmpty(msg))
+                return;
+
+            SendMessage(msg);
+        }
+
+        private void SendMessage(string msg)
+        {
+            var channel = this.channelProvider.Get();
+            if (client.JoinedChannels.Count == 0)
+                client.JoinChannel(channel);
 
             client.SendMessage(channel, msg);
         }
@@ -374,7 +421,7 @@ namespace RavenBot
 
         private void OnRaidNotification(object sender, OnRaidNotificationArgs e)
         {
-            this.Broadcast("", Localization.Twitch.THANK_YOU_RAID, e.RaidNotification.DisplayName);
+            this.Announce(Localization.Twitch.THANK_YOU_RAID, e.RaidNotification.DisplayName);
         }
 
         private void Subscribe()

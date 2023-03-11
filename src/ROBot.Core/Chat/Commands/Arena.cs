@@ -17,36 +17,36 @@ namespace ROBot.Core.Chat.Commands
                 var connection = game.GetConnection(session);
                 if (connection != null)
                 {
-                    var player = session.Get(cmd.Sender);
+                    var player = session.Get(cmd);
 
                     var command = cmd.Arguments?.Trim().ToLower();
                     if (string.IsNullOrEmpty(command) || command.Equals("join"))
                     {
-                        await connection.JoinArenaAsync(player);
+                        await connection.Reply(cmd.CorrelationId).JoinArenaAsync(player);
                     }
                     else if (command.Equals("leave"))
                     {
-                        await connection.LeaveArenaAsync(player);
+                        await connection.Reply(cmd.CorrelationId).LeaveArenaAsync(player);
                     }
                     else if (command.Equals("start") || command.Equals("begin"))
                     {
                         if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator && !cmd.Sender.IsGameAdmin && !cmd.Sender.IsGameModerator)
                         {
-                            chat.Broadcast(channel, cmd.Sender.Username, Localization.ARENA_PERM_FORCE);
+                            chat.SendReply(cmd, Localization.ARENA_PERM_FORCE);
                             return;
                         }
 
-                        await connection.StartArenaAsync(player);
+                        await connection.Reply(cmd.CorrelationId).StartArenaAsync(player);
                     }
                     else if (command.Equals("cancel") || command.Equals("end"))
                     {
                         if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator && !cmd.Sender.IsGameAdmin && !cmd.Sender.IsGameModerator)
                         {
-                            chat.Broadcast(channel, cmd.Sender.Username, Localization.ARENA_PERM_CANCEL);
+                            chat.SendReply(cmd, Localization.ARENA_PERM_CANCEL);
                             return;
                         }
 
-                        await connection.CancelArenaAsync(player);
+                        await connection.Reply(cmd.CorrelationId).CancelArenaAsync(player);
                     }
                     else
                     {
@@ -54,23 +54,23 @@ namespace ROBot.Core.Chat.Commands
                         {
                             if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator && !cmd.Sender.IsGameAdmin && !cmd.Sender.IsGameModerator)
                             {
-                                chat.Broadcast(channel, cmd.Sender.Username, Localization.ARENA_PERM_KICK);
+                                chat.SendReply(cmd, Localization.ARENA_PERM_KICK);
                                 return;
                             }
                             var targetPlayerName = command.Split(' ').LastOrDefault();
                             var targetPlayer = session.GetUserByName(targetPlayerName);
-                            await connection.KickPlayerFromArenaAsync(player, targetPlayer);
+                            await connection.Reply(cmd.CorrelationId).KickPlayerFromArenaAsync(player, targetPlayer);
                         }
                         else if (command.StartsWith("add "))
                         {
                             if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator && !cmd.Sender.IsGameAdmin && !cmd.Sender.IsGameModerator)
                             {
-                                chat.Broadcast(channel, cmd.Sender.Username, Localization.ARENA_PERM_ADD);
+                                chat.SendReply(cmd, Localization.ARENA_PERM_ADD);
                                 return;
                             }
 
-                            var targetPlayer = session.Get(cmd.Sender);
-                            await connection.AddPlayerToArenaAsync(player, targetPlayer);
+                            var targetPlayer = session.Get(cmd);
+                            await connection.Reply(cmd.CorrelationId).AddPlayerToArenaAsync(player, targetPlayer);
                         }
                     }
 

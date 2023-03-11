@@ -179,6 +179,7 @@ namespace ROBot.Core.OpenAI
         }
     }
 
+
     public class OpenAI : IOpenAI, IDisposable
     {
         private bool disposed;
@@ -193,24 +194,7 @@ namespace ROBot.Core.OpenAI
 
         public async Task<ImageResponse> GenerateImageAsync(string prompt, string size = "512x512", int count = 1)
         {
-            var req = ImageRequest.Create(prompt, size, count);
-            ImageResponse response = null;
-            using (var httpReq = new HttpRequestMessage(HttpMethod.Post, "https://api.openai.com/v1/images/generations"))
-            {
-                httpReq.Headers.Add("Authorization", $"Bearer {settings.AccessToken}");
-                var requestString = JsonSerializer.Serialize(req);
-                httpReq.Content = new StringContent(requestString, Encoding.UTF8, "application/json");
-                using (var httpResponse = await client.SendAsync(httpReq))
-                {
-                    var responseString = await httpResponse.Content.ReadAsStringAsync();
-                    if (!string.IsNullOrWhiteSpace(responseString))
-                    {
-                        response = JsonSerializer.Deserialize<ImageResponse>(responseString);
-                    }
-
-                    return response;
-                }
-            }
+            return await RequestAsync<ImageRequest, ImageResponse>("https://api.openai.com/v1/images/generations", ImageRequest.Create(prompt, size, count));
         }
 
         public async Task<ChatCompletionResponse> GetCompletionAsync(string prompt, params ChatMessage[] previousMessages)
@@ -218,30 +202,34 @@ namespace ROBot.Core.OpenAI
             var msgs = new List<ChatMessage>();
             msgs.AddRange(previousMessages);
             msgs.Add(ChatMessage.Create("user", prompt));
-            var completionRequest = new ChatCompletionRequest
+
+            return await RequestAsync<ChatCompletionRequest, ChatCompletionResponse>("https://api.openai.com/v1/chat/completions", new ChatCompletionRequest
             {
                 //Model = "text-davinci-003",
                 Model = "gpt-3.5-turbo",
                 //Model = "davinci:ft-shinobytes-2023-02-20-14-02-16",
                 // Prompt = "What if Nicholas Cage played the lead role in Superman?",
                 Messages = msgs.ToArray()
-            };
+            });
+        }
 
-            ChatCompletionResponse completionResponse = null;
-            using (var httpReq = new HttpRequestMessage(HttpMethod.Post, "https://api.openai.com/v1/chat/completions"))
+        private async Task<TResult> RequestAsync<TRequest, TResult>(string url, TRequest model)
+        {
+            using (var httpReq = new HttpRequestMessage(HttpMethod.Post, url))
             {
                 httpReq.Headers.Add("Authorization", $"Bearer {settings.AccessToken}");
-                var requestString = JsonSerializer.Serialize(completionRequest);
+
+                var requestString = JsonSerializer.Serialize(model);
                 httpReq.Content = new StringContent(requestString, Encoding.UTF8, "application/json");
                 using (var httpResponse = await client.SendAsync(httpReq))
                 {
                     var responseString = await httpResponse.Content.ReadAsStringAsync();
                     if (!string.IsNullOrWhiteSpace(responseString))
                     {
-                        completionResponse = JsonSerializer.Deserialize<ChatCompletionResponse>(responseString);
+                        return JsonSerializer.Deserialize<TResult>(responseString);
                     }
 
-                    return completionResponse;
+                    return default;
                 }
             }
         }

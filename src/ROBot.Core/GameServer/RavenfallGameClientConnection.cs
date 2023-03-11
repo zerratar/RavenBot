@@ -88,7 +88,7 @@ namespace ROBot.Core.GameServer
             Connected?.Invoke(this, EventArgs.Empty);
         }
 
-        public IGameClientSubcription Subscribe(string cmdIdentifier, Action<IGameCommand> onCommand)
+        public IGameClientSubcription Subscribe(string cmdIdentifier, Action<GameMessageResponse> onCommand)
         {
             lock (mutex)
             {
@@ -154,20 +154,15 @@ namespace ROBot.Core.GameServer
         {
             if (string.IsNullOrEmpty(message)) return;
 
-            var packet = JsonConvert.DeserializeObject<GamePacket>(message);
+            var packet = JsonConvert.DeserializeObject<GameMessageResponse>(message);
             if (packet != null)
             {
-                HandleCommand(packet.Destination, packet.Id, packet.Format, packet.Args);
-            }
-        }
-
-        private void HandleCommand(string user, string id, string format, params string[] args)
-        {
-            lock (mutex)
-            {
-                foreach (var sub in subs.Where(x => x.Identifier == id))
+                lock (mutex)
                 {
-                    sub.Invoke(new GameSessionCommand(Session, user, id, format, args));
+                    foreach (var sub in subs.Where(x => x.Identifier == packet.Identifier))
+                    {
+                        sub.Invoke(packet);
+                    }
                 }
             }
         }
@@ -224,16 +219,16 @@ namespace ROBot.Core.GameServer
         {
             public readonly string Identifier;
             private readonly RavenfallGameClientConnection client;
-            private readonly Action<IGameSessionCommand> onCommand;
+            private readonly Action<GameMessageResponse> onCommand;
 
-            public Subscription(RavenfallGameClientConnection client, string identifier, Action<IGameSessionCommand> onCommand)
+            public Subscription(RavenfallGameClientConnection client, string identifier, Action<GameMessageResponse> onCommand)
             {
                 this.client = client;
                 this.Identifier = identifier;
                 this.onCommand = onCommand;
             }
 
-            public void Invoke(IGameSessionCommand command)
+            public void Invoke(GameMessageResponse command)
             {
                 this.onCommand?.Invoke(command);
             }

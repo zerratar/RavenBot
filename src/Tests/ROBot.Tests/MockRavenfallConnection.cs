@@ -1,4 +1,5 @@
-﻿using RavenBot.Core.Ravenfall.Models;
+﻿using RavenBot.Core.Ravenfall;
+using RavenBot.Core.Ravenfall.Models;
 using ROBot.Core;
 using ROBot.Core.GameServer;
 using System;
@@ -16,6 +17,8 @@ namespace ROBot.Tests
         public IPEndPoint EndPoint => null;
 
         public string EndPointString => "127.0.0.1:1";
+
+        public IRavenfallApi Api => throw new NotImplementedException();
 
         public event EventHandler<GameSessionInfo> OnSessionInfoReceived;
 
@@ -207,7 +210,7 @@ namespace ROBot.Tests
             return Task.CompletedTask;
         }
 
-        public Task JoinDungeonAsync(EventJoinRequest player)
+        public Task JoinDungeonAsync(User player, string code)
         {
             throw new NotImplementedException();
         }
@@ -222,14 +225,19 @@ namespace ROBot.Tests
             return Task.CompletedTask;
         }
 
-        public Task JoinRaidAsync(EventJoinRequest player)
+        public Task JoinRaidAsync(User player, string code)
         {
-            return Task.CompletedTask;
+            throw new NotImplementedException();
         }
 
         public Task KickAsync(User targetPlayer)
         {
             return Task.CompletedTask;
+        }
+
+        public Task KickAsync(User sender, User targetPlayer)
+        {
+            throw new NotImplementedException();
         }
 
         public Task KickPlayerFromArenaAsync(User player, User targetPlayer)
@@ -307,6 +315,11 @@ namespace ROBot.Tests
             return Task.CompletedTask;
         }
 
+        public Task RaidStreamerAsync(User player, User target, bool isRaidWar)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task RedeemStreamerTokenAsync(User player, string query)
         {
             return Task.CompletedTask;
@@ -325,6 +338,11 @@ namespace ROBot.Tests
         public Task RemoveFromClanAsync(User player, User targetPlayer)
         {
             return Task.CompletedTask;
+        }
+
+        public IRavenfallApi Reply(string correlationId)
+        {
+            throw new NotImplementedException();
         }
 
         public Task RequestHighestSkillAsync(User player, string skill)

@@ -23,7 +23,7 @@ namespace ROBot.Core.Chat.Commands
                 {
                     if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator && !cmd.Sender.IsSubscriber)
                     {
-                        chat.Broadcast(channel, cmd.Sender.Username, Localization.OBSERVE_PERM);
+                        chat.SendReply(cmd, Localization.OBSERVE_PERM);
                         return;
                     }
 
@@ -32,7 +32,7 @@ namespace ROBot.Core.Chat.Commands
                         ? session.Get(cmd.Sender)
                         : session.GetUserByName(targetPlayerName);
 
-                    await connection.ObservePlayerAsync(player);
+                    await connection.Reply(cmd.CorrelationId).ObservePlayerAsync(player);
                 }
             }
         }

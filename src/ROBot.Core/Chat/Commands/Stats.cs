@@ -16,8 +16,8 @@ namespace ROBot.Core.Chat.Commands
                 var connection = game.GetConnection(session);
                 if (connection != null)
                 {
-                    var player = session.Get(cmd.Sender);
-                    await connection.RequestPlayerStatsAsync(player, cmd.Arguments);
+                    var player = session.Get(cmd);
+                    await connection.Reply(cmd.CorrelationId).RequestPlayerStatsAsync(player, cmd.Arguments);
                 }
             }
         }

@@ -10,7 +10,7 @@ using RavenBot.Core.Extensions;
 
 namespace RavenBot.Core.Net
 {
-    public class TcpGameClient : IGameClient, IGameClient2, IGameClient3
+    public class TcpGameClient : IGameClient
     {
         private readonly IGameConnection connection;
         private readonly ILogger logger;
@@ -81,7 +81,7 @@ namespace RavenBot.Core.Net
 
         private bool ConnectionAvailable => this.connection.IsConnected && isConnected;
 
-        public IGameClientSubcription Subscribe(string cmdIdentifier, Action<IGameCommand> onCommand)
+        public IGameClientSubcription Subscribe(string cmdIdentifier, Action<GameMessageResponse> onCommand)
         {
             lock (mutex)
             {
@@ -137,20 +137,15 @@ namespace RavenBot.Core.Net
         {
             if (string.IsNullOrEmpty(message)) return;
 
-            var packet = JsonConvert.DeserializeObject<GamePacket>(message);
+            var packet = JsonConvert.DeserializeObject<GameMessageResponse>(message);
             if (packet != null)
             {
-                HandleCommand(packet.Destination, packet.Id, packet.Format, packet.Args);
-            }
-        }
-
-        private void HandleCommand(string user, string id, string format, params string[] args)
-        {
-            lock (mutex)
-            {
-                foreach (var sub in subs.Where(x => x.Identifier == id))
+                lock (mutex)
                 {
-                    sub.Invoke(new GameCommand(user, id, format, args));
+                    foreach (var sub in subs.Where(x => x.Identifier == packet.Identifier))
+                    {
+                        sub.Invoke(packet);
+                    }
                 }
             }
         }
@@ -172,16 +167,16 @@ namespace RavenBot.Core.Net
         {
             public readonly string Identifier;
             private readonly TcpGameClient client;
-            private readonly Action<IGameCommand> onCommand;
+            private readonly Action<GameMessageResponse> onCommand;
 
-            public Subscription(TcpGameClient client, string identifier, Action<IGameCommand> onCommand)
+            public Subscription(TcpGameClient client, string identifier, Action<GameMessageResponse> onCommand)
             {
                 this.client = client;
                 this.Identifier = identifier;
                 this.onCommand = onCommand;
             }
 
-            public void Invoke(IGameCommand command)
+            public void Invoke(GameMessageResponse command)
             {
                 this.onCommand?.Invoke(command);
             }

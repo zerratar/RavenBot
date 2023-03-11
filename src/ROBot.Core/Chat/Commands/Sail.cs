@@ -16,22 +16,22 @@ namespace ROBot.Core.Chat.Commands
                 var connection = game.GetConnection(session);
                 if (connection != null)
                 {
-                    var player = session.Get(cmd.Sender);
+                    var player = session.Get(cmd);
 
                     var destination = cmd.Arguments?.ToLower();
                     if (string.IsNullOrEmpty(destination))
                     {
-                        await connection.EmbarkFerryAsync(player);
+                        await connection.Reply(cmd.CorrelationId).EmbarkFerryAsync(player);
                         return;
                     }
 
                     if (destination.StartsWith("stop"))
                     {
-                        await connection.DisembarkFerryAsync(player);
+                        await connection.Reply(cmd.CorrelationId).DisembarkFerryAsync(player);
                         return;
                     }
 
-                    await connection.TravelAsync(player, destination);
+                    await connection.Reply(cmd.CorrelationId).TravelAsync(player, destination);
                 }
             }
         }

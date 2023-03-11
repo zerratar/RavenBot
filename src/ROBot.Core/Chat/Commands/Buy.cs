@@ -17,15 +17,15 @@ namespace ROBot.Core.Chat.Commands
                 var connection = game.GetConnection(session);
                 if (connection != null)
                 {
-                    var player = session.Get(cmd.Sender);
+                    var player = session.Get(cmd);
 
                     if (string.IsNullOrEmpty(cmd.Arguments) || !cmd.Arguments.Trim().Contains(" "))
                     {
-                        chat.Broadcast(channel, cmd.Sender.Username, Localization.TRADE_NO_ARG, cmd.Command);
+                        chat.SendReply(cmd, Localization.TRADE_NO_ARG, cmd.Command);
                         return;
                     }
 
-                    await connection.BuyItemAsync(player, cmd.Arguments);
+                    await connection.Reply(cmd.CorrelationId).BuyItemAsync(player, cmd.Arguments);
                 }
             }
         }

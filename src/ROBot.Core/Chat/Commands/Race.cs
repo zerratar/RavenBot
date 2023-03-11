@@ -17,16 +17,16 @@ namespace ROBot.Core.Chat.Commands
                 var connection = game.GetConnection(session);
                 if (connection != null)
                 {
-                    var player = session.Get(cmd.Sender);
+                    var player = session.Get(cmd);
                     if (string.IsNullOrEmpty(cmd.Arguments))
                     {
-                        await connection.PlayPetRacingAsync(player);
+                        await connection.Reply(cmd.CorrelationId).PlayPetRacingAsync(player);
                         return;
                     }
 
                     if (cmd.Arguments.Contains("reset", StringComparison.OrdinalIgnoreCase))
                     {
-                        await connection.ResetPetRacingAsync(player);
+                        await connection.Reply(cmd.CorrelationId).ResetPetRacingAsync(player);
                         return;
                     }
                 }

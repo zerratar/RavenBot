@@ -60,6 +60,11 @@ namespace RavenBot.Core.Ravenfall
             }
         }
 
+        public User Get(ICommand cmd)
+        {
+            return Get(cmd.Sender);
+        }
+
         public User Get(ICommandSender sender, string identifier = null)
         {
             lock (mutex)

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RavenBot.Core.Handlers;
+using System;
 using System.Threading.Tasks;
 
 namespace ROBot.Core.Chat
@@ -8,8 +9,8 @@ namespace ROBot.Core.Chat
         void Start();
         void Stop();
 
-        void Broadcast(IGameSessionCommand message);
-        void Broadcast(string channel, string user, string format, params object[] args);
-        Task SendChatMessageAsync(string channel, string message);
+        void Broadcast(SessionGameMessageResponse message);
+        void SendReply(ICommand command, string format, params object[] args);
+        void SendMessage(ICommandChannel channel, string format, object[] args);
     }
 }

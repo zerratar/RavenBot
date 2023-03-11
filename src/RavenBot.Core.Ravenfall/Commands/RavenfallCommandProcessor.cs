@@ -18,11 +18,11 @@ namespace RavenBot.Core.Ravenfall.Commands
             this.playerProvider = playerProvider;
         }
 
-        public override async Task ProcessAsync(IMessageChat broadcaster, ICommand cmd)
+        public override async Task ProcessAsync(IMessageChat chat, ICommand cmd)
         {
             if (!await this.game.ProcessAsync(Settings.UNITY_SERVER_PORT))
             {
-                broadcaster.Broadcast(cmd.Sender.Username, Localization.GAME_NOT_STARTED);
+                chat.SendReply(cmd, Localization.GAME_NOT_STARTED);
                 return;
             }
 
@@ -34,19 +34,19 @@ namespace RavenBot.Core.Ravenfall.Commands
 
             if (arg.StartsWith("help"))
             {
-                broadcaster.Broadcast(cmd.Sender.Username, Localization.HELP);
+                chat.SendReply(cmd, Localization.HELP);
                 return;
             }
 
             if (arg.StartsWith("join"))
             {
-                var player = playerProvider.Get(cmd.Sender);
-                await game.JoinAsync(player);
+                var player = playerProvider.Get(cmd);
+                await this.game.Reply(cmd.CorrelationId).JoinAsync(player);
             }
 
             if (arg.StartsWith("task"))
             {
-                var player = playerProvider.Get(cmd.Sender);
+                var player = playerProvider.Get(cmd);
                 var task = arg.Split(' ').LastOrDefault();
 
                 var availableTasks = Enum.GetValues(typeof(PlayerTask))
@@ -55,14 +55,14 @@ namespace RavenBot.Core.Ravenfall.Commands
 
                 if (string.IsNullOrEmpty(task))
                 {
-                    broadcaster.Broadcast(cmd.Sender.Username, Localization.TASK_NO_ARG, string.Join(", ", availableTasks.Select(x => x.ToString())));
+                    chat.SendReply(cmd, Localization.TASK_NO_ARG, string.Join(", ", availableTasks.Select(x => x.ToString())));
                     return;
                 }
 
                 var targetTask = availableTasks.FirstOrDefault(x =>
                     x.ToString().Equals(task, StringComparison.InvariantCultureIgnoreCase));
 
-                await game.SendPlayerTaskAsync(player, targetTask);
+                await this.game.Reply(cmd.CorrelationId).SendPlayerTaskAsync(player, targetTask);
             }
         }
     }

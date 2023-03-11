@@ -16,7 +16,7 @@ namespace ROBot.Core.Chat.Commands
                 var connection = game.GetConnection(session);
                 if (connection != null)
                 {
-                    var player = session.Get(cmd.Sender);
+                    var player = session.Get(cmd);
                     if (player == null)
                         return;
 
@@ -24,7 +24,7 @@ namespace ROBot.Core.Chat.Commands
 
                     if (!string.IsNullOrEmpty(item) && item.Split(' ')[0] == "remove")
                     {
-                        await connection.DisenchantAsync(player, item.Replace("remove", "").Trim());
+                        await connection.Reply(cmd.CorrelationId).DisenchantAsync(player, item.Replace("remove", "").Trim());
                         return;
                     }
                     //if (string.IsNullOrEmpty(item))
@@ -33,7 +33,7 @@ namespace ROBot.Core.Chat.Commands
                     //    return;
                     //}
 
-                    await connection.EnchantAsync(player, item);
+                    await connection.Reply(cmd.CorrelationId).EnchantAsync(player, item);
                 }
             }
         }

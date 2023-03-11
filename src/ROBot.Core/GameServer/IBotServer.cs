@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RavenBot.Core.Handlers;
+using System;
 using System.Collections.Generic;
 
 namespace ROBot.Core.GameServer
@@ -7,7 +8,7 @@ namespace ROBot.Core.GameServer
     {
         void Start();
         IReadOnlyList<IRavenfallConnection> AllConnections();
-        IGameSession GetSession(string session);
+        IGameSession GetSession(ICommandChannel session);
         void OnClientDisconnected(IRavenfallConnection connection);
         IRavenfallConnection GetConnection(IGameSession ravenfallGameSession);
         IRavenfallConnection GetConnectionByUserId(Guid ravenfallUserId);

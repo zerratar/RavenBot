@@ -12,13 +12,13 @@ namespace RavenBot.Core.Net
         {
         }
 
-        public abstract Task ProcessAsync(IMessageChat broadcaster, ICommand cmd);
+        public abstract Task ProcessAsync(IMessageChat chat, ICommand cmd);
     }
 
     public interface ICommandProcessor : IDisposable
     {
         bool RequiresBroadcaster { get; }
 
-        Task ProcessAsync(IMessageChat broadcaster, ICommand cmd);
+        Task ProcessAsync(IMessageChat chat, ICommand cmd);
     }
 }

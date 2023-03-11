@@ -14,36 +14,36 @@ namespace RavenBot.Core.Ravenfall.Commands
             this.playerProvider = playerProvider;
         }
 
-        public override async Task ProcessAsync(IMessageChat broadcaster, ICommand cmd)
+        public override async Task ProcessAsync(IMessageChat chat, ICommand cmd)
         {
             if (!await this.game.ProcessAsync(Settings.UNITY_SERVER_PORT))
             {
-                broadcaster.Broadcast(cmd.Sender.Username, Localization.GAME_NOT_STARTED);
+                chat.SendReply(cmd, Localization.GAME_NOT_STARTED);
                 return;
             }
 
-            var player = playerProvider.Get(cmd.Sender);
+            var player = playerProvider.Get(cmd);
 
             if (cmd.Command.StartsWith("disembark"))
             {
-                await game.DisembarkFerryAsync(player);
+                await this.game.Reply(cmd.CorrelationId).DisembarkFerryAsync(player);
                 return;
             }
 
             var destination = cmd.Arguments?.ToLower();
             if (string.IsNullOrEmpty(destination))
             {
-                await game.EmbarkFerryAsync(player);
+                await this.game.Reply(cmd.CorrelationId).EmbarkFerryAsync(player);
                 return;
             }
 
             if (destination.StartsWith("stop"))
             {
-                await game.DisembarkFerryAsync(player);
+                await this.game.Reply(cmd.CorrelationId).DisembarkFerryAsync(player);
                 return;
             }
 
-            await game.TravelAsync(player, destination);
+            await this.game.Reply(cmd.CorrelationId).TravelAsync(player, destination);
         }
     }
 }

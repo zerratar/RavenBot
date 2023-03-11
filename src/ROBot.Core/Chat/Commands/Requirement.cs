@@ -19,13 +19,13 @@ namespace ROBot.Core.Chat.Commands
                 {
                     if (string.IsNullOrEmpty(cmd.Arguments))
                     {
-                        chat.Broadcast(channel, cmd.Sender.Username, Localization.VALUE_NO_ARG, cmd.Command);
+                        chat.SendReply(cmd, Localization.VALUE_NO_ARG, cmd.Command);
                         return;
                     }
 
-                    var player = session.Get(cmd.Sender);
+                    var player = session.Get(cmd);
                     if (player != null)
-                        await connection.CraftRequirementAsync(player, cmd.Arguments);
+                        await connection.Reply(cmd.CorrelationId).CraftRequirementAsync(player, cmd.Arguments);
                 }
             }
         }

@@ -20,22 +20,22 @@ namespace ROBot.Core.Chat.Commands
                 {
                     if (string.IsNullOrEmpty(cmd.Arguments))
                     {
-                        chat.Broadcast(channel, cmd.Sender.Username, Localization.VALUE_NO_ARG, cmd.Command);
+                        chat.SendReply(cmd, Localization.VALUE_NO_ARG, cmd.Command);
                         return;
                     }
 
-                    var player = session.Get(cmd.Sender);
+                    var player = session.Get(cmd);
                     if (cmd.Arguments.Contains("helm", StringComparison.OrdinalIgnoreCase))
                     {
-                        await connection.ToggleHelmetAsync(player);
+                        await connection.Reply(cmd.CorrelationId).ToggleHelmetAsync(player);
                     }
                     else if (cmd.Arguments.Contains("pet", StringComparison.OrdinalIgnoreCase))
                     {
-                        await connection.TogglePetAsync(player);
+                        await connection.Reply(cmd.CorrelationId).TogglePetAsync(player);
                     }
                     else
                     {
-                        chat.Broadcast(channel, cmd.Sender.Username, Localization.TOGGLE_INVALID, cmd.Arguments);
+                        chat.SendReply(cmd, Localization.TOGGLE_INVALID, cmd.Arguments);
                     }
                 }
             }

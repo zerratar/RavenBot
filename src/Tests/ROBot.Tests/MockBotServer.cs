@@ -1,4 +1,5 @@
-﻿using ROBot.Core;
+﻿using RavenBot.Core.Handlers;
+using ROBot.Core;
 using ROBot.Core.GameServer;
 using System;
 using System.Collections.Generic;
@@ -34,6 +35,11 @@ namespace ROBot.Tests
         public IGameSession GetSession(string session)
         {
             return new MockGameSession(session);
+        }
+
+        public IGameSession GetSession(ICommandChannel session)
+        {
+            throw new NotImplementedException();
         }
 
         public void OnClientDisconnected(IRavenfallConnection connection)

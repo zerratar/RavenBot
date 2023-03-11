@@ -7,10 +7,9 @@ namespace ROBot.Core.Chat.Commands
 {
     public class Help : ChatCommandHandler
     {
-        public override Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
+        public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
         {
-            var channel = cmd.Channel;
-            return chat.SendChatMessageAsync(channel, "No help available at this time.");
+            chat.SendReply(cmd, "No help available at this time.");
         }
     }
 }

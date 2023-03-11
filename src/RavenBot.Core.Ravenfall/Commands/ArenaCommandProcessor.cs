@@ -16,11 +16,11 @@ namespace RavenBot.Core.Ravenfall.Commands
             this.playerProvider = playerProvider;
         }
 
-        public override async Task ProcessAsync(IMessageChat broadcaster, ICommand cmd)
+        public override async Task ProcessAsync(IMessageChat chat, ICommand cmd)
         {
             if (!await this.game.ProcessAsync(Settings.UNITY_SERVER_PORT))
             {
-                broadcaster.Broadcast("", Localization.GAME_NOT_STARTED);
+                chat.Announce(Localization.GAME_NOT_STARTED);
                 return;
             }
 
@@ -35,34 +35,34 @@ namespace RavenBot.Core.Ravenfall.Commands
             //!arena add <player>
 
             var command = cmd.Arguments?.Trim().ToLower();
-            var player = playerProvider.Get(cmd.Sender);
+            var player = playerProvider.Get(cmd);
             if (string.IsNullOrEmpty(command) || command.Equals("join"))
             {
-                await game.JoinArenaAsync(player);
+                await this.game.Reply(cmd.CorrelationId).JoinArenaAsync(player);
             }
             else if (command.Equals("leave"))
             {
-                await game.LeaveArenaAsync(player);
+                await this.game.Reply(cmd.CorrelationId).LeaveArenaAsync(player);
             }
             else if (command.Equals("start") || command.Equals("begin"))
             {
                 if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator && !cmd.Sender.IsGameAdmin && !cmd.Sender.IsGameModerator)
                 {
-                    broadcaster.Broadcast(cmd.Sender.Username, Localization.ARENA_PERM_FORCE);
+                    chat.SendReply(cmd, Localization.ARENA_PERM_FORCE);
                     return;
                 }
 
-                await game.StartArenaAsync(player);
+                await this.game.Reply(cmd.CorrelationId).StartArenaAsync(player);
             }
             else if (command.Equals("cancel") || command.Equals("end"))
             {
                 if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator && !cmd.Sender.IsGameAdmin && !cmd.Sender.IsGameModerator)
                 {
-                    broadcaster.Broadcast(cmd.Sender.Username, Localization.ARENA_PERM_CANCEL);
+                    chat.SendReply(cmd, Localization.ARENA_PERM_CANCEL);
                     return;
                 }
 
-                await game.CancelArenaAsync(player);
+                await this.game.Reply(cmd.CorrelationId).CancelArenaAsync(player);
             }
             else
             {
@@ -70,24 +70,24 @@ namespace RavenBot.Core.Ravenfall.Commands
                 {
                     if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator && !cmd.Sender.IsGameAdmin && !cmd.Sender.IsGameModerator)
                     {
-                        broadcaster.Broadcast(cmd.Sender.Username, Localization.ARENA_PERM_KICK);
+                        chat.SendReply(cmd, Localization.ARENA_PERM_KICK);
                         return;
                     }
                     var targetPlayerName = command.Split(' ').LastOrDefault();
                     var targetPlayer = playerProvider.Get(targetPlayerName);
-                    await game.KickPlayerFromArenaAsync(player, targetPlayer);
+                    await this.game.Reply(cmd.CorrelationId).KickPlayerFromArenaAsync(player, targetPlayer);
                 }
                 else if (command.StartsWith("add "))
                 {
                     if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator && !cmd.Sender.IsGameAdmin && !cmd.Sender.IsGameModerator)
                     {
                         //broadcaster.Broadcast(
-                        broadcaster.Broadcast(cmd.Sender.Username, Localization.ARENA_PERM_ADD);
+                        chat.SendReply(cmd, Localization.ARENA_PERM_ADD);
                         return;
                     }
 
-                    var targetPlayer = playerProvider.Get(cmd.Sender);
-                    await game.AddPlayerToArenaAsync(player, targetPlayer);
+                    var targetPlayer = playerProvider.Get(cmd.Arguments);
+                    await this.game.Reply(cmd.CorrelationId).AddPlayerToArenaAsync(player, targetPlayer);
                 }
             }
         }

@@ -20,17 +20,17 @@ namespace RavenBot.Core.Ravenfall.Commands
             this.userStore = userStore;
         }
 
-        public override async Task ProcessAsync(IMessageChat broadcaster, ICommand cmd)
+        public override async Task ProcessAsync(IMessageChat chat, ICommand cmd)
         {
             if (!await this.game.ProcessAsync(Settings.UNITY_SERVER_PORT))
             {
-                broadcaster.Broadcast(cmd.Sender.Username, Localization.GAME_NOT_STARTED);
+                chat.SendReply(cmd, Localization.GAME_NOT_STARTED);
                 return;
             }
 
             if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator && !cmd.Sender.IsSubscriber)
             {
-                broadcaster.Broadcast(cmd.Sender.Username, Localization.OBSERVE_PERM);
+                chat.SendReply(cmd, Localization.OBSERVE_PERM);
                 return;
             }
             var isSubscriber = cmd.Sender.IsSubscriber && !cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator;
@@ -41,7 +41,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                 if (!user.CanUseCommand(command))
                 {
                     var timeLeft = user.GetCooldown(command);
-                    broadcaster.Broadcast(cmd.Sender.Username, Localization.COMMAND_COOLDOWN, Math.Floor(timeLeft.TotalSeconds));
+                    chat.SendReply(cmd, Localization.COMMAND_COOLDOWN, Math.Floor(timeLeft.TotalSeconds));
                     return;
                 }
 
@@ -56,10 +56,10 @@ namespace RavenBot.Core.Ravenfall.Commands
             }
             else
             {
-                player = playerProvider.Get(cmd.Sender);
+                player = playerProvider.Get(cmd);
             }
 
-            await game.ObservePlayerAsync(player);
+            await this.game.Reply(cmd.CorrelationId).ObservePlayerAsync(player);
 
         }
     }
