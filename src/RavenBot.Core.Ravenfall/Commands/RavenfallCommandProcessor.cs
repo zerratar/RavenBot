@@ -41,7 +41,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             if (arg.StartsWith("join"))
             {
                 var player = playerProvider.Get(cmd);
-                await this.game.Reply(cmd.CorrelationId).JoinAsync(player);
+                await this.game[cmd.CorrelationId].JoinAsync(player);
             }
 
             if (arg.StartsWith("task"))
@@ -62,7 +62,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                 var targetTask = availableTasks.FirstOrDefault(x =>
                     x.ToString().Equals(task, StringComparison.InvariantCultureIgnoreCase));
 
-                await this.game.Reply(cmd.CorrelationId).SendPlayerTaskAsync(player, targetTask);
+                await this.game[cmd.CorrelationId].SendPlayerTaskAsync(player, targetTask);
             }
         }
     }

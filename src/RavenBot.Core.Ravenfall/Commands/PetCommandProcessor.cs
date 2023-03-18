@@ -29,11 +29,11 @@ namespace RavenBot.Core.Ravenfall.Commands
             var pet = cmd.Arguments?.ToLower();
             if (string.IsNullOrEmpty(pet))
             {
-                await this.game.Reply(cmd.CorrelationId).GetPetAsync(player);
+                await this.game[cmd.CorrelationId].GetPetAsync(player);
                 return;
             }
 
-            await this.game.Reply(cmd.CorrelationId).SetPetAsync(player, pet);
+            await this.game[cmd.CorrelationId].SetPetAsync(player, pet);
         }
     }
 }

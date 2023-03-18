@@ -31,7 +31,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                 player = playerProvider.Get(cmd);
             }
 
-            await this.game.Reply(cmd.CorrelationId).ScalePlayerAsync(player, 3f);
+            await this.game[cmd.CorrelationId].ScalePlayerAsync(player, 3f);
         }
     }
 }

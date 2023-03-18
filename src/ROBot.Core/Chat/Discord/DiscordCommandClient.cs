@@ -1,15 +1,20 @@
 ﻿using Discord;
 using Discord.Commands;
+using Discord.Net;
 using Discord.WebSocket;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using RavenBot.Core.Chat.Discord;
 using RavenBot.Core.Handlers;
+using RavenBot.Core.Net;
 using RavenBot.Core.Ravenfall;
 using RavenBot.Core.Ravenfall.Models;
 using ROBot.Core.GameServer;
 using Shinobytes.Core;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ROBot.Core.Chat.Discord
@@ -32,6 +37,7 @@ namespace ROBot.Core.Chat.Discord
 
         private readonly ConcurrentDictionary<string, ulong> channelIdLookup = new();
         private readonly ConcurrentDictionary<string, DiscordCommand.DiscordChannel> channels = new();
+        private readonly DiscordFormatMessager messager;
 
         public DiscordCommandClient(
             ILogger logger,
@@ -54,6 +60,7 @@ namespace ROBot.Core.Chat.Discord
             this.messageTransformer = messageTransformer;
             this.commandHandler = commandHandler;
 
+            messager = new DiscordFormatMessager();
             broadcastSubscription = messageBus.Subscribe<SessionGameMessageResponse>(MessageBus.Broadcast, Broadcast);
 
             discord = new DiscordSocketClient(new DiscordSocketConfig
@@ -76,6 +83,59 @@ namespace ROBot.Core.Chat.Discord
             discord.Log += Log;
             discord.Disconnected += Discord_Disconnected;
             discord.Connected += Discord_Connected;
+            discord.ButtonExecuted += Discord_ButtonExecuted;
+            discord.Ready += Discord_Ready;
+            discord.SlashCommandExecuted += Discord_SlashCommandExecuted;
+        }
+
+        private List<SocketApplicationCommand> slashCommands = new List<SocketApplicationCommand>();
+
+        private async Task Discord_Ready()
+        {
+            var commands = commandHandler.RegisterSlashCommands(this, discord);
+            try
+            {
+                // Now that we have our builder, we can call the CreateApplicationCommandAsync method to make our slash command.               
+                var guild = discord.GetGuild(694530158341783612); // ravenfall
+
+                await guild.DeleteApplicationCommandsAsync();
+
+                //slashCommands.AddRange(await guild.GetApplicationCommandsAsync());
+
+                //if (slashCommands.Count != 0) return;
+
+                foreach (var command in commands)
+                {
+                    if (slashCommands.Any(x => x.Name == command.Name.Value))
+                        continue;
+
+                    this.slashCommands.Add(await guild.CreateApplicationCommandAsync(command));
+
+                    // With global commands we don't need the guild.
+
+                    //await discord.CreateGlobalApplicationCommandAsync(command);
+
+                    // Using the ready event is a simple implementation for the sake of the example. Suitable for testing and development.
+                    // For a production bot, it is recommended to only run the CreateGlobalApplicationCommandAsync() once for each command.
+                }
+            }
+            catch (ApplicationCommandException exception)
+            {
+                // If our command was invalid, we should catch an ApplicationCommandException. This exception contains the path of the error as well as the error message. You can serialize the Error field in the exception to get a visual of where your error is.
+                var json = JsonConvert.SerializeObject(exception.Errors, Formatting.Indented);
+
+                // You can send this error somewhere or just print it to the console, for this example we're just going to print it.
+                Console.WriteLine(json);
+            }
+        }
+
+        private async Task Discord_ButtonExecuted(SocketMessageComponent component)
+        {
+            await component.UpdateAsync(msg =>
+            {
+                msg.Components = null;
+                msg.Content = "Nope";
+            });
         }
 
         private async Task Discord_Connected()
@@ -123,14 +183,14 @@ namespace ROBot.Core.Chat.Discord
                 {
                     if (!string.IsNullOrEmpty(message.CorrelationId) && ulong.TryParse(message.CorrelationId, out var replyId) && replyId != 0)
                     {
-                        SendReply(channel, message.Format, message.Args, replyId);
+                        SendReply(channel, cmd.Message.Recipent, message.Format, message.Args, message.Category, message.Tags, replyId);
                         return;
                     }
 
                     // if we can't reply we should mention the recipent.
                     if (ulong.TryParse(message.Recipent.PlatformId, out var uid))
                     {
-                        SendMessage(channel, MentionUtils.MentionUser(uid) + " " + message.Format, message.Args);
+                        SendMessage(channel, message.Recipent, MentionUtils.MentionUser(uid) + " " + message.Format, message.Args, message.Category, message.Tags);
                     }
                     else
                     {
@@ -150,27 +210,60 @@ namespace ROBot.Core.Chat.Discord
             var channel = cmd.Channel;
             if (!string.IsNullOrEmpty(cmd.CorrelationId) && ulong.TryParse(cmd.CorrelationId, out var replyId) && replyId != 0)
             {
-                SendReply(channel, message, args, replyId);
+                SendReply(channel, cmd.Sender, message, args, string.Empty, new string[0], replyId);
                 return;
             }
 
             SendMessage(channel, message, args);
         }
 
+        public async void SendReply(
+            ICommandChannel channel, ICommandSender recipent, string format, object[] args, string category, string[] tags, ulong replyId)
+        {
+            // unique to Discord, we can generate embeds and format our messages a bit more pretty
+            // for special messages like !stats, we want to give a more appealing message. For these,
+            // the formatter and transformation will be ignored as we will generate it ourselves.
+            // but only if we can reply to a message
+            var targetChannel = GetChannel(channel);
+            if (targetChannel != null &&
+                await messager.HandleCustomReplyAsync(targetChannel, new UserReference(recipent), new MessageReference(replyId), args, category, tags))
+                return;
+
+            SendReply(channel, format, args, replyId);
+        }
+
+        public async void SendReply(
+            ICommandChannel channel, GameMessageRecipent recipent, string format, object[] args, string category, string[] tags, ulong replyId)
+        {
+            var targetChannel = GetChannel(channel);
+            if (targetChannel != null &&
+                await messager.HandleCustomReplyAsync(targetChannel, new UserReference(recipent), new MessageReference(replyId), args, category, tags))
+                return;
+
+            SendReply(channel, format, args, replyId);
+        }
+
+        public async void SendMessage(
+            ICommandChannel channel, GameMessageRecipent recipent, string format, object[] args, string category, string[] tags)
+        {
+            var targetChannel = GetChannel(channel);
+            if (targetChannel != null &&
+                await messager.HandleCustomReplyAsync(targetChannel, new UserReference(recipent), null, args, category, tags))
+                return;
+
+            SendMessage(channel, format, args);
+        }
+
         public async void SendReply(ICommandChannel channel, string format, object[] args, ulong replyId)
         {
             if (string.IsNullOrWhiteSpace(format))
             {
-                //logger.LogWarning($"[TWITCH] Broadcast Ignored - Empty Message (Channel: {channel} User: {user}");
                 return;
             }
 
             var msg = messageFormatter.Format(format, args);
             if (string.IsNullOrEmpty(msg))
-            {
-                //logger.LogWarning($"[TWITCH] Broadcast Ignored - Message became empty after formatting (Channel: {channel} Format: '{format}' Args: '{string.Join(",", args)}')");
                 return;
-            }
 
             await SendChatMessageAsync(channel, msg, new MessageReference(replyId));
         }
@@ -236,14 +329,7 @@ namespace ROBot.Core.Chat.Discord
             }
 
             // Process the chat message a final time before sending it off.
-
-            if (channel is not DiscordCommand.DiscordChannel)
-            {
-                channel = TryResolveChannel(channel.Name);
-            }
-
-            var discordChannel = channel as DiscordCommand.DiscordChannel;
-            var c = discordChannel != null ? discordChannel.Channel : null;
+            var c = GetChannel(channel);
             if (c != null)
             {
                 var session = game.GetSession(channel);
@@ -272,7 +358,7 @@ namespace ROBot.Core.Chat.Discord
                 {
                     logger.LogDebug($"[DISCORD] Sending Message (Channel: {channel} Message: {message})");
                 }
-
+                
                 await c.SendMessageAsync(message, messageReference: replyReference);
             }
             else
@@ -281,11 +367,31 @@ namespace ROBot.Core.Chat.Discord
             }
         }
 
+        private ISocketMessageChannel GetChannel(ICommandChannel channel)
+        {
+            var c = channel;
+            if (c is not DiscordCommand.DiscordChannel)
+                c = TryResolveChannel(c.Name);
+
+            var discordChannel = c as DiscordCommand.DiscordChannel;
+            return discordChannel != null ? discordChannel.Channel : null;
+        }
+
         private ICommandChannel TryResolveChannel(string name)
         {
             if (channels.TryGetValue(name.ToLower(), out var channel))
                 return channel;
             return null;
+        }
+
+        private async Task Discord_SlashCommandExecuted(SocketSlashCommand msg)
+        {
+            channelIdLookup[msg.Channel.Name.ToLower()] = msg.Channel.Id;
+            channels[msg.Channel.Name.ToLower()] = new DiscordCommand.DiscordChannel(msg.Channel);
+
+            Log(new LogMessage(LogSeverity.Info, "", msg.User.Username + " used /" + msg.CommandName));
+
+            await commandHandler.HandleAsync(game, this, msg);//msg.Data);
         }
 
         private async Task HandleCommandAsync(SocketMessage arg)

@@ -34,7 +34,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                 return;
 
             var player = playerProvider.Get(values[0], values[1]);
-            await this.game.Reply(cmd.CorrelationId).JoinAsync(player);
+            await this.game[cmd.CorrelationId].JoinAsync(player);
         }
     }
 }

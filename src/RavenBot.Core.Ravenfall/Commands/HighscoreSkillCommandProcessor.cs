@@ -24,7 +24,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             }
             var player = playerProvider.Get(cmd);
             var skill = cmd.Arguments;
-            await this.game.Reply(cmd.CorrelationId).RequestHighscoreAsync(player, skill);
+            await this.game[cmd.CorrelationId].RequestHighscoreAsync(player, skill);
         }
     }
 }

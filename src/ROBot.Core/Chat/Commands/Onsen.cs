@@ -22,11 +22,11 @@ namespace ROBot.Core.Chat.Commands
                     var leaveOnsen = !string.IsNullOrEmpty(cmd.Arguments) && cmd.Arguments.Contains("leave", StringComparison.OrdinalIgnoreCase);
                     if (leaveOnsen)
                     {
-                        await connection.Reply(cmd.CorrelationId).LeaveOnsenAsync(player);
+                        await connection[cmd.CorrelationId].LeaveOnsenAsync(player);
                     }
                     else
                     {
-                        await connection.Reply(cmd.CorrelationId).JoinOnsenAsync(player);
+                        await connection[cmd.CorrelationId].JoinOnsenAsync(player);
                     }
                 }
             }

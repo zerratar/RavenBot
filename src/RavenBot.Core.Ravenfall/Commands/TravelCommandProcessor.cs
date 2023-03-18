@@ -30,7 +30,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                 return;
             }
 
-            await this.game.Reply(cmd.CorrelationId).TravelAsync(player, destination);
+            await this.game[cmd.CorrelationId].TravelAsync(player, destination);
         }
     }
 }

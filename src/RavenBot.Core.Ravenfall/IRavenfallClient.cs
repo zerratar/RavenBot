@@ -281,7 +281,8 @@ namespace RavenBot.Core.Ravenfall
     public interface IRavenfallClient
     {
         IRavenfallApi Api { get; }
-        IRavenfallApi Reply(string correlationId);
+        IRavenfallApi Ref(string correlationId);
+        IRavenfallApi this[string correlationid] { get; }
         Task<bool> ProcessAsync(int serverPort);
     }
 }

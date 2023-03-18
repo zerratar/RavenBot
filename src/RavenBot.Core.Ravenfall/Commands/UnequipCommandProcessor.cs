@@ -33,7 +33,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                 return;
             }
 
-            await this.game.Reply(cmd.CorrelationId).UnequipAsync(player, item);
+            await this.game[cmd.CorrelationId].UnequipAsync(player, item);
         }
     }
 }

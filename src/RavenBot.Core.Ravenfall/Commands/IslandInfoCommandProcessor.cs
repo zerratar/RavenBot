@@ -29,7 +29,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                 return;
             }
 
-            await this.game.Reply(cmd.CorrelationId).RequestIslandInfoAsync(player);
+            await this.game[cmd.CorrelationId].RequestIslandInfoAsync(player);
         }
     }
 }

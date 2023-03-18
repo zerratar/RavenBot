@@ -35,19 +35,19 @@ namespace RavenBot.Core.Ravenfall.Commands
             var player = playerProvider.Get(cmd);
             if (sub.Equals("cancel", StringComparison.InvariantCultureIgnoreCase))
             {
-                await this.game.Reply(cmd.CorrelationId).CancelDuelRequestAsync(player);
+                await this.game[cmd.CorrelationId].CancelDuelRequestAsync(player);
             }
             else if (sub.Equals("accept", StringComparison.InvariantCultureIgnoreCase))
             {
-                await this.game.Reply(cmd.CorrelationId).AcceptDuelRequestAsync(player);
+                await this.game[cmd.CorrelationId].AcceptDuelRequestAsync(player);
             }
             else if (sub.Equals("decline", StringComparison.InvariantCultureIgnoreCase))
             {
-                await this.game.Reply(cmd.CorrelationId).DeclineDuelRequestAsync(player);
+                await this.game[cmd.CorrelationId].DeclineDuelRequestAsync(player);
             }
             else
             {
-                await this.game.Reply(cmd.CorrelationId).DuelRequestAsync(player, playerProvider.Get(sub));
+                await this.game[cmd.CorrelationId].DuelRequestAsync(player, playerProvider.Get(sub));
             }
         }
     }

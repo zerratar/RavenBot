@@ -30,7 +30,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                 player = playerProvider.Get(cmd);
             }
 
-            await this.game.Reply(cmd.CorrelationId).TurnIntoMonsterAsync(player);
+            await this.game[cmd.CorrelationId].TurnIntoMonsterAsync(player);
         }
     }
 }

@@ -36,7 +36,7 @@ namespace ROBot.Core.Chat.Commands
                     if (values.Length > 1)
                         player.Identifier = values[1];
 
-                    await connection.Reply(cmd.CorrelationId).JoinAsync(player);
+                    await connection[cmd.CorrelationId].JoinAsync(player);
                 }
             }
         }

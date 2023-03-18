@@ -28,14 +28,14 @@ namespace RavenBot.Core.Ravenfall.Commands
             var item = cmd.Arguments?.ToLower();
             if (!string.IsNullOrEmpty(item) && item.Split(' ')[0] == "remove")
             {
-                await this.game.Reply(cmd.CorrelationId).DisenchantAsync(player, item.Replace("remove", "").Trim());
+                await this.game[cmd.CorrelationId].DisenchantAsync(player, item.Replace("remove", "").Trim());
                 return;
             }
             //    broadcaster.Broadcast(cmd.Sender.Username, "You have to use !equip <item name> or !equip all for equipping your best items.");
             //    return;
             //}
 
-            await this.game.Reply(cmd.CorrelationId).EnchantAsync(player, item);
+            await this.game[cmd.CorrelationId].EnchantAsync(player, item);
         }
     }
 }

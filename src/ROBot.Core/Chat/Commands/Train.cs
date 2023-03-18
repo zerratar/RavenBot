@@ -31,14 +31,14 @@ namespace ROBot.Core.Chat.Commands
 
                     if (GetCombatTypeFromString(cmd.Command) != -1)
                     {
-                        await connection.Reply(cmd.CorrelationId).SendPlayerTaskAsync(player, PlayerTask.Fighting, cmd.Command);
+                        await connection[cmd.CorrelationId].SendPlayerTaskAsync(player, PlayerTask.Fighting, cmd.Command);
                         return;
                     }
 
                     var commandSkillTarget = GetSkillTypeFromString(cmd.Command);
                     if (commandSkillTarget != -1)
                     {
-                        await connection.Reply(cmd.CorrelationId).SendPlayerTaskAsync(player, (PlayerTask)commandSkillTarget, cmd.Command);
+                        await connection[cmd.CorrelationId].SendPlayerTaskAsync(player, (PlayerTask)commandSkillTarget, cmd.Command);
                         return;
                     }
 
@@ -52,7 +52,7 @@ namespace ROBot.Core.Chat.Commands
 
                     if (GetCombatTypeFromString(skill) != -1)
                     {
-                        await connection.Reply(cmd.CorrelationId).SendPlayerTaskAsync(player, PlayerTask.Fighting, skill);
+                        await connection[cmd.CorrelationId].SendPlayerTaskAsync(player, PlayerTask.Fighting, skill);
                     }
                     else
                     {
@@ -63,7 +63,7 @@ namespace ROBot.Core.Chat.Commands
                         }
                         else
                         {
-                            await connection.Reply(cmd.CorrelationId).SendPlayerTaskAsync(player, (PlayerTask)value, skill);
+                            await connection[cmd.CorrelationId].SendPlayerTaskAsync(player, (PlayerTask)value, skill);
                         }
                     }
                 }

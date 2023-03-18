@@ -38,11 +38,11 @@ namespace RavenBot.Core.Ravenfall.Commands
             var player = playerProvider.Get(cmd);
             if (string.IsNullOrEmpty(command) || command.Equals("join"))
             {
-                await this.game.Reply(cmd.CorrelationId).JoinArenaAsync(player);
+                await this.game[cmd.CorrelationId].JoinArenaAsync(player);
             }
             else if (command.Equals("leave"))
             {
-                await this.game.Reply(cmd.CorrelationId).LeaveArenaAsync(player);
+                await this.game[cmd.CorrelationId].LeaveArenaAsync(player);
             }
             else if (command.Equals("start") || command.Equals("begin"))
             {
@@ -52,7 +52,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                     return;
                 }
 
-                await this.game.Reply(cmd.CorrelationId).StartArenaAsync(player);
+                await this.game[cmd.CorrelationId].StartArenaAsync(player);
             }
             else if (command.Equals("cancel") || command.Equals("end"))
             {
@@ -62,7 +62,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                     return;
                 }
 
-                await this.game.Reply(cmd.CorrelationId).CancelArenaAsync(player);
+                await this.game[cmd.CorrelationId].CancelArenaAsync(player);
             }
             else
             {
@@ -75,7 +75,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                     }
                     var targetPlayerName = command.Split(' ').LastOrDefault();
                     var targetPlayer = playerProvider.Get(targetPlayerName);
-                    await this.game.Reply(cmd.CorrelationId).KickPlayerFromArenaAsync(player, targetPlayer);
+                    await this.game[cmd.CorrelationId].KickPlayerFromArenaAsync(player, targetPlayer);
                 }
                 else if (command.StartsWith("add "))
                 {
@@ -87,7 +87,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                     }
 
                     var targetPlayer = playerProvider.Get(cmd.Arguments);
-                    await this.game.Reply(cmd.CorrelationId).AddPlayerToArenaAsync(player, targetPlayer);
+                    await this.game[cmd.CorrelationId].AddPlayerToArenaAsync(player, targetPlayer);
                 }
             }
         }

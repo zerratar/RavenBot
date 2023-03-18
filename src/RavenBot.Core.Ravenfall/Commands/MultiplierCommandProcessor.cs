@@ -23,7 +23,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             }
 
             var player = playerProvider.Get(cmd);
-            await this.game.Reply(cmd.CorrelationId).GetMaxMultiplierAsync(player);
+            await this.game[cmd.CorrelationId].GetMaxMultiplierAsync(player);
         }
     }
 }

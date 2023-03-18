@@ -8,6 +8,11 @@ namespace ROBot.Core.Chat.Commands
 {
     public class Big : ChatCommandHandler
     {
+        public override string Description => "Transform your character into a giant. Only streamer can use this command.";
+        public override System.Collections.Generic.IReadOnlyList<ChatCommandInput> Inputs { get; } = new System.Collections.Generic.List<ChatCommandInput>
+        {
+        };
+
         public Big()
         {
             RequiresBroadcaster = true;
@@ -23,7 +28,8 @@ namespace ROBot.Core.Chat.Commands
                 {
                     var targetPlayerName = cmd.Arguments?.Trim();
                     User player = null;
-                    if ((cmd.Sender.IsBroadcaster || cmd.Sender.IsModerator || cmd.Sender.IsGameAdmin || cmd.Sender.IsGameModerator) && !string.IsNullOrEmpty(targetPlayerName))
+                    if ((cmd.Sender.IsBroadcaster || cmd.Sender.IsModerator || cmd.Sender.IsGameAdmin
+                        || cmd.Sender.IsGameModerator) && !string.IsNullOrEmpty(targetPlayerName))
                     {
                         player = session.GetUserByName(targetPlayerName);
                     }
@@ -32,7 +38,7 @@ namespace ROBot.Core.Chat.Commands
                         player = session.Get(cmd);
                     }
 
-                    await connection.Reply(cmd.CorrelationId).ScalePlayerAsync(player, 3f);
+                    await connection[cmd.CorrelationId].ScalePlayerAsync(player, 3f);
                 }
             }
         }

@@ -25,11 +25,11 @@ namespace RavenBot.Core.Ravenfall.Commands
 
             if (!string.IsNullOrEmpty(cmd.Arguments))
             {
-                await this.game.Reply(cmd.CorrelationId).SetAllVillageHutsAsync(player, cmd.Arguments);
+                await this.game[cmd.CorrelationId].SetAllVillageHutsAsync(player, cmd.Arguments);
                 return;
             }
 
-            await this.game.Reply(cmd.CorrelationId).GetVillageBoostAsync(player);
+            await this.game[cmd.CorrelationId].GetVillageBoostAsync(player);
         }
     }
 

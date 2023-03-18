@@ -27,7 +27,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             if (player == null)
                 return;
 
-            await this.game.Reply(cmd.CorrelationId).LeaveAsync(player);
+            await this.game[cmd.CorrelationId].LeaveAsync(player);
         }
     }
 }

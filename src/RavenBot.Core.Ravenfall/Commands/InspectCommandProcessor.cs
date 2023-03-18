@@ -28,7 +28,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                 player = playerProvider.Get(cmd.Arguments);
             }
 
-            await this.game.Reply(cmd.CorrelationId).InspectPlayerAsync(player);
+            await this.game[cmd.CorrelationId].InspectPlayerAsync(player);
         }
     }
 }

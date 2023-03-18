@@ -1,6 +1,7 @@
 ﻿using RavenBot.Core.Handlers;
 using RavenBot.Core.Ravenfall;
 using ROBot.Core.GameServer;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -8,6 +9,14 @@ namespace ROBot.Core.Chat.Commands
 {
     public class Arena : ChatCommandHandler
     {
+        public override string Description => "Arena command is used for interacting with the Arena, such as joining, leaving, starting, etc.";
+        public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
+        {
+            ChatCommandInput.Create("interaction", "How you will interact with the arena", "join", "leave")
+            //.WithOptions(ChatCommandInput.Create("join", "joins the arena"),
+            //             ChatCommandInput.Create("leave", "leaves the arena"))
+        };
+
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
         {
             var channel = cmd.Channel;
@@ -22,11 +31,11 @@ namespace ROBot.Core.Chat.Commands
                     var command = cmd.Arguments?.Trim().ToLower();
                     if (string.IsNullOrEmpty(command) || command.Equals("join"))
                     {
-                        await connection.Reply(cmd.CorrelationId).JoinArenaAsync(player);
+                        await connection[cmd.CorrelationId].JoinArenaAsync(player);
                     }
                     else if (command.Equals("leave"))
                     {
-                        await connection.Reply(cmd.CorrelationId).LeaveArenaAsync(player);
+                        await connection[cmd.CorrelationId].LeaveArenaAsync(player);
                     }
                     else if (command.Equals("start") || command.Equals("begin"))
                     {
@@ -36,7 +45,7 @@ namespace ROBot.Core.Chat.Commands
                             return;
                         }
 
-                        await connection.Reply(cmd.CorrelationId).StartArenaAsync(player);
+                        await connection[cmd.CorrelationId].StartArenaAsync(player);
                     }
                     else if (command.Equals("cancel") || command.Equals("end"))
                     {
@@ -46,7 +55,7 @@ namespace ROBot.Core.Chat.Commands
                             return;
                         }
 
-                        await connection.Reply(cmd.CorrelationId).CancelArenaAsync(player);
+                        await connection[cmd.CorrelationId].CancelArenaAsync(player);
                     }
                     else
                     {
@@ -59,7 +68,7 @@ namespace ROBot.Core.Chat.Commands
                             }
                             var targetPlayerName = command.Split(' ').LastOrDefault();
                             var targetPlayer = session.GetUserByName(targetPlayerName);
-                            await connection.Reply(cmd.CorrelationId).KickPlayerFromArenaAsync(player, targetPlayer);
+                            await connection[cmd.CorrelationId].KickPlayerFromArenaAsync(player, targetPlayer);
                         }
                         else if (command.StartsWith("add "))
                         {
@@ -70,7 +79,7 @@ namespace ROBot.Core.Chat.Commands
                             }
 
                             var targetPlayer = session.Get(cmd);
-                            await connection.Reply(cmd.CorrelationId).AddPlayerToArenaAsync(player, targetPlayer);
+                            await connection[cmd.CorrelationId].AddPlayerToArenaAsync(player, targetPlayer);
                         }
                     }
 

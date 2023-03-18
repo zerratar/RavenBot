@@ -26,12 +26,12 @@ namespace RavenBot.Core.Ravenfall.Commands
             {
                 var player = playerProvider.Get(cmd.Arguments);
                 if (player != null)
-                    await this.game.Reply(cmd.CorrelationId).UnstuckAsync(player);
+                    await this.game[cmd.CorrelationId].UnstuckAsync(player);
             }
             else
             {
                 var player = playerProvider.Get(cmd.Sender, cmd.Arguments);
-                await this.game.Reply(cmd.CorrelationId).UnstuckAsync(player);
+                await this.game[cmd.CorrelationId].UnstuckAsync(player);
             }
 
         }

@@ -29,7 +29,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                 int.TryParse(cmd.Arguments, out numOfSubs);
 
             var player = playerProvider.Get(cmd);
-            await this.game.Reply(cmd.CorrelationId).SetExpMultiplierAsync(player, numOfSubs);
+            await this.game[cmd.CorrelationId].SetExpMultiplierAsync(player, numOfSubs);
         }        
     }
 }

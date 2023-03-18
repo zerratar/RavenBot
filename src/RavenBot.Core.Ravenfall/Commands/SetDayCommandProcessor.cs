@@ -18,7 +18,7 @@ namespace RavenBot.Core.Ravenfall.Commands
         public override async Task ProcessAsync(IMessageChat chat, ICommand cmd)
         {
             var player = playerProvider.Get(cmd);
-            await this.game.Reply(cmd.CorrelationId).SetTimeOfDayAsync(player, 0, 15);
+            await this.game[cmd.CorrelationId].SetTimeOfDayAsync(player, 0, 15);
         }
     }
 }

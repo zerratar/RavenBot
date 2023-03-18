@@ -36,7 +36,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             }
             var sender = playerProvider.Get(cmd);
             var targetPlayer = playerProvider.Get(targetPlayerName);
-            await this.game.Reply(cmd.CorrelationId).KickAsync(sender, targetPlayer);
+            await this.game[cmd.CorrelationId].KickAsync(sender, targetPlayer);
         }
     }
 }

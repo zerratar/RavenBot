@@ -17,7 +17,7 @@ namespace ROBot.Core.Chat.Commands
                 if (connection != null)
                 {
                     var player = session.Get(cmd);
-                    await connection.Reply(cmd.CorrelationId).DisembarkFerryAsync(player);
+                    await connection[cmd.CorrelationId].DisembarkFerryAsync(player);
                 }
             }
         }

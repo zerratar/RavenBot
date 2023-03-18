@@ -32,7 +32,7 @@ namespace ROBot.Core.Chat.Commands
                         player = session.Get(cmd);
                     }
 
-                    await connection.Reply(cmd.CorrelationId).TurnIntoMonsterAsync(player);
+                    await connection[cmd.CorrelationId].TurnIntoMonsterAsync(player);
                 }
             }
         }

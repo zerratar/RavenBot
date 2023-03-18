@@ -35,7 +35,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                     return;
                 }
 
-                await this.game.Reply(cmd.CorrelationId).JoinRaidAsync(player, null);
+                await this.game[cmd.CorrelationId].JoinRaidAsync(player, null);
                 return;
             }
 
@@ -43,13 +43,13 @@ namespace RavenBot.Core.Ravenfall.Commands
             {
                 if (cmd.Arguments.Contains("start", StringComparison.OrdinalIgnoreCase))
                 {
-                    await this.game.Reply(cmd.CorrelationId).RaidStartAsync(player);
+                    await this.game[cmd.CorrelationId].RaidStartAsync(player);
                     return;
                 }
 
                 if (cmd.Arguments.Contains("stop", StringComparison.OrdinalIgnoreCase))
                 {
-                    await this.game.Reply(cmd.CorrelationId).StopRaidAsync(player);
+                    await this.game[cmd.CorrelationId].StopRaidAsync(player);
                     return;
                 }
 
@@ -61,7 +61,7 @@ namespace RavenBot.Core.Ravenfall.Commands
 
                 var sender = playerProvider.Get(cmd);
                 var target = playerProvider.Get(cmd.Arguments);
-                await this.game.Reply(cmd.CorrelationId).RaidStreamerAsync(sender, target, isRaidWar);
+                await this.game[cmd.CorrelationId].RaidStreamerAsync(sender, target, isRaidWar);
             }
         }
     }

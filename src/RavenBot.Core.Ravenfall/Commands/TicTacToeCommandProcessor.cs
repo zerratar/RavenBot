@@ -25,19 +25,19 @@ namespace RavenBot.Core.Ravenfall.Commands
 
             if (string.IsNullOrEmpty(cmd.Arguments))
             {
-                await this.game.Reply(cmd.CorrelationId).ActivateTicTacToeAsync(player);
+                await this.game[cmd.CorrelationId].ActivateTicTacToeAsync(player);
                 return;
             }
 
             if (cmd.Arguments.Trim().Equals("reset", System.StringComparison.OrdinalIgnoreCase))
             {
-                await this.game.Reply(cmd.CorrelationId).ResetTicTacToeAsync(player);
+                await this.game[cmd.CorrelationId].ResetTicTacToeAsync(player);
                 return;
             }
 
             if (int.TryParse(cmd.Arguments.Trim(), out var num))
             {
-                await this.game.Reply(cmd.CorrelationId).PlayTicTacToeAsync(player, num);
+                await this.game[cmd.CorrelationId].PlayTicTacToeAsync(player, num);
             }
         }
     }

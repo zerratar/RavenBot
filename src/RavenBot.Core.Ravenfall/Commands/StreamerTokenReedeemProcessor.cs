@@ -30,7 +30,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                 return;
             }
 
-            await this.game.Reply(cmd.CorrelationId).RedeemStreamerTokenAsync(player, cmd.Arguments);
+            await this.game[cmd.CorrelationId].RedeemStreamerTokenAsync(player, cmd.Arguments);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using RavenBot.Core.Chat;
 using RavenBot.Core.Chat.Twitch;
 using RavenBot.Core.Net;
@@ -23,6 +24,7 @@ namespace ROBot.Core.GameServer
         private readonly IBotServer server;
         private readonly IUserProvider playerProvider;
         private readonly IMessageBus messageBus;
+        private readonly IUserSettingsManager settingsManager;
         private readonly RavenfallGameClientConnection client;
         private GameSessionInfo queuedSessionInfo;
         private IGameSession session;
@@ -44,8 +46,10 @@ namespace ROBot.Core.GameServer
             IBotServer server,
             IUserProvider playerProvider,
             IMessageBus messageBus,
+            IUserSettingsManager settingsManager,
             RavenfallGameClientConnection client)
         {
+            this.settingsManager = settingsManager;
             this.logger = logger;
             this.kernel = kernel;
             this.server = server;
@@ -58,7 +62,7 @@ namespace ROBot.Core.GameServer
             this.subs.Add(messageBus.Subscribe<UserSubscriptionEvent>(nameof(UserSubscriptionEvent), OnUserSub));
 
             this.client = client;
-            
+
             this.Api = new RavenfallApi(client, EnqueueRequest, null);
 
             this.client.Connected += Client_Connected;
@@ -74,8 +78,8 @@ namespace ROBot.Core.GameServer
             }
 
         }
-
-        public IRavenfallApi Reply(string correlationId)
+        public IRavenfallApi this[string correlationid] => Ref(correlationid);
+        public IRavenfallApi Ref(string correlationId)
         {
             if (string.IsNullOrEmpty(correlationId)) return Api;
             return new RavenfallApi(client, EnqueueRequest, correlationId);
@@ -164,6 +168,13 @@ namespace ROBot.Core.GameServer
                 Guid.TryParse(obj.Args[1].ToString(), out var userId);
                 DateTime.TryParse(obj.Args[2].ToString(), out var sessionStart);
 
+                var token = obj.Args[3] as JToken;
+                var userSettings = JsonConvert.DeserializeObject<Dictionary<string, object>>(token.ToString());
+
+                //var userSettings = obj.Args[3];
+
+                settingsManager.Set(userId, userSettings);
+
                 var player = playerProvider.Get(userId);
                 player.IsBroadcaster = true;
 
@@ -178,6 +189,7 @@ namespace ROBot.Core.GameServer
                     SessionId = sessionid,
                     UserId = userId,
                     Owner = player,
+
                 });
             }
             catch (Exception exc)

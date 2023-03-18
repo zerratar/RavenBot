@@ -24,7 +24,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             }
 
             var player = playerProvider.Get(cmd);
-            await this.game.Reply(cmd.CorrelationId).GetStreamerTokenCountAsync(player);
+            await this.game[cmd.CorrelationId].GetStreamerTokenCountAsync(player);
         }
     }
 }

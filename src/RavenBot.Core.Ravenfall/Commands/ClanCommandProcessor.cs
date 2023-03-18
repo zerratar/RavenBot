@@ -43,48 +43,48 @@ namespace RavenBot.Core.Ravenfall.Commands
             {
                 case "info":
                     // clan info, displays the current clan and clan level
-                    await this.game.Reply(cmd.CorrelationId).GetClanInfoAsync(player, argument);
+                    await this.game[cmd.CorrelationId].GetClanInfoAsync(player, argument);
                     return;
 
                 case "stats":
                     // gets some statistics for the clan
                     // how many members, clan skill levels
                     // how many members of each type
-                    await this.game.Reply(cmd.CorrelationId).GetClanStatsAsync(player, argument);
+                    await this.game[cmd.CorrelationId].GetClanStatsAsync(player, argument);
                     return;
 
                 case "leave":
-                    await this.game.Reply(cmd.CorrelationId).LeaveClanAsync(player, argument);
+                    await this.game[cmd.CorrelationId].LeaveClanAsync(player, argument);
                     return;
 
                 case "join":
                     // allow players to join clans that does not require invites.
-                    await this.game.Reply(cmd.CorrelationId).JoinClanAsync(player, argument);
+                    await this.game[cmd.CorrelationId].JoinClanAsync(player, argument);
                     return;
 
                 case "remove":
                 case "kick":
-                    await this.game.Reply(cmd.CorrelationId).RemoveFromClanAsync(player, targetPlayer);
+                    await this.game[cmd.CorrelationId].RemoveFromClanAsync(player, targetPlayer);
                     return;
 
                 case "invite":
-                    await this.game.Reply(cmd.CorrelationId).SendClanInviteAsync(player, targetPlayer);
+                    await this.game[cmd.CorrelationId].SendClanInviteAsync(player, targetPlayer);
                     return;
 
                 case "accept":
-                    await this.game.Reply(cmd.CorrelationId).AcceptClanInviteAsync(player, argument);
+                    await this.game[cmd.CorrelationId].AcceptClanInviteAsync(player, argument);
                     return;
 
                 case "decline":
-                    await this.game.Reply(cmd.CorrelationId).DeclineClanInviteAsync(player, argument);
+                    await this.game[cmd.CorrelationId].DeclineClanInviteAsync(player, argument);
                     return;
 
                 case "promote":
-                    await this.game.Reply(cmd.CorrelationId).PromoteClanMemberAsync(player, targetPlayer, argument);
+                    await this.game[cmd.CorrelationId].PromoteClanMemberAsync(player, targetPlayer, argument);
                     return;
 
                 case "demote":
-                    await this.game.Reply(cmd.CorrelationId).DemoteClanMemberAsync(player, targetPlayer, argument);
+                    await this.game[cmd.CorrelationId].DemoteClanMemberAsync(player, targetPlayer, argument);
                     return;
             }
         }

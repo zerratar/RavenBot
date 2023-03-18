@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using RavenBot.Core.Chat;
 using RavenBot.Core.Chat.Twitch;
 using RavenBot.Core.Net;
@@ -19,15 +21,17 @@ namespace RavenBot.Core.Ravenfall
         private readonly IUserProvider playerProvider;
         private readonly IMessageBus messageBus;
         private readonly IGameClient client;
+        private readonly IUserSettingsManager settingsManager;
 
         public IRavenfallApi Api { get; }
-
         public UnityRavenfallClient(
             ILogger logger,
             IUserProvider playerProvider,
             IMessageBus messageBus,
-            IGameClient client)
+            IGameClient client,
+            IUserSettingsManager settingsManager)
         {
+            this.settingsManager = settingsManager;
             this.logger = logger;
             this.playerProvider = playerProvider;
             this.messageBus = messageBus;
@@ -38,18 +42,19 @@ namespace RavenBot.Core.Ravenfall
             messageBus.Subscribe<UserSubscriptionEvent>(nameof(UserSubscriptionEvent), OnUserSub);
 
             this.client = client;
-            
+
             this.Api = new RavenfallApi(client, EnqueueRequest, null);
 
             this.client.Connected += Client_OnConnect;
 
-            this.client.Subscribe("session", RegisterSessionOwner);
+            this.client.Subscribe("session", RegisterSession);
             this.client.Subscribe("pubsub_token", RegisterPubSubToken);
             this.client.Subscribe("message", SendResponseToTwitchChat);
 
         }
 
-        public IRavenfallApi Reply(string correlationId)
+        public IRavenfallApi this[string correlationid] => Ref(correlationid);
+        public IRavenfallApi Ref(string correlationId)
         {
             if (string.IsNullOrEmpty(correlationId)) return Api;
             return new RavenfallApi(client, EnqueueRequest, correlationId);
@@ -64,15 +69,23 @@ namespace RavenBot.Core.Ravenfall
             messageBus.Send("pubsub_token", userId + "," + token);
         }
 
-        private void RegisterSessionOwner(GameMessageResponse obj)
+        private void RegisterSession(GameMessageResponse obj)
         {
-            if (string.IsNullOrEmpty(obj.Args[0]?.ToString()))
-                return;
+            Guid.TryParse(obj.Args[0].ToString(), out var sessionid);
+            Guid.TryParse(obj.Args[1].ToString(), out var userId);
+            DateTime.TryParse(obj.Args[2].ToString(), out var sessionStart);
 
-            var plr = playerProvider.Get(obj.Args[0]?.ToString(), obj.Args[1]?.ToString());
-            plr.IsBroadcaster = true;
+            var token = obj.Args[3] as JToken;
+            var userSettings = JsonConvert.DeserializeObject<Dictionary<string, object>>(token.ToString());
 
-            messageBus.Send("streamer_userid_acquired", plr.PlatformId);
+            //var userSettings = obj.Args[3];
+
+            settingsManager.Set(userId, userSettings);
+
+            var player = playerProvider.Get(userId);
+            player.IsBroadcaster = true;
+
+            messageBus.Send("streamer_userid_acquired", player.PlatformId);
         }
 
         public Task<bool> ProcessAsync(int serverPort)

@@ -28,7 +28,7 @@ namespace ROBot.Core.Chat.Commands
                         return;
                     }
 
-                    await connection.Reply(cmd.CorrelationId).EquipAsync(player, item);
+                    await connection[cmd.CorrelationId].EquipAsync(player, item);
                 }
             }
         }

@@ -340,7 +340,8 @@ namespace ROBot.Tests
             return Task.CompletedTask;
         }
 
-        public IRavenfallApi Reply(string correlationId)
+        public IRavenfallApi this[string correlationid] => Ref(correlationid);
+        public IRavenfallApi Ref(string correlationId)
         {
             throw new NotImplementedException();
         }

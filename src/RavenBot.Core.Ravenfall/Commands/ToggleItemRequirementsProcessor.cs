@@ -23,7 +23,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                 return;
             }
             var player = playerProvider.Get(cmd);
-            await this.game.Reply(cmd.CorrelationId).ToggleItemRequirementsAsync(player);
+            await this.game[cmd.CorrelationId].ToggleItemRequirementsAsync(player);
         }
     }
 }

@@ -8,6 +8,12 @@ namespace ROBot.Core.Chat.Commands
 {
     public class Redeem : ChatCommandHandler
     {
+        public override string Description => "Redeem items using seasonal Tokens like Halloween Tokens and Christmas Tokens";
+        public override System.Collections.Generic.IReadOnlyList<ChatCommandInput> Inputs { get; } = new System.Collections.Generic.List<ChatCommandInput>
+        {
+            ChatCommandInput.Create("item", "What item you want to redeem").Required(),
+            ChatCommandInput.Create("amount", "How many of the said item you want to redeem")
+        };
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
         {
             var channel = cmd.Channel;
@@ -24,7 +30,7 @@ namespace ROBot.Core.Chat.Commands
                         return;
                     }
 
-                    await connection.Reply(cmd.CorrelationId).RedeemStreamerTokenAsync(player, cmd.Arguments);
+                    await connection[cmd.CorrelationId].RedeemStreamerTokenAsync(player, cmd.Arguments);
                 }
             }
         }

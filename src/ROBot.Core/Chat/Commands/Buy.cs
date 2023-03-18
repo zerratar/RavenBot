@@ -8,6 +8,14 @@ namespace ROBot.Core.Chat.Commands
 {
     public class Buy : ChatCommandHandler
     {
+        public override string Description => "Buy items from the marketplace. See https://www.ravenfall.stream/marketplace";
+        public override System.Collections.Generic.IReadOnlyList<ChatCommandInput> Inputs { get; } = new System.Collections.Generic.List<ChatCommandInput>
+        {
+            ChatCommandInput.Create("item", "What item you want to buy").Required(),
+            ChatCommandInput.Create("amount", "How many of the said item you want to buy"),
+            ChatCommandInput.Create("price", "The maximum amount of coins you want to pay per item").Required()
+        };
+
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
         {
             var channel = cmd.Channel;
@@ -25,7 +33,7 @@ namespace ROBot.Core.Chat.Commands
                         return;
                     }
 
-                    await connection.Reply(cmd.CorrelationId).BuyItemAsync(player, cmd.Arguments);
+                    await connection[cmd.CorrelationId].BuyItemAsync(player, cmd.Arguments);
                 }
             }
         }

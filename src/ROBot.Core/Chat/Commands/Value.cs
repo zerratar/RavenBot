@@ -25,7 +25,7 @@ namespace ROBot.Core.Chat.Commands
 
                     var player = session.Get(cmd);
                     if (player != null)
-                        await connection.Reply(cmd.CorrelationId).ValueItemAsync(player, cmd.Arguments);
+                        await connection[cmd.CorrelationId].ValueItemAsync(player, cmd.Arguments);
                 }
             }
         }

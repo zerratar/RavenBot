@@ -21,19 +21,19 @@ namespace ROBot.Core.Chat.Commands
 
                     if (string.IsNullOrEmpty(cmd.Arguments))
                     {
-                        await connection.Reply(cmd.CorrelationId).JoinDungeonAsync(player, null);
+                        await connection[cmd.CorrelationId].JoinDungeonAsync(player, null);
                         return;
                     }
                     else if (cmd.Arguments.Contains("stop", System.StringComparison.OrdinalIgnoreCase))
                     {
                         if (player.IsBroadcaster || player.IsModerator)
                         {
-                            await connection.Reply(cmd.CorrelationId).StopDungeonAsync(player);
+                            await connection[cmd.CorrelationId].StopDungeonAsync(player);
                         }
                     }
                     else if (cmd.Arguments.Contains("start", System.StringComparison.OrdinalIgnoreCase))
                     {
-                        await connection.Reply(cmd.CorrelationId).DungeonStartAsync(player);
+                        await connection[cmd.CorrelationId].DungeonStartAsync(player);
                     }
                 }
             }

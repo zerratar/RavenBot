@@ -35,7 +35,7 @@ namespace ROBot.Core.Chat.Commands
 
                     if (player != null)
                     {
-                        await connection.Reply(cmd.CorrelationId).RequestIslandInfoAsync(player);
+                        await connection[cmd.CorrelationId].RequestIslandInfoAsync(player);
                     }
                 }
             }

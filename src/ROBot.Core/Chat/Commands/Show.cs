@@ -32,7 +32,7 @@ namespace ROBot.Core.Chat.Commands
                         ? session.Get(cmd.Sender)
                         : session.GetUserByName(targetPlayerName);
 
-                    await connection.Reply(cmd.CorrelationId).ObservePlayerAsync(player);
+                    await connection[cmd.CorrelationId].ObservePlayerAsync(player);
                 }
             }
         }

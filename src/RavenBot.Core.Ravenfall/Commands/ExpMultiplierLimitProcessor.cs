@@ -32,7 +32,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             if (numOfSubs < 15) return;
 
             var player = playerProvider.Get(cmd);
-            await this.game.Reply(cmd.CorrelationId).SetExpMultiplierLimitAsync(player, numOfSubs);
+            await this.game[cmd.CorrelationId].SetExpMultiplierLimitAsync(player, numOfSubs);
         }
     }
 }

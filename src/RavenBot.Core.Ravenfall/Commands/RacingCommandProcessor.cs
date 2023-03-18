@@ -24,13 +24,13 @@ namespace RavenBot.Core.Ravenfall.Commands
             var player = playerProvider.Get(cmd);
             if (string.IsNullOrEmpty(cmd.Arguments))
             {
-                await this.game.Reply(cmd.CorrelationId).PlayPetRacingAsync(player);
+                await this.game[cmd.CorrelationId].PlayPetRacingAsync(player);
                 return;
             }
 
             if (cmd.Arguments.Trim().Equals("reset", System.StringComparison.OrdinalIgnoreCase))
             {
-                await this.game.Reply(cmd.CorrelationId).ResetPetRacingAsync(player);
+                await this.game[cmd.CorrelationId].ResetPetRacingAsync(player);
                 return;
             }
         }

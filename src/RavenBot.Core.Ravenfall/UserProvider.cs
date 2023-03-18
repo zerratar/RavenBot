@@ -196,8 +196,8 @@ namespace RavenBot.Core.Ravenfall
 
         private void LoadSettings(User user)
         {
-            var settings = user.Id != Guid.Empty 
-                ? settingsManager.Get(user.Id) 
+            var settings = user.Id != Guid.Empty
+                ? settingsManager.Get(user.Id)
                 : settingsManager.Get(user.PlatformId, user.Platform);
 
             if (settings.HasValues)
@@ -209,7 +209,7 @@ namespace RavenBot.Core.Ravenfall
 
         private User CreateUser(string username, string platformId, string platform)
         {
-            var user = new User(Guid.Empty, username, username, null, platform, platformId, false, false, false, false, "1");
+            var user = new User(Guid.Empty, Guid.Empty, username, username, null, platform, platformId, false, false, false, false, "1");
             var settings = settingsManager.Get(platformId, platform);
             if (settings.HasValues)
             {

@@ -10,16 +10,19 @@ namespace ROBot.Core.GameServer
         private readonly IMessageBus messageBus;
         private readonly Microsoft.Extensions.Logging.ILogger logger;
         private readonly IKernel kernel;
+        private readonly IUserSettingsManager userSettingsManager;
         private readonly IUserProvider playerProvider;
 
         public RavenfallConnectionProvider(
             IMessageBus messageBus,
             Microsoft.Extensions.Logging.ILogger logger,
             IKernel kernel,
+            IUserSettingsManager userSettingsManager,
             IUserProvider playerProvider)
         {
             this.logger = logger;
             this.kernel = kernel;
+            this.userSettingsManager = userSettingsManager;
             this.playerProvider = playerProvider;
             this.messageBus = messageBus;
         }
@@ -32,6 +35,7 @@ namespace ROBot.Core.GameServer
                 server,
                 playerProvider,
                 messageBus,
+                userSettingsManager,
                 new RavenfallGameClientConnection(client, logger));
         }
     }

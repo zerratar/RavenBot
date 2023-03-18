@@ -25,12 +25,12 @@ namespace ROBot.Core.Chat.Commands
                     {
                         var player = session.GetUserByName(cmd.Arguments);
                         if (player != null)
-                            await connection.Reply(cmd.CorrelationId).UnstuckAsync(player);
+                            await connection[cmd.CorrelationId].UnstuckAsync(player);
                     }
                     else
                     {
                         var player = session.Get(cmd);
-                        await connection.Reply(cmd.CorrelationId).UnstuckAsync(player);
+                        await connection[cmd.CorrelationId].UnstuckAsync(player);
                     }
                 }
             }

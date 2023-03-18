@@ -22,7 +22,7 @@ namespace ROBot.Core.Chat.Commands
                     if (!string.IsNullOrEmpty(cmd.Arguments))
                         int.TryParse(cmd.Arguments, out numOfSubs);
 
-                    await connection.Reply(cmd.CorrelationId).UseExpMultiplierScrollAsync(player, numOfSubs);
+                    await connection[cmd.CorrelationId].UseExpMultiplierScrollAsync(player, numOfSubs);
                 }
             }
         }

@@ -25,7 +25,7 @@ namespace RavenBot.Core.Ravenfall.Commands
 
             var query = cmd.Arguments?.Trim();
             var player = playerProvider.Get(cmd);
-            await this.game.Reply(cmd.CorrelationId).CraftAsync(player, query);
+            await this.game[cmd.CorrelationId].CraftAsync(player, query);
         }
     }
 }

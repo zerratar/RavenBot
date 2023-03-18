@@ -18,7 +18,7 @@ namespace ROBot.Core.Chat.Commands
                 if (connection != null)
                 {
                     var player = session.Join(cmd.Sender, cmd.Arguments);
-                    await connection.Reply(cmd.CorrelationId).JoinAsync(player);
+                    await connection[cmd.CorrelationId].JoinAsync(player);
                 }
             }
             else if (chat is Discord.DiscordCommandClient) // only for discord

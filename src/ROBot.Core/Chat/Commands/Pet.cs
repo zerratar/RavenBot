@@ -23,11 +23,11 @@ namespace ROBot.Core.Chat.Commands
                     var pet = cmd.Arguments?.ToLower();
                     if (string.IsNullOrEmpty(pet))
                     {
-                        await connection.Reply(cmd.CorrelationId).GetPetAsync(player);
+                        await connection[cmd.CorrelationId].GetPetAsync(player);
                         return;
                     }
 
-                    await connection.Reply(cmd.CorrelationId).SetPetAsync(player, pet);
+                    await connection[cmd.CorrelationId].SetPetAsync(player, pet);
                 }
             }
         }

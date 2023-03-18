@@ -26,19 +26,19 @@ namespace RavenBot.Core.Ravenfall.Commands
             var player = playerProvider.Get(cmd);
             if (string.IsNullOrEmpty(cmd.Arguments))
             {
-                await this.game.Reply(cmd.CorrelationId).JoinDungeonAsync(player, null);
+                await this.game[cmd.CorrelationId].JoinDungeonAsync(player, null);
                 return;
             }
             else if (cmd.Arguments.Contains("stop", System.StringComparison.OrdinalIgnoreCase))
             {
                 if (player.IsBroadcaster || player.IsModerator)
                 {
-                    await this.game.Reply(cmd.CorrelationId).StopDungeonAsync(player);
+                    await this.game[cmd.CorrelationId].StopDungeonAsync(player);
                 }
             }
             else if (cmd.Arguments.Contains("start", System.StringComparison.OrdinalIgnoreCase))
             {
-                await this.game.Reply(cmd.CorrelationId).DungeonStartAsync(player);
+                await this.game[cmd.CorrelationId].DungeonStartAsync(player);
             }
         }
     }

@@ -30,7 +30,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                 return;
             }
 
-            await this.game.Reply(cmd.CorrelationId).PlayerAppearanceUpdateAsync(player, cmd.Arguments);
+            await this.game[cmd.CorrelationId].PlayerAppearanceUpdateAsync(player, cmd.Arguments);
         }
     }
 
@@ -54,7 +54,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             }
 
             var player = playerProvider.Get(cmd);
-            await this.game.Reply(cmd.CorrelationId).RequestPlayerStatsAsync(player, cmd.Arguments);
+            await this.game[cmd.CorrelationId].RequestPlayerStatsAsync(player, cmd.Arguments);
         }
     }
 }

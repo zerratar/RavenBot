@@ -38,14 +38,14 @@ namespace RavenBot.Core.Ravenfall.Commands
             var player = playerProvider.Get(cmd);
             if (GetCombatTypeFromString(cmd.Command) != -1)
             {
-                await this.game.Reply(cmd.CorrelationId).SendPlayerTaskAsync(player, PlayerTask.Fighting, cmd.Command);
+                await this.game[cmd.CorrelationId].SendPlayerTaskAsync(player, PlayerTask.Fighting, cmd.Command);
                 return;
             }
 
             var commandSkillTarget = GetSkillTypeFromString(cmd.Command);
             if (commandSkillTarget != -1)
             {
-                await this.game.Reply(cmd.CorrelationId).SendPlayerTaskAsync(player, (PlayerTask)commandSkillTarget, cmd.Command);
+                await this.game[cmd.CorrelationId].SendPlayerTaskAsync(player, (PlayerTask)commandSkillTarget, cmd.Command);
                 return;
             }
 
@@ -59,7 +59,7 @@ namespace RavenBot.Core.Ravenfall.Commands
 
             if (GetCombatTypeFromString(skill) != -1)
             {
-                await this.game.Reply(cmd.CorrelationId).SendPlayerTaskAsync(player, PlayerTask.Fighting, skill);
+                await this.game[cmd.CorrelationId].SendPlayerTaskAsync(player, PlayerTask.Fighting, skill);
             }
             else
             {
@@ -70,7 +70,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                 }
                 else
                 {
-                    await this.game.Reply(cmd.CorrelationId).SendPlayerTaskAsync(player, (PlayerTask)value, skill);
+                    await this.game[cmd.CorrelationId].SendPlayerTaskAsync(player, (PlayerTask)value, skill);
                 }
             }
         }

@@ -9,6 +9,29 @@ namespace RavenBot.Core.Chat.Discord
 {
     public class DiscordCommand : ICommand
     {
+        public DiscordCommand(SocketSlashCommand cmd, bool isGameAdmin = false, bool isGameModerator = false)
+        {
+            Command = cmd.CommandName;
+            if (cmd.Data.Options != null)
+            {
+                // for now, simplify it.
+                Arguments = String.Join(" ", cmd.Data.Options.Select(x => x.Value?.ToString()));
+            }
+
+            Channel = new DiscordChannel(cmd.Channel);
+
+            var author = cmd.User;
+
+            Sender = new DiscordSender(
+                author.Id,
+                author.Username + "#" + author.Discriminator,
+                author.Username,
+                isGameAdmin,
+                isGameModerator);
+
+            CorrelationId = cmd.Id.ToString();
+        }
+
         public DiscordCommand(SocketMessage cmd, bool isGameAdmin = false, bool isGameModerator = false)
         {
             int pos = 0;

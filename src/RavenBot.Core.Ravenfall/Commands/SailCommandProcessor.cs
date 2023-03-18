@@ -26,24 +26,24 @@ namespace RavenBot.Core.Ravenfall.Commands
 
             if (cmd.Command.StartsWith("disembark"))
             {
-                await this.game.Reply(cmd.CorrelationId).DisembarkFerryAsync(player);
+                await this.game[cmd.CorrelationId].DisembarkFerryAsync(player);
                 return;
             }
 
             var destination = cmd.Arguments?.ToLower();
             if (string.IsNullOrEmpty(destination))
             {
-                await this.game.Reply(cmd.CorrelationId).EmbarkFerryAsync(player);
+                await this.game[cmd.CorrelationId].EmbarkFerryAsync(player);
                 return;
             }
 
             if (destination.StartsWith("stop"))
             {
-                await this.game.Reply(cmd.CorrelationId).DisembarkFerryAsync(player);
+                await this.game[cmd.CorrelationId].DisembarkFerryAsync(player);
                 return;
             }
 
-            await this.game.Reply(cmd.CorrelationId).TravelAsync(player, destination);
+            await this.game[cmd.CorrelationId].TravelAsync(player, destination);
         }
     }
 }

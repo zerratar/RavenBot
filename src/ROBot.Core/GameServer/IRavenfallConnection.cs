@@ -15,7 +15,8 @@ namespace ROBot.Core.GameServer
         IPEndPoint EndPoint { get; }
         string EndPointString { get; }
         IRavenfallApi Api { get; }
-        IRavenfallApi Reply(string correlationId);
+        IRavenfallApi Ref(string correlationId);
+        IRavenfallApi this[string correlationid] { get; }
         void Close();
     }
 }

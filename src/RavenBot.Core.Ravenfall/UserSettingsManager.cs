@@ -148,5 +148,14 @@ namespace RavenBot.Core.Ravenfall
         {
             Get(userId).Set(key, value);
         }
+
+        public void Set(Guid userId, Dictionary<string, object> userSettings)
+        {
+            var settings = Get(userId);
+            foreach(var s in userSettings)
+            {
+                settings.Set(s.Key, s.Value);
+            }
+        }
     }
 }

@@ -30,11 +30,11 @@ namespace RavenBot.Core.Ravenfall.Commands
             var leaveOnsen = !string.IsNullOrEmpty(cmd.Arguments) && cmd.Arguments.Contains("leave", StringComparison.OrdinalIgnoreCase);
             if (leaveOnsen)
             {
-                await this.game.Reply(cmd.CorrelationId).LeaveOnsenAsync(player);
+                await this.game[cmd.CorrelationId].LeaveOnsenAsync(player);
             }
             else
             {
-                await this.game.Reply(cmd.CorrelationId).JoinOnsenAsync(player);
+                await this.game[cmd.CorrelationId].JoinOnsenAsync(player);
             }
         }
     }
