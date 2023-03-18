@@ -99,25 +99,18 @@ namespace ROBot.Core.Chat.Discord
                 var guild = discord.GetGuild(694530158341783612); // ravenfall
 
                 await guild.DeleteApplicationCommandsAsync();
-
                 //slashCommands.AddRange(await guild.GetApplicationCommandsAsync());
-
                 //if (slashCommands.Count != 0) return;
-
-                foreach (var command in commands)
-                {
-                    if (slashCommands.Any(x => x.Name == command.Name.Value))
-                        continue;
-
-                    this.slashCommands.Add(await guild.CreateApplicationCommandAsync(command));
-
-                    // With global commands we don't need the guild.
-
-                    //await discord.CreateGlobalApplicationCommandAsync(command);
-
-                    // Using the ready event is a simple implementation for the sake of the example. Suitable for testing and development.
-                    // For a production bot, it is recommended to only run the CreateGlobalApplicationCommandAsync() once for each command.
-                }
+                //foreach (var command in commands)
+                //{
+                //    if (slashCommands.Any(x => x.Name == command.Name.Value))
+                //        continue;
+                //    this.slashCommands.Add(await guild.CreateApplicationCommandAsync(command));
+                //    // With global commands we don't need the guild.
+                //    //await discord.CreateGlobalApplicationCommandAsync(command);
+                //    // Using the ready event is a simple implementation for the sake of the example. Suitable for testing and development.
+                //    // For a production bot, it is recommended to only run the CreateGlobalApplicationCommandAsync() once for each command.
+                //}
             }
             catch (ApplicationCommandException exception)
             {
