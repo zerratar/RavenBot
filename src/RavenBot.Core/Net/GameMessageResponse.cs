@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace RavenBot.Core.Net
+﻿namespace RavenBot.Core.Net
 {
     public class GameMessageResponse
     {
@@ -13,6 +11,12 @@ namespace RavenBot.Core.Net
             string category,
             string correlationId)
         {
+            if (!string.IsNullOrEmpty(format) && format.StartsWith("%["))
+            {
+                format = MessageUtilities.TryExtractCategory(format, out category);
+                format = MessageUtilities.TryExtractTags(format, out tags);
+            }
+
             this.Identifier = identifier;
             this.Format = format;
             this.Recipent = recipent;
@@ -29,32 +33,5 @@ namespace RavenBot.Core.Net
         public string[] Tags { get; }
         public string Category { get; }
         public string CorrelationId { get; }
-    }
-
-
-    public class GameMessageRecipent
-    {
-        public GameMessageRecipent(Guid userId, Guid characterId, string platform, string platformId, string platformUserName)
-        {
-            UserId = userId;
-            CharacterId = characterId;
-            Platform = platform;
-            PlatformId = platformId;
-            PlatformUserName = platformUserName;
-        }
-
-        public Guid UserId { get; }
-        public Guid CharacterId { get; }
-        public string Platform { get; }
-        public string PlatformId { get; }
-        public string PlatformUserName { get; }
-    }
-
-    public class GameMessage
-    {
-        public string Identifier { get; set; }
-        public string Content { get; set; }
-        public string CorrelationId { get; set; }
-        public Ravenfall.Models.User Sender { get; set; }
     }
 }
