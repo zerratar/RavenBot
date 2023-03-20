@@ -9,12 +9,12 @@ namespace ROBot.Core.OpenAI
     public class ChatGPT35MessageTransformer : IChatMessageTransformer
     {
         private readonly TimeSpan TransformationTimeout = TimeSpan.FromMinutes(1);
-        private readonly ILogger<ChatGPT35MessageTransformer> logger;
+        private readonly Microsoft.Extensions.Logging.ILogger logger;
         private readonly IAppSettings settings;
         private readonly OpenAI openAI;
         private DateTime noTransformationBefore;
         public ChatGPT35MessageTransformer(
-            ILogger<ChatGPT35MessageTransformer> logger,
+            Microsoft.Extensions.Logging.ILogger logger,
             IAppSettings settings)
         {
             this.logger = logger;
