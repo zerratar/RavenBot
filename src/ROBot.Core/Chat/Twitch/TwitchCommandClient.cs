@@ -179,8 +179,8 @@ namespace ROBot.Core.Chat.Twitch
                     new TwitchClient(new WebSocketClient(new ClientOptions
                     {
                         ClientType = ClientType.Chat,
-                        MessagesAllowedInPeriod = 750,
-                        ThrottlingPeriod = TimeSpan.FromSeconds(30)
+                        //MessagesAllowedInPeriod = 750,
+                        //ThrottlingPeriod = TimeSpan.FromSeconds(30)
                     }));
 
                 client.AutoReListenOnException = true;
@@ -761,7 +761,6 @@ namespace ROBot.Core.Chat.Twitch
 
             if (err == "")
             {
-
                 logger.LogWarning("[TWITCH] Failed To Get Join Confirmation Without Reported Errors (Channel: " + e.Exception.Channel + ")");
             }
             else
