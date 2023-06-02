@@ -75,13 +75,13 @@ namespace ROBot.Core.Chat.Discord
             {
                 // How much logging do you want to see?
                 LogLevel = LogSeverity.Info,
-                GatewayIntents = GatewayIntents.All
+                GatewayIntents = GatewayIntents.All,
 
                 // If you or another service needs to do anything with messages
                 // (eg. checking Reactions, checking the content of edited/deleted messages),
                 // you must set the MessageCacheSize. You may adjust the number as needed.
                 //MessageCacheSize = 50,
-
+                MessageCacheSize = 100,
                 // If your platform doesn't have native WebSockets,
                 // add Discord.Net.Providers.WS4Net from NuGet,
                 // add the `using` at the top, and uncomment this line:
