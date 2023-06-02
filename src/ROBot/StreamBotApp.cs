@@ -228,6 +228,8 @@ namespace ROBot
 
         private void OnSessionUpdated(object sender, GameSessionUpdateEventArgs e)
         {
+            discord.EnsureSessionChannel(e.Session);
+
             if (e.OldName != e.Session.Name)
             {
                 logger.LogWarning("[RVNFLL] Game Session Name Changed (OldName: " + e.OldName + " New: " + e.Session.Name + ")");
@@ -247,7 +249,7 @@ namespace ROBot
             logger.LogDebug("[RVNFLL] Game Session Started (Name: " + session.Name + ")");
             twitch.JoinChannel(session.Name);
             botStats.LastSessionStarted = DateTime.UtcNow;
-            discord.SessionStarted(session);
+            discord.EnsureSessionChannel(session);
         }
 
         private void OnSessionEnded(object sender, IGameSession session)

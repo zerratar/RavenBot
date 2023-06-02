@@ -469,12 +469,13 @@ namespace ROBot.Core.Chat.Discord
             await TrySetChannelTopicAsync(session.Name.ToLower(), "Game Status: Offline");
         }
 
-        public async void SessionStarted(IGameSession session)
+        public async void EnsureSessionChannel(IGameSession session)
         {
             // create the channel?
-            if (session.Channel == null)
+            var channel = await TryResolveChannelAsync(session.Name);
+            if (session.Channel == null || session.Channel.Name != channel.Name)
             {
-                session.Channel = await TryResolveChannelAsync(session.Name);
+                session.Channel = channel;
             }
 
             await TrySetChannelTopicAsync(session.Name.ToLower(), "Game Status: Online! - Use !join to play");
