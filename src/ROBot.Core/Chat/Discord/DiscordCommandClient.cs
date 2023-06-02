@@ -369,21 +369,32 @@ namespace ROBot.Core.Chat.Discord
 
         private async Task<IMessageChannel> GetChannelAsync(ICommandChannel channel)
         {
-            var c = channel;
-            if (c is not DiscordCommand.DiscordChannel)
-                c = await TryResolveChannelAsync(c.Name);
+            // ugly method, but it will try to create the channel if one does not exist.
+            IMessageChannel msgChannel = null;
 
-            var discordChannel = c as DiscordCommand.DiscordChannel;
-            return discordChannel != null ? discordChannel.Channel : null;
+            if (channel is DiscordCommand.DiscordChannel discordChannel && discordChannel.Channel != null)
+            {
+                return discordChannel.Channel;
+            }
+
+            if (channel != null)
+            {
+                var c0 = await TryResolveChannelAsync(channel.Name);
+                if (c0 != null) msgChannel = c0.Channel;
+            }
+
+            return msgChannel;
         }
 
-        private async Task<ICommandChannel> TryResolveChannelAsync(string name)
+        private async Task<DiscordCommand.DiscordChannel> TryResolveChannelAsync(string name)
         {
             try
             {
                 var key = name.ToLower();
                 if (channels.TryGetValue(key, out var channel))
+                {
                     return channel;
+                }
 
                 // we will create a channel if one does not exist.
                 if (!CreateTextChannelForStreamers || insufficientPermissionsForCreatingTextChannel)
@@ -391,10 +402,10 @@ namespace ROBot.Core.Chat.Discord
                     return null;
                 }
 
-                var c = await ravenfallGuild.CreateTextChannelAsync(name, props => props.CategoryId = PlayRavenfallCategoryId);
-                if (c != null)
+                var msgChannel = await ravenfallGuild.CreateTextChannelAsync(name, props => props.CategoryId = PlayRavenfallCategoryId);
+                if (msgChannel != null)
                 {
-                    return channels[key] = new DiscordCommand.DiscordChannel(c);
+                    return channels[key] = new DiscordCommand.DiscordChannel(msgChannel);
                 }
             }
             catch (Exception exc)
