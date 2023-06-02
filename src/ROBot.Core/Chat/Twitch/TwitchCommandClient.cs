@@ -175,13 +175,7 @@ namespace ROBot.Core.Chat.Twitch
                            // one option is to never create a new client here
             try
             {
-                client =
-                    new TwitchClient(new WebSocketClient(new ClientOptions
-                    {
-                        ClientType = ClientType.Chat,
-                        //MessagesAllowedInPeriod = 750,
-                        //ThrottlingPeriod = TimeSpan.FromSeconds(30)
-                    }));
+                client = new TwitchClient(new WebSocketClient(new ClientOptions(clientType: ClientType.Chat)));
 
                 client.AutoReListenOnException = true;
 
@@ -629,20 +623,20 @@ namespace ROBot.Core.Chat.Twitch
                     return;
                 }
 
-                if (e.Command.ArgumentsAsString.Contains("activate", StringComparison.OrdinalIgnoreCase))
-                {
-                    if (pubSubManager.IsReady(e.Command.ChatMessage.Channel))
-                    {
-                        return;
-                    }
+                //if (e.Command.ArgumentsAsString.Contains("activate", StringComparison.OrdinalIgnoreCase))
+                //{
+                //    if (pubSubManager.IsReady(e.Command.ChatMessage.Channel))
+                //    {
+                //        return;
+                //    }
 
-                    var activationLink = pubSubManager.GetActivationLink(e.Command.ChatMessage.UserId, e.Command.ChatMessage.Username);
-                    client.SendWhisper(e.Command.ChatMessage.Username,
-                        "Please use the following link to activate the channel point rewards. " +
-                        activationLink
-                        );
-                    return;
-                }
+                //    var activationLink = pubSubManager.GetActivationLink(e.Command.ChatMessage.UserId, e.Command.ChatMessage.Username);
+                //    client.SendWhisper(e.Command.ChatMessage.Username,
+                //        "Please use the following link to activate the channel point rewards. " +
+                //        activationLink
+                //        );
+                //    return;
+                //}
             }
 
             if (await commandHandler.HandleAsync(game, this, e.Command))

@@ -278,11 +278,21 @@ namespace RavenBot
         private void CreateTwitchClient()
         {
             pubsub = new TwitchPubSub();
-            client = new TwitchClient(new WebSocketClient(new ClientOptions
+
+            var options = new ClientOptions(
+                clientType: ClientType.Chat);
+
+            /*
+             
+             new ClientOptions
             {
                 ClientType = ClientType.Chat,
                 MessagesAllowedInPeriod = 100
-            }));
+            }
+             
+             */
+
+            client = new TwitchClient(new WebSocketClient(options));
         }
 
         private void OnReSub(object sender, OnReSubscriberArgs e)
@@ -413,11 +423,11 @@ namespace RavenBot
             messageBus.Send("twitch", "");
         }
 
-        private void OnReconnected(object sender, OnReconnectedEventArgs e)
-        {
-            logger.WriteDebug("Reconnected to Twitch IRC Server");
-            messageBus.Send("twitch", "");
-        }
+        //private void OnReconnected(object sender, OnReconnectedEventArgs e)
+        //{
+        //    logger.WriteDebug("Reconnected to Twitch IRC Server");
+        //    messageBus.Send("twitch", "");
+        //}
 
         private void OnRaidNotification(object sender, OnRaidNotificationArgs e)
         {
@@ -444,6 +454,12 @@ namespace RavenBot
             pubsub.OnPubSubServiceError += Pubsub_OnPubSubServiceError;
             pubsub.OnPubSubServiceClosed += Pubsub_OnPubSubServiceClosed;
             pubsub.OnChannelPointsRewardRedeemed += Pubsub_OnChannelPointsRewardRedeemed;
+        }
+
+        private void OnReconnected(object sender, OnConnectedArgs e)
+        {
+            logger.WriteDebug("Reconnected to Twitch IRC Server");
+            messageBus.Send("twitch", "");
         }
 
         private void OnConnectionError(object sender, OnConnectionErrorArgs e)
