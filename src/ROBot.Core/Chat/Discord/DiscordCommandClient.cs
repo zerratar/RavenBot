@@ -463,14 +463,40 @@ namespace ROBot.Core.Chat.Discord
             return Task.CompletedTask;
         }
 
-        public void SessionEnded(IGameSession session)
+        public async void SessionEnded(IGameSession session)
         {
             // delete the channel?
+            await TrySetChannelTopicAsync(session.Name.ToLower(), "Game Status: Offline");
         }
 
-        public void SessionStarted(IGameSession session)
+        public async void SessionStarted(IGameSession session)
         {
             // create the channel?
+            if (session.Channel == null)
+            {
+                session.Channel = await TryResolveChannelAsync(session.Name);
+            }
+
+            await TrySetChannelTopicAsync(session.Name.ToLower(), "Game Status: Online! - Use !join to play");
+        }
+
+        private async Task TrySetChannelTopicAsync(string key, string topic)
+        {
+            try
+            {
+                if (channels.TryGetValue(key, out var c) && c.Channel != null)
+                {
+                    var channel = this.ravenfallGuild.TextChannels.FirstOrDefault(x => x.Id == c.Channel.Id);
+                    if (channel != null)
+                    {
+                        await channel.ModifyAsync(prop => prop.Topic = topic);
+                    }
+                }
+            }
+            catch
+            {
+                // ignored
+            }
         }
     }
 }
