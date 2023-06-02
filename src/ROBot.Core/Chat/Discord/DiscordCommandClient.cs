@@ -379,18 +379,18 @@ namespace ROBot.Core.Chat.Discord
 
         private async Task<ICommandChannel> TryResolveChannelAsync(string name)
         {
-            var key = name.ToLower();
-            if (channels.TryGetValue(key, out var channel))
-                return channel;
-
-            // we will create a channel if one does not exist.
-            if (!CreateTextChannelForStreamers || insufficientPermissionsForCreatingTextChannel)
-            {
-                return null;
-            }
-
             try
             {
+                var key = name.ToLower();
+                if (channels.TryGetValue(key, out var channel))
+                    return channel;
+
+                // we will create a channel if one does not exist.
+                if (!CreateTextChannelForStreamers || insufficientPermissionsForCreatingTextChannel)
+                {
+                    return null;
+                }
+
                 var c = await ravenfallGuild.CreateTextChannelAsync(name, props => props.CategoryId = PlayRavenfallCategoryId);
                 if (c != null)
                 {
@@ -473,7 +473,7 @@ namespace ROBot.Core.Chat.Discord
         {
             // create the channel?
             var channel = await TryResolveChannelAsync(session.Name);
-            if (session.Channel == null || session.Channel.Name != channel.Name)
+            if (session.Channel == null && channel != null)
             {
                 session.Channel = channel;
             }
