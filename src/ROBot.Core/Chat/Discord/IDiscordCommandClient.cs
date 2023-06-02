@@ -7,5 +7,7 @@ namespace ROBot.Core.Chat.Discord
 {
     public interface IDiscordCommandClient : IChatCommandClient
     {
+        void SessionEnded(IGameSession session);
+        void SessionStarted(IGameSession session);
     }
 }

@@ -32,7 +32,11 @@ namespace RavenBot
             ioc.RegisterShared<ILogger, ConsoleLogger>();
             ioc.RegisterShared<IKernel, Kernel>();
 
-            ioc.RegisterShared<IUserSettingsManager, UserSettingsManager>();
+#if DEBUG
+            ioc.RegisterCustomShared<IUserSettingsManager>(() => new UserSettingsManager(@"C:\Ravenfall\user-settings"));
+#else
+            ioc.RegisterCustomShared<IUserSettingsManager>(() => new UserSettingsManager("./user-settings/"));
+#endif
             ioc.RegisterShared<ITwitchUserStore, TwitchUserStore>();
             ioc.RegisterCustomShared<IAppSettings>(() => new AppSettingsProvider().Get());
             ioc.Register<IGameConnection, TcpGameConnection>();
@@ -46,7 +50,6 @@ namespace RavenBot
             ioc.RegisterShared<IGameClient, TcpGameClient>();
 
             ioc.RegisterShared<IUserProvider, UserProvider>();
-            ioc.RegisterShared<IUserSettingsManager, UserSettingsManager>();
 
             ioc.RegisterShared<IStringProvider, CachedStringProvider>();
             ioc.RegisterShared<IStringTemplateParser, StringTemplateParser>();

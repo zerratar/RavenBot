@@ -39,6 +39,14 @@ namespace ROBot.Core.Chat.Discord
         private readonly ConcurrentDictionary<string, DiscordCommand.DiscordChannel> channels = new();
         private readonly DiscordFormatMessager messager;
 
+        private const long RavenfallGuildId = 694530158341783612;
+        private const long PlayRavenfallCategoryId = 1114144307876724760;
+        private const bool CreateTextChannelForStreamers = true; // set to true for now. but needs to be configurable.
+
+        private List<SocketApplicationCommand> slashCommands = new List<SocketApplicationCommand>();
+        private SocketGuild ravenfallGuild;
+        private bool insufficientPermissionsForCreatingTextChannel;
+
         public DiscordCommandClient(
             ILogger logger,
             IKernel kernel,
@@ -88,17 +96,16 @@ namespace ROBot.Core.Chat.Discord
             discord.SlashCommandExecuted += Discord_SlashCommandExecuted;
         }
 
-        private List<SocketApplicationCommand> slashCommands = new List<SocketApplicationCommand>();
 
         private async Task Discord_Ready()
         {
-            var commands = commandHandler.RegisterSlashCommands(this, discord);
+            //var commands = commandHandler.RegisterSlashCommands(this, discord);
             try
             {
                 // Now that we have our builder, we can call the CreateApplicationCommandAsync method to make our slash command.               
-                var guild = discord.GetGuild(694530158341783612); // ravenfall
+                this.ravenfallGuild = discord.GetGuild(RavenfallGuildId); // ravenfall
 
-                await guild.DeleteApplicationCommandsAsync();
+                await ravenfallGuild.DeleteApplicationCommandsAsync();
                 //slashCommands.AddRange(await guild.GetApplicationCommandsAsync());
                 //if (slashCommands.Count != 0) return;
                 //foreach (var command in commands)
@@ -149,7 +156,7 @@ namespace ROBot.Core.Chat.Discord
             channels.Clear();
         }
 
-        public void Broadcast(SessionGameMessageResponse cmd)
+        public async void Broadcast(SessionGameMessageResponse cmd)
         {
             if (cmd == null || cmd.Session?.Name == null)
             {
@@ -159,7 +166,7 @@ namespace ROBot.Core.Chat.Discord
             var channel = cmd.Session.Channel;
             if (channel == null)
             {
-                cmd.Session.Channel = channel = TryResolveChannel(cmd.Session.Name);
+                cmd.Session.Channel = channel = await TryResolveChannelAsync(cmd.Session.Name);
             }
 
             if (channel != null)
@@ -217,7 +224,7 @@ namespace ROBot.Core.Chat.Discord
             // for special messages like !stats, we want to give a more appealing message. For these,
             // the formatter and transformation will be ignored as we will generate it ourselves.
             // but only if we can reply to a message
-            var targetChannel = GetChannel(channel);
+            var targetChannel = await GetChannelAsync(channel);
             if (targetChannel != null &&
                 await messager.HandleCustomReplyAsync(targetChannel, new UserReference(recipent), new MessageReference(replyId), args, category, tags))
                 return;
@@ -228,7 +235,7 @@ namespace ROBot.Core.Chat.Discord
         public async void SendReply(
             ICommandChannel channel, GameMessageRecipent recipent, string format, object[] args, string category, string[] tags, ulong replyId)
         {
-            var targetChannel = GetChannel(channel);
+            var targetChannel = await GetChannelAsync(channel);
             if (targetChannel != null &&
                 await messager.HandleCustomReplyAsync(targetChannel, new UserReference(recipent), new MessageReference(replyId), args, category, tags))
                 return;
@@ -239,7 +246,7 @@ namespace ROBot.Core.Chat.Discord
         public async void SendMessage(
             ICommandChannel channel, GameMessageRecipent recipent, string format, object[] args, string category, string[] tags)
         {
-            var targetChannel = GetChannel(channel);
+            var targetChannel = await GetChannelAsync(channel);
             if (targetChannel != null &&
                 await messager.HandleCustomReplyAsync(targetChannel, new UserReference(recipent), null, args, category, tags))
                 return;
@@ -322,7 +329,7 @@ namespace ROBot.Core.Chat.Discord
             }
 
             // Process the chat message a final time before sending it off.
-            var c = GetChannel(channel);
+            var c = await GetChannelAsync(channel);
             if (c != null)
             {
                 var session = game.GetSession(channel);
@@ -351,7 +358,7 @@ namespace ROBot.Core.Chat.Discord
                 {
                     logger.LogDebug($"[DISCORD] Sending Message (Channel: {channel} Message: {message})");
                 }
-                
+
                 await c.SendMessageAsync(message, messageReference: replyReference);
             }
             else
@@ -360,20 +367,42 @@ namespace ROBot.Core.Chat.Discord
             }
         }
 
-        private ISocketMessageChannel GetChannel(ICommandChannel channel)
+        private async Task<IMessageChannel> GetChannelAsync(ICommandChannel channel)
         {
             var c = channel;
             if (c is not DiscordCommand.DiscordChannel)
-                c = TryResolveChannel(c.Name);
+                c = await TryResolveChannelAsync(c.Name);
 
             var discordChannel = c as DiscordCommand.DiscordChannel;
             return discordChannel != null ? discordChannel.Channel : null;
         }
 
-        private ICommandChannel TryResolveChannel(string name)
+        private async Task<ICommandChannel> TryResolveChannelAsync(string name)
         {
-            if (channels.TryGetValue(name.ToLower(), out var channel))
+            var key = name.ToLower();
+            if (channels.TryGetValue(key, out var channel))
                 return channel;
+
+            // we will create a channel if one does not exist.
+            if (!CreateTextChannelForStreamers || insufficientPermissionsForCreatingTextChannel)
+            {
+                return null;
+            }
+
+            try
+            {
+                var c = await ravenfallGuild.CreateTextChannelAsync(name, props => props.CategoryId = PlayRavenfallCategoryId);
+                if (c != null)
+                {
+                    return channels[key] = new DiscordCommand.DiscordChannel(c);
+                }
+            }
+            catch (Exception exc)
+            {
+                logger.LogError("Failed to create Ravenfall Bot Channel for " + name + ", all future attempts are ignored. Exception: " + exc);
+                insufficientPermissionsForCreatingTextChannel = true;
+            }
+
             return null;
         }
 
@@ -434,5 +463,14 @@ namespace ROBot.Core.Chat.Discord
             return Task.CompletedTask;
         }
 
+        public void SessionEnded(IGameSession session)
+        {
+            // delete the channel?
+        }
+
+        public void SessionStarted(IGameSession session)
+        {
+            // create the channel?
+        }
     }
 }

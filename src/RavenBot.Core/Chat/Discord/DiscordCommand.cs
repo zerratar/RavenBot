@@ -1,4 +1,5 @@
-﻿using Discord.Commands;
+﻿using Discord;
+using Discord.Commands;
 using Discord.WebSocket;
 using RavenBot.Core.Extensions;
 using RavenBot.Core.Handlers;
@@ -129,9 +130,9 @@ namespace RavenBot.Core.Chat.Discord
         {
             public ulong Id { get; }
             public string Name { get; }
-            public ISocketMessageChannel Channel { get; }
+            public IMessageChannel Channel { get; }
 
-            public DiscordChannel(ISocketMessageChannel channel)
+            public DiscordChannel(IMessageChannel channel)
             {
                 Channel = channel;
 

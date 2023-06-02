@@ -247,6 +247,7 @@ namespace ROBot
             logger.LogDebug("[RVNFLL] Game Session Started (Name: " + session.Name + ")");
             twitch.JoinChannel(session.Name);
             botStats.LastSessionStarted = DateTime.UtcNow;
+            discord.SessionStarted(session);
         }
 
         private void OnSessionEnded(object sender, IGameSession session)
@@ -254,6 +255,7 @@ namespace ROBot
             logger.LogDebug("[RVNFLL] Game Session Ended (Name: " + session.Name + ")");
             twitch.LeaveChannel(session.Name);
             botStats.LastSessionEnded = DateTime.UtcNow;
+            discord.SessionEnded(session);
         }
     }
 }

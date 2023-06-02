@@ -8,23 +8,19 @@ namespace RavenBot.Core.Ravenfall
 {
     public class UserSettingsManager : IUserSettingsManager
     {
-#if DEBUG
-        const string SettingsDirectory = @"C:\Ravenfall\user-settings";
-#else
-        const string SettingsDirectory = "../user-settings/";
-#endif
-
+        private readonly string SettingsDirectory;
         private readonly ConcurrentDictionary<Guid, UserSettings> dict = new();
         private readonly ConcurrentDictionary<string, Guid> idLookup = new();
 
-        public UserSettingsManager()
+        public UserSettingsManager(string settingsDirectory = "../user-settings/")
         {
-            if (!System.IO.Directory.Exists(SettingsDirectory))
+            this.SettingsDirectory = settingsDirectory;
+            if (!System.IO.Directory.Exists(settingsDirectory))
             {
-                System.IO.Directory.CreateDirectory(SettingsDirectory);
+                System.IO.Directory.CreateDirectory(settingsDirectory);
             }
 
-            var settingsFiles = System.IO.Directory.GetFiles(SettingsDirectory, "*.json");
+            var settingsFiles = System.IO.Directory.GetFiles(settingsDirectory, "*.json");
             foreach (var file in settingsFiles)
             {
                 try

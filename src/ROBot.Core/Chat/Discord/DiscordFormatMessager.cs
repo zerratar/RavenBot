@@ -15,7 +15,7 @@ namespace ROBot.Core.Chat.Discord
     public class DiscordFormatMessager
     {
         public async Task<bool> HandleCustomReplyAsync(
-            ISocketMessageChannel channel,
+            IMessageChannel channel,
             UserReference user,
             MessageReference reference,
             object[] args,
@@ -53,7 +53,7 @@ namespace ROBot.Core.Chat.Discord
             return false;
         }
 
-        private async Task<bool> HandleCustomReplyAsync(ISocketMessageChannel channel, UserReference user, MessageReference reference, JToken arg, string category, string[] tags)
+        private async Task<bool> HandleCustomReplyAsync(IMessageChannel channel, UserReference user, MessageReference reference, JToken arg, string category, string[] tags)
         {
             //await channel.SendMessageAsync(message, messageReference: reference);
 
@@ -69,7 +69,7 @@ namespace ROBot.Core.Chat.Discord
             return false;
         }
 
-        private async Task<bool> SendPlayerStatsReplyAsync(ISocketMessageChannel channel, UserReference user, MessageReference reference, PlayerInspect inspect)
+        private async Task<bool> SendPlayerStatsReplyAsync(IMessageChannel channel, UserReference user, MessageReference reference, PlayerInspect inspect)
         {
             try
             {
