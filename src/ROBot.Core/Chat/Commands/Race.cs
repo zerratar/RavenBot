@@ -20,13 +20,13 @@ namespace ROBot.Core.Chat.Commands
                     var player = session.Get(cmd);
                     if (string.IsNullOrEmpty(cmd.Arguments))
                     {
-                        await connection[cmd.CorrelationId].PlayPetRacingAsync(player);
+                        await connection[cmd].PlayPetRacingAsync(player);
                         return;
                     }
 
                     if (cmd.Arguments.Contains("reset", StringComparison.OrdinalIgnoreCase))
                     {
-                        await connection[cmd.CorrelationId].ResetPetRacingAsync(player);
+                        await connection[cmd].ResetPetRacingAsync(player);
                         return;
                     }
                 }

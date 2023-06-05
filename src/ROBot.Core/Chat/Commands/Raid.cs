@@ -28,7 +28,7 @@ namespace ROBot.Core.Chat.Commands
                             return;
                         }
 
-                        await connection[cmd.CorrelationId].JoinRaidAsync(player, null);
+                        await connection[cmd].JoinRaidAsync(player, null);
                         return;
                     }
 
@@ -36,13 +36,13 @@ namespace ROBot.Core.Chat.Commands
                     {
                         if (cmd.Arguments.Contains("start", StringComparison.OrdinalIgnoreCase))
                         {
-                            await connection[cmd.CorrelationId].RaidStartAsync(player);
+                            await connection[cmd].RaidStartAsync(player);
                             return;
                         }
 
                         if (cmd.Arguments.Contains("stop", StringComparison.OrdinalIgnoreCase))
                         {
-                            await connection[cmd.CorrelationId].StopRaidAsync(player);
+                            await connection[cmd].StopRaidAsync(player);
                             return;
                         }
 
@@ -53,7 +53,7 @@ namespace ROBot.Core.Chat.Commands
                         }
 
                         var target = session.GetUserByName(cmd.Arguments);
-                        await connection[cmd.CorrelationId].RaidStreamerAsync(player, target, isRaidWar);
+                        await connection[cmd].RaidStreamerAsync(player, target, isRaidWar);
                     }
                 }
             }

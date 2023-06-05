@@ -21,17 +21,17 @@ namespace ROBot.Core.Chat.Commands
                     var destination = cmd.Arguments?.ToLower();
                     if (string.IsNullOrEmpty(destination))
                     {
-                        await connection[cmd.CorrelationId].EmbarkFerryAsync(player);
+                        await connection[cmd].EmbarkFerryAsync(player);
                         return;
                     }
 
                     if (destination.StartsWith("stop"))
                     {
-                        await connection[cmd.CorrelationId].DisembarkFerryAsync(player);
+                        await connection[cmd].DisembarkFerryAsync(player);
                         return;
                     }
 
-                    await connection[cmd.CorrelationId].TravelAsync(player, destination);
+                    await connection[cmd].TravelAsync(player, destination);
                 }
             }
         }

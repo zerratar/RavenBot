@@ -33,7 +33,7 @@ namespace ROBot.Core.Chat.Commands
                         return;
                     }
 
-                    await connection[cmd.CorrelationId].BuyItemAsync(player, cmd.Arguments);
+                    await connection[cmd].BuyItemAsync(player, cmd.Arguments);
                 }
             }
         }

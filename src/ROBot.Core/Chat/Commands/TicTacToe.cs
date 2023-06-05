@@ -19,19 +19,19 @@ namespace ROBot.Core.Chat.Commands
                     var player = session.Get(cmd);
                     if (string.IsNullOrEmpty(cmd.Arguments))
                     {
-                        await connection[cmd.CorrelationId].ActivateTicTacToeAsync(player);
+                        await connection[cmd].ActivateTicTacToeAsync(player);
                         return;
                     }
 
                     if (cmd.Arguments.Trim().Equals("reset", System.StringComparison.OrdinalIgnoreCase))
                     {
-                        await connection[cmd.CorrelationId].ResetTicTacToeAsync(player);
+                        await connection[cmd].ResetTicTacToeAsync(player);
                         return;
                     }
 
                     if (int.TryParse(cmd.Arguments.Trim(), out var num))
                     {
-                        await connection[cmd.CorrelationId].PlayTicTacToeAsync(player, num);
+                        await connection[cmd].PlayTicTacToeAsync(player, num);
                     }
                 }
             }

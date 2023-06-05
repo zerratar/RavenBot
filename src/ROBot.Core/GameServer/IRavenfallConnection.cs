@@ -1,4 +1,5 @@
-﻿using RavenBot.Core.Ravenfall;
+﻿using RavenBot.Core.Handlers;
+using RavenBot.Core.Ravenfall;
 using RavenBot.Core.Ravenfall.Models;
 using System;
 using System.Net;
@@ -17,6 +18,7 @@ namespace ROBot.Core.GameServer
         IRavenfallApi Api { get; }
         IRavenfallApi Ref(string correlationId);
         IRavenfallApi this[string correlationid] { get; }
+        IRavenfallApi this[ICommand cmd] { get; }
         void Close();
     }
 }

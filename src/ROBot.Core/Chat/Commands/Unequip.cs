@@ -27,7 +27,7 @@ namespace ROBot.Core.Chat.Commands
                         return;
                     }
 
-                    await connection[cmd.CorrelationId].UnequipAsync(player, item);
+                    await connection[cmd].UnequipAsync(player, item);
                 }
             }
         }

@@ -17,7 +17,7 @@ namespace ROBot.Core.Chat.Commands
                 if (connection != null)
                 {
                     var player = session.Get(cmd);
-                    await connection[cmd.CorrelationId].GetScrollCountAsync(player);
+                    await connection[cmd].GetScrollCountAsync(player);
                 }
             }
         }

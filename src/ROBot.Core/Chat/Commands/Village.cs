@@ -19,11 +19,11 @@ namespace ROBot.Core.Chat.Commands
                     var player = session.Get(cmd);
                     if (!string.IsNullOrEmpty(cmd.Arguments))
                     {
-                        await connection[cmd.CorrelationId].SetAllVillageHutsAsync(player, cmd.Arguments);
+                        await connection[cmd].SetAllVillageHutsAsync(player, cmd.Arguments);
                     }
                     else
                     {
-                        await connection[cmd.CorrelationId].GetVillageBoostAsync(player);
+                        await connection[cmd].GetVillageBoostAsync(player);
                     }
                 }
             }

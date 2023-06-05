@@ -1,4 +1,5 @@
-﻿using RavenBot.Core.Ravenfall;
+﻿using RavenBot.Core.Handlers;
+using RavenBot.Core.Ravenfall;
 using RavenBot.Core.Ravenfall.Models;
 using ROBot.Core;
 using ROBot.Core.GameServer;
@@ -19,6 +20,8 @@ namespace ROBot.Tests
         public string EndPointString => "127.0.0.1:1";
 
         public IRavenfallApi Api => throw new NotImplementedException();
+
+        public IRavenfallApi this[ICommand cmd] => throw new NotImplementedException();
 
         public event EventHandler<GameSessionInfo> OnSessionInfoReceived;
 

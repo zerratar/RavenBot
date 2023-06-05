@@ -27,15 +27,16 @@ namespace ROBot.Core.Chat.Commands
                 if (connection != null)
                 {
                     var player = session.Get(cmd);
+                    //var client = connection[cmd];
 
                     var command = cmd.Arguments?.Trim().ToLower();
                     if (string.IsNullOrEmpty(command) || command.Equals("join"))
                     {
-                        await connection[cmd.CorrelationId].JoinArenaAsync(player);
+                        await connection[cmd].JoinArenaAsync(player);
                     }
                     else if (command.Equals("leave"))
                     {
-                        await connection[cmd.CorrelationId].LeaveArenaAsync(player);
+                        await connection[cmd].LeaveArenaAsync(player);
                     }
                     else if (command.Equals("start") || command.Equals("begin"))
                     {
@@ -45,7 +46,7 @@ namespace ROBot.Core.Chat.Commands
                             return;
                         }
 
-                        await connection[cmd.CorrelationId].StartArenaAsync(player);
+                        await connection[cmd].StartArenaAsync(player);
                     }
                     else if (command.Equals("cancel") || command.Equals("end"))
                     {
@@ -55,7 +56,7 @@ namespace ROBot.Core.Chat.Commands
                             return;
                         }
 
-                        await connection[cmd.CorrelationId].CancelArenaAsync(player);
+                        await connection[cmd].CancelArenaAsync(player);
                     }
                     else
                     {
@@ -68,7 +69,7 @@ namespace ROBot.Core.Chat.Commands
                             }
                             var targetPlayerName = command.Split(' ').LastOrDefault();
                             var targetPlayer = session.GetUserByName(targetPlayerName);
-                            await connection[cmd.CorrelationId].KickPlayerFromArenaAsync(player, targetPlayer);
+                            await connection[cmd].KickPlayerFromArenaAsync(player, targetPlayer);
                         }
                         else if (command.StartsWith("add "))
                         {
@@ -79,7 +80,7 @@ namespace ROBot.Core.Chat.Commands
                             }
 
                             var targetPlayer = session.Get(cmd);
-                            await connection[cmd.CorrelationId].AddPlayerToArenaAsync(player, targetPlayer);
+                            await connection[cmd].AddPlayerToArenaAsync(player, targetPlayer);
                         }
                     }
 

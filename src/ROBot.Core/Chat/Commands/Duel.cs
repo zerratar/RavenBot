@@ -27,19 +27,19 @@ namespace ROBot.Core.Chat.Commands
                     var sub = cmd.Arguments?.Trim();
                     if (sub.Equals("cancel", StringComparison.InvariantCultureIgnoreCase))
                     {
-                        await connection[cmd.CorrelationId].CancelDuelRequestAsync(player);
+                        await connection[cmd].CancelDuelRequestAsync(player);
                     }
                     else if (sub.Equals("accept", StringComparison.InvariantCultureIgnoreCase))
                     {
-                        await connection[cmd.CorrelationId].AcceptDuelRequestAsync(player);
+                        await connection[cmd].AcceptDuelRequestAsync(player);
                     }
                     else if (sub.Equals("decline", StringComparison.InvariantCultureIgnoreCase))
                     {
-                        await connection[cmd.CorrelationId].DeclineDuelRequestAsync(player);
+                        await connection[cmd].DeclineDuelRequestAsync(player);
                     }
                     else
                     {
-                        await connection[cmd.CorrelationId].DuelRequestAsync(player, session.GetUserByName(sub));
+                        await connection[cmd].DuelRequestAsync(player, session.GetUserByName(sub));
                     }
                 }
             }

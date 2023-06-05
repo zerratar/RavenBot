@@ -23,7 +23,7 @@ namespace ROBot.Core.Chat.Commands
                 {
                     var player = session.Get(cmd);
                     if (player != null)
-                        await connection[cmd.CorrelationId].SetTimeOfDayAsync(player, 230, 30);
+                        await connection[cmd].SetTimeOfDayAsync(player, 230, 30);
                 }
             }
         }

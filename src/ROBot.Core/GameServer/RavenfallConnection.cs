@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RavenBot.Core.Chat;
 using RavenBot.Core.Chat.Twitch;
+using RavenBot.Core.Handlers;
 using RavenBot.Core.Net;
 using RavenBot.Core.Ravenfall;
 using RavenBot.Core.Ravenfall.Models;
@@ -78,6 +79,7 @@ namespace ROBot.Core.GameServer
             }
 
         }
+        public IRavenfallApi this[ICommand cmd] => Ref(cmd.CorrelationId);
         public IRavenfallApi this[string correlationid] => Ref(correlationid);
         public IRavenfallApi Ref(string correlationId)
         {

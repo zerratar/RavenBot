@@ -19,7 +19,7 @@
 //                    var numOfSubs = 1;
 //                    if (!string.IsNullOrEmpty(cmd.Arguments))
 //                        int.TryParse(cmd.Arguments, out numOfSubs);
-//                    await connection[cmd.CorrelationId].SetExpMultiplierAsync(player, numOfSubs);
+//                    await connection[cmd].SetExpMultiplierAsync(player, numOfSubs);
 //                }
 //            }
 //        }

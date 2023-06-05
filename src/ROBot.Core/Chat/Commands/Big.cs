@@ -1,6 +1,5 @@
 ﻿using RavenBot.Core.Handlers;
 using RavenBot.Core.Ravenfall.Models;
-using ROBot.Core.Chat.Twitch;
 using ROBot.Core.GameServer;
 using System.Threading.Tasks;
 
@@ -8,7 +7,8 @@ namespace ROBot.Core.Chat.Commands
 {
     public class Big : ChatCommandHandler
     {
-        public override string Description => "Transform your character into a giant. Only streamer can use this command.";
+        public override string Description => "Transform your character into a giant. Only streamer or moderator can use this command.";
+
         public override System.Collections.Generic.IReadOnlyList<ChatCommandInput> Inputs { get; } = new System.Collections.Generic.List<ChatCommandInput>
         {
         };
@@ -38,7 +38,7 @@ namespace ROBot.Core.Chat.Commands
                         player = session.Get(cmd);
                     }
 
-                    await connection[cmd.CorrelationId].ScalePlayerAsync(player, 3f);
+                    await connection[cmd].ScalePlayerAsync(player, 3f);
                 }
             }
         }

@@ -22,7 +22,7 @@ namespace ROBot.Core.Chat.Commands
                         player = session.GetUserByName(cmd.Arguments);
                     }
 
-                    await connection[cmd.CorrelationId].InspectPlayerAsync(player);
+                    await connection[cmd].InspectPlayerAsync(player);
                 }
             }
         }

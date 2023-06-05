@@ -27,11 +27,11 @@ namespace ROBot.Core.Chat.Commands
                     var player = session.Get(cmd);
                     if (cmd.Arguments.Contains("helm", StringComparison.OrdinalIgnoreCase))
                     {
-                        await connection[cmd.CorrelationId].ToggleHelmetAsync(player);
+                        await connection[cmd].ToggleHelmetAsync(player);
                     }
                     else if (cmd.Arguments.Contains("pet", StringComparison.OrdinalIgnoreCase))
                     {
-                        await connection[cmd.CorrelationId].TogglePetAsync(player);
+                        await connection[cmd].TogglePetAsync(player);
                     }
                     else
                     {

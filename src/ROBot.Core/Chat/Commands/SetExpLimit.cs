@@ -22,7 +22,7 @@
 //                        int.TryParse(cmd.Arguments, out numOfSubs);
 //                    }
 //                    if (numOfSubs < 15) return;
-//                    await connection[cmd.CorrelationId].SetExpMultiplierLimitAsync(player, numOfSubs);
+//                    await connection[cmd].SetExpMultiplierLimitAsync(player, numOfSubs);
 //                }
 //            }
 //        }

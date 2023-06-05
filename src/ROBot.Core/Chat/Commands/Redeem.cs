@@ -30,7 +30,7 @@ namespace ROBot.Core.Chat.Commands
                         return;
                     }
 
-                    await connection[cmd.CorrelationId].RedeemStreamerTokenAsync(player, cmd.Arguments);
+                    await connection[cmd].RedeemStreamerTokenAsync(player, cmd.Arguments);
                 }
             }
         }
