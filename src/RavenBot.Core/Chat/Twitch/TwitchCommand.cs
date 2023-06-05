@@ -53,6 +53,13 @@ namespace RavenBot.Core.Chat.Twitch
             var isModerator = cmd.ChatMessage.IsModerator;
             var isSubscriber = cmd.ChatMessage.IsSubscriber;
             var isBroadcaster = cmd.ChatMessage.IsBroadcaster;
+
+            if (!isBroadcaster)
+            {
+                // just in case, check if the user is the same as the channel.
+                isBroadcaster = cmd.ChatMessage.Username.ToLower().Equals(cmd.ChatMessage.Channel.ToLower());
+            }
+
             var isVip = cmd.ChatMessage.IsVip;
             var isVerifiedBot = false;
 
