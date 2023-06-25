@@ -7,7 +7,16 @@
         ICommandChannel Channel { get; }
         string Command { get; }
         string Arguments { get; }
+        /// <summary>
+        ///     A message correlation id, most of the cases this will be the message id that first issued a command that was sent to the game and will be used for direct reply to.
+        ///     This will be empty if the client sent a message related to an event or if the user used the Twitcch Extension or 3rd party app to send a command.
+        /// </summary>
         string CorrelationId { get; }
+        /// <summary>
+        ///     While correlation id should always be used to refeer to a recipent or target, most commonly it will be the message id to reply to. 
+        ///     But when that is missing and we still want to mention a user, this is the username to use.
+        /// </summary>
+        string Mention { get; }
     }
 
     public interface ICommandChannel

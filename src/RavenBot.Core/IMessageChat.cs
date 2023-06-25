@@ -6,7 +6,7 @@ namespace RavenBot.Core
     {
         //void Broadcast(string format, params object[] args);
         void SendReply(ICommand cmd, string message, params object[] args);
-        void SendReply(string format, object[] args, string correlationId);
+        void SendReply(string format, object[] args, string correlationId, string mention);
         void Announce(string format, params object[] args);
         bool CanRecieveChannelPointRewards { get; }
         //void Send(string target, string message);

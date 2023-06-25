@@ -82,6 +82,7 @@ namespace RavenBot.Core.Chat.Discord
 
 
             CorrelationId = cmd.Id.ToString();
+            Mention = msg.Author.Mention;
         }
 
         public ICommandSender Sender { get; set; }
@@ -89,6 +90,8 @@ namespace RavenBot.Core.Chat.Discord
         public string Arguments { get; set; }
         public ICommandChannel Channel { get; set; }
         public string CorrelationId { get; set; }
+
+        public string Mention { get; set; }
 
         public class DiscordSender : ICommandSender
         {

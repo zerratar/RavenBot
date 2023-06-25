@@ -20,6 +20,7 @@ using TwitchLib.Communication.Enums;
 using TwitchLib.Communication.Events;
 using TwitchLib.Communication.Models;
 using TwitchLib.PubSub.Events;
+using static System.Collections.Specialized.BitVector32;
 
 namespace ROBot.Core.Chat.Twitch
 {
@@ -451,20 +452,7 @@ namespace ROBot.Core.Chat.Twitch
 
                 if (message.Recipent.Platform == "twitch")
                 {
-                    if (!string.IsNullOrEmpty(message.CorrelationId))
-                    {
-                        SendReply(channel, message.Format, message.Args, message.CorrelationId);
-                        return;
-                    }
-
-                    if (!string.IsNullOrEmpty(message.Recipent.PlatformUserName))
-                    {
-                        SendMessage(channel, message.Recipent.PlatformUserName + " " + message.Format, message.Args);
-                    }
-                    else
-                    {
-                        SendMessage(channel, message.Format, message.Args);
-                    }
+                    SendReply(channel, message.Format, message.Args, message.CorrelationId, message.Recipent.PlatformUserName);
                 }
 
                 // ignore any platform that is not discord.
@@ -484,7 +472,7 @@ namespace ROBot.Core.Chat.Twitch
             await SendMessageAsync(channel, msg);
         }
 
-        public async void SendReply(ICommandChannel channel, string format, object[] args, string correlationId)
+        public async void SendReply(ICommandChannel channel, string format, object[] args, string correlationId, string mention)
         {
             if (string.IsNullOrWhiteSpace(format))
                 return;
@@ -493,20 +481,20 @@ namespace ROBot.Core.Chat.Twitch
             if (string.IsNullOrEmpty(msg))
                 return;
 
-            await SendMessageAsync(channel, msg, correlationId);
+            await SendMessageAsync(channel, msg, correlationId, mention);
         }
 
         public void SendReply(ICommand command, string format, params object[] args)
         {
-            SendReply(command.Channel, format, args, command.CorrelationId);
+            SendReply(command.Channel, format, args, command.CorrelationId, command.Mention);
         }
 
         public Task SendMessageAsync(ICommandChannel channel, string message)
         {
-            return SendMessageAsync(channel, message, null);
+            return SendMessageAsync(channel, message, null, null);
         }
 
-        public async Task SendMessageAsync(ICommandChannel channel, string message, string correlationId)
+        public async Task SendMessageAsync(ICommandChannel channel, string message, string correlationId, string mention)
         {
             if (!client.IsConnected)
             {
@@ -530,6 +518,16 @@ namespace ROBot.Core.Chat.Twitch
 
             if (string.IsNullOrEmpty(correlationId))
             {
+                if (!string.IsNullOrEmpty(mention))
+                {
+                    if (!mention.StartsWith("@"))
+                    {
+                        mention = "@" + mention;
+                    }
+
+                    message = mention + ", " + message;
+                }
+
                 client.SendMessage(channel.Name, message);
                 return;
             }

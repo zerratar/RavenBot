@@ -214,13 +214,15 @@ namespace RavenBot
 
             if (message.Recipent.Platform == "twitch")
             {
-                if (!string.IsNullOrEmpty(message.CorrelationId))
-                {
-                    SendReply(message.Format, message.Args, message.CorrelationId);
-                    return;
-                }
+                SendReply(message.Format, message.Args, message.CorrelationId, message.Recipent.PlatformUserName);
 
-                SendMessage(message.Format, message.Args);
+                //if (!string.IsNullOrEmpty(message.CorrelationId))
+                //{
+                //    SendReply(message.Format, message.Args, message.CorrelationId);
+                //    return;
+                //}
+
+                //SendMessage(message.Format, message.Args);
             }
 
             // Ignore other platforms for now.
@@ -235,10 +237,10 @@ namespace RavenBot
 
         public void SendReply(ICommand cmd, string message, params object[] args)
         {
-            SendReply(message, args, cmd.CorrelationId);
+            SendReply(message, args, cmd.CorrelationId, cmd.Mention);
         }
 
-        public void SendReply(string format, object[] args, string correlationId)
+        public void SendReply(string format, object[] args, string correlationId, string mention)
         {
             if (!this.client.IsConnected || string.IsNullOrWhiteSpace(format))
                 return;
@@ -251,7 +253,23 @@ namespace RavenBot
             if (string.IsNullOrEmpty(msg))
                 return;
 
-            client.SendReply(channel, correlationId, msg);
+            if (!string.IsNullOrEmpty(correlationId))
+            {
+                client.SendReply(channel, correlationId, msg);
+                return;
+            }
+
+            if (!string.IsNullOrEmpty(mention))
+            {
+                if (!mention.StartsWith("@"))
+                {
+                    mention = "@" + mention;
+                }
+
+                msg = mention + ", " + msg;
+            }
+
+            SendMessage(msg);
         }
 
         public void SendMessage(string format, object[] args)

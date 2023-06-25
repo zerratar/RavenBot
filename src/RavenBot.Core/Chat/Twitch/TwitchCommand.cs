@@ -50,6 +50,7 @@ namespace RavenBot.Core.Chat.Twitch
 
             Channel = new TwitchChannel(cmd.ChatMessage.Channel);
 
+            var isVip = cmd.ChatMessage.IsVip;
             var isModerator = cmd.ChatMessage.IsModerator;
             var isSubscriber = cmd.ChatMessage.IsSubscriber;
             var isBroadcaster = cmd.ChatMessage.IsBroadcaster;
@@ -60,7 +61,6 @@ namespace RavenBot.Core.Chat.Twitch
                 isBroadcaster = cmd.ChatMessage.Username.ToLower().Equals(cmd.ChatMessage.Channel.ToLower());
             }
 
-            var isVip = cmd.ChatMessage.IsVip;
             var isVerifiedBot = false;
 
             Sender = new TwitchCommandSender(
@@ -77,6 +77,7 @@ namespace RavenBot.Core.Chat.Twitch
                 cmd.ChatMessage.ColorHex);
 
             CorrelationId = cmd.ChatMessage.Id;
+            Mention = cmd.ChatMessage.Username;
         }
 
         public string CorrelationId { get; set; }
@@ -94,6 +95,9 @@ namespace RavenBot.Core.Chat.Twitch
         public ICommandSender Sender { get; }
         public string Command { get; }
         public string Arguments { get; }
+
+        public string Mention { get; set; }
+
         public override string ToString()
         {
             return (Sender?.Username ?? "???") + ": #" + Channel + ", " + Command + " " + Arguments;

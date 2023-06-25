@@ -18,6 +18,7 @@ namespace RavenBot.Core.Ravenfall
             this.Command = command.AsUTF8();
             this.Channel = new TwitchCommand.TwitchChannel(channel);
             this.CorrelationId = player.PlatformId;
+            this.Mention = "@" + player.Username;
         }
 
         public ICommandSender Sender { get; }
@@ -25,6 +26,7 @@ namespace RavenBot.Core.Ravenfall
         public string Command { get; }
         public string Arguments { get; }
         public string CorrelationId { get; set; }
+        public string Mention { get; set; }
         public override string ToString()
         {
             return (Player?.Username ?? Sender?.Username ?? "???") + ": #" + Channel + ", " + Command + " " + Arguments;
