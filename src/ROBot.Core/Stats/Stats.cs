@@ -307,11 +307,11 @@ namespace ROBot.Core.Stats
             _lastTwitchLibErrorMessage = JsonConvert.SerializeObject(e);
         }
 
-        public void ReceivedLog(OnLogArgs e)
-        {
-            _lastTwitchLibLog = _lastUpdated = DateTime.UtcNow;
-            _lastTwitchLibLogMessage = JsonConvert.SerializeObject(e);
-        }
+        //public void ReceivedLog(OnLogArgs e)
+        //{
+        //    _lastTwitchLibLog = _lastUpdated = DateTime.UtcNow;
+        //    _lastTwitchLibLogMessage = JsonConvert.SerializeObject(e);
+        //}
 
         public void AddLastRateLimit(OnRateLimitArgs e)
         {

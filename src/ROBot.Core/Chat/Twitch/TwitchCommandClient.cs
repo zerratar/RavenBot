@@ -125,7 +125,7 @@ namespace ROBot.Core.Chat.Twitch
             client.OnRateLimit += Client_OnRateLimit;
             //full events
             client.OnError += OnError;
-            client.OnLog += OnLog;
+            //client.OnLog += OnLog;
 
             /* TwitchLib.PubSub Events */
             pubSubManager.OnChannelPointsRewardRedeemed += Pubsub_OnChannelPointsRewardRedeemed;
@@ -177,8 +177,8 @@ namespace ROBot.Core.Chat.Twitch
             try
             {
                 client = new TwitchClient(new WebSocketClient(new ClientOptions(clientType: ClientType.Chat)));
-
-                client.AutoReListenOnException = true;
+                
+                //client.AutoReListenOnException = true;
 
                 var credentials = credentialsProvider.Get();
 
@@ -199,7 +199,7 @@ namespace ROBot.Core.Chat.Twitch
             if (kernel.Started) kernel.Stop();
             if (client != null)
             {
-                client.OnLog -= OnLog;
+                //client.OnLog -= OnLog;
                 client.OnError -= OnError;
             }
             Unsubscribe();
@@ -768,14 +768,14 @@ namespace ROBot.Core.Chat.Twitch
         {
         }
 
-        private void OnLog(object sender, TwitchLib.Client.Events.OnLogArgs e)
-        {
-            if (e == null)
-                return;
-            if (e.Data.StartsWith("Received:"))
-                stats.ReceivedLog(e);
-            //logger.LogDebug("[TWITCH] onLog (Log: " + e.Data + ")");
-        }
+        //private void OnLog(object sender, TwitchLib.Client.Events.OnLogArgs e)
+        //{
+        //    if (e == null)
+        //        return;
+        //    if (e.Data.StartsWith("Received:"))
+        //        stats.ReceivedLog(e);
+        //    //logger.LogDebug("[TWITCH] onLog (Log: " + e.Data + ")");
+        //}
 
         private void OnError(object sender, OnErrorEventArgs e)
         {

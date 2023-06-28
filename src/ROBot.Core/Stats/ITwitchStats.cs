@@ -33,7 +33,7 @@ namespace ROBot.Core.Stats
         TimeSpan avgMsgDelays();
         void JoinedChannel(string channel, System.Collections.Generic.IReadOnlyList<TwitchLib.Client.Models.JoinedChannel> joinedChannels);
         void LeftChannel(string channel, System.Collections.Generic.IReadOnlyList<TwitchLib.Client.Models.JoinedChannel> joinedChannels);
-        void ReceivedLog(OnLogArgs e);
+        //void ReceivedLog(OnLogArgs e);
         void ResetReceivedCount();
         void ResetTwitchAttempt();
         void AddLastRateLimit(OnRateLimitArgs e);

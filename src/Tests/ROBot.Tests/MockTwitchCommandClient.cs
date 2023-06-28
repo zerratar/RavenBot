@@ -11,7 +11,7 @@ namespace ROBot.Tests
 {
     public class MockTwitchCommandClient : ITwitchCommandClient
     {
-        public event System.EventHandler<OnLogArgs> OnTwitchLog;
+        //public event System.EventHandler<OnLogArgs> OnTwitchLog;
         public event System.EventHandler<OnErrorEventArgs> OnTwitchError;
 
         public void Broadcast(string channel, string user, string format, params object[] args)
