@@ -16,6 +16,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TwitchLib.Api.Helix;
 
 namespace ROBot.Core.Chat.Discord
 {
@@ -89,7 +90,6 @@ namespace ROBot.Core.Chat.Discord
             discord.MessageReceived += HandleCommandAsync;
             discord.Log += Log;
             discord.Disconnected += Discord_Disconnected;
-            discord.Connected += Discord_Connected;
             discord.ButtonExecuted += Discord_ButtonExecuted;
             discord.Ready += Discord_Ready;
             discord.SlashCommandExecuted += Discord_SlashCommandExecuted;
@@ -117,6 +117,14 @@ namespace ROBot.Core.Chat.Discord
                 //    // Using the ready event is a simple implementation for the sake of the example. Suitable for testing and development.
                 //    // For a production bot, it is recommended to only run the CreateGlobalApplicationCommandAsync() once for each command.
                 //}
+
+                foreach (var channel in ravenfallGuild.TextChannels)
+                {
+                    channels[channel.Name.ToLower()] = new DiscordCommand.DiscordChannel(channel);
+                    channelIdLookup[channel.Name.ToLower()] = channel.Id;
+                }
+
+
             }
             catch (ApplicationCommandException exception)
             {
@@ -137,18 +145,18 @@ namespace ROBot.Core.Chat.Discord
             });
         }
 
-        private async Task Discord_Connected()
-        {
-            foreach (var value in channelIdLookup)
-            {
-                var channelId = value.Value;
-                var channel = discord.GetChannel(channelId) as ISocketMessageChannel;
-                if (channel != null)
-                {
-                    channels[channel.Name] = new DiscordCommand.DiscordChannel(channel);
-                }
-            }
-        }
+        //private async Task Discord_Connected()
+        //{            
+        //    foreach (var value in channelIdLookup)
+        //    {
+        //        var channelId = value.Value;
+        //        var channel = discord.GetChannel(channelId) as ISocketMessageChannel;
+        //        if (channel != null)
+        //        {
+        //            channels[channel.Name] = new DiscordCommand.DiscordChannel(channel);
+        //        }
+        //    }
+        //}
 
         private async Task Discord_Disconnected(Exception arg)
         {
@@ -401,14 +409,10 @@ namespace ROBot.Core.Chat.Discord
                     return null;
                 }
 
-                IMessageChannel msgChannel = ravenfallGuild.TextChannels.FirstOrDefault(x => x.Name.Equals(x.Name, StringComparison.OrdinalIgnoreCase));
-                if (msgChannel == null)
-                {
-                    msgChannel = await ravenfallGuild.CreateTextChannelAsync(name, props => props.CategoryId = PlayRavenfallCategoryId);
-                }
-
+                var msgChannel = await ravenfallGuild.CreateTextChannelAsync(name, props => props.CategoryId = PlayRavenfallCategoryId);
                 if (msgChannel != null)
                 {
+                    channelIdLookup[key] = msgChannel.Id;
                     return channels[key] = new DiscordCommand.DiscordChannel(msgChannel);
                 }
             }
@@ -422,8 +426,12 @@ namespace ROBot.Core.Chat.Discord
 
         private async Task Discord_SlashCommandExecuted(SocketSlashCommand msg)
         {
-            channelIdLookup[msg.Channel.Name.ToLower()] = msg.Channel.Id;
-            channels[msg.Channel.Name.ToLower()] = new DiscordCommand.DiscordChannel(msg.Channel);
+            var key = msg.Channel.Name.ToLower();
+            if (channels.ContainsKey(key))
+            {
+                channelIdLookup[key] = msg.Channel.Id;
+                channels[key] = new DiscordCommand.DiscordChannel(msg.Channel);
+            }
 
             Log(new LogMessage(LogSeverity.Info, "", msg.User.Username + " used /" + msg.CommandName));
 
@@ -432,8 +440,12 @@ namespace ROBot.Core.Chat.Discord
 
         private async Task HandleCommandAsync(SocketMessage arg)
         {
-            channelIdLookup[arg.Channel.Name.ToLower()] = arg.Channel.Id;
-            channels[arg.Channel.Name.ToLower()] = new DiscordCommand.DiscordChannel(arg.Channel);
+            var key = arg.Channel.Name.ToLower();
+            if (channels.ContainsKey(key))
+            {
+                channelIdLookup[key] = arg.Channel.Id;
+                channels[key] = new DiscordCommand.DiscordChannel(arg.Channel);
+            }
 
             // Bail out if it's a System Message.
             var msg = arg as SocketUserMessage;
@@ -499,13 +511,9 @@ namespace ROBot.Core.Chat.Discord
         {
             try
             {
-                if (channels.TryGetValue(key, out var c) && c.Channel != null)
+                if (channels.TryGetValue(key, out var c) && c.Channel is SocketTextChannel channel)
                 {
-                    var channel = this.ravenfallGuild.TextChannels.FirstOrDefault(x => x.Id == c.Channel.Id);
-                    if (channel != null)
-                    {
-                        await channel.ModifyAsync(prop => prop.Topic = topic);
-                    }
+                    await channel.ModifyAsync(prop => prop.Topic = topic);
                 }
             }
             catch
