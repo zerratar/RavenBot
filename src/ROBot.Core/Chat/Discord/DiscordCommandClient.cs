@@ -137,6 +137,9 @@ namespace ROBot.Core.Chat.Discord
             var textChannels = ravenfallGuild.TextChannels.ToList();
             foreach (var channel in textChannels)
             {
+                if (channel.CategoryId != PlayRavenfallCategoryId)
+                    continue;
+
                 var key = channel.Name.ToLower();
                 if (channels.ContainsKey(key))
                 {
@@ -469,7 +472,8 @@ namespace ROBot.Core.Chat.Discord
         private async Task Discord_SlashCommandExecuted(SocketSlashCommand msg)
         {
             var key = msg.Channel.Name.ToLower();
-            if (channels.ContainsKey(key))
+
+            if (!channels.ContainsKey(key))
             {
                 channelIdLookup[key] = msg.Channel.Id;
                 channels[key] = new DiscordCommand.DiscordChannel(msg.Channel);
@@ -483,7 +487,8 @@ namespace ROBot.Core.Chat.Discord
         private async Task HandleCommandAsync(SocketMessage arg)
         {
             var key = arg.Channel.Name.ToLower();
-            if (channels.ContainsKey(key))
+
+            if (!channels.ContainsKey(key))
             {
                 channelIdLookup[key] = arg.Channel.Id;
                 channels[key] = new DiscordCommand.DiscordChannel(arg.Channel);
