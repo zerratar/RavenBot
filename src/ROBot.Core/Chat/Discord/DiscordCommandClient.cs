@@ -135,13 +135,17 @@ namespace ROBot.Core.Chat.Discord
         private async Task RebuildChannelListAsync()
         {
             var textChannels = ravenfallGuild.TextChannels.ToList();
+
+            ConcurrentDictionary<string, ulong> newChannelIdLookup = new();
+            ConcurrentDictionary<string, DiscordCommand.DiscordChannel> newChannels = new();
+
             foreach (var channel in textChannels)
             {
                 if (channel.CategoryId != PlayRavenfallCategoryId)
                     continue;
 
                 var key = channel.Name.ToLower();
-                if (channels.ContainsKey(key))
+                if (newChannels.ContainsKey(key))
                 {
                     // we can't spam this, so we have to make sure we have a slight delay.
                     await Task.Delay(300);
@@ -149,8 +153,24 @@ namespace ROBot.Core.Chat.Discord
                     continue;
                 }
 
-                channels[key] = new DiscordCommand.DiscordChannel(channel);
-                channelIdLookup[key] = channel.Id;
+                newChannels[key] = new DiscordCommand.DiscordChannel(channel);
+                newChannelIdLookup[key] = channel.Id;
+            }
+
+            try
+            {
+                channels.Clear();
+                channelIdLookup.Clear();
+
+                foreach (var channel in newChannels)
+                {
+                    channels[channel.Key] = channel.Value;
+                    channelIdLookup[channel.Key] = channel.Value.Id;
+                }
+            }
+            catch (Exception exc)
+            {
+                logger.LogError("Error recreating channels list. " + exc);
             }
         }
 
