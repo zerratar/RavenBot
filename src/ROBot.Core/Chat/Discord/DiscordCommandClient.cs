@@ -15,6 +15,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using TwitchLib.Api.Helix;
 
@@ -46,7 +47,7 @@ namespace ROBot.Core.Chat.Discord
 
         private List<SocketApplicationCommand> slashCommands = new List<SocketApplicationCommand>();
         private SocketGuild ravenfallGuild;
-
+        private SemaphoreSlim creatingChannelMutex = new SemaphoreSlim(1);
         public DiscordCommandClient(
             ILogger logger,
             IKernel kernel,
@@ -397,6 +398,8 @@ namespace ROBot.Core.Chat.Discord
         {
             try
             {
+                await creatingChannelMutex.WaitAsync();
+
                 var key = name.ToLower();
                 if (channels.TryGetValue(key, out var channel))
                 {
@@ -420,7 +423,10 @@ namespace ROBot.Core.Chat.Discord
             {
                 logger.LogError("Failed to create Ravenfall Bot Channel for " + name + ". Exception: " + exc);
             }
-
+            finally
+            {
+                creatingChannelMutex.Release();
+            }
             return null;
         }
 
