@@ -119,12 +119,7 @@ namespace ROBot.Core.Chat.Discord
                 //    // For a production bot, it is recommended to only run the CreateGlobalApplicationCommandAsync() once for each command.
                 //}
 
-                foreach (var channel in ravenfallGuild.TextChannels)
-                {
-                    channels[channel.Name.ToLower()] = new DiscordCommand.DiscordChannel(channel);
-                    channelIdLookup[channel.Name.ToLower()] = channel.Id;
-                }
-
+                await RebuildChannelListAsync();
 
             }
             catch (ApplicationCommandException exception)
@@ -134,6 +129,25 @@ namespace ROBot.Core.Chat.Discord
 
                 // You can send this error somewhere or just print it to the console, for this example we're just going to print it.
                 Console.WriteLine(json);
+            }
+        }
+
+        private async Task RebuildChannelListAsync()
+        {
+            var textChannels = ravenfallGuild.TextChannels.ToList();
+            foreach (var channel in textChannels)
+            {
+                var key = channel.Name.ToLower();
+                if (channels.ContainsKey(key))
+                {
+                    // we can't spam this, so we have to make sure we have a slight delay.
+                    await Task.Delay(300);
+                    await channel.DeleteAsync();
+                    continue;
+                }
+
+                channels[key] = new DiscordCommand.DiscordChannel(channel);
+                channelIdLookup[key] = channel.Id;
             }
         }
 
@@ -412,12 +426,34 @@ namespace ROBot.Core.Chat.Discord
                     return null;
                 }
 
-                var msgChannel = await ravenfallGuild.CreateTextChannelAsync(name, props => props.CategoryId = PlayRavenfallCategoryId);
-                if (msgChannel != null)
+                // before we create one, make sure there isnt one already.
+
+                IMessageChannel msgChannel = null;
+
+                if (channelIdLookup.TryGetValue(key, out var channelId))
                 {
-                    channelIdLookup[key] = msgChannel.Id;
-                    return channels[key] = new DiscordCommand.DiscordChannel(msgChannel);
+                    msgChannel = ravenfallGuild.GetTextChannel(channelId);
                 }
+
+                // cant find the channel after all, rebuild channel list.
+                if (msgChannel == null)
+                {
+                    await RebuildChannelListAsync();
+
+                    if (channels.TryGetValue(key, out var c))
+                    {
+                        return c;
+                    }
+                }
+
+                // if it is still null, create it.
+                if (msgChannel == null)
+                {
+                    msgChannel = await ravenfallGuild.CreateTextChannelAsync(name, props => props.CategoryId = PlayRavenfallCategoryId);
+                }
+
+                channelIdLookup[key] = msgChannel.Id;
+                return channels[key] = new DiscordCommand.DiscordChannel(msgChannel);
             }
             catch (Exception exc)
             {
