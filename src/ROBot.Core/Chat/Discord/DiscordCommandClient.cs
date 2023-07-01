@@ -45,7 +45,6 @@ namespace ROBot.Core.Chat.Discord
 
         private List<SocketApplicationCommand> slashCommands = new List<SocketApplicationCommand>();
         private SocketGuild ravenfallGuild;
-        private bool insufficientPermissionsForCreatingTextChannel;
 
         public DiscordCommandClient(
             ILogger logger,
@@ -397,12 +396,17 @@ namespace ROBot.Core.Chat.Discord
                 }
 
                 // we will create a channel if one does not exist.
-                if (!CreateTextChannelForStreamers || insufficientPermissionsForCreatingTextChannel)
+                if (!CreateTextChannelForStreamers)
                 {
                     return null;
                 }
 
-                var msgChannel = await ravenfallGuild.CreateTextChannelAsync(name, props => props.CategoryId = PlayRavenfallCategoryId);
+                IMessageChannel msgChannel = ravenfallGuild.TextChannels.FirstOrDefault(x => x.Name.Equals(x.Name, StringComparison.OrdinalIgnoreCase));
+                if (msgChannel == null)
+                {
+                    msgChannel = await ravenfallGuild.CreateTextChannelAsync(name, props => props.CategoryId = PlayRavenfallCategoryId);
+                }
+
                 if (msgChannel != null)
                 {
                     return channels[key] = new DiscordCommand.DiscordChannel(msgChannel);
@@ -410,8 +414,7 @@ namespace ROBot.Core.Chat.Discord
             }
             catch (Exception exc)
             {
-                logger.LogError("Failed to create Ravenfall Bot Channel for " + name + ", all future attempts are ignored. Exception: " + exc);
-                insufficientPermissionsForCreatingTextChannel = true;
+                logger.LogError("Failed to create Ravenfall Bot Channel for " + name + ". Exception: " + exc);
             }
 
             return null;
