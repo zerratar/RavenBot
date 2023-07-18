@@ -3,12 +3,12 @@ using RavenBot.Core.Handlers;
 
 namespace RavenBot.Core.Ravenfall.Commands
 {
-    public class ResourcesCommandProcessor : Net.RavenfallCommandProcessor
+    public class TownResourcesCommandProcessor : Net.RavenfallCommandProcessor
     {
         private readonly IRavenfallClient game;
         private readonly IUserProvider playerProvider;
 
-        public ResourcesCommandProcessor(
+        public TownResourcesCommandProcessor(
             IRavenfallClient game,
             IUserProvider playerProvider)
         {
@@ -25,7 +25,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             }
 
             var player = playerProvider.Get(cmd);
-            await this.game[cmd.CorrelationId].RequestPlayerResourcesAsync(player);
+            await this.game[cmd.CorrelationId].RequestTownResourcesAsync(player);
         }
     }
 }

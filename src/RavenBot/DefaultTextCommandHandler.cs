@@ -10,9 +10,7 @@ namespace RavenBot
         public DefaultTextCommandHandler(IoC ioc)
             : base(ioc)
         {
-
             var commandBindingProvider = ioc.Resolve<ICommandBindingProvider>();
-
 #if DEBUG
             Register<DropEventCommandProcessor>(commandBindingProvider.Get("drop"));
             Register<ForceAddPlayerCommandProcessor>(commandBindingProvider.Get("add"));
@@ -21,12 +19,13 @@ namespace RavenBot
             Register<ApperanceCommandProcessor>(commandBindingProvider.Get("appearance"));//, "looks");
             Register<StatsCommandProcessor>(commandBindingProvider.Get("stats"));//, "status");
             Register<ResourcesCommandProcessor>(commandBindingProvider.Get("res"));//, "resource", "res");
+            Register<TownResourcesCommandProcessor>(commandBindingProvider.Get("townres"));
             Register<HighestSkillCommandProcessor>(commandBindingProvider.Get("highest", "top"));//, "top");
             Register<HighscoreSkillCommandProcessor>(commandBindingProvider.Get("leaderboard", "highscore", "hs"));//, "top");
             Register<DungeonCommandProcessor>(commandBindingProvider.Get("dungeon"));
 
             Register<ClanCommandProcessor>(commandBindingProvider.Get("clan"));
-            
+
 
             Register<DuelCommandProcessor>(commandBindingProvider.Get("duel"));//, "fight");
             Register<KickCommandProcessor>(commandBindingProvider.Get("kick"));//);
@@ -42,7 +41,7 @@ namespace RavenBot
 
             Register<VendorItemCommandProcessor>(commandBindingProvider.Get("vendor"));
             Register<DisenchantItemCommandProcessor>(commandBindingProvider.Get("disenchant"));
-            
+
             Register<GiftItemCommandProcessor>(commandBindingProvider.Get("gift"));
             Register<ValueItemCommandProcessor>(commandBindingProvider.Get("value"));
             Register<CraftRequirementCommandProcessor>(commandBindingProvider.Get("req"));//, "requirement", "requirements");

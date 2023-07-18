@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace ROBot.Core.Chat.Commands
 {
-    public class Resources : ChatCommandHandler
+    public class TownResources : ChatCommandHandler
     {
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
         {
@@ -16,7 +16,7 @@ namespace ROBot.Core.Chat.Commands
                 if (connection != null)
                 {
                     var player = session.Get(cmd);
-                    await connection[cmd].RequestPlayerResourcesAsync(player);
+                    await connection[cmd].RequestTownResourcesAsync(player);
                 }
             }
         }
