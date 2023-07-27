@@ -68,11 +68,16 @@ namespace RavenBot.Core.Ravenfall
         public Task SetAllVillageHutsAsync(User player, string skill) => SendAsync("set_village_huts", player, skill);
         public Task SellItemAsync(User player, string itemQuery) => SendAsync("sell_item", player, itemQuery);
         public Task BuyItemAsync(User player, string itemQuery) => SendAsync("buy_item", player, itemQuery);
+
+        public Task UseMarketAsync(User player, string itemQuery) => SendAsync("marketplace", player, itemQuery);
+        public Task UseVendorAsync(User player, string itemQuery) => SendAsync("vendor", player, itemQuery);
+
         public Task GiftItemAsync(User player, string itemQuery) => SendAsync("gift_item", player, itemQuery);
         public Task VendorItemAsync(User player, string itemQuery) => SendAsync("vendor_item", player, itemQuery);
         public Task ValueItemAsync(User player, string itemQuery) => SendAsync("value_item", player, itemQuery);
         public Task CraftRequirementAsync(User player, string itemName) => SendAsync("req_item", player, itemName);
         public Task SendPlayerTaskAsync(User player, PlayerTask task, params string[] args) => SendAsync("task", player, new PlayerTaskRequest(task.ToString(), args));
+
         public Task JoinArenaAsync(User player) => SendAsync("arena_join", player);
         public Task LeaveArenaAsync(User player) => SendAsync("arena_leave", player);
         public Task LeaveAsync(User player) => SendAsync("leave", player);
@@ -82,6 +87,11 @@ namespace RavenBot.Core.Ravenfall
         public Task AddPlayerToArenaAsync(User player, User targetPlayer) => SendAsync("arena_add", player, targetPlayer);
         public Task KickAsync(User player, User targetPlayer) => SendAsync("kick", player, targetPlayer);
         public Task CraftAsync(User player, string itemQuery) => SendAsync("craft", player, itemQuery);
+        public Task CookAsync(User player, string itemQuery) => SendAsync("cook", player, itemQuery);
+        public Task FishAsync(User player, string itemQuery) => SendAsync("fish", player, itemQuery);
+        public Task MineAsync(User player, string itemQuery) => SendAsync("mine", player, itemQuery);
+        public Task FarmAsync(User player, string itemQuery) => SendAsync("farm", player, itemQuery);
+        public Task ChopAsync(User player, string itemQuery) => SendAsync("chop", player, itemQuery);
         public Task TravelAsync(User player, string destination) => SendAsync("ferry_travel", player, destination);
         public Task DisembarkFerryAsync(User player) => SendAsync("ferry_leave", player);
         public Task EmbarkFerryAsync(User player) => SendAsync("ferry_enter", player);
@@ -180,6 +190,13 @@ namespace RavenBot.Core.Ravenfall
         Task AddPlayerToArenaAsync(User author, User targetPlayer);
         Task KickAsync(User author, User targetPlayer);
         Task CraftAsync(User author, string itemQuery);
+        Task CookAsync(User author, string itemQuery);
+
+        Task MineAsync(User author, string itemQuery);
+        Task ChopAsync(User author, string itemQuery);
+        Task FarmAsync(User author, string itemQuery);
+        Task FishAsync(User author, string itemQuery);
+
         Task RequestHighscoreAsync(User author, string skill);
         Task DuelRequestAsync(User author, User target);
         Task ReloadGameAsync(User author);
@@ -219,6 +236,10 @@ namespace RavenBot.Core.Ravenfall
         Task ObservePlayerAsync(User author);
         Task ToggleHelmetAsync(User author);
         Task TogglePetAsync(User author);
+
+        Task UseMarketAsync(User author, string itemQuery);
+        Task UseVendorAsync(User author, string itemQuery);
+
         Task SellItemAsync(User author, string itemQuery);
         Task BuyItemAsync(User author, string itemQuery);
         Task VendorItemAsync(User author, string itemQuery);

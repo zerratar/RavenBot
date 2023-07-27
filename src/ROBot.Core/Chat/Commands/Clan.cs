@@ -9,14 +9,15 @@ namespace ROBot.Core.Chat.Commands
     public class Clan : ChatCommandHandler
     {
         public override string Description => "Interact with a clan";
+        public override string UsageExample => "!clan kick zerratar";
+        public override string Category => "Game";
         public override System.Collections.Generic.IReadOnlyList<ChatCommandInput> Inputs { get; } = new System.Collections.Generic.List<ChatCommandInput>
         {
-            //            ChatCommandInput.Create("interaction", "Clan interaction")
-            //                .WithOptions(ChatCommandInput.Create("info", "joins the arena"),
-            //                             ChatCommandInput.Create("leave", "leaves the arena"))
-            //ChatCommandInput.Create("item", "What item you want to redeem").Required(),
-            //ChatCommandInput.Create("amount", "How many of the said item you want to redeem")
+            ChatCommandInput.Create("action", "What kind of interaction you want to do", "info", "stats", "leave", "join", "remove", "kick", "invite", "accept", "decline", "promote", "demote").Required(),
+            ChatCommandInput.Create("target", "When joining a clan, clan name may be provided or player name if it's a player action."),
+            ChatCommandInput.Create("rank", "When inviting, kicking, promoting or demoting a player, the new rank needs to be specified"),
         };
+
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
         {
             var channel = cmd.Channel;

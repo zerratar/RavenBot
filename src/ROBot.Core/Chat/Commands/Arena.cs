@@ -9,6 +9,7 @@ namespace ROBot.Core.Chat.Commands
 {
     public class Arena : ChatCommandHandler
     {
+        public override string Category => "PvP";
         public override string Description => "Arena command is used for interacting with the Arena, such as joining, leaving, starting, etc.";
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {

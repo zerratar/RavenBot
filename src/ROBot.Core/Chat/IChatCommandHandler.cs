@@ -10,6 +10,8 @@ namespace ROBot.Core.Chat
     {
         IReadOnlyList<ChatCommandInput> Inputs { get; }
         string Description { get; }
+        string UsageExample { get; }
+        string Category { get; }
         bool RequiresBroadcaster { get; set; }
         Task HandleAsync(IBotServer game, IChatCommandClient twitch, ICommand cmd);
     }

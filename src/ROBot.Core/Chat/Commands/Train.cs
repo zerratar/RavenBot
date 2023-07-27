@@ -3,6 +3,7 @@ using RavenBot.Core.Ravenfall;
 using RavenBot.Core.Ravenfall.Models;
 using ROBot.Core.GameServer;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -16,6 +17,17 @@ namespace ROBot.Core.Chat.Commands
             "all", "atk", "def", "str", "magic",
             "ranged", "fishing", "cooking", "woodcutting", "mining",
             "crafting", "farming", "healing",
+        };
+
+        public override string Category => "Skills";
+        public override string Description => "Used for making your character to start training a specific skill.";
+        public override string UsageExample => "!train fishing";
+        public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
+        {
+            ChatCommandInput.Create("skill", "What skill do you want to train?",
+                "All", "Attack", "Defense", "Strength", "Magic", "Ranged", "Fishing", "Cooking",
+                "Crafting", "Woodcutting", "mining", "Farming", "Healing"
+            ).Required()
         };
 
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)

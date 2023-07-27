@@ -8,6 +8,9 @@ namespace ROBot.Core.Chat.Commands
 {
     public class Island : ChatCommandHandler
     {
+
+        public override string Category => "Game";
+        public override string Description => "Check which island your character is currently on.";
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
         {
             var channel = cmd.Channel;

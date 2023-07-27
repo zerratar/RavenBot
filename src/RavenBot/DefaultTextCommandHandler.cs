@@ -31,6 +31,13 @@ namespace RavenBot
             Register<KickCommandProcessor>(commandBindingProvider.Get("kick"));//);
             Register<ArenaCommandProcessor>(commandBindingProvider.Get("arena"));
             Register<CraftCommandProcessor>(commandBindingProvider.Get("craft"));
+            Register<CookCommandProcessor>(commandBindingProvider.Get("cook"));
+            
+            Register<MineCommandProcessor>(commandBindingProvider.Get("mine"));
+            Register<FarmCommandProcessor>(commandBindingProvider.Get("farm"));
+            Register<ChopCommandProcessor>(commandBindingProvider.Get("chop"));
+            Register<FishCommandProcessor>(commandBindingProvider.Get("fish"));
+
             Register<JoinCommandProcessor>(commandBindingProvider.Get("join"));//, "play");
 
             Register<UnstuckCommandProcessor>(commandBindingProvider.Get("unstuck"));//, "play");
@@ -85,7 +92,7 @@ namespace RavenBot
             Register<StreamerTokenProcessor>(commandBindingProvider.Get("token", "tokens"));
 
             Register<TradeItemCommandProcessor>(commandBindingProvider.Get("sell", "buy"));
-            Register<TrainCommandProcessor>(commandBindingProvider.Get("train", "task", "strength", "attack", "mine", "defense", "mining", "wood", "crafting", "fishing", "fish", "woodcutting"));
+            Register<TrainCommandProcessor>(commandBindingProvider.Get("train", "task"));
             Register<SailCommandProcessor>(commandBindingProvider.Get("sail", "disembark"));
 
             Register<OnsenCommandProcessor>(commandBindingProvider.Get("onsen", "rest"));

@@ -14,6 +14,7 @@ using RavenBot.Core.Chat;
 using RavenBot.Core.Ravenfall;
 using Shinobytes.Core;
 using RavenBot.Core.Chat.Discord;
+using Newtonsoft.Json;
 
 namespace ROBot.Core.Chat.Discord
 {
@@ -21,7 +22,8 @@ namespace ROBot.Core.Chat.Discord
     {
         Task<bool> HandleAsync(IBotServer game, IChatCommandClient chat, SocketSlashCommand cmd);
         Task<bool> HandleAsync(IBotServer game, IChatCommandClient chat, SocketMessage cmd);
-        IReadOnlyList<SlashCommandProperties> RegisterSlashCommands(DiscordCommandClient discordCommandClient, DiscordSocketClient discord);
+        IReadOnlyList<SlashCommandProperties> GetCommandDescriptors();
+        void ExportCommandDescriptors();
     }
 
     /*
@@ -35,6 +37,9 @@ namespace ROBot.Core.Chat.Discord
 
     public class DiscordCommandController : IDiscordCommandController
     {
+        public const string GeneratedData = "../generated-data";
+        private const string CommandDescriptorsFile = GeneratedData + "/commands.json";
+
         private readonly ConcurrentDictionary<string, Type> handlerLookup = new();
         private readonly ILogger logger;
         private readonly IoC ioc;
@@ -204,7 +209,57 @@ namespace ROBot.Core.Chat.Discord
             }
         }
 
-        public IReadOnlyList<SlashCommandProperties> RegisterSlashCommands(DiscordCommandClient discordCommandClient, DiscordSocketClient discord)
+        public void ExportCommandDescriptors()
+        {
+            var cmds = new List<CommandDescriptor>();
+
+            foreach (var h in handlerLookup)
+            {
+                var cmd = new CommandDescriptor();
+                cmd.Name = h.Key.ToLower();
+
+                var handler = ioc.Resolve(h.Value) as IChatCommandHandler;
+                var baseType = handler.GetType().BaseType;
+                var isAlias = baseType != typeof(ChatCommandHandler);
+                if (isAlias)
+                {
+                    cmd.Alias = baseType.Name.ToLower();
+                }
+                cmd.Category = handler.Category;
+                cmd.Description = handler.Description ?? h.Key.ToLower();
+                cmd.UsageExample = handler.UsageExample;
+                cmd.RequiresBroadcaster = handler.RequiresBroadcaster;
+                if (handler.Inputs != null)
+                {
+                    cmd.Options = new List<CommandInputDescriptor>();
+                    foreach (var input in handler.Inputs)
+                    {
+                        var type = GetType(input.Type);
+                        var name = input.Name.ToLower();
+                        var options = input.Options != null ? GetOptions(input.Options).Select(x => new CommandInputDescriptor(x)).ToList() : null;
+                        var choices = input.Choices != null ? input.Choices.ToList() : null;
+                        cmd.Options.Add(new CommandInputDescriptor(name, type, input.Description, input.IsRequired, options: options, choices: choices));
+                    }
+                }
+
+                cmds.Add(cmd);
+            }
+
+            var targetFile = CommandDescriptorsFile;
+
+#if DEBUG
+            targetFile = @"C:\git\RavenNest\src\generated-data\commands.json";
+#endif
+
+            System.IO.File.WriteAllText(targetFile, JsonConvert.SerializeObject(cmds, Formatting.Indented, new JsonSerializerSettings()
+            {
+                Converters = new List<JsonConverter> { new Newtonsoft.Json.Converters.StringEnumConverter() },
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                NullValueHandling = NullValueHandling.Ignore,
+            }));
+        }
+
+        public IReadOnlyList<SlashCommandProperties> GetCommandDescriptors()
         {
             var cmds = new List<SlashCommandProperties>();
             foreach (var h in handlerLookup)
@@ -256,6 +311,9 @@ namespace ROBot.Core.Chat.Discord
         {
             if (choices == null || choices.Length == 0)
                 return new ApplicationCommandOptionChoiceProperties[0];
+            //if (choices.Any(x => x.Length == 0))
+            //{
+            //}
             return choices.Select(x => new ApplicationCommandOptionChoiceProperties { Name = x.ToLower(), Value = x }).ToArray();
         }
 
@@ -278,6 +336,50 @@ namespace ROBot.Core.Chat.Discord
             }
 
             return ApplicationCommandOptionType.String;
+        }
+
+        public class CommandDescriptor
+        {
+            public string Name { get; set; }
+            public string Description { get; set; }
+            public string Alias { get; set; }
+            public string Category { get; set; }
+            public string UsageExample { get; set; }
+            public List<CommandInputDescriptor> Options { get; set; }
+            public bool RequiresBroadcaster { get; set; }
+        }
+
+        public class CommandInputDescriptor
+        {
+            public string Name { get; set; }
+            public ApplicationCommandOptionType Type { get; set; }
+            public string Description { get; set; }
+            public bool IsRequired { get; set; }
+            public List<CommandInputDescriptor> Options { get; set; }
+            public List<string> Choices { get; set; }
+            public CommandInputDescriptor() { }
+            public CommandInputDescriptor(string name, ApplicationCommandOptionType applicationCommandOptionType, string description, bool isRequired, List<CommandInputDescriptor> options, List<string> choices)
+            {
+                this.Name = name;
+                this.Type = applicationCommandOptionType;
+                this.Description = description;
+                this.IsRequired = isRequired;
+                this.Options = options != null && options.Count == 0 ? null : options;
+                this.Choices = choices != null && choices.Count == 0 ? null : choices;
+            }
+
+            public CommandInputDescriptor(SlashCommandOptionBuilder other)
+            {
+                this.Name = other.Name;
+                this.Type = other.Type;
+                this.Description = other.Description;
+                this.IsRequired = other.IsRequired.GetValueOrDefault();
+                this.Options = other.Options.Select(x => new CommandInputDescriptor(x)).ToList();
+                if (this.Options != null && this.Options.Count == 0) this.Options = null;
+
+                this.Choices = other.Choices.Select(x => x.Value.ToString()).ToList();
+                if (this.Choices != null && this.Choices.Count == 0) this.Choices = null;
+            }
         }
     }
 }

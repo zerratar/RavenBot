@@ -1,12 +1,20 @@
 ﻿using RavenBot.Core.Handlers;
 using ROBot.Core.Chat.Twitch;
 using ROBot.Core.GameServer;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ROBot.Core.Chat.Commands
 {
     public class Equip : ChatCommandHandler
     {
+        public override string Category => "Items";
+        public override string Description => "This command allows equipping items.";
+        public override string UsageExample => "!equip rune 2h sword";
+        public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
+        {
+            ChatCommandInput.Create("item", "Which item you want to equip").Required()
+        };
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
         {
             var channel = cmd.Channel;
@@ -23,7 +31,7 @@ namespace ROBot.Core.Chat.Commands
                     var item = cmd.Arguments?.ToLower();
                     if (string.IsNullOrEmpty(item))
                     {
-                        
+
                         chat.SendReply(cmd, "You have to use !equip <item name> or !equip all for equipping your best items.");
                         return;
                     }

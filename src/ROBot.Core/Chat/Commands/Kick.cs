@@ -1,6 +1,5 @@
 ﻿using RavenBot.Core.Handlers;
 using RavenBot.Core.Ravenfall;
-using ROBot.Core.Chat.Twitch;
 using ROBot.Core.GameServer;
 using System.Threading.Tasks;
 
@@ -8,6 +7,15 @@ namespace ROBot.Core.Chat.Commands
 {
     public class Kick : ChatCommandHandler
     {
+        public override bool RequiresBroadcaster => true;
+        public override string Category => "Game";
+        public override string Description => "Kick target player or afk players, this command can only be used by the broadcaster or a moderator.";
+        public override System.Collections.Generic.IReadOnlyList<ChatCommandInput> Inputs { get; } = new System.Collections.Generic.List<ChatCommandInput>
+        {
+            ChatCommandInput.Create("target", "Who do you want to kick?", "<player name>", "afk").Required(),
+        };
+        public override string UsageExample => "!kick zerratar";
+
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
         {
             var channel = cmd.Channel;

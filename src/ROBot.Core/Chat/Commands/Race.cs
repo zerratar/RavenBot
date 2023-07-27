@@ -8,6 +8,8 @@ namespace ROBot.Core.Chat.Commands
 {
     public class Race : ChatCommandHandler
     {
+        public override string Category => "Tavern";
+        public override string Description => "This is a Tavern Pet Race game, currently unavailable.";
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
         {
             var channel = cmd.Channel;

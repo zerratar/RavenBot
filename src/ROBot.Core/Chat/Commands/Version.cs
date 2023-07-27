@@ -7,6 +7,8 @@ namespace ROBot.Core.Chat.Commands
 {
     public class Version : ChatCommandHandler
     {
+        public override string Category => "Game";
+        public override string Description => "Gets the current version of the game running.";
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
         {
             var channel = cmd.Channel;

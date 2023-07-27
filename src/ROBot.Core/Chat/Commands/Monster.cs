@@ -8,6 +8,14 @@ namespace ROBot.Core.Chat.Commands
 {
     public class Monster : ChatCommandHandler
     {
+        public override string Category => "Appearance";
+        public override System.Collections.Generic.IReadOnlyList<ChatCommandInput> Inputs { get; } = new System.Collections.Generic.List<ChatCommandInput>
+        {
+            ChatCommandInput.Create("target", "target player that will be effected, leave empty for targeting yourself."),
+        };
+        public override string Description => "Transform your character into a monster. Only streamer or moderator can use this command.";
+        public override string UsageExample => "!monster zerratar";
+
         public Monster()
         {
             RequiresBroadcaster = true;

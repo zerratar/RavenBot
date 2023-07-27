@@ -1,6 +1,5 @@
 ﻿using RavenBot.Core.Handlers;
 using RavenBot.Core.Ravenfall;
-using ROBot.Core.Chat.Twitch;
 using ROBot.Core.GameServer;
 using System.Threading.Tasks;
 
@@ -15,7 +14,7 @@ namespace ROBot.Core.Chat.Commands
             ChatCommandInput.Create("amount", "How many of the said item you want to buy"),
             ChatCommandInput.Create("price", "The maximum amount of coins you want to pay per item").Required()
         };
-
+        public override string Category => "Items";
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
         {
             var channel = cmd.Channel;

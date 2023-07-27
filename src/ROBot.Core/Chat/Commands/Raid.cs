@@ -1,7 +1,5 @@
 ﻿using RavenBot.Core.Handlers;
 using RavenBot.Core.Ravenfall;
-using RavenBot.Core.Ravenfall.Models;
-using ROBot.Core.Chat.Twitch;
 using ROBot.Core.GameServer;
 using System;
 using System.Threading.Tasks;
@@ -10,6 +8,14 @@ namespace ROBot.Core.Chat.Commands
 {
     public class Raid : ChatCommandHandler
     {
+        public override string Description => "This command allows you to join a raid, use a raid scroll, forcibly stop a raid or start a streamer raid.";
+        public override System.Collections.Generic.IReadOnlyList<ChatCommandInput> Inputs { get; } = new System.Collections.Generic.List<ChatCommandInput>
+        {
+            ChatCommandInput.Create("action", "Leave empty if you intend to join a raid, 'stop' to forcibly stop or 'start' to use a raid scroll", "start", "stop"),
+            ChatCommandInput.Create("target", "The target user to raid. Only broadcaster can use this."),
+        };
+        public override string UsageExample => "!raid start";
+        public override string Category => "Events";
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
         {
             var channel = cmd.Channel;

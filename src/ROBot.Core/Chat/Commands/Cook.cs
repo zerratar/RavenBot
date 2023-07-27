@@ -1,20 +1,22 @@
 ﻿using RavenBot.Core.Handlers;
-using ROBot.Core.Chat.Twitch;
 using ROBot.Core.GameServer;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ROBot.Core.Chat.Commands
 {
-    public class Count : ChatCommandHandler
+    public class Cook : ChatCommandHandler
     {
-        public override string Description => "This command allows for  checking how many of a certain item you got in your inventory";
-        public override string UsageExample => "!count rune 2h sword";
-        public override string Category => "Items";
+        public override string Category => "Skills";
+        public override string Description => "This command allows you to cook an item, it requires your character to be training cooking to do so.";
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {
-            ChatCommandInput.Create("item", "Which item you want to count").Required()
+            ChatCommandInput.Create("req", "Include 'req' if you want to just check the cooking requirement of a recipe/item."),
+            ChatCommandInput.Create("item", "target item or recipe you want to cook").Required(),
+            ChatCommandInput.Create("amount", "the amount of said item you want to cook"),
         };
+
+        public override string UsageExample => "!cook 10 shrimps";
 
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
         {
@@ -26,7 +28,7 @@ namespace ROBot.Core.Chat.Commands
                 if (connection != null)
                 {
                     var player = session.Get(cmd);
-                    await connection[cmd].CountItemAsync(player, cmd.Arguments);
+                    await connection[cmd].CookAsync(player, cmd.Arguments?.Trim());
                 }
             }
         }

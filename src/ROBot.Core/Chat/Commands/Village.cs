@@ -7,6 +7,13 @@ namespace ROBot.Core.Chat.Commands
 {
     public class Village : ChatCommandHandler
     {
+        public override string Description => "This command allows getting or setting details about the village.";
+        public override string UsageExample => "!village melee";
+        public override System.Collections.Generic.IReadOnlyList<ChatCommandInput> Inputs { get; } = new System.Collections.Generic.List<ChatCommandInput>
+        {
+            ChatCommandInput.Create("skill", "Set all available huts to a target skill allowing for quick update", "melee", "magic", "ranged", "healing", "woodcutting", "mining", "fishing", "sailing", "farming"),
+        };
+        public override string Category => "Game";
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
         {
             var channel = cmd.Channel;

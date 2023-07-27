@@ -1,6 +1,4 @@
 ﻿using RavenBot.Core.Handlers;
-using RavenBot.Core.Ravenfall.Models;
-using ROBot.Core.Chat.Twitch;
 using ROBot.Core.GameServer;
 using System.Threading.Tasks;
 
@@ -8,6 +6,12 @@ namespace ROBot.Core.Chat.Commands
 {
     public class Dungeon : ChatCommandHandler
     {
+        public override string Category => "Events";
+        public override string Description => "Interact with a dungeon, you can join, start or forcibly stop a dungeon.";
+        public override System.Collections.Generic.IReadOnlyList<ChatCommandInput> Inputs { get; } = new System.Collections.Generic.List<ChatCommandInput>
+        {
+            ChatCommandInput.Create("action", "Leave empty if you intend to join a dungeon, stop to forcibly stop or start to use a dungeon scroll", "start", "stop"),
+        };
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
         {
             var channel = cmd.Channel;

@@ -1,13 +1,23 @@
 ﻿using RavenBot.Core.Handlers;
-using ROBot.Core.Chat.Twitch;
 using ROBot.Core.GameServer;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ROBot.Core.Chat.Commands
 {
     public class Duel : ChatCommandHandler
     {
+        public override string Category => "PvP";
+        public override string Description => "This command allows for duelling other players";
+        public override string UsageExample => "!duel zerratar";
+
+        public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
+        {
+            ChatCommandInput.Create("action", "What kind of action you want to take with an ongoing duel request", "cancel", "accept", "decline"),
+            ChatCommandInput.Create("player", "The target player you want to duel")
+        };
+
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
         {
             var channel = cmd.Channel;

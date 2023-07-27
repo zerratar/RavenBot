@@ -69,6 +69,8 @@ namespace ROBot.Core.Chat.Discord
             this.messageTransformer = messageTransformer;
             this.commandHandler = commandHandler;
 
+            commandHandler.ExportCommandDescriptors();
+
             messager = new DiscordFormatMessager();
             broadcastSubscription = messageBus.Subscribe<SessionGameMessageResponse>(MessageBus.Broadcast, Broadcast);
 

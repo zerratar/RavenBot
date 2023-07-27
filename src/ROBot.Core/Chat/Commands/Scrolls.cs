@@ -7,6 +7,9 @@ namespace ROBot.Core.Chat.Commands
 {
     public class Scrolls : ChatCommandHandler
     {
+        public override string Description => "Gets the amount of exp, raid and dungeon scrolls you have in your inventory.";
+        public override string Category => "Items";
+
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
         {
             var channel = cmd.Channel;

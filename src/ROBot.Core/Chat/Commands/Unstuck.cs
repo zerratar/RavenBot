@@ -1,6 +1,7 @@
 ﻿using RavenBot.Core.Handlers;
 using ROBot.Core.Chat.Twitch;
 using ROBot.Core.GameServer;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ROBot.Core.Chat.Commands
@@ -11,6 +12,14 @@ namespace ROBot.Core.Chat.Commands
         {
             RequiresBroadcaster = true;
         }
+        public override string Description => "Unstuck yourself in case your character got stuck, teleporting you back to the spawn point of the island you're on.";
+        public override string UsageExample => "!unstuck";
+        public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
+        {
+            ChatCommandInput.Create("target", "If you're a broadcaster or moderator you can unstuck a target player.")
+        };
+
+        public override string Category => "Game";
 
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
         {

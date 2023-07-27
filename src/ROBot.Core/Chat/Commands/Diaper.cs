@@ -1,12 +1,15 @@
 ﻿using RavenBot.Core.Handlers;
 using ROBot.Core.Chat.Twitch;
 using ROBot.Core.GameServer;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ROBot.Core.Chat.Commands
 {
     public class Diaper : ChatCommandHandler
     {
+        public override string Category => "Appearance";
+        public override string Description => "This command will unequip all your armors and leave your character in their bare trousers.";
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
         {
             var channel = cmd.Channel;
