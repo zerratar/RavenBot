@@ -176,16 +176,20 @@ namespace ROBot.Core.Chat.Twitch
                            // one option is to never create a new client here
             try
             {
+                logger.LogInformation("[TWITCH] Starting...");
+
                 client = new TwitchClient(new WebSocketClient(new ClientOptions(clientType: ClientType.Chat)));
                 
                 //client.AutoReListenOnException = true;
 
                 var credentials = credentialsProvider.Get();
 
+                logger.LogInformation("[TWITCH] Initializing Client...");
                 client.Initialize(credentials);
 
                 Subscribe();
 
+                logger.LogInformation("[TWITCH] Connecting...");
                 client.Connect();
             }
             catch (Exception exc)
