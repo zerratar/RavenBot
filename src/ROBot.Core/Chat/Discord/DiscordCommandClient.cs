@@ -43,7 +43,7 @@ namespace ROBot.Core.Chat.Discord
 
         private const long RavenfallGuildId = 694530158341783612;
         private const long PlayRavenfallCategoryId = 1114144307876724760;
-        private const bool CreateTextChannelForStreamers = true; // set to true for now. but needs to be configurable.
+        private const bool CreateTextChannelForStreamers = false; // set to true for now. but needs to be configurable.
 
         private List<SocketApplicationCommand> slashCommands = new List<SocketApplicationCommand>();
         private SocketGuild ravenfallGuild;
