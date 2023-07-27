@@ -1,10 +1,7 @@
 ﻿using RavenBot.Core.Handlers;
 using ROBot.Core;
 using ROBot.Core.Chat.Twitch;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using TwitchLib.Client.Events;
-using TwitchLib.Client.Models;
 using TwitchLib.Communication.Events;
 
 namespace ROBot.Tests

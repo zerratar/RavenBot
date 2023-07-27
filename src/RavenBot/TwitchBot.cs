@@ -149,7 +149,7 @@ namespace RavenBot
             disposed = true;
         }
 
-        private async Task OnUserLeft(object sender, OnUserLeftArgs e)
+        private async void OnUserLeft(object sender, OnUserLeftArgs e)
         {
             if (!e.Channel.Contains(this.channelProvider.Get(), StringComparison.InvariantCultureIgnoreCase))
                 return;
@@ -157,7 +157,7 @@ namespace RavenBot
             this.messageBus.Send(nameof(UserLeftEvent), new UserLeftEvent(e.Username));
         }
 
-        private async Task OnUserJoined(object sender, OnUserJoinedArgs e)
+        private async void OnUserJoined(object sender, OnUserJoinedArgs e)
         {
             if (!e.Channel.Contains(this.channelProvider.Get(), StringComparison.InvariantCultureIgnoreCase))
                 return;
@@ -165,7 +165,7 @@ namespace RavenBot
             this.messageBus.Send(nameof(UserJoinedEvent), new UserJoinedEvent(e.Username));
         }
 
-        private async Task OnMessageReceived(object sender, OnMessageReceivedArgs e)
+        private async void OnMessageReceived(object sender, OnMessageReceivedArgs e)
         {
             if (e.ChatMessage.Bits == 0) return;
 
@@ -186,7 +186,7 @@ namespace RavenBot
             this.Announce(Localization.Twitch.THANK_YOU_BITS, e.ChatMessage.DisplayName, e.ChatMessage.Bits);
         }
 
-        private async Task OnCommandReceived(object sender, OnChatCommandReceivedArgs e)
+        private async void OnCommandReceived(object sender, OnChatCommandReceivedArgs e)
         {
             var uid = e.Command.ChatMessage.UserId;
             var settings = userSettingsManager.Get(uid, "twitch");
@@ -314,7 +314,7 @@ namespace RavenBot
             client = new TwitchClient(new WebSocketClient(options));
         }
 
-        private async Task OnReSub(object sender, OnReSubscriberArgs e)
+        private async void OnReSub(object sender, OnReSubscriberArgs e)
         {
             this.messageBus.Send(nameof(UserSubscriptionEvent),
                 new UserSubscriptionEvent(
@@ -332,7 +332,7 @@ namespace RavenBot
             //this.Broadcast("", Localization.Twitch.THANK_YOU_RESUB, e.ReSubscriber.DisplayName);
         }
 
-        private async Task OnNewSub(object sender, OnNewSubscriberArgs e)
+        private async void OnNewSub(object sender, OnNewSubscriberArgs e)
         {
             this.messageBus.Send(nameof(UserSubscriptionEvent),
                 new UserSubscriptionEvent(
@@ -349,7 +349,7 @@ namespace RavenBot
             //this.Broadcast("", Localization.Twitch.THANK_YOU_SUB, e.Subscriber.DisplayName);
         }
 
-        private async Task OnPrimeSub(object sender, OnCommunitySubscriptionArgs e)
+        private async void OnPrimeSub(object sender, OnCommunitySubscriptionArgs e)
         {
             this.messageBus.Send(nameof(UserSubscriptionEvent),
                 new UserSubscriptionEvent(
@@ -366,7 +366,7 @@ namespace RavenBot
             //this.Broadcast("", Localization.Twitch.THANK_YOU_SUB, e.GiftedSubscription.DisplayName);
         }
 
-        private async Task OnGiftedSub(object sender, OnGiftedSubscriptionArgs e)
+        private async void OnGiftedSub(object sender, OnGiftedSubscriptionArgs e)
         {
             this.messageBus.Send(nameof(UserSubscriptionEvent),
             new UserSubscriptionEvent("twitch",
@@ -382,7 +382,7 @@ namespace RavenBot
             //this.Broadcast("", Localization.Twitch.THANK_YOU_GIFT_SUB, e.GiftedSubscription.DisplayName);
         }
 
-        private async Task OnDisconnected(object sender, OnDisconnectedEventArgs e)
+        private async void OnDisconnected(object sender, OnDisconnectedEventArgs e)
         {
             logger.WriteDebug("Disconnected from the Twitch IRC Server");
             TryToReconnect();
@@ -436,7 +436,7 @@ namespace RavenBot
             broadcastSubscription?.Unsubscribe();
         }
 
-        private async Task OnConnected(object sender, OnConnectedArgs e)
+        private async void OnConnected(object sender, OnConnectedArgs e)
         {
             logger.WriteDebug("Connected to Twitch IRC Server");
             messageBus.Send("twitch", "");
@@ -448,7 +448,7 @@ namespace RavenBot
         //    messageBus.Send("twitch", "");
         //}
 
-        private async Task OnRaidNotification(object sender, OnRaidNotificationArgs e)
+        private async void OnRaidNotification(object sender, OnRaidNotificationArgs e)
         {
             this.Announce(Localization.Twitch.THANK_YOU_RAID, e.RaidNotification.DisplayName);
         }
@@ -475,13 +475,13 @@ namespace RavenBot
             pubsub.OnChannelPointsRewardRedeemed += Pubsub_OnChannelPointsRewardRedeemed;
         }
 
-        private async Task OnReconnected(object sender, OnConnectedArgs e)
+        private async void OnReconnected(object sender, OnConnectedArgs e)
         {
             logger.WriteDebug("Reconnected to Twitch IRC Server");
             messageBus.Send("twitch", "");
         }
 
-        private async Task OnConnectionError(object sender, OnConnectionErrorArgs e)
+        private async void OnConnectionError(object sender, OnConnectionErrorArgs e)
         {
             logger.WriteError("Error connecting to Twitch: " + e.Error + ". Maybe time to refresh the access token?");
         }
