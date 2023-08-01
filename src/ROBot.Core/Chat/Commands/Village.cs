@@ -1,5 +1,4 @@
 ﻿using RavenBot.Core.Handlers;
-using ROBot.Core.Chat.Twitch;
 using ROBot.Core.GameServer;
 using System.Threading.Tasks;
 
@@ -26,6 +25,13 @@ namespace ROBot.Core.Chat.Commands
                     var player = session.Get(cmd);
                     if (!string.IsNullOrEmpty(cmd.Arguments))
                     {
+                        var arg = cmd.Arguments.ToLower().Trim();
+                        if (arg.Equals("res") || arg.Equals("resources"))
+                        {
+                            await connection[cmd].RequestTownResourcesAsync(player);
+                            return;
+                        }
+
                         await connection[cmd].SetAllVillageHutsAsync(player, cmd.Arguments);
                     }
                     else

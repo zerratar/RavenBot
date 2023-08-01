@@ -22,9 +22,15 @@ namespace RavenBot.Core.Ravenfall.Commands
             }
 
             var player = playerProvider.Get(cmd);
-
             if (!string.IsNullOrEmpty(cmd.Arguments))
             {
+                var arg = cmd.Arguments.ToLower().Trim();
+                if (arg.Equals("res") || arg.Equals("resources"))
+                {
+                    await this.game[cmd.CorrelationId].RequestTownResourcesAsync(player);
+                    return;
+                }
+
                 await this.game[cmd.CorrelationId].SetAllVillageHutsAsync(player, cmd.Arguments);
                 return;
             }

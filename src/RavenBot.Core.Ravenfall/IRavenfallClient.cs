@@ -86,12 +86,14 @@ namespace RavenBot.Core.Ravenfall
         public Task KickPlayerFromArenaAsync(User player, User targetPlayer) => SendAsync("arena_kick", player, targetPlayer);
         public Task AddPlayerToArenaAsync(User player, User targetPlayer) => SendAsync("arena_add", player, targetPlayer);
         public Task KickAsync(User player, User targetPlayer) => SendAsync("kick", player, targetPlayer);
+
         public Task CraftAsync(User player, string itemQuery) => SendAsync("craft", player, itemQuery);
         public Task CookAsync(User player, string itemQuery) => SendAsync("cook", player, itemQuery);
         public Task FishAsync(User player, string itemQuery) => SendAsync("fish", player, itemQuery);
         public Task MineAsync(User player, string itemQuery) => SendAsync("mine", player, itemQuery);
         public Task FarmAsync(User player, string itemQuery) => SendAsync("farm", player, itemQuery);
         public Task ChopAsync(User player, string itemQuery) => SendAsync("chop", player, itemQuery);
+
         public Task TravelAsync(User player, string destination) => SendAsync("ferry_travel", player, destination);
         public Task DisembarkFerryAsync(User player) => SendAsync("ferry_leave", player);
         public Task EmbarkFerryAsync(User player) => SendAsync("ferry_enter", player);
