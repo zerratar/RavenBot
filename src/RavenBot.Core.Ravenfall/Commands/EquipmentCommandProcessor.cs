@@ -1,15 +1,14 @@
 ﻿using System.Threading.Tasks;
 using RavenBot.Core.Handlers;
-using RavenBot.Core.Net;
 
 namespace RavenBot.Core.Ravenfall.Commands
 {
-    public class StatsCommandProcessor : Net.RavenfallCommandProcessor
+    public class EquipmentCommandProcessor : Net.RavenfallCommandProcessor
     {
         private readonly IRavenfallClient game;
         private readonly IUserProvider playerProvider;
 
-        public StatsCommandProcessor(IRavenfallClient game, IUserProvider playerProvider)
+        public EquipmentCommandProcessor(IRavenfallClient game, IUserProvider playerProvider)
         {
             this.game = game;
             this.playerProvider = playerProvider;
@@ -24,7 +23,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             }
 
             var player = playerProvider.Get(cmd);
-            await this.game[cmd.CorrelationId].RequestPlayerStatsAsync(player, cmd.Arguments);
+            await this.game[cmd.CorrelationId].RequestPlayerEquipmentStatsAsync(player, cmd.Arguments);
         }
     }
 }

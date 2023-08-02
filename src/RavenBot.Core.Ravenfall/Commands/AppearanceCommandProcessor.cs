@@ -1,15 +1,14 @@
 ﻿using System.Threading.Tasks;
 using RavenBot.Core.Handlers;
-using RavenBot.Core.Net;
 
 namespace RavenBot.Core.Ravenfall.Commands
 {
-    public class StatsCommandProcessor : Net.RavenfallCommandProcessor
+    public class AppearanceCommandProcessor : Net.RavenfallCommandProcessor
     {
         private readonly IRavenfallClient game;
         private readonly IUserProvider playerProvider;
 
-        public StatsCommandProcessor(IRavenfallClient game, IUserProvider playerProvider)
+        public AppearanceCommandProcessor(IRavenfallClient game, IUserProvider playerProvider)
         {
             this.game = game;
             this.playerProvider = playerProvider;
@@ -24,7 +23,13 @@ namespace RavenBot.Core.Ravenfall.Commands
             }
 
             var player = playerProvider.Get(cmd);
-            await this.game[cmd.CorrelationId].RequestPlayerStatsAsync(player, cmd.Arguments);
+            if (string.IsNullOrEmpty(cmd.Arguments))
+            {
+                chat.Announce("You can customize your character here https://www.ravenfall.stream/characters");
+                return;
+            }
+
+            await this.game[cmd.CorrelationId].PlayerAppearanceUpdateAsync(player, cmd.Arguments);
         }
     }
 }

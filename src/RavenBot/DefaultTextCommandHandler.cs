@@ -16,8 +16,10 @@ namespace RavenBot
             Register<ForceAddPlayerCommandProcessor>(commandBindingProvider.Get("add"));
 #endif
             Register<RavenfallInfoCommandProcessor>(commandBindingProvider.Get("ravenfall"));
-            Register<ApperanceCommandProcessor>(commandBindingProvider.Get("appearance"));//, "looks");
+            Register<AppearanceCommandProcessor>(commandBindingProvider.Get("appearance"));//, "looks");
             Register<StatsCommandProcessor>(commandBindingProvider.Get("stats"));//, "status");
+            Register<EquipmentCommandProcessor>(commandBindingProvider.Get("eq", "equipment"));
+
             Register<ResourcesCommandProcessor>(commandBindingProvider.Get("res", "resources", "resource"));
             Register<TownResourcesCommandProcessor>(commandBindingProvider.Get("townres", "townresources"));
             Register<HighestSkillCommandProcessor>(commandBindingProvider.Get("highest", "top"));//, "top");

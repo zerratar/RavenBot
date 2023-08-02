@@ -57,6 +57,8 @@ namespace RavenBot.Core.Ravenfall
         public Task SetPetAsync(User player, string item) => SendAsync("set_pet", player, item);
         public Task GetPetAsync(User player) => SendAsync("get_pet", player);
         public Task RequestPlayerStatsAsync(User player, string skill) => SendAsync("player_stats", player, skill);
+
+        public Task RequestPlayerEquipmentStatsAsync(User player, string target) => SendAsync("player_eq", player, target);
         public Task RequestPlayerResourcesAsync(User player) => SendAsync("player_resources", player);
         public Task RequestTownResourcesAsync(User player) => SendAsync("town_resources", player);
         public Task ScalePlayerAsync(User player, float scale) => SendAsync("set_player_scale", player, scale);
@@ -232,6 +234,7 @@ namespace RavenBot.Core.Ravenfall
         Task RequestTownResourcesAsync(User author);
         Task TravelAsync(User author, string destination);
         Task RequestPlayerStatsAsync(User author, string skill);
+        Task RequestPlayerEquipmentStatsAsync(User author, string target);
         Task RequestHighestSkillAsync(User author, string skill);
         Task PlayerAppearanceUpdateAsync(User author, string appearance);
         Task ItemDropEventAsync(User author, string item);
