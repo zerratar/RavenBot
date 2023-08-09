@@ -18,7 +18,7 @@ namespace RavenBot.Core.Ravenfall.Commands
         {
             "all", "atk", "def", "str", "magic",
             "ranged", "fishing", "cooking", "woodcutting",
-            "mining", "crafting", "farming", "healing",
+            "mining", "crafting", "farming", "healing", "gathering", "alchemy"
         };
 
         public TrainCommandProcessor(IRavenfallClient game, IUserProvider playerProvider)
@@ -95,6 +95,8 @@ namespace RavenBot.Core.Ravenfall.Commands
             if (StartsWith(val, "craft")) return (int)PlayerTask.Crafting;
             if (StartsWith(val, "mine") || StartsWith(val, "min") || StartsWith(val, "mining")) return (int)PlayerTask.Mining;
             if (StartsWith(val, "farm") || StartsWith(val, "fm")) return (int)PlayerTask.Farming;
+            if (StartsWith(val, "gath")) return (int)PlayerTask.Gathering;
+            if (StartsWith(val, "alch") || StartsWith(val, "brew")) return (int)PlayerTask.Brewing;
             return -1;
         }
 

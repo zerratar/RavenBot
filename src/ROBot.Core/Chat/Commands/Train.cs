@@ -104,7 +104,7 @@ namespace ROBot.Core.Chat.Commands
             if (StartsWith(val, "mine") || StartsWith(val, "min") || StartsWith(val, "mining")) return (int)PlayerTask.Mining;
             if (StartsWith(val, "farm") || StartsWith(val, "fm")) return (int)PlayerTask.Farming;
             if (StartsWith(val, "gath")) return (int)PlayerTask.Gathering;
-            if (StartsWith(val, "brew")|| StartsWith(val, "alch")) return (int)PlayerTask.Gathering;
+            if (StartsWith(val, "brew") || StartsWith(val, "alch")) return (int)PlayerTask.Brewing;
             return -1;
         }
 
