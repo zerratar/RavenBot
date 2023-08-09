@@ -42,10 +42,12 @@ namespace RavenBot.Core.Ravenfall
         public Task AcceptDuelRequestAsync(User player) => SendAsync("duel_accept", player);
         public Task DeclineDuelRequestAsync(User player) => SendAsync("duel_decline", player);
         public Task PlayerCountAsync(User player) => SendAsync("player_count", player);
-        public Task JoinRaidAsync(User player, string code) => SendAsync("raid_join", player, code);
+        public Task JoinRaidAsync(User player, string query) => SendAsync("raid_join", player, query);
+        public Task AutoJoinRaidAsync(User player, string query) => SendAsync("raid_auto", player, query);
         public Task RaidStartAsync(User player) => SendAsync("raid_force", player);
         public Task StopDungeonAsync(User player) => SendAsync("dungeon_stop", player);
         public Task DungeonStartAsync(User player) => SendAsync("dungeon_force", player);
+        public Task AutoJoinDungeonAsync(User player, string code) => SendAsync("dungeon_auto", player, code);
         public Task JoinDungeonAsync(User player, string code) => SendAsync("dungeon_join", player, code);
         public Task ReloadGameAsync(User player) => SendAsync("reload", player);
         public Task GetMaxMultiplierAsync(User player) => SendAsync("multiplier", player);
@@ -230,10 +232,12 @@ namespace RavenBot.Core.Ravenfall
         Task GetVillageBoostAsync(User author);
         Task SetAllVillageHutsAsync(User author, string skill);
         Task JoinRaidAsync(User author, string code);
+        Task AutoJoinRaidAsync(User player, string query);
         Task StopRaidAsync(User author);
         Task RaidStartAsync(User author);
         Task DungeonStartAsync(User author);
         Task JoinDungeonAsync(User author, string code);
+        Task AutoJoinDungeonAsync(User player, string query);
         Task StopDungeonAsync(User author);
         Task CraftRequirementAsync(User author, string itemName);
         Task CountItemAsync(User author, string itemName);

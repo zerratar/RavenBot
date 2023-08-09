@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using RavenBot.Core.Chat.Twitch;
 using RavenBot.Core.Handlers;
@@ -41,6 +42,12 @@ namespace RavenBot.Core.Ravenfall.Commands
 
             if (!string.IsNullOrEmpty(cmd.Arguments))
             {
+                if (cmd.Arguments.Contains(" join ", System.StringComparison.OrdinalIgnoreCase))
+                {
+                    await game[cmd.CorrelationId].AutoJoinRaidAsync(player, cmd.Arguments.Split(' ').LastOrDefault());
+                    return;
+                }
+
                 if (cmd.Arguments.Contains("start", StringComparison.OrdinalIgnoreCase))
                 {
                     await this.game[cmd.CorrelationId].RaidStartAsync(player);

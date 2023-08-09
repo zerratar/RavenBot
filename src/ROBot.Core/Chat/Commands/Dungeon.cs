@@ -1,5 +1,6 @@
 ﻿using RavenBot.Core.Handlers;
 using ROBot.Core.GameServer;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ROBot.Core.Chat.Commands
@@ -27,6 +28,10 @@ namespace ROBot.Core.Chat.Commands
                     {
                         await connection[cmd].JoinDungeonAsync(player, null);
                         return;
+                    }
+                    else if (cmd.Arguments.Contains(" join ", System.StringComparison.OrdinalIgnoreCase))
+                    {
+                        await connection[cmd].AutoJoinDungeonAsync(player, cmd.Arguments.Split(' ').LastOrDefault());
                     }
                     else if (cmd.Arguments.Contains("stop", System.StringComparison.OrdinalIgnoreCase))
                     {

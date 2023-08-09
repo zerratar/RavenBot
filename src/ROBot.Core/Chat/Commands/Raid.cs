@@ -2,6 +2,7 @@
 using RavenBot.Core.Ravenfall;
 using ROBot.Core.GameServer;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ROBot.Core.Chat.Commands
@@ -40,6 +41,12 @@ namespace ROBot.Core.Chat.Commands
 
                     if (!string.IsNullOrEmpty(cmd.Arguments))
                     {
+                        if (cmd.Arguments.Contains(" join ", System.StringComparison.OrdinalIgnoreCase))
+                        {
+                            await connection[cmd].AutoJoinRaidAsync(player, cmd.Arguments.Split(' ').LastOrDefault());
+                            return;
+                        }
+
                         if (cmd.Arguments.Contains("start", StringComparison.OrdinalIgnoreCase))
                         {
                             await connection[cmd].RaidStartAsync(player);

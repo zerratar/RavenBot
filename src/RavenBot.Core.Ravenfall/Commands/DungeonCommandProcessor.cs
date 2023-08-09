@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using RavenBot.Core.Handlers;
 using RavenBot.Core.Ravenfall.Models;
 
@@ -28,6 +29,10 @@ namespace RavenBot.Core.Ravenfall.Commands
             {
                 await this.game[cmd.CorrelationId].JoinDungeonAsync(player, null);
                 return;
+            }
+            else if (cmd.Arguments.Contains(" join ", System.StringComparison.OrdinalIgnoreCase))
+            {
+                await game[cmd.CorrelationId].AutoJoinDungeonAsync(player, cmd.Arguments.Split(' ').LastOrDefault());
             }
             else if (cmd.Arguments.Contains("stop", System.StringComparison.OrdinalIgnoreCase))
             {
