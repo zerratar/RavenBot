@@ -52,6 +52,8 @@ namespace RavenBot.Core.Ravenfall
         public Task EquipAsync(User player, string pet) => SendAsync("equip", player, pet);
         public Task EnchantAsync(User player, string item) => SendAsync("enchant", player, item);
         public Task DisenchantAsync(User player, string item) => SendAsync("disenchant", player, item);
+        public Task ClearEnchantmentCooldownAsync(User player) => SendAsync("clear_enchantment_cooldown", player);
+        public Task GetEnchantmentCooldownAsync(User player) => SendAsync("enchantment_cooldown", player);
         public Task CountItemAsync(User player, string item) => SendAsync("get_item_count", player, item);
         public Task UnequipAsync(User player, string item) => SendAsync("unequip", player, item);
         public Task SetPetAsync(User player, string item) => SendAsync("set_pet", player, item);
@@ -220,6 +222,8 @@ namespace RavenBot.Core.Ravenfall
         Task EquipAsync(User author, string item);
         Task EnchantAsync(User author, string item);
         Task DisenchantAsync(User author, string item);
+        Task ClearEnchantmentCooldownAsync(User author);
+        Task GetEnchantmentCooldownAsync(User author);
         Task SetPetAsync(User author, string pet);
         Task GetPetAsync(User author);
         Task GetMaxMultiplierAsync(User author);

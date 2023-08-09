@@ -30,10 +30,26 @@ namespace ROBot.Core.Chat.Commands
 
                     var item = cmd.Arguments?.ToLower();
 
-                    if (!string.IsNullOrEmpty(item) && item.Split(' ')[0] == "remove")
+                    if (!string.IsNullOrEmpty(item))
                     {
-                        await connection[cmd].DisenchantAsync(player, item.Replace("remove", "").Trim());
-                        return;
+                        if (item == "remove cooldown" || item == "clear cooldown" || item == "remove cd" || item == "clear cd")
+                        {
+                            await connection[cmd].ClearEnchantmentCooldownAsync(player);
+                            return;
+                        }
+
+                        if (item == "cooldown" || item == "cd")
+                        {
+                            await connection[cmd].GetEnchantmentCooldownAsync(player);
+                            return;
+                        }
+
+                        var part = item.Split(' ');
+                        if (part[0] == "remove")
+                        {
+                            await connection[cmd].DisenchantAsync(player, item.Replace("remove", "").Trim());
+                            return;
+                        }
                     }
                     //if (string.IsNullOrEmpty(item))
                     //{

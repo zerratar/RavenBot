@@ -16,7 +16,7 @@ namespace RavenBot.Core.Ravenfall.Commands
         public override async Task ProcessAsync(IMessageChat chat, ICommand cmd)
         {
 
-            if (!await this.game.ProcessAsync(Settings.UNITY_SERVER_PORT))
+            if (!await game.ProcessAsync(Settings.UNITY_SERVER_PORT))
             {
                 chat.SendReply(cmd, Localization.GAME_NOT_STARTED);
                 return;
@@ -24,18 +24,32 @@ namespace RavenBot.Core.Ravenfall.Commands
 
             var player = playerProvider.Get(cmd);
 
-
             var item = cmd.Arguments?.ToLower();
-            if (!string.IsNullOrEmpty(item) && item.Split(' ')[0] == "remove")
+            if (!string.IsNullOrEmpty(item))
             {
-                await this.game[cmd.CorrelationId].DisenchantAsync(player, item.Replace("remove", "").Trim());
-                return;
+                if (item == "remove cooldown" || item == "clear cooldown" || item == "remove cd" || item == "clear cd")
+                {
+                    await game[cmd.CorrelationId].ClearEnchantmentCooldownAsync(player);
+                    return;
+                }
+
+                if (item == "cooldown" || item == "cd")
+                {
+                    await game[cmd.CorrelationId].GetEnchantmentCooldownAsync(player);
+                    return;
+                }
+
+                if (item.Split(' ')[0] == "remove")
+                {
+                    await game[cmd.CorrelationId].DisenchantAsync(player, item.Replace("remove", "").Trim());
+                    return;
+                }
             }
             //    broadcaster.Broadcast(cmd.Sender.Username, "You have to use !equip <item name> or !equip all for equipping your best items.");
             //    return;
             //}
 
-            await this.game[cmd.CorrelationId].EnchantAsync(player, item);
+            await game[cmd.CorrelationId].EnchantAsync(player, item);
         }
     }
 }
