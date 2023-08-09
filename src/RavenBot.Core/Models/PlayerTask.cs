@@ -8,6 +8,8 @@
         Crafting,
         Cooking,
         Farming,
+        Gathering,
+        Brewing,
         Fighting,
     }
 }

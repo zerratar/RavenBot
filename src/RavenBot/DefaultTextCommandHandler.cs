@@ -32,8 +32,11 @@ namespace RavenBot
             Register<KickCommandProcessor>(commandBindingProvider.Get("kick"));//);
             Register<ArenaCommandProcessor>(commandBindingProvider.Get("arena"));
             Register<CraftCommandProcessor>(commandBindingProvider.Get("craft"));
+
+            Register<BrewCommandProcessor>(commandBindingProvider.Get("brew"));
             Register<CookCommandProcessor>(commandBindingProvider.Get("cook"));
 
+            Register<GatherCommandProcessor>(commandBindingProvider.Get("gather"));
             Register<MineCommandProcessor>(commandBindingProvider.Get("mine"));
             Register<FarmCommandProcessor>(commandBindingProvider.Get("farm"));
             Register<ChopCommandProcessor>(commandBindingProvider.Get("chop"));

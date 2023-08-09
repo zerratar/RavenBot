@@ -16,7 +16,7 @@ namespace ROBot.Core.Chat.Commands
         {
             "all", "atk", "def", "str", "magic",
             "ranged", "fishing", "cooking", "woodcutting", "mining",
-            "crafting", "farming", "healing",
+            "crafting", "farming", "healing", "gathering", "alchemy"
         };
 
         public override string Category => "Skills";
@@ -26,7 +26,7 @@ namespace ROBot.Core.Chat.Commands
         {
             ChatCommandInput.Create("skill", "What skill do you want to train?",
                 "All", "Attack", "Defense", "Strength", "Magic", "Ranged", "Fishing", "Cooking",
-                "Crafting", "Woodcutting", "mining", "Farming", "Healing"
+                "Crafting", "Woodcutting", "mining", "Farming", "Healing", "Gathering", "Alchemy"
             ).Required()
         };
 
@@ -103,6 +103,8 @@ namespace ROBot.Core.Chat.Commands
             if (StartsWith(val, "craft")) return (int)PlayerTask.Crafting;
             if (StartsWith(val, "mine") || StartsWith(val, "min") || StartsWith(val, "mining")) return (int)PlayerTask.Mining;
             if (StartsWith(val, "farm") || StartsWith(val, "fm")) return (int)PlayerTask.Farming;
+            if (StartsWith(val, "gath")) return (int)PlayerTask.Gathering;
+            if (StartsWith(val, "brew")|| StartsWith(val, "alch")) return (int)PlayerTask.Gathering;
             return -1;
         }
 

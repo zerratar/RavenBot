@@ -23,7 +23,14 @@ namespace RavenBot.Core.Ravenfall.Models
         {
             this.file = file;
             loadedTime = DateTime.UtcNow;
-            dict = new ConcurrentDictionary<string, object>(src);
+            if (src != null)
+            {
+                dict = new ConcurrentDictionary<string, object>(src);
+            }
+            else
+            {
+                dict = new ConcurrentDictionary<string, object>();
+            }
         }
 
         public bool HasValues => dict.Count > 0;

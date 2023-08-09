@@ -95,6 +95,8 @@ namespace RavenBot.Core.Ravenfall
         public Task MineAsync(User player, string itemQuery) => SendAsync("mine", player, itemQuery);
         public Task FarmAsync(User player, string itemQuery) => SendAsync("farm", player, itemQuery);
         public Task ChopAsync(User player, string itemQuery) => SendAsync("chop", player, itemQuery);
+        public Task BrewAsync(User player, string itemQuery) => SendAsync("alchemy", player, itemQuery);
+        public Task GatherAsync(User player, string itemQuery) => SendAsync("gather", player, itemQuery);
 
         public Task TravelAsync(User player, string destination) => SendAsync("ferry_travel", player, destination);
         public Task DisembarkFerryAsync(User player) => SendAsync("ferry_leave", player);
@@ -200,6 +202,8 @@ namespace RavenBot.Core.Ravenfall
         Task ChopAsync(User author, string itemQuery);
         Task FarmAsync(User author, string itemQuery);
         Task FishAsync(User author, string itemQuery);
+        Task GatherAsync(User author, string itemQuery);
+        Task BrewAsync(User author, string itemQuery);
 
         Task RequestHighscoreAsync(User author, string skill);
         Task DuelRequestAsync(User author, User target);
