@@ -1,19 +1,18 @@
 ﻿using RavenBot.Core.Handlers;
-using ROBot.Core.Chat.Twitch;
 using ROBot.Core.GameServer;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ROBot.Core.Chat.Commands
 {
-    public class Count : ChatCommandHandler
+    public class Teleport : ChatCommandHandler
     {
-        public override string Description => "This command allows for checking how many of a certain item you got in your inventory";
-        public override string UsageExample => "!count rune 2h sword";
-        public override string Category => "Items";
+        public override string Description => "This command allows for using a tome to teleport the player to a target island";
+        public override string UsageExample => "!teleport kyo";
+        public override string Category => "Character";
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {
-            ChatCommandInput.Create("item", "Which item you want to count").Required()
+            ChatCommandInput.Create("island", "Which island do you wish to teleport to?").Required()
         };
 
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
@@ -26,7 +25,7 @@ namespace ROBot.Core.Chat.Commands
                 if (connection != null)
                 {
                     var player = session.Get(cmd);
-                    await connection[cmd].CountItemAsync(player, cmd.Arguments);
+                    await connection[cmd].TeleportAsync(player, cmd.Arguments);
                 }
             }
         }

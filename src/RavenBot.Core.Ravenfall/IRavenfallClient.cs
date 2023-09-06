@@ -57,6 +57,7 @@ namespace RavenBot.Core.Ravenfall
         public Task ClearEnchantmentCooldownAsync(User player) => SendAsync("clear_enchantment_cooldown", player);
         public Task GetEnchantmentCooldownAsync(User player) => SendAsync("enchantment_cooldown", player);
         public Task CountItemAsync(User player, string item) => SendAsync("get_item_count", player, item);
+        public Task ExamineItemAsync(User player, string item) => SendAsync("examine_item", player, item);
         public Task UnequipAsync(User player, string item) => SendAsync("unequip", player, item);
         public Task SetPetAsync(User player, string item) => SendAsync("set_pet", player, item);
         public Task GetPetAsync(User player) => SendAsync("get_pet", player);
@@ -74,7 +75,10 @@ namespace RavenBot.Core.Ravenfall
         public Task SetAllVillageHutsAsync(User player, string skill) => SendAsync("set_village_huts", player, skill);
         public Task SellItemAsync(User player, string itemQuery) => SendAsync("sell_item", player, itemQuery);
         public Task BuyItemAsync(User player, string itemQuery) => SendAsync("buy_item", player, itemQuery);
-
+        public Task UseItemAsync(User player, string itemQuery) => SendAsync("use_item", player, itemQuery);
+        public Task TeleportAsync(User player, string island) => SendAsync("teleport_island", player, island);
+        
+        public Task GetStatusEffectsAsync(User player, string arguments) => SendAsync("get_status_effects", player, arguments);
         public Task UseMarketAsync(User player, string itemQuery) => SendAsync("marketplace", player, itemQuery);
         public Task UseVendorAsync(User player, string itemQuery) => SendAsync("vendor", player, itemQuery);
 
@@ -241,6 +245,7 @@ namespace RavenBot.Core.Ravenfall
         Task StopDungeonAsync(User author);
         Task CraftRequirementAsync(User author, string itemName);
         Task CountItemAsync(User author, string itemName);
+        Task ExamineItemAsync(User author, string itemName);
         Task RequestIslandInfoAsync(User author);
         Task RequestPlayerResourcesAsync(User author);
         Task RequestTownResourcesAsync(User author);
@@ -316,6 +321,9 @@ namespace RavenBot.Core.Ravenfall
         /// <param name="player"></param>
         /// <returns></returns>
         Task GetClanStatsAsync(User author, string argument);
+        Task UseItemAsync(User player, string arguments);
+        Task TeleportAsync(User player, string island);
+        Task GetStatusEffectsAsync(User player, string arguments);
     }
 
     public interface IRavenfallClient

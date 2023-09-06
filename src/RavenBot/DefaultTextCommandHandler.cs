@@ -88,6 +88,11 @@ namespace RavenBot
             Register<ScrollsCommandProcessor>(commandBindingProvider.Get("scrolls"));
             Register<UseExpMultiplierScrollProcessor>(commandBindingProvider.Get("exp"));
 
+            Register<ExamineItemProcessor>(commandBindingProvider.Get("examine"));
+            Register<StatusCommandProcessor>(commandBindingProvider.Get("status", "effects"));
+            Register<UseItemProcessor>(commandBindingProvider.Get("use", "consume", "eat", "drink"));
+            Register<TeleportProcessor>(commandBindingProvider.Get("teleport"));
+
             Register<ToggleItemRequirementsProcessor>("!noitemreq");
             Register<ExpMultiplierProcessor>("!exp");
             Register<ExpMultiplierLimitProcessor>("!explimit");

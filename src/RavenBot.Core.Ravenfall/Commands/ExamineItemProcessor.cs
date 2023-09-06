@@ -3,14 +3,12 @@ using RavenBot.Core.Handlers;
 
 namespace RavenBot.Core.Ravenfall.Commands
 {
-    public class ItemCountCommandProcessor : Net.RavenfallCommandProcessor
+    public class ExamineItemProcessor : Net.RavenfallCommandProcessor
     {
         private readonly IRavenfallClient game;
         private readonly IUserProvider playerProvider;
-
-        public ItemCountCommandProcessor(IRavenfallClient game, IUserProvider playerProvider)
+        public ExamineItemProcessor(IRavenfallClient game, IUserProvider playerProvider)
         {
-            this.RequiresBroadcaster = true;
             this.game = game;
             this.playerProvider = playerProvider;
         }
@@ -24,7 +22,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             }
 
             var player = playerProvider.Get(cmd);
-            await this.game[cmd.CorrelationId].CountItemAsync(player, cmd.Arguments);
+            await this.game[cmd.CorrelationId].ExamineItemAsync(player, cmd.Arguments);
         }
     }
 }
