@@ -41,7 +41,7 @@ namespace ROBot.Core.Chat.Commands
 
                     if (!string.IsNullOrEmpty(cmd.Arguments))
                     {
-                        if (cmd.Arguments.Contains(" join ", System.StringComparison.OrdinalIgnoreCase))
+                        if (cmd.Arguments.Contains("join ", System.StringComparison.OrdinalIgnoreCase))
                         {
                             await connection[cmd].AutoJoinRaidAsync(player, cmd.Arguments.Split(' ').LastOrDefault());
                             return;

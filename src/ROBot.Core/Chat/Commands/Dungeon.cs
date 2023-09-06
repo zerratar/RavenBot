@@ -29,7 +29,7 @@ namespace ROBot.Core.Chat.Commands
                         await connection[cmd].JoinDungeonAsync(player, null);
                         return;
                     }
-                    else if (cmd.Arguments.Contains(" join ", System.StringComparison.OrdinalIgnoreCase))
+                    else if (cmd.Arguments.Contains("join ", System.StringComparison.OrdinalIgnoreCase))
                     {
                         await connection[cmd].AutoJoinDungeonAsync(player, cmd.Arguments.Split(' ').LastOrDefault());
                     }

@@ -77,7 +77,7 @@ namespace RavenBot.Core.Ravenfall
         public Task BuyItemAsync(User player, string itemQuery) => SendAsync("buy_item", player, itemQuery);
         public Task UseItemAsync(User player, string itemQuery) => SendAsync("use_item", player, itemQuery);
         public Task TeleportAsync(User player, string island) => SendAsync("teleport_island", player, island);
-        
+
         public Task GetStatusEffectsAsync(User player, string arguments) => SendAsync("get_status_effects", player, arguments);
         public Task UseMarketAsync(User player, string itemQuery) => SendAsync("marketplace", player, itemQuery);
         public Task UseVendorAsync(User player, string itemQuery) => SendAsync("vendor", player, itemQuery);
@@ -86,6 +86,7 @@ namespace RavenBot.Core.Ravenfall
         public Task VendorItemAsync(User player, string itemQuery) => SendAsync("vendor_item", player, itemQuery);
         public Task ValueItemAsync(User player, string itemQuery) => SendAsync("value_item", player, itemQuery);
         public Task CraftRequirementAsync(User player, string itemName) => SendAsync("req_item", player, itemName);
+        public Task GetItemUsageAsync(User player, string itemName) => SendAsync("item_usage", player, itemName);
         public Task SendPlayerTaskAsync(User player, PlayerTask task, params string[] args) => SendAsync("task", player, new PlayerTaskRequest(task.ToString(), args));
 
         public Task JoinArenaAsync(User player) => SendAsync("arena_join", player);
@@ -324,6 +325,7 @@ namespace RavenBot.Core.Ravenfall
         Task UseItemAsync(User player, string arguments);
         Task TeleportAsync(User player, string island);
         Task GetStatusEffectsAsync(User player, string arguments);
+        Task GetItemUsageAsync(User player, string arguments);
     }
 
     public interface IRavenfallClient
