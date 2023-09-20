@@ -261,7 +261,7 @@ namespace ROBot.Core.GameServer
             return false;
         }
 
-        private void Connection_OnSessionInfoReceived(object sender, GameSessionInfo e)
+        private void Connection_OnSessionInfoReceived(object sender, RemoteGameSessionInfo e)
         {
             lock (SessionAuthMutex)
             {

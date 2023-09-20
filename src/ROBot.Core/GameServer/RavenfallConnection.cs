@@ -27,7 +27,7 @@ namespace ROBot.Core.GameServer
         private readonly IMessageBus messageBus;
         private readonly IUserSettingsManager settingsManager;
         private readonly RavenfallGameClientConnection client;
-        private GameSessionInfo queuedSessionInfo;
+        private RemoteGameSessionInfo queuedSessionInfo;
         private IGameSession session;
         private ITimeoutHandle activePing;
 
@@ -87,9 +87,9 @@ namespace ROBot.Core.GameServer
             return new RavenfallApi(client, EnqueueRequest, correlationId);
         }
 
-        private event EventHandler<GameSessionInfo> internalSessionInfoReceived;
+        private event EventHandler<RemoteGameSessionInfo> internalSessionInfoReceived;
 
-        public event EventHandler<GameSessionInfo> OnSessionInfoReceived
+        public event EventHandler<RemoteGameSessionInfo> OnSessionInfoReceived
         {
             add
             {
@@ -105,7 +105,7 @@ namespace ROBot.Core.GameServer
             }
         }
 
-        public event EventHandler<GameSessionInfo> OnSessionNameChanged;
+        public event EventHandler<RemoteGameSessionInfo> OnSessionNameChanged;
 
         public IGameSession Session
         {
@@ -184,15 +184,18 @@ namespace ROBot.Core.GameServer
                 {
                     return;
                 }
-
-                internalSessionInfoReceived.Invoke(this, new GameSessionInfo
+                var sessionInfo = new RemoteGameSessionInfo
                 {
                     Created = sessionStart,
                     SessionId = sessionid,
                     UserId = userId,
                     Owner = player,
                     Settings = userSettings
-                });
+                };
+
+                internalSessionInfoReceived.Invoke(this, sessionInfo);
+
+                messageBus.Send("ravenfall_session", sessionInfo);
             }
             catch (Exception exc)
             {

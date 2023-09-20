@@ -10,7 +10,7 @@ namespace ROBot.Core.Chat.Twitch.PubSub
     {
         private TwitchPubSub client;
         private readonly ILogger logger;
-        private readonly PubSubToken token;
+        private readonly TwitchPubSubData pubsub;
 
         private bool disposed;
         private PubSubState state;
@@ -19,34 +19,20 @@ namespace ROBot.Core.Chat.Twitch.PubSub
         public event EventHandler<TwitchPubSubClient> OnDispose;
         public bool IsConnected => client != null && state >= PubSubState.Connected;
         public bool IsReady => client != null && state == PubSubState.Ready;
-        public bool IsAuthOK => token != null && !token.BadAuth;
-        public PubSubToken Token => token;
-
+        public bool IsConnecting => state == PubSubState.Connecting || state == PubSubState.Authenticating;
         private bool allowReconnect = true;
-        public TwitchPubSubClient(ILogger logger, PubSubToken token)
+        public TwitchPubSubClient(ILogger logger, TwitchPubSubData pubsub)
         {
-            token.OnUpdated += OnTokenUpdated;
-
             this.logger = logger;
-            this.token = token;
+            this.pubsub = pubsub;
 
             CreateClient();
             Connect();
         }
 
-        private async void OnTokenUpdated(object sender, EventArgs e)
+        public string GetInstanceKey()
         {
-            if (state == PubSubState.Connecting)
-            {
-                CreateClient();
-            }
-
-            if (state == PubSubState.Disconnected || state == PubSubState.Connected)
-            {
-                logger.LogWarning("[TWITCH] Recieved new pubsub token for (Username: " + token.UserName + ") trying to reconnect.");
-                Connect();
-                await Task.Delay(1000);
-            }
+            return pubsub.SessionInfo.Owner.Username.ToLower();
         }
 
         private void CreateClient()
@@ -82,11 +68,6 @@ namespace ROBot.Core.Chat.Twitch.PubSub
             state = PubSubState.Disconnected;
         }
 
-        public string getChannel()
-        {
-            return token.UserName;
-        }
-
         private void Connect()
         {
             if (disposed)
@@ -96,19 +77,14 @@ namespace ROBot.Core.Chat.Twitch.PubSub
 
             try
             {
-                if (token.BadAuth || string.IsNullOrEmpty(token.Token))
-                {
-                    return;
-                }
-
                 state = PubSubState.Connecting;
-                logger.LogDebug("[TWITCH] Connecting to PubSub (Username: " + token.UserName + ")");
-                client.ListenToChannelPoints(token.UserId);
+                logger.LogDebug("[TWITCH] Connecting to PubSub (Username: " + pubsub.SessionInfo.Owner.Username + ")");
+                client.ListenToChannelPoints(pubsub.TwitchUserId);
                 client.Connect();
             }
             catch (Exception exc)
             {
-                logger.LogError("[TWITCH] Unable to connect To pubsub (Username: " + token.UserName + " Error: " + exc.Message + ")");
+                logger.LogError("[TWITCH] Unable to connect To pubsub (Username: " + pubsub.SessionInfo.Owner.Username + " Error: " + exc.Message + ")");
             }
         }
 
@@ -120,7 +96,7 @@ namespace ROBot.Core.Chat.Twitch.PubSub
                 return;
             }
 
-            logger.LogWarning("[TWITCH] Attempting to Reconnect to PubSub (Username: " + token.UserName + ")");
+            logger.LogWarning("[TWITCH] Attempting to Reconnect to PubSub (Username: " + pubsub.SessionInfo.Owner.Username + ")");
             await Task.Delay(1000);
             Connect();
         }
@@ -133,17 +109,17 @@ namespace ROBot.Core.Chat.Twitch.PubSub
 
             if (e.Exception is not OperationCanceledException)
             {
-                logger.LogError("[TWITCH] PubSub Error (Username: " + token.UserName + " Exception: " + e.Exception.Message + ")");
+                logger.LogError("[TWITCH] PubSub Error (Username: " + pubsub.SessionInfo.Owner.Username + " Exception: " + e.Exception.Message + ")");
             }
 
-            allowReconnect = allowReconnect && wasReady && !token.BadAuth;
+            allowReconnect = allowReconnect && wasReady;
             await ReconnectAsync();
         }
 
         private async void Client_OnPubSubServiceClosed(object sender, EventArgs e)
         {
             state = PubSubState.Disconnected;
-            logger.LogError("[TWITCH] PubSub Connection Closed for " + token.UserName);
+            logger.LogError("[TWITCH] PubSub Connection Closed for " + pubsub.SessionInfo.Owner.Username);
             await ReconnectAsync();
         }
 
@@ -153,19 +129,12 @@ namespace ROBot.Core.Chat.Twitch.PubSub
             {
                 state = PubSubState.Authenticating;
 
-                //logger.LogDebug("[TWITCH] Connected To PubSub (Username: " + token.UserName + ")");                
-                if (string.IsNullOrEmpty(token.Token))
-                {
-                    state = PubSubState.Connected;
-                    return;
-                }
-
-                client.SendTopics(token.Token);
-                logger.LogDebug("[TWITCH] Sent PubSub Topics (Username: " + token.UserName + " Token: " + token.Token + ")");
+                client.SendTopics(pubsub.PubSubToken);
+                //logger.LogDebug("[TWITCH] Sent PubSub Topics (Username: " + pubsub.SessionInfo.Owner.Username + " Token: " + pubsub.PubSubToken + ")");
             }
             catch (Exception exc)
             {
-                logger.LogError("[TWITCH] Unable To Send PubSub Topics (Username: " + token.UserName + " Exception: " + exc + ")");
+                logger.LogError("[TWITCH] Unable To Send PubSub Topics (Username: " + pubsub.SessionInfo.Owner.Username + " Exception: " + exc + ")");
             }
         }
 
@@ -175,20 +144,17 @@ namespace ROBot.Core.Chat.Twitch.PubSub
             {
                 allowReconnect = true;
                 state = PubSubState.Ready;
-                token.UnverifiedToken = null;
-                logger.LogDebug("[TWITCH] PubSub Listen Success (Topic: " + e.Topic + " Username: " + token.UserName + ")");
+                logger.LogDebug("[TWITCH] PubSub Listen Success (Topic: " + e.Topic + " Username: " + pubsub.SessionInfo.Owner.Username + ")");
             }
             else
             {
                 state = PubSubState.Connected;
-                logger.LogError("[TWITCH] PubSub Listen failed. (Topic: " + e.Topic + ", Username: " + token.UserName + " Error: " + e.Response.Error + ")");
+                logger.LogError("[TWITCH] PubSub Listen failed. (Topic: " + e.Topic + ", Username: " + pubsub.SessionInfo.Owner.Username + " Error: " + e.Response.Error + ")");
 
                 if (e.Response.Error == "ERR_BADAUTH")
                 {
                     allowReconnect = false;
                     // Remove the token, we don't want to use this one.
-                    token.Token = token.UnverifiedToken;
-                    token.BadAuth = true;
                 }
             }
         }
@@ -196,7 +162,7 @@ namespace ROBot.Core.Chat.Twitch.PubSub
         private void Client_OnChannelPointsRewardRedeemed(object sender, OnChannelPointsRewardRedeemedArgs e)
         {
             state = PubSubState.Ready;
-            logger.LogDebug("[TWITCH] PubSub Reward Redeemed (Channel: " + token.UserName + " Title: " + e.RewardRedeemed.Redemption.Reward.Title + ")");
+            logger.LogDebug("[TWITCH] PubSub Reward Redeemed (Channel: " + pubsub.SessionInfo.Owner.Username + " Title: " + e.RewardRedeemed.Redemption.Reward.Title + ")");
             OnChannelPointsRewardRedeemed?.Invoke(this, e);
         }
 
@@ -211,8 +177,7 @@ namespace ROBot.Core.Chat.Twitch.PubSub
             allowReconnect = false;
             state = PubSubState.Disposed;
 
-            logger.LogDebug("[TWITCH] PubSub Disposed (Username: " + token.UserName + ")");
-            token.OnUpdated -= OnTokenUpdated;
+            logger.LogDebug("[TWITCH] PubSub Disposed (Username: " + pubsub.SessionInfo.Owner.Username + ")");
 
             UnsubscribeClient();
 

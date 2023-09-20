@@ -49,7 +49,7 @@ namespace RavenBot
         private readonly HashSet<string> newSubAdded = new HashSet<string>();
         private PubSubState pubsubState;
         private bool tryPubSubAuthWithOAuthToken;
-        private GameSessionInfo ravenfallSession;
+        private LocalGameSessionInfo ravenfallSession;
         private readonly object pubsubListenMutex = new object();
         public TwitchBot(
             ILogger logger,
@@ -83,7 +83,7 @@ namespace RavenBot
                 ListenToChannelPoints(logger, data);
             });
 
-            this.messageBus.Subscribe<GameSessionInfo>("ravenfall_session", session =>
+            this.messageBus.Subscribe<LocalGameSessionInfo>("ravenfall_session", session =>
             {
                 string twitchId = "";
                 if (session != null)

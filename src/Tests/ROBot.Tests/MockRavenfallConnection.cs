@@ -23,7 +23,7 @@ namespace ROBot.Tests
 
         public IRavenfallApi this[ICommand cmd] => throw new NotImplementedException();
 
-        public event EventHandler<GameSessionInfo> OnSessionInfoReceived;
+        public event EventHandler<RemoteGameSessionInfo> OnSessionInfoReceived;
 
         public Task AcceptClanInviteAsync(User player, string argument)
         {

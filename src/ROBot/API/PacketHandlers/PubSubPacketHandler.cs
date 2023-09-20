@@ -10,16 +10,13 @@ namespace ROBot.API.PacketHandlers
     {
         private readonly ILogger logger;
         private readonly IMessageBus messageBus;
-        private readonly ITwitchPubSubTokenRepository pubSubRepo;
 
         public PubSubPacketHandler(
             ILogger logger,
-            IMessageBus messageBus,
-            ITwitchPubSubTokenRepository pubSubRepo)
+            IMessageBus messageBus)
         {
             this.logger = logger;
             this.messageBus = messageBus;
-            this.pubSubRepo = pubSubRepo;
         }
 
         public Task HandleAsync(INetworkClient client, ServerPacket packet)
@@ -41,15 +38,15 @@ namespace ROBot.API.PacketHandlers
                     userName = reader.ReadString();
                     token = reader.ReadString();
 
-                    messageBus.Send("pubsub", pubSubRepo.AddOrUpdate(userId, userName, token));
-                    if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(token))
-                    {
-                        logger.LogError("[LOG] Bad pubsub data recieved: "
-                            + ", userId: " + userId
-                            + ", userName: " + userName
-                            + ", token: " + token
-                        );
-                    }
+                    //messageBus.Send("pubsub", pubSubRepo.AddOrUpdate(userId, userName, token));
+                    //if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(token))
+                    //{
+                    //    logger.LogError("[LOG] Bad pubsub data recieved: "
+                    //        + ", userId: " + userId
+                    //        + ", userName: " + userName
+                    //        + ", token: " + token
+                    //    );
+                    //}
                 }
             }
             catch (System.Exception exc)

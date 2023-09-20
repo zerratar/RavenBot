@@ -91,7 +91,7 @@ namespace ROBot.Core.Chat.Twitch
             this.pubSubManager = pubSubManager;
             stats = twitchStats;
 
-            this.messageBus.Subscribe<PubSubToken>("pubsub", OnPubSubTokenReceived);
+            //this.messageBus.Subscribe<PubSubToken>("pubsub", OnPubSubTokenReceived);
             broadcastSubscription = messageBus.Subscribe<SessionGameMessageResponse>(MessageBus.Broadcast, Broadcast);
         }
 
@@ -382,7 +382,7 @@ namespace ROBot.Core.Chat.Twitch
                     logger.LogDebug("[TWITCH] Joining Channel (Channel: " + channel + " Rejoin: " + newChannel + ")");
                     stats.AddChAttempt();
                     client.JoinChannel(channel);
-                    pubSubManager.PubSubConnect(channel);
+                    //pubSubManager.PubSubConnect(channel);
                 }
                 else
                 {
@@ -587,17 +587,17 @@ namespace ROBot.Core.Chat.Twitch
         {
         }
 
-        private void OnPubSubTokenReceived(PubSubToken obj)
-        {
-            lock (channelMutex)
-            {
-                if (joinedChannels.Contains(obj.UserName))
-                {
-                    logger.LogInformation("[RVNFLL] pubsub Token recieved for " + obj.UserName);
-                    pubSubManager.PubSubConnect(obj.UserName);
-                }
-            }
-        }
+        //private void OnPubSubTokenReceived(PubSubToken obj)
+        //{
+        //    lock (channelMutex)
+        //    {
+        //        if (joinedChannels.Contains(obj.UserName))
+        //        {
+        //            logger.LogInformation("[RVNFLL] pubsub Token recieved for " + obj.UserName);
+        //            pubSubManager.PubSubConnect(obj.UserName);
+        //        }
+        //    }
+        //}
 
         private async Task OnUserJoinedAsync(object sender, OnUserJoinedArgs e)
         {

@@ -73,7 +73,6 @@ namespace ROBot
             ioc.RegisterShared<ITwitchCommandClient, TwitchCommandClient>();
 
             ioc.RegisterShared<ITwitchPubSubManager, TwitchPubSubManager>();
-            ioc.RegisterShared<ITwitchPubSubTokenRepository, TwitchPubSubTokenRepository>();
 
             ioc.RegisterShared<IDiscordCommandController, DiscordCommandController>();
             ioc.RegisterShared<IDiscordCommandClient, DiscordCommandClient>();

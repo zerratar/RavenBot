@@ -11,7 +11,7 @@ namespace ROBot.Core.GameServer
     {
         Guid InstanceId { get; }
 
-        event EventHandler<GameSessionInfo> OnSessionInfoReceived;
+        event EventHandler<RemoteGameSessionInfo> OnSessionInfoReceived;
         IGameSession Session { get; set; }
         IPEndPoint EndPoint { get; }
         string EndPointString { get; }

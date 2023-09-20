@@ -85,7 +85,7 @@ namespace RavenBot.Core.Ravenfall
             var player = playerProvider.Get(userId);
             player.IsBroadcaster = true;
 
-            messageBus.Send("ravenfall_session", new GameSessionInfo
+            messageBus.Send("ravenfall_session", new LocalGameSessionInfo
             {
                 SessionId = sessionid,
                 SessionStart = sessionStart,
@@ -153,7 +153,7 @@ namespace RavenBot.Core.Ravenfall
         }
     }
 
-    public class GameSessionInfo
+    public class LocalGameSessionInfo
     {
         public Guid SessionId { get; set; }
         public DateTime SessionStart { get; set; }
