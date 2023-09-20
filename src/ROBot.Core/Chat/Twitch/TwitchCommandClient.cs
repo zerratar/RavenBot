@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using RavenBot.Core.Chat;
@@ -102,33 +103,33 @@ namespace ROBot.Core.Chat.Twitch
         {
             /* TwitchLib.Client Events */
             //Twitch Connection events            
-            client.OnConnected += OnConnected;
-            client.OnConnectionError += OnConnectionError;
-            client.OnDisconnected += OnDisconnected;
+            client.OnConnected += OnConnectedAsync;
+            client.OnConnectionError += OnConnectionErrorAsync;
+            client.OnDisconnected += OnDisconnectedAsync;
             //in channel events
-            client.OnChatCommandReceived += OnCommandReceived;
-            client.OnMessageReceived += OnMessageReceived;
-            client.OnUserJoined += OnUserJoined;
-            client.OnUserLeft += OnUserLeft;
-            client.OnGiftedSubscription += OnGiftedSub;
-            client.OnCommunitySubscription += OnPrimeSub;
-            client.OnNewSubscriber += OnNewSub;
-            client.OnReSubscriber += OnReSub;
-            client.OnRaidNotification += OnRaidNotification;
+            client.OnChatCommandReceived += OnCommandReceivedAsync;
+            client.OnMessageReceived += OnMessageReceivedAsync;
+            client.OnUserJoined += OnUserJoinedAsync;
+            client.OnUserLeft += OnUserLeftAsync;
+            client.OnGiftedSubscription += OnGiftedSubAsync;
+            client.OnCommunitySubscription += OnPrimeSubAsync;
+            client.OnNewSubscriber += OnNewSubAsync;
+            client.OnReSubscriber += OnReSubAsync;
+            client.OnRaidNotification += OnRaidNotificationAsync;
             //Confirmation Events
-            client.OnFailureToReceiveJoinConfirmation += OnFailureToReceiveJoinConfirmation;
-            client.OnJoinedChannel += Client_OnJoinedChannel;
-            client.OnLeftChannel += Client_OnLeftChannel;
-            client.OnMessageSent += Client_OnMessageSent; //When Twitch message sent (responded to sent messages with "USERSTATE" )
-            client.OnUserStateChanged += Client_OnUserStateChanged;
+            client.OnFailureToReceiveJoinConfirmation += OnFailureToReceiveJoinConfirmationAsync;
+            client.OnJoinedChannel += OnJoinedChannelAsync;
+            client.OnLeftChannel += OnLeftChannelAsync;
+            client.OnMessageSent += OnMessageSentAsync; //When Twitch message sent (responded to sent messages with "USERSTATE" )
+            client.OnUserStateChanged += OnUserStateChangedAsync;
             //Rate limited Events
-            client.OnRateLimit += Client_OnRateLimit;
+            client.OnRateLimit += OnRateLimitAsync;
             //full events
-            client.OnError += OnError;
+            client.OnError += OnErrorAsync;
             //client.OnLog += OnLog;
 
             /* TwitchLib.PubSub Events */
-            pubSubManager.OnChannelPointsRewardRedeemed += Pubsub_OnChannelPointsRewardRedeemed;
+            pubSubManager.OnChannelPointsRewardRedeemed += OnChannelPointsRewardRedeemed;
         }
 
         private void Unsubscribe()
@@ -137,35 +138,35 @@ namespace ROBot.Core.Chat.Twitch
             if (client != null)
             {
                 //TwitchLib.Client
-                client.OnChatCommandReceived -= OnCommandReceived;
-                client.OnMessageReceived -= OnMessageReceived;
-                client.OnConnected -= OnConnected;
-                client.OnDisconnected -= OnDisconnected;
-                client.OnUserJoined -= OnUserJoined;
-                client.OnUserLeft -= OnUserLeft;
-                client.OnGiftedSubscription -= OnGiftedSub;
-                client.OnCommunitySubscription -= OnPrimeSub;
-                client.OnNewSubscriber -= OnNewSub;
-                client.OnReSubscriber -= OnReSub;
-                client.OnRaidNotification -= OnRaidNotification;
-                client.OnFailureToReceiveJoinConfirmation -= OnFailureToReceiveJoinConfirmation;
-                client.OnJoinedChannel -= Client_OnJoinedChannel;
-                client.OnLeftChannel -= Client_OnLeftChannel;
-                client.OnConnectionError -= OnConnectionError;
-                client.OnMessageSent -= Client_OnMessageSent;
-                client.OnUserStateChanged -= Client_OnUserStateChanged;
-                client.OnRateLimit -= Client_OnRateLimit;
+                client.OnChatCommandReceived -= OnCommandReceivedAsync;
+                client.OnMessageReceived -= OnMessageReceivedAsync;
+                client.OnConnected -= OnConnectedAsync;
+                client.OnDisconnected -= OnDisconnectedAsync;
+                client.OnUserJoined -= OnUserJoinedAsync;
+                client.OnUserLeft -= OnUserLeftAsync;
+                client.OnGiftedSubscription -= OnGiftedSubAsync;
+                client.OnCommunitySubscription -= OnPrimeSubAsync;
+                client.OnNewSubscriber -= OnNewSubAsync;
+                client.OnReSubscriber -= OnReSubAsync;
+                client.OnRaidNotification -= OnRaidNotificationAsync;
+                client.OnFailureToReceiveJoinConfirmation -= OnFailureToReceiveJoinConfirmationAsync;
+                client.OnJoinedChannel -= OnJoinedChannelAsync;
+                client.OnLeftChannel -= OnLeftChannelAsync;
+                client.OnConnectionError -= OnConnectionErrorAsync;
+                client.OnMessageSent -= OnMessageSentAsync;
+                client.OnUserStateChanged -= OnUserStateChangedAsync;
+                client.OnRateLimit -= OnRateLimitAsync;
             }
 
             if (pubSubManager != null)
             {
                 //TwitchLib.PubSub
-                pubSubManager.OnChannelPointsRewardRedeemed -= Pubsub_OnChannelPointsRewardRedeemed;
+                pubSubManager.OnChannelPointsRewardRedeemed -= OnChannelPointsRewardRedeemed;
             }
         }
 
 
-        public void Start()
+        public async Task StartAsync()
         {
             if (!kernel.Started) kernel.Start();
 
@@ -178,8 +179,8 @@ namespace ROBot.Core.Chat.Twitch
             {
                 logger.LogInformation("[TWITCH] Starting...");
 
-                client = new TwitchClient(new WebSocketClient(new ClientOptions(clientType: ClientType.Chat)));
-                
+                client = new TwitchClient(new TcpClient(new ClientOptions(clientType: ClientType.Chat)));
+
                 //client.AutoReListenOnException = true;
 
                 var credentials = credentialsProvider.Get();
@@ -190,7 +191,7 @@ namespace ROBot.Core.Chat.Twitch
                 Subscribe();
 
                 logger.LogInformation("[TWITCH] Connecting...");
-                client.Connect();
+                await client.ConnectAsync();
             }
             catch (Exception exc)
             {
@@ -204,7 +205,7 @@ namespace ROBot.Core.Chat.Twitch
             if (client != null)
             {
                 //client.OnLog -= OnLog;
-                client.OnError -= OnError;
+                client.OnError -= OnErrorAsync;
             }
             Unsubscribe();
 
@@ -241,7 +242,7 @@ namespace ROBot.Core.Chat.Twitch
             return isConnectedToTwitch || client.IsConnected;
         }
 
-        private void TryToReconnect() //prepare to be broa...reconnected
+        private async Task TryToReconnectAsync() //prepare to be broa...reconnected
         {
             if (attemptingReconnection)
                 return; //Avoid more than one reconnect attempt. (I.e. disconnect fired twice)
@@ -252,19 +253,19 @@ namespace ROBot.Core.Chat.Twitch
 
                 attemptingReconnection = true;
 
-                ReconnectAttempt();
+                await ReconnectAsync();
             }
             catch (Exception exc)
             {
-                logger.LogError("[TWITCH] " + nameof(TryToReconnect) + " failed: " + exc);
+                logger.LogError("[TWITCH] " + nameof(TryToReconnectAsync) + " failed: " + exc);
             }
             finally
             {
-                TestingConnection();
+                TestConnectionAsync();
             }
         }
 
-        private void ReconnectAttempt()
+        private async Task ReconnectAsync()
         {
             stats.AddTwitchAttempt();
             //client.Reconnect(); Abby: Seem to have a bug. Will Manually Do our own reconnect
@@ -286,11 +287,11 @@ namespace ROBot.Core.Chat.Twitch
             }
             else
             {
-                Start(); //Restart Process every 10 tries to see if this fix any connection issues
+                await StartAsync(); //Restart Process every 10 tries to see if this fix any connection issues
             }
 
         }
-        private async void TestingConnection() //Start timer to test for connection
+        private async Task TestConnectionAsync() //Start timer to test for connection
         {
             try
             {
@@ -305,8 +306,8 @@ namespace ROBot.Core.Chat.Twitch
                 }
                 else
                 {
-                    ReconnectAttempt();
-                    TestingConnection();
+                    await StartAsync();
+                    await TestConnectionAsync();
                 }
             }
             catch (Exception)
@@ -438,10 +439,9 @@ namespace ROBot.Core.Chat.Twitch
             }
 
             var channel = cmd.Session.Channel;
-            if (channel == null)
+            if (channel == null && !string.IsNullOrEmpty(cmd.Session.Name))
             {
-                // gotta find a channel.
-                // ...
+                cmd.Session.Channel = channel = TryResolveChannel(cmd.Session.Name);
             }
 
             if (channel != null)
@@ -464,6 +464,12 @@ namespace ROBot.Core.Chat.Twitch
                 //Broadcast(channel, message.Receiver, message.Format, message.Args);
             }
         }
+
+        private ICommandChannel TryResolveChannel(string name)
+        {
+            return new TwitchCommand.TwitchChannel(name);
+        }
+
         public async void SendMessage(ICommandChannel channel, string format, object[] args)
         {
             if (string.IsNullOrWhiteSpace(format))
@@ -577,7 +583,7 @@ namespace ROBot.Core.Chat.Twitch
         // EVENTS //
         ////////////
 
-        private async void OnUserLeft(object sender, OnUserLeftArgs e)
+        private async Task OnUserLeftAsync(object sender, OnUserLeftArgs e)
         {
         }
 
@@ -593,11 +599,11 @@ namespace ROBot.Core.Chat.Twitch
             }
         }
 
-        private async void OnUserJoined(object sender, OnUserJoinedArgs e)
+        private async Task OnUserJoinedAsync(object sender, OnUserJoinedArgs e)
         {
         }
 
-        private async void OnMessageReceived(object sender, OnMessageReceivedArgs e)
+        private async Task OnMessageReceivedAsync(object sender, OnMessageReceivedArgs e)
         {
             if (await commandHandler.HandleAsync(game, this, e.ChatMessage))
             {
@@ -605,7 +611,7 @@ namespace ROBot.Core.Chat.Twitch
             }
         }
 
-        private async void OnCommandReceived(object sender, OnChatCommandReceivedArgs e)
+        private async Task OnCommandReceivedAsync(object sender, OnChatCommandReceivedArgs e)
         {
             if (e == null || e.Command == null)
             {
@@ -624,21 +630,6 @@ namespace ROBot.Core.Chat.Twitch
                 {
                     return;
                 }
-
-                //if (e.Command.ArgumentsAsString.Contains("activate", StringComparison.OrdinalIgnoreCase))
-                //{
-                //    if (pubSubManager.IsReady(e.Command.ChatMessage.Channel))
-                //    {
-                //        return;
-                //    }
-
-                //    var activationLink = pubSubManager.GetActivationLink(e.Command.ChatMessage.UserId, e.Command.ChatMessage.Username);
-                //    client.SendWhisper(e.Command.ChatMessage.Username,
-                //        "Please use the following link to activate the channel point rewards. " +
-                //        activationLink
-                //        );
-                //    return;
-                //}
             }
 
             if (await commandHandler.HandleAsync(game, this, e.Command))
@@ -647,13 +638,13 @@ namespace ROBot.Core.Chat.Twitch
             }
         }
 
-        private async void Pubsub_OnChannelPointsRewardRedeemed(object sender, OnChannelPointsRewardRedeemedArgs e)
+        private async void OnChannelPointsRewardRedeemed(object sender, OnChannelPointsRewardRedeemedArgs e)
         {
             //logger.LogDebug("[TWITCH] Reward Redeemed (Title: " + e.RewardRedeemed?.Redemption?.Reward?.Title + " Name: " + e.RewardRedeemed?.Redemption?.User?.Login + " Channel: " + e.ChannelId + ")");
             await commandHandler.HandleAsync(game, this, e);
         }
 
-        private async void OnReSub(object sender, OnReSubscriberArgs e)
+        private async Task OnReSubAsync(object sender, OnReSubscriberArgs e)
         {
             messageBus.Send(nameof(UserSubscriptionEvent),
                  new UserSubscriptionEvent(
@@ -661,7 +652,7 @@ namespace ROBot.Core.Chat.Twitch
                      e.ReSubscriber.IsModerator, e.ReSubscriber.IsSubscriber, e.ReSubscriber.Months, false));
         }
 
-        private async void OnNewSub(object sender, OnNewSubscriberArgs e)
+        private async Task OnNewSubAsync(object sender, OnNewSubscriberArgs e)
         {
             messageBus.Send(nameof(UserSubscriptionEvent),
                new UserSubscriptionEvent("twitch", e.Channel, e.Subscriber.UserId, e.Subscriber.Login, e.Subscriber.DisplayName,
@@ -669,7 +660,7 @@ namespace ROBot.Core.Chat.Twitch
             //this.Broadcast(e.Channel, "", Localization.Twitch.THANK_YOU_SUB, e.Subscriber.DisplayName);
         }
 
-        private async void OnPrimeSub(object sender, OnCommunitySubscriptionArgs e)
+        private async Task OnPrimeSubAsync(object sender, OnCommunitySubscriptionArgs e)
         {
             messageBus.Send(nameof(UserSubscriptionEvent),
                 new UserSubscriptionEvent("twitch", e.Channel, e.GiftedSubscription.UserId, e.GiftedSubscription.Login,
@@ -677,7 +668,7 @@ namespace ROBot.Core.Chat.Twitch
             //this.Broadcast(e.Channel, "", Localization.Twitch.THANK_YOU_SUB, e.GiftedSubscription.DisplayName);
         }
 
-        private async void OnGiftedSub(object sender, OnGiftedSubscriptionArgs e)
+        private async Task OnGiftedSubAsync(object sender, OnGiftedSubscriptionArgs e)
         {
             messageBus.Send(nameof(UserSubscriptionEvent),
                new UserSubscriptionEvent("twitch", e.Channel, e.GiftedSubscription.Id, e.GiftedSubscription.Login,
@@ -687,7 +678,7 @@ namespace ROBot.Core.Chat.Twitch
             //this.Broadcast(e.Channel, "", Localization.Twitch.THANK_YOU_GIFT_SUB, e.GiftedSubscription.DisplayName);
         }
 
-        private async void OnDisconnected(object sender, OnDisconnectedEventArgs e)
+        private async Task OnDisconnectedAsync(object sender, OnDisconnectedEventArgs e)
         {
             stats.AddTwitchDisconnect();
             isConnectedToTwitch = false;
@@ -706,15 +697,15 @@ namespace ROBot.Core.Chat.Twitch
                 logger.LogWarning("[TWITCH] Disconnected.");
             }
 
-            TryToReconnect();
+            await TryToReconnectAsync();
         }
 
-        private async void Client_OnUserStateChanged(object sender, OnUserStateChangedArgs e)
+        private async Task OnUserStateChangedAsync(object sender, OnUserStateChangedArgs e)
         {
             //logger.LogDebug("[TWITCH] Client_OnUserStateChanged: " + e.ToString());
         }
 
-        private async void Client_OnMessageSent(object sender, OnMessageSentArgs e)
+        private async Task OnMessageSentAsync(object sender, OnMessageSentArgs e)
         {
             // this is already being logged in SendChatMessage
             //logger.LogDebug("[TWITCH] OnMessageSent (To: " + e.SentMessage.Channel + " Message: '" + e.SentMessage.Message + "')");
@@ -724,13 +715,13 @@ namespace ROBot.Core.Chat.Twitch
             stats.AddMsgSent(e.SentMessage.Channel, e.SentMessage.Message);
         }
 
-        private async void Client_OnRateLimit(object sender, OnRateLimitArgs e)
+        private async Task OnRateLimitAsync(object sender, OnRateLimitArgs e)
         {
             stats.AddLastRateLimit(e);
             logger.LogError("[TWITCH] RateLimited (OnRateLimitArgs: " + e.ToString() + ")");
         }
 
-        private async void OnConnected(object sender, OnConnectedArgs e)
+        private async Task OnConnectedAsync(object sender, OnConnectedArgs e)
         {
             logger.LogDebug("[TWITCH] Connected");
             isConnectedToTwitch = true;
@@ -740,7 +731,7 @@ namespace ROBot.Core.Chat.Twitch
             RejoinChannels();
         }
 
-        private async void OnFailureToReceiveJoinConfirmation(object sender, OnFailureToReceiveJoinConfirmationArgs e)
+        private async Task OnFailureToReceiveJoinConfirmationAsync(object sender, OnFailureToReceiveJoinConfirmationArgs e)
         {
             stats.AddChError();
             var err = "";
@@ -768,7 +759,7 @@ namespace ROBot.Core.Chat.Twitch
             JoinChannel(e.Exception.Channel);
         }
 
-        private async void OnRaidNotification(object sender, OnRaidNotificationArgs e)
+        private async Task OnRaidNotificationAsync(object sender, OnRaidNotificationArgs e)
         {
         }
 
@@ -781,13 +772,13 @@ namespace ROBot.Core.Chat.Twitch
         //    //logger.LogDebug("[TWITCH] onLog (Log: " + e.Data + ")");
         //}
 
-        private async void OnError(object sender, OnErrorEventArgs e)
+        private async Task OnErrorAsync(object sender, OnErrorEventArgs e)
         {
             logger.LogError("[TWITCH] onError (Error: " + e.ToString() + ")");
             stats.AddTwitchError(e);
         }
 
-        private async void OnConnectionError(object sender, OnConnectionErrorArgs e)
+        private async Task OnConnectionErrorAsync(object sender, OnConnectionErrorArgs e)
         {
             logger.LogError("[TWITCH] OnConnectionError (Error: " + e.Error.Message + ")");
             stats.AddTwitchError(e);
@@ -797,7 +788,7 @@ namespace ROBot.Core.Chat.Twitch
             //TODO: Certain errors may require differnet actions - (example bad certs)
         }
 
-        private async void Client_OnLeftChannel(object sender, OnLeftChannelArgs e)
+        private async Task OnLeftChannelAsync(object sender, OnLeftChannelArgs e)
         {
             stats.LeftChannel(e.Channel, client.JoinedChannels);
             logger.LogWarning("[TWITCH] Left Channel (Channel: " + e.Channel + ")");
@@ -805,7 +796,7 @@ namespace ROBot.Core.Chat.Twitch
             currentlyJoiningChannels.TryRemove(e.Channel, out _);
         }
 
-        private async void Client_OnJoinedChannel(object sender, OnJoinedChannelArgs e)
+        private async Task OnJoinedChannelAsync(object sender, OnJoinedChannelArgs e)
         {
             stats.JoinedChannel(e.Channel, client.JoinedChannels);
             logger.LogInformation("[TWITCH] Joined (Channel: " + e.Channel + ")");

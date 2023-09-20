@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 
 namespace ROBot.Core.Chat.Commands
 {
+    public class Conjure : Brew { }
+    public class Alchemise : Brew { }
     public class Brew : ChatCommandHandler
     {
         public override string Category => "Skills";

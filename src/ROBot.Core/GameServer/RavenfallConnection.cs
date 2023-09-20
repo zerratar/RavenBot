@@ -191,7 +191,7 @@ namespace ROBot.Core.GameServer
                     SessionId = sessionid,
                     UserId = userId,
                     Owner = player,
-
+                    Settings = userSettings
                 });
             }
             catch (Exception exc)

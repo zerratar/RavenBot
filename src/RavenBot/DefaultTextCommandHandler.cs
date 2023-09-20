@@ -20,7 +20,7 @@ namespace RavenBot
             Register<StatsCommandProcessor>(commandBindingProvider.Get("stats"));//, "status");
             Register<EquipmentCommandProcessor>(commandBindingProvider.Get("eq", "equipment"));
 
-            Register<ResourcesCommandProcessor>(commandBindingProvider.Get("res", "resources", "resource"));
+            Register<ResourcesCommandProcessor>(commandBindingProvider.Get("coins", "gold", "res", "resources", "resource"));
             Register<TownResourcesCommandProcessor>(commandBindingProvider.Get("townres", "townresources"));
             Register<HighestSkillCommandProcessor>(commandBindingProvider.Get("highest", "top"));//, "top");
             Register<HighscoreSkillCommandProcessor>(commandBindingProvider.Get("leaderboard", "highscore", "hs"));
@@ -33,8 +33,8 @@ namespace RavenBot
             Register<ArenaCommandProcessor>(commandBindingProvider.Get("arena"));
             Register<CraftCommandProcessor>(commandBindingProvider.Get("craft"));
 
-            Register<BrewCommandProcessor>(commandBindingProvider.Get("brew"));
-            Register<CookCommandProcessor>(commandBindingProvider.Get("cook"));
+            Register<BrewCommandProcessor>(commandBindingProvider.Get("brew", "conjure", "alchemise", "alchemize"));
+            Register<CookCommandProcessor>(commandBindingProvider.Get("cook", "prepare"));
 
             Register<GatherCommandProcessor>(commandBindingProvider.Get("gather"));
             Register<MineCommandProcessor>(commandBindingProvider.Get("mine"));
@@ -109,7 +109,7 @@ namespace RavenBot
             Register<VersionCommandProcessor>(commandBindingProvider.Get("version"));
             Register<ItemCountCommandProcessor>(commandBindingProvider.Get("count", "items"));
             Register<ItemUsageCommandProcessor>(commandBindingProvider.Get("usage", "uses"));
-            
+
             Register<VillageCommandProcessor>(commandBindingProvider.Get("village", "town"));
 
             Register<PubSubActivateCommandProcessor>(commandBindingProvider.Get("pubsub", "channelpointrewards"));//, "points", "rewards"));

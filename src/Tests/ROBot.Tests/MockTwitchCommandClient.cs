@@ -71,7 +71,7 @@ namespace ROBot.Tests
             throw new System.NotImplementedException();
         }
 
-        public void Start()
+        public async Task StartAsync()
         {
         }
 

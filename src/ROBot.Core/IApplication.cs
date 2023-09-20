@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace ROBot.Core
 {
     public interface IApplication : IDisposable
     {
-        void Run();
+        Task RunAsync();
         void Shutdown();
     }
 

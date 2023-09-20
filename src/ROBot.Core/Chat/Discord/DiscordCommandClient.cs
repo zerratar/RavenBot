@@ -204,7 +204,8 @@ namespace ROBot.Core.Chat.Discord
 
         public async void Broadcast(SessionGameMessageResponse cmd)
         {
-            if (cmd == null || cmd.Session?.Name == null)
+            if (this.discord.ConnectionState != ConnectionState.Connected 
+                || cmd == null || cmd.Session?.Name == null)
             {
                 return;
             }
@@ -332,7 +333,7 @@ namespace ROBot.Core.Chat.Discord
             await SendChatMessageAsync(channel, msg, null);
         }
 
-        public async void Start()
+        public async Task StartAsync()
         {
             if (!kernel.Started) kernel.Start();
             try

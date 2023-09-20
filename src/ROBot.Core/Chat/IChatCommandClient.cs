@@ -6,7 +6,7 @@ namespace ROBot.Core.Chat
 {
     public interface IChatCommandClient : IDisposable
     {
-        void Start();
+        Task StartAsync();
         void Stop();
 
         void Broadcast(SessionGameMessageResponse message);

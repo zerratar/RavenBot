@@ -63,20 +63,20 @@ namespace ROBot
             sessionManager.SessionUpdated += OnSessionUpdated;
         }
 
-        public void Run()
+        public async Task RunAsync()
         {
             botStats.Started = DateTime.UtcNow;
 
             logger.LogInformation("[BOT] Application Started");
 
-            logger.LogInformation("[BOT] Initializing Twitch Integration..");
-            twitch.Start();
-
-            logger.LogInformation("[BOT] Initializing Discord Integration..");
-            discord.Start();
-
             logger.LogInformation("[BOT] Starting Bot Server..");
             botServer.Start();
+
+            logger.LogInformation("[BOT] Initializing Twitch Integration..");
+            await twitch.StartAsync();
+
+            //logger.LogInformation("[BOT] Initializing Discord Integration..");
+            //await discord.StartAsync();
 
             UpdateTitle();
         }

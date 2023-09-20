@@ -293,11 +293,10 @@ namespace ROBot.Core.Stats
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static string GetKey(string channel, string message)
         {
-            channel = channel.ToLower().Trim();
-            message = message.ToLower().Trim();
-
-            // Note(zerratar): since we are returning one and the same type always. Its better to use the type
-
+            if (!string.IsNullOrEmpty(channel))
+                channel = channel.ToLower().Trim();
+            if (!string.IsNullOrEmpty(message))
+                message = message.ToLower().Trim();
             return channel + message;
         }
 

@@ -9,10 +9,10 @@ namespace ROBot.Core.Chat.Commands
     public class Stats : ChatCommandHandler
     {
         public override string Category => "Skills";
-        public override string Description => "Get the current level of all your skills, or more details of a specific one.";
+        public override string Description => "Get the current level of all your skills, or more details of a specific skill or item.";
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {
-            ChatCommandInput.Create("skill", "Detailed status of a target skill")
+            ChatCommandInput.Create("skill or item", "Detailed status of a target skill or item")
         };
 
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)

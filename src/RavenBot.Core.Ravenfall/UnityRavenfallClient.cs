@@ -85,7 +85,13 @@ namespace RavenBot.Core.Ravenfall
             var player = playerProvider.Get(userId);
             player.IsBroadcaster = true;
 
-            messageBus.Send("streamer_userid_acquired", player.PlatformId);
+            messageBus.Send("ravenfall_session", new GameSessionInfo
+            {
+                SessionId = sessionid,
+                SessionStart = sessionStart,
+                Settings = userSettings,
+                Owner = player
+            });
         }
 
         public Task<bool> ProcessAsync(int serverPort)
@@ -145,6 +151,14 @@ namespace RavenBot.Core.Ravenfall
         {
             this.requests.Enqueue(request);
         }
+    }
+
+    public class GameSessionInfo
+    {
+        public Guid SessionId { get; set; }
+        public DateTime SessionStart { get; set; }
+        public User Owner { get; set; }
+        public Dictionary<string, object> Settings { get; set; }
     }
 
     //public class BroadcastMessage

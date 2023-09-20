@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 namespace ROBot.Core.Chat.Commands
 {
+    public class Prepare : Cook { }
     public class Cook : ChatCommandHandler
     {
         public override string Category => "Skills";

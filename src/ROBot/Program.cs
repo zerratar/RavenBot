@@ -14,6 +14,7 @@ using RavenBot.Core.Templating;
 using Shinobytes.Core;
 using ROBot.API;
 using RavenBot.Core.Ravenfall;
+using System.Threading.Tasks;
 //using RavenBot.Core;
 
 namespace ROBot
@@ -22,7 +23,7 @@ namespace ROBot
     {
         private static IoC ioc;
         private static bool isExiting;
-        static void Main(string[] args)
+        async static Task Main(string[] args)
         {
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomain_ProcessExit);
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
@@ -99,7 +100,7 @@ namespace ROBot
 
             var app = ioc.Resolve<IStreamBotApplication>();
             {
-                app.Run();
+                await app.RunAsync();
                 while (!isExiting)
                 {
                     //if (Console.ReadKey().Key == ConsoleKey.Q)

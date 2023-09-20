@@ -10,6 +10,7 @@ using RavenBot.Core.Chat.Twitch;
 using RavenBot.Core.Handlers;
 using RavenBot.Core.Net;
 using RavenBot.Core.Ravenfall;
+using RavenBot.Core.Ravenfall.Models;
 using Shinobytes.Core;
 using TwitchLib.Client;
 using TwitchLib.Client.Events;
@@ -43,10 +44,12 @@ namespace RavenBot
         private bool tryToReconnect = true;
         private bool disposed;
         private string pubsubToken;
+        private string twitchId;
         private readonly object mutex = new object();
         private readonly HashSet<string> newSubAdded = new HashSet<string>();
         private PubSubState pubsubState;
         private bool tryPubSubAuthWithOAuthToken;
+        private GameSessionInfo ravenfallSession;
         private readonly object pubsubListenMutex = new object();
         public TwitchBot(
             ILogger logger,
@@ -80,12 +83,28 @@ namespace RavenBot
                 ListenToChannelPoints(logger, data);
             });
 
-            this.messageBus.Subscribe<string>("streamer_userid_acquired", data =>
+            this.messageBus.Subscribe<GameSessionInfo>("ravenfall_session", session =>
             {
+                string twitchId = "";
+                if (session != null)
+                {
+                    this.ravenfallSession = session;
+
+                    if (session.Settings.TryGetValue("twitch_id", out var v))
+                        twitchId = v.ToString();
+
+                    if (session.Settings.TryGetValue("twitch_pubsub", out v))
+                        pubsubToken = v.ToString();
+
+                    var settings = session.Settings;
+                    if (string.IsNullOrEmpty(twitchId))
+                        twitchId = this.ravenfallSession.Owner.PlatformId;
+                }
+
                 if (tryPubSubAuthWithOAuthToken)
                 {
                     var credentials = credentialsProvider.Get();
-                    ListenToChannelPoints(logger, data + "," + credentials.TwitchOAuth);
+                    ListenToChannelPoints(logger, twitchId);// data + "," + credentials.TwitchOAuth);
                     tryPubSubAuthWithOAuthToken = false;
                 }
             });
@@ -119,11 +138,19 @@ namespace RavenBot
 
                 try
                 {
-                    var d = data.Split(',');
-                    pubsubToken = d[1];
-
+                    if (data.Contains(","))
+                    {
+                        var d = data.Split(',');
+                        pubsubToken = d[1];
+                        twitchId = d[0];
+                    }
+                    else
+                    {
+                        //pubsubToken = data;
+                        twitchId = data;
+                    }
                     logger.WriteDebug("Connecting to PubSub...");
-                    pubsub.ListenToChannelPoints(d[0]);
+                    pubsub.ListenToChannelPoints(twitchId);
                     pubsub.Connect();
                 }
                 catch (Exception exc)
@@ -149,7 +176,7 @@ namespace RavenBot
             disposed = true;
         }
 
-        private async void OnUserLeft(object sender, OnUserLeftArgs e)
+        private async Task OnUserLeftAsync(object sender, OnUserLeftArgs e)
         {
             if (!e.Channel.Contains(this.channelProvider.Get(), StringComparison.InvariantCultureIgnoreCase))
                 return;
@@ -157,7 +184,7 @@ namespace RavenBot
             this.messageBus.Send(nameof(UserLeftEvent), new UserLeftEvent(e.Username));
         }
 
-        private async void OnUserJoined(object sender, OnUserJoinedArgs e)
+        private async Task OnUserJoinedAsync(object sender, OnUserJoinedArgs e)
         {
             if (!e.Channel.Contains(this.channelProvider.Get(), StringComparison.InvariantCultureIgnoreCase))
                 return;
@@ -165,7 +192,7 @@ namespace RavenBot
             this.messageBus.Send(nameof(UserJoinedEvent), new UserJoinedEvent(e.Username));
         }
 
-        private async void OnMessageReceived(object sender, OnMessageReceivedArgs e)
+        private async Task OnMessageReceivedAsync(object sender, OnMessageReceivedArgs e)
         {
             if (e.ChatMessage.Bits == 0) return;
 
@@ -186,7 +213,7 @@ namespace RavenBot
             this.Announce(Localization.Twitch.THANK_YOU_BITS, e.ChatMessage.DisplayName, e.ChatMessage.Bits);
         }
 
-        private async void OnCommandReceived(object sender, OnChatCommandReceivedArgs e)
+        private async Task OnCommandReceivedAsync(object sender, OnChatCommandReceivedArgs e)
         {
             var uid = e.Command.ChatMessage.UserId;
             var settings = userSettingsManager.Get(uid, "twitch");
@@ -314,7 +341,7 @@ namespace RavenBot
             client = new TwitchClient(new WebSocketClient(options));
         }
 
-        private async void OnReSub(object sender, OnReSubscriberArgs e)
+        private async Task OnReSubAsync(object sender, OnReSubscriberArgs e)
         {
             this.messageBus.Send(nameof(UserSubscriptionEvent),
                 new UserSubscriptionEvent(
@@ -332,7 +359,7 @@ namespace RavenBot
             //this.Broadcast("", Localization.Twitch.THANK_YOU_RESUB, e.ReSubscriber.DisplayName);
         }
 
-        private async void OnNewSub(object sender, OnNewSubscriberArgs e)
+        private async Task OnNewSubAsync(object sender, OnNewSubscriberArgs e)
         {
             this.messageBus.Send(nameof(UserSubscriptionEvent),
                 new UserSubscriptionEvent(
@@ -349,7 +376,7 @@ namespace RavenBot
             //this.Broadcast("", Localization.Twitch.THANK_YOU_SUB, e.Subscriber.DisplayName);
         }
 
-        private async void OnPrimeSub(object sender, OnCommunitySubscriptionArgs e)
+        private async Task OnPrimeSubAsync(object sender, OnCommunitySubscriptionArgs e)
         {
             this.messageBus.Send(nameof(UserSubscriptionEvent),
                 new UserSubscriptionEvent(
@@ -366,7 +393,7 @@ namespace RavenBot
             //this.Broadcast("", Localization.Twitch.THANK_YOU_SUB, e.GiftedSubscription.DisplayName);
         }
 
-        private async void OnGiftedSub(object sender, OnGiftedSubscriptionArgs e)
+        private async Task OnGiftedSubAsync(object sender, OnGiftedSubscriptionArgs e)
         {
             this.messageBus.Send(nameof(UserSubscriptionEvent),
             new UserSubscriptionEvent("twitch",
@@ -382,7 +409,7 @@ namespace RavenBot
             //this.Broadcast("", Localization.Twitch.THANK_YOU_GIFT_SUB, e.GiftedSubscription.DisplayName);
         }
 
-        private async void OnDisconnected(object sender, OnDisconnectedEventArgs e)
+        private async Task OnDisconnectedAsync(object sender, OnDisconnectedEventArgs e)
         {
             logger.WriteDebug("Disconnected from the Twitch IRC Server");
             TryToReconnect();
@@ -436,7 +463,7 @@ namespace RavenBot
             broadcastSubscription?.Unsubscribe();
         }
 
-        private async void OnConnected(object sender, OnConnectedArgs e)
+        private async Task OnConnectedAsync(object sender, OnConnectedArgs e)
         {
             logger.WriteDebug("Connected to Twitch IRC Server");
             messageBus.Send("twitch", "");
@@ -448,26 +475,26 @@ namespace RavenBot
         //    messageBus.Send("twitch", "");
         //}
 
-        private async void OnRaidNotification(object sender, OnRaidNotificationArgs e)
+        private async Task OnRaidNotificationAsync(object sender, OnRaidNotificationArgs e)
         {
             this.Announce(Localization.Twitch.THANK_YOU_RAID, e.RaidNotification.DisplayName);
         }
 
         private void Subscribe()
         {
-            client.OnChatCommandReceived += OnCommandReceived;
-            client.OnMessageReceived += OnMessageReceived;
-            client.OnConnected += OnConnected;
-            client.OnReconnected += OnReconnected;
-            client.OnDisconnected += OnDisconnected;
-            client.OnUserJoined += OnUserJoined;
-            client.OnUserLeft += OnUserLeft;
-            client.OnGiftedSubscription += OnGiftedSub;
-            client.OnCommunitySubscription += OnPrimeSub;
-            client.OnNewSubscriber += OnNewSub;
-            client.OnReSubscriber += OnReSub;
-            client.OnRaidNotification += OnRaidNotification;
-            client.OnConnectionError += OnConnectionError;
+            client.OnChatCommandReceived += OnCommandReceivedAsync;
+            client.OnMessageReceived += OnMessageReceivedAsync;
+            client.OnConnected += OnConnectedAsync;
+            client.OnReconnected += OnReconnectedAsync;
+            client.OnDisconnected += OnDisconnectedAsync;
+            client.OnUserJoined += OnUserJoinedAsync;
+            client.OnUserLeft += OnUserLeftAsync;
+            client.OnGiftedSubscription += OnGiftedSubAsync;
+            client.OnCommunitySubscription += OnPrimeSubAsync;
+            client.OnNewSubscriber += OnNewSubAsync;
+            client.OnReSubscriber += OnReSubAsync;
+            client.OnRaidNotification += OnRaidNotificationAsync;
+            client.OnConnectionError += OnConnectionErrorAsync;
             pubsub.OnListenResponse += Pubsub_OnListenResponse;
             pubsub.OnPubSubServiceConnected += Pubsub_OnPubSubServiceConnected;
             pubsub.OnPubSubServiceError += Pubsub_OnPubSubServiceError;
@@ -475,26 +502,35 @@ namespace RavenBot
             pubsub.OnChannelPointsRewardRedeemed += Pubsub_OnChannelPointsRewardRedeemed;
         }
 
-        private async void OnReconnected(object sender, OnConnectedArgs e)
+        private async Task OnReconnectedAsync(object sender, OnConnectedArgs e)
         {
             logger.WriteDebug("Reconnected to Twitch IRC Server");
             messageBus.Send("twitch", "");
         }
 
-        private async void OnConnectionError(object sender, OnConnectionErrorArgs e)
+        private async Task OnConnectionErrorAsync(object sender, OnConnectionErrorArgs e)
         {
             logger.WriteError("Error connecting to Twitch: " + e.Error + ". Maybe time to refresh the access token?");
         }
 
         private void Pubsub_OnPubSubServiceError(object sender, TwitchLib.PubSub.Events.OnPubSubServiceErrorArgs e)
         {
+            if (pubsubState == PubSubState.BadAuth)
+            {
+                return;
+            }
+
             logger.WriteError("PubSub Service Error: " + e.Exception);
         }
 
         private void Pubsub_OnPubSubServiceClosed(object sender, EventArgs e)
         {
+            if (pubsubState == PubSubState.OK)
+            {
+                logger.WriteWarning("Disconnected from PubSub");
+            }
+
             pubsubState = PubSubState.NotConnected;
-            logger.WriteWarning("Disconnected from PubSub");
         }
 
         private void Pubsub_OnChannelPointsRewardRedeemed(object sender, TwitchLib.PubSub.Events.OnChannelPointsRewardRedeemedArgs e)
@@ -546,19 +582,19 @@ namespace RavenBot
 
         private void Unsubscribe()
         {
-            client.OnChatCommandReceived -= OnCommandReceived;
-            client.OnMessageReceived -= OnMessageReceived;
-            client.OnConnected -= OnConnected;
-            client.OnDisconnected -= OnDisconnected;
-            client.OnUserJoined -= OnUserJoined;
-            client.OnUserLeft -= OnUserLeft;
-            client.OnGiftedSubscription -= OnGiftedSub;
-            client.OnCommunitySubscription -= OnPrimeSub;
-            client.OnNewSubscriber -= OnNewSub;
-            client.OnReSubscriber -= OnReSub;
-            client.OnRaidNotification -= OnRaidNotification;
+            client.OnChatCommandReceived -= OnCommandReceivedAsync;
+            client.OnMessageReceived -= OnMessageReceivedAsync;
+            client.OnConnected -= OnConnectedAsync;
+            client.OnDisconnected -= OnDisconnectedAsync;
+            client.OnUserJoined -= OnUserJoinedAsync;
+            client.OnUserLeft -= OnUserLeftAsync;
+            client.OnGiftedSubscription -= OnGiftedSubAsync;
+            client.OnCommunitySubscription -= OnPrimeSubAsync;
+            client.OnNewSubscriber -= OnNewSubAsync;
+            client.OnReSubscriber -= OnReSubAsync;
+            client.OnRaidNotification -= OnRaidNotificationAsync;
 
-            client.OnConnectionError -= OnConnectionError;
+            client.OnConnectionError -= OnConnectionErrorAsync;
             pubsub.OnChannelPointsRewardRedeemed -= Pubsub_OnChannelPointsRewardRedeemed;
         }
     }
