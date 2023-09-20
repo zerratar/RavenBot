@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RavenBot.Core.Extensions;
+using Shinobytes.Core;
 
 namespace RavenBot.Core.Net
 {
@@ -29,6 +30,7 @@ namespace RavenBot.Core.Net
             this.connection = connection;
             this.logger = logger;
         }
+
 
         public async Task<bool> ProcessAsync(int serverPort)
         {

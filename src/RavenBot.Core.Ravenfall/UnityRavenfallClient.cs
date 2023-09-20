@@ -18,19 +18,23 @@ namespace RavenBot.Core.Ravenfall
     {
         private readonly ConcurrentQueue<string> requests = new ConcurrentQueue<string>();
         private readonly ILogger logger;
+        private readonly IKernel kernel;
         private readonly IUserProvider playerProvider;
         private readonly IMessageBus messageBus;
         private readonly IGameClient client;
         private readonly IUserSettingsManager settingsManager;
+        private ITimeoutHandle keepAliveHandle;
 
         public IRavenfallApi Api { get; }
         public UnityRavenfallClient(
             ILogger logger,
+            IKernel kernel,
             IUserProvider playerProvider,
             IMessageBus messageBus,
             IGameClient client,
             IUserSettingsManager settingsManager)
         {
+            this.kernel = kernel;
             this.settingsManager = settingsManager;
             this.logger = logger;
             this.playerProvider = playerProvider;
@@ -42,15 +46,23 @@ namespace RavenBot.Core.Ravenfall
             messageBus.Subscribe<UserSubscriptionEvent>(nameof(UserSubscriptionEvent), OnUserSub);
 
             this.client = client;
-
             this.Api = new RavenfallApi(client, EnqueueRequest, null);
-
             this.client.Connected += Client_OnConnect;
-
             this.client.Subscribe("session", RegisterSession);
             this.client.Subscribe("pubsub_token", RegisterPubSubToken);
             this.client.Subscribe("message", SendResponseToTwitchChat);
+            this.keepAliveHandle = this.kernel.SetTimeout(KeepAlive, 1000);
+        }
 
+        private void KeepAlive()
+        {
+            var isConnected = client.IsConnected;
+            if (!client.IsConnected)
+            {
+                client.ProcessAsync(Settings.UNITY_SERVER_PORT);
+                isConnected = true;
+            }
+            this.keepAliveHandle = this.kernel.SetTimeout(KeepAlive, isConnected ? 5000 : 2000);
         }
 
         public IRavenfallApi this[string correlationid] => Ref(correlationid);
@@ -99,6 +111,8 @@ namespace RavenBot.Core.Ravenfall
 
         public void Dispose()
         {
+            if (keepAliveHandle != null)
+                kernel.ClearTimeout(keepAliveHandle);
             this.client.Dispose();
             this.client.Connected -= Client_OnConnect;
         }

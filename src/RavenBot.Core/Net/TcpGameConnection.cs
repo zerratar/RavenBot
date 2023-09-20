@@ -47,7 +47,7 @@ namespace RavenBot.Core.Net
         {
             try
             {
-                if (this.client.Connected)
+                if (this.client != null && this.client.Connected)
                 {
                     this.client.Close();
                 }
