@@ -2,7 +2,6 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Channels;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using RavenBot.Core.Chat;
@@ -21,7 +20,6 @@ using TwitchLib.Communication.Enums;
 using TwitchLib.Communication.Events;
 using TwitchLib.Communication.Models;
 using TwitchLib.PubSub.Events;
-using static System.Collections.Specialized.BitVector32;
 
 namespace ROBot.Core.Chat.Twitch
 {
@@ -92,7 +90,7 @@ namespace ROBot.Core.Chat.Twitch
             stats = twitchStats;
 
             //this.messageBus.Subscribe<PubSubToken>("pubsub", OnPubSubTokenReceived);
-            broadcastSubscription = messageBus.Subscribe<SessionGameMessageResponse>(MessageBus.Broadcast, Broadcast);
+            broadcastSubscription = messageBus.Subscribe<SessionGameMessageResponse>(MessageBus.Broadcast, BroadcastAsync);
         }
 
         /*
@@ -327,16 +325,16 @@ namespace ROBot.Core.Chat.Twitch
             {
                 foreach (var c in joinedChannels)
                 {
-                    JoinChannel(c);
+                    JoinChannelAsync(c);
                 }
             }
 
             while (channelJoinQueue.TryDequeue(out var channel))
             {
-                JoinChannel(channel);
+                JoinChannelAsync(channel);
             }
         }
-        public void JoinChannel(string channel)
+        public async Task JoinChannelAsync(string channel)
         {
             if (suspendedChannels.Contains(channel))
             {
@@ -370,18 +368,15 @@ namespace ROBot.Core.Chat.Twitch
                 if (WaitForConnection(5))
                 {
                     currentlyJoiningChannels[channel] = DateTime.UtcNow;
-                    bool newChannel;
 
                     lock (channelMutex)
                     {
-                        newChannel = joinedChannels.Contains(channel);
-                        if (newChannel)
-                            joinedChannels.Add(channel);
+                        joinedChannels.Add(channel);
                     }
 
-                    logger.LogDebug("[TWITCH] Joining Channel (Channel: " + channel + " Rejoin: " + newChannel + ")");
+                    logger.LogDebug("[TWITCH] Joining Channel (Channel: " + channel + ")");
                     stats.AddChAttempt();
-                    client.JoinChannel(channel);
+                    await client.JoinChannelAsync(channel);
                     //pubSubManager.PubSubConnect(channel);
                 }
                 else
@@ -399,7 +394,7 @@ namespace ROBot.Core.Chat.Twitch
         {
             channelJoinQueue.Enqueue(channel);
         }
-        public void LeaveChannel(string channel)
+        public async Task LeaveChannelAsync(string channel)
         {
             lock (channelMutex)
             {
@@ -420,7 +415,7 @@ namespace ROBot.Core.Chat.Twitch
             //logger.LogDebug("[TWITCH] Leaving Channel (Channel: " + channel + ")");
 
             pubSubManager.Disconnect(channel);
-            client.LeaveChannel(channel);
+            await client.LeaveChannelAsync(channel);
         }
         public bool InChannel(string channel)
         {
@@ -430,7 +425,7 @@ namespace ROBot.Core.Chat.Twitch
         /*
          * Sending
          */
-        public void Broadcast(SessionGameMessageResponse cmd)
+        public async Task BroadcastAsync(SessionGameMessageResponse cmd)
         {
             if (cmd == null || cmd.Session?.Name == null)
             {
@@ -450,13 +445,13 @@ namespace ROBot.Core.Chat.Twitch
                 if (message.Recipent.Platform == "system")
                 {
                     // system message
-                    SendMessage(channel, message.Format, message.Args);
+                    await SendMessageAsync(channel, message.Format, message.Args);
                     return;
                 }
 
                 if (message.Recipent.Platform == "twitch")
                 {
-                    SendReply(channel, message.Format, message.Args, message.CorrelationId, message.Recipent.PlatformUserName);
+                    await SendReplyAsync(channel, message.Format, message.Args, message.CorrelationId, message.Recipent.PlatformUserName);
                 }
 
                 // ignore any platform that is not discord.
@@ -470,7 +465,7 @@ namespace ROBot.Core.Chat.Twitch
             return new TwitchCommand.TwitchChannel(name);
         }
 
-        public async void SendMessage(ICommandChannel channel, string format, object[] args)
+        public async Task SendMessageAsync(ICommandChannel channel, string format, object[] args)
         {
             if (string.IsNullOrWhiteSpace(format))
                 return;
@@ -482,7 +477,7 @@ namespace ROBot.Core.Chat.Twitch
             await SendMessageAsync(channel, msg);
         }
 
-        public async void SendReply(ICommandChannel channel, string format, object[] args, string correlationId, string mention)
+        public async Task SendReplyAsync(ICommandChannel channel, string format, object[] args, string correlationId, string mention)
         {
             if (string.IsNullOrWhiteSpace(format))
                 return;
@@ -494,9 +489,9 @@ namespace ROBot.Core.Chat.Twitch
             await SendMessageAsync(channel, msg, correlationId, mention);
         }
 
-        public void SendReply(ICommand command, string format, params object[] args)
+        public async Task SendReplyAsync(ICommand command, string format, params object[] args)
         {
-            SendReply(command.Channel, format, args, command.CorrelationId, command.Mention);
+            await SendReplyAsync(command.Channel, format, args, command.CorrelationId, command.Mention);
         }
 
         public Task SendMessageAsync(ICommandChannel channel, string message)
@@ -517,7 +512,7 @@ namespace ROBot.Core.Chat.Twitch
             if (!InChannel(channelName))
             {
                 EnqueueChatMessage(channel, message);
-                JoinChannel(channelName);
+                JoinChannelAsync(channelName);
                 return;
             }
 
@@ -756,7 +751,7 @@ namespace ROBot.Core.Chat.Twitch
             }
 
             await Task.Delay(1000);
-            JoinChannel(e.Exception.Channel);
+            JoinChannelAsync(e.Exception.Channel);
         }
 
         private async Task OnRaidNotificationAsync(object sender, OnRaidNotificationArgs e)

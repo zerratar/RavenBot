@@ -27,7 +27,7 @@ namespace ROBot.Core.Chat.Commands
                     var destination = cmd.Arguments?.ToLower();
                     if (string.IsNullOrEmpty(destination))
                     {
-                        chat.SendReply(cmd, Localization.TRAVEL_NO_ARG);
+                        await chat.SendReplyAsync(cmd, Localization.TRAVEL_NO_ARG);
                         return;
                     }
 

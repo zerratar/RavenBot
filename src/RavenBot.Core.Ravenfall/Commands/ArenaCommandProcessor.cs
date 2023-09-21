@@ -20,7 +20,7 @@ namespace RavenBot.Core.Ravenfall.Commands
         {
             if (!await this.game.ProcessAsync(Settings.UNITY_SERVER_PORT))
             {
-                chat.Announce(Localization.GAME_NOT_STARTED);
+                chat.AnnounceAsync(Localization.GAME_NOT_STARTED);
                 return;
             }
 
@@ -48,7 +48,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             {
                 if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator && !cmd.Sender.IsGameAdmin && !cmd.Sender.IsGameModerator)
                 {
-                    chat.SendReply(cmd, Localization.ARENA_PERM_FORCE);
+                    await chat.SendReplyAsync(cmd, Localization.ARENA_PERM_FORCE);
                     return;
                 }
 
@@ -58,7 +58,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             {
                 if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator && !cmd.Sender.IsGameAdmin && !cmd.Sender.IsGameModerator)
                 {
-                    chat.SendReply(cmd, Localization.ARENA_PERM_CANCEL);
+                    await chat.SendReplyAsync(cmd, Localization.ARENA_PERM_CANCEL);
                     return;
                 }
 
@@ -70,7 +70,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                 {
                     if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator && !cmd.Sender.IsGameAdmin && !cmd.Sender.IsGameModerator)
                     {
-                        chat.SendReply(cmd, Localization.ARENA_PERM_KICK);
+                        await chat.SendReplyAsync(cmd, Localization.ARENA_PERM_KICK);
                         return;
                     }
                     var targetPlayerName = command.Split(' ').LastOrDefault();
@@ -82,7 +82,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                     if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator && !cmd.Sender.IsGameAdmin && !cmd.Sender.IsGameModerator)
                     {
                         //broadcaster.Broadcast(
-                        chat.SendReply(cmd, Localization.ARENA_PERM_ADD);
+                        await chat.SendReplyAsync(cmd, Localization.ARENA_PERM_ADD);
                         return;
                     }
 

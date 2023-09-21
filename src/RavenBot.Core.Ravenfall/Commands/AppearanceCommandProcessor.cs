@@ -18,14 +18,14 @@ namespace RavenBot.Core.Ravenfall.Commands
         {
             if (!await this.game.ProcessAsync(Settings.UNITY_SERVER_PORT))
             {
-                chat.SendReply(cmd, Localization.GAME_NOT_STARTED);
+                await chat.SendReplyAsync(cmd, Localization.GAME_NOT_STARTED);
                 return;
             }
 
             var player = playerProvider.Get(cmd);
             if (string.IsNullOrEmpty(cmd.Arguments))
             {
-                chat.Announce("You can customize your character here https://www.ravenfall.stream/characters");
+                chat.AnnounceAsync("You can customize your character here https://www.ravenfall.stream/characters");
                 return;
             }
 

@@ -87,6 +87,14 @@ namespace ROBot.Core.GameServer
             }
         }
 
+        public IGameSession GetByChannelId(ulong id)
+        {
+            lock (sessionMutex)
+            {
+                return sessions.FirstOrDefault(x => x.Channel.Id == id);
+            }
+        }
+
         public IGameSession GetByName(string twitchUserName)
         {
             lock (sessionMutex)

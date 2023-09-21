@@ -121,13 +121,17 @@ namespace ROBot.Core.Chat.Twitch
             {
                 var redeemer = reward.RewardRedeemed.Redemption.User;
 
+                uint.TryParse(reward.ChannelId, out var channelId);
+
                 // Todo: Test to see if Prompt contains a valid username before setting arguments.
                 // Prompt also seem to be the channel reward description when set
                 //var arguments = reward.RewardRedeemed.Redemption.Reward.Prompt?.Trim();
                 var arguments = redeemer.Login; //Will ignore anything from twitch
                 var command = reward.RewardRedeemed.Redemption.Reward.Title;
                 var cmdParts = command.ToLower().Split(' ');
-                var session = game.GetSession(new TwitchCommand.TwitchChannel(reward.ChannelId));
+
+                var channel = new TwitchCommand.TwitchChannel(channelId, arguments);
+                var session = game.GetSession(channel);
 
                 // In case we use brackets to identify a command
                 cmd = cmdParts.FirstOrDefault(x => x.Contains("["));

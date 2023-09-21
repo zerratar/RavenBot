@@ -27,7 +27,7 @@ namespace ROBot.Core.Chat.Commands
                     var player = session.Get(cmd);
                     if (string.IsNullOrEmpty(cmd.Arguments))
                     {
-                        chat.SendReply(cmd, Localization.REDEEM_NO_ARG);
+                        await chat.SendReplyAsync(cmd, Localization.REDEEM_NO_ARG);
                         return;
                     }
 

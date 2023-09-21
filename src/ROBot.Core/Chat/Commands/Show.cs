@@ -31,7 +31,7 @@ namespace ROBot.Core.Chat.Commands
                 {
                     if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator && !cmd.Sender.IsSubscriber)
                     {
-                        chat.SendReply(cmd, Localization.OBSERVE_PERM);
+                        await chat.SendReplyAsync(cmd, Localization.OBSERVE_PERM);
                         return;
                     }
 

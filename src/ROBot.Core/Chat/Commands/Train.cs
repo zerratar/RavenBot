@@ -58,7 +58,7 @@ namespace ROBot.Core.Chat.Commands
                     var skill = arg?.Split(' ').LastOrDefault();
                     if (string.IsNullOrEmpty(skill))
                     {
-                        chat.SendReply(cmd, Localization.TRAIN_NO_ARG, string.Join(", ", trainableSkills));
+                        await chat.SendReplyAsync(cmd, Localization.TRAIN_NO_ARG, string.Join(", ", trainableSkills));
                         return;
                     }
 
@@ -71,7 +71,7 @@ namespace ROBot.Core.Chat.Commands
                         var value = GetSkillTypeFromString(skill);
                         if (value == -1)
                         {
-                            chat.SendReply(cmd, Localization.TRAIN_INVALID, skill);
+                            await chat.SendReplyAsync(cmd, Localization.TRAIN_INVALID, skill);
                         }
                         else
                         {

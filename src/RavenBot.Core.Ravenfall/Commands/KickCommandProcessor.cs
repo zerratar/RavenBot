@@ -18,20 +18,20 @@ namespace RavenBot.Core.Ravenfall.Commands
         {
             if (!await this.game.ProcessAsync(Settings.UNITY_SERVER_PORT))
             {
-                chat.SendReply(cmd, Localization.GAME_NOT_STARTED);
+                await chat.SendReplyAsync(cmd, Localization.GAME_NOT_STARTED);
                 return;
             }
 
             if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator && !cmd.Sender.IsGameAdmin && !cmd.Sender.IsGameModerator)
             {
-                chat.SendReply(cmd, Localization.KICK_PERM);
+                await chat.SendReplyAsync(cmd, Localization.KICK_PERM);
                 return;
             }
 
             var targetPlayerName = cmd.Arguments?.Trim();
             if (string.IsNullOrEmpty(targetPlayerName))
             {
-                chat.SendReply(cmd, Localization.KICK_NO_USER);
+                await chat.SendReplyAsync(cmd, Localization.KICK_NO_USER);
                 return;
             }
             var sender = playerProvider.Get(cmd);

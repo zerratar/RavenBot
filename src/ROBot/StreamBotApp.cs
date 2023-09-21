@@ -233,21 +233,21 @@ namespace ROBot
             if (e.OldName != e.Session.Name)
             {
                 //logger.LogWarning("[RVNFLL] Game Session Name Changed (OldName: " + e.OldName + " New: " + e.Session.Name + ")");
-                twitch.LeaveChannel(e.OldName);
-                twitch.JoinChannel(e.Session.Name);
+                twitch.LeaveChannelAsync(e.OldName);
+                twitch.JoinChannelAsync(e.Session.Name);
                 return;
             }
 
             if (!twitch.InChannel(e.Session.Name))
             {
-                twitch.JoinChannel(e.Session.Name);
+                twitch.JoinChannelAsync(e.Session.Name);
             }
         }
 
         private void OnSessionStarted(object sender, IGameSession session)
         {
             //logger.LogDebug("[RVNFLL] Game Session Started (Name: " + session.Name + ")");
-            twitch.JoinChannel(session.Name);
+            twitch.JoinChannelAsync(session.Name);
             botStats.LastSessionStarted = DateTime.UtcNow;
             discord.EnsureSessionChannel(session);
         }
@@ -255,7 +255,7 @@ namespace ROBot
         private void OnSessionEnded(object sender, IGameSession session)
         {
             //logger.LogDebug("[RVNFLL] Game Session Ended (Name: " + session.Name + ")");
-            twitch.LeaveChannel(session.Name);
+            twitch.LeaveChannelAsync(session.Name);
             botStats.LastSessionEnded = DateTime.UtcNow;
             discord.SessionEnded(session);
         }

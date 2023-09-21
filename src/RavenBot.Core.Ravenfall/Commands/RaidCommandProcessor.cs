@@ -23,7 +23,7 @@ namespace RavenBot.Core.Ravenfall.Commands
         {
             if (!await this.game.ProcessAsync(Settings.UNITY_SERVER_PORT))
             {
-                chat.SendReply(cmd, Localization.GAME_NOT_STARTED);
+                await chat.SendReplyAsync(cmd, Localization.GAME_NOT_STARTED);
                 return;
             }
 
@@ -62,7 +62,7 @@ namespace RavenBot.Core.Ravenfall.Commands
 
                 if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsGameAdmin)
                 {
-                    chat.SendReply(cmd, Localization.PERMISSION_DENIED);
+                    await chat.SendReplyAsync(cmd, Localization.PERMISSION_DENIED);
                     return;
                 }
 

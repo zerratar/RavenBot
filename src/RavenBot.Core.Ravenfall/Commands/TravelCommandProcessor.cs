@@ -18,7 +18,7 @@ namespace RavenBot.Core.Ravenfall.Commands
         {
             if (!await this.game.ProcessAsync(Settings.UNITY_SERVER_PORT))
             {
-                chat.SendReply(cmd, Localization.GAME_NOT_STARTED);
+                await chat.SendReplyAsync(cmd, Localization.GAME_NOT_STARTED);
                 return;
             }
 
@@ -26,7 +26,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             var destination = cmd.Arguments?.ToLower();
             if (string.IsNullOrEmpty(destination))
             {
-                chat.SendReply(cmd, Localization.TRAVEL_NO_ARG);
+                await chat.SendReplyAsync(cmd, Localization.TRAVEL_NO_ARG);
                 return;
             }
 

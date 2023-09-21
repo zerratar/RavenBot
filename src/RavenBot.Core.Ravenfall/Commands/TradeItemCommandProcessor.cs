@@ -22,14 +22,14 @@ namespace RavenBot.Core.Ravenfall.Commands
         {
             if (!await this.game.ProcessAsync(Settings.UNITY_SERVER_PORT))
             {
-                chat.SendReply(cmd, Localization.GAME_NOT_STARTED);
+                await chat.SendReplyAsync(cmd, Localization.GAME_NOT_STARTED);
                 return;
             }
 
 
             if (string.IsNullOrEmpty(cmd.Arguments) || !cmd.Arguments.Trim().Contains(" "))
             {
-                chat.SendReply(cmd, Localization.TRADE_NO_ARG, cmd.Command);
+                await chat.SendReplyAsync(cmd, Localization.TRADE_NO_ARG, cmd.Command);
                 return;
             }
 

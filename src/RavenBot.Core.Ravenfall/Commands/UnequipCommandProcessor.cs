@@ -18,7 +18,7 @@ namespace RavenBot.Core.Ravenfall.Commands
 
             if (!await this.game.ProcessAsync(Settings.UNITY_SERVER_PORT))
             {
-                chat.SendReply(cmd, Localization.GAME_NOT_STARTED);
+                await chat.SendReplyAsync(cmd, Localization.GAME_NOT_STARTED);
                 return;
             }
 
@@ -29,7 +29,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             if (string.IsNullOrEmpty(item))
             {
 
-                chat.SendReply(cmd, "You have to use !unequip <item name> or !unequip all for unequipping all your items.");
+                await chat.SendReplyAsync(cmd, "You have to use !unequip <item name> or !unequip all for unequipping all your items.");
                 return;
             }
 

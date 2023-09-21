@@ -28,7 +28,7 @@ namespace ROBot.Core.Chat.Commands
                 {
                     if (string.IsNullOrEmpty(cmd.Arguments))
                     {
-                        chat.SendReply(cmd, Localization.VALUE_NO_ARG, cmd.Command);
+                        await chat.SendReplyAsync(cmd, Localization.VALUE_NO_ARG, cmd.Command);
                         return;
                     }
 
@@ -43,7 +43,7 @@ namespace ROBot.Core.Chat.Commands
                     }
                     else
                     {
-                        chat.SendReply(cmd, Localization.TOGGLE_INVALID, cmd.Arguments);
+                        await chat.SendReplyAsync(cmd, Localization.TOGGLE_INVALID, cmd.Arguments);
                     }
                 }
             }

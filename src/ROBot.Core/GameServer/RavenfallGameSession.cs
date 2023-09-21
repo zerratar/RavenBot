@@ -92,6 +92,11 @@ namespace ROBot.Core.GameServer
 
         public User GetBroadcaster()
         {
+            if (Owner != null)
+            {
+                return Owner;
+            }
+
             return playerProvider.GetBroadcaster();
         }
 

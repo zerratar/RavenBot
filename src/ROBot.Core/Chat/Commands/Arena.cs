@@ -43,7 +43,7 @@ namespace ROBot.Core.Chat.Commands
                     {
                         if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator && !cmd.Sender.IsGameAdmin && !cmd.Sender.IsGameModerator)
                         {
-                            chat.SendReply(cmd, Localization.ARENA_PERM_FORCE);
+                            await chat.SendReplyAsync(cmd, Localization.ARENA_PERM_FORCE);
                             return;
                         }
 
@@ -53,7 +53,7 @@ namespace ROBot.Core.Chat.Commands
                     {
                         if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator && !cmd.Sender.IsGameAdmin && !cmd.Sender.IsGameModerator)
                         {
-                            chat.SendReply(cmd, Localization.ARENA_PERM_CANCEL);
+                            await chat.SendReplyAsync(cmd, Localization.ARENA_PERM_CANCEL);
                             return;
                         }
 
@@ -65,7 +65,7 @@ namespace ROBot.Core.Chat.Commands
                         {
                             if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator && !cmd.Sender.IsGameAdmin && !cmd.Sender.IsGameModerator)
                             {
-                                chat.SendReply(cmd, Localization.ARENA_PERM_KICK);
+                                await chat.SendReplyAsync(cmd, Localization.ARENA_PERM_KICK);
                                 return;
                             }
                             var targetPlayerName = command.Split(' ').LastOrDefault();
@@ -76,7 +76,7 @@ namespace ROBot.Core.Chat.Commands
                         {
                             if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator && !cmd.Sender.IsGameAdmin && !cmd.Sender.IsGameModerator)
                             {
-                                chat.SendReply(cmd, Localization.ARENA_PERM_ADD);
+                                await chat.SendReplyAsync(cmd, Localization.ARENA_PERM_ADD);
                                 return;
                             }
 

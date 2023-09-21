@@ -104,10 +104,14 @@ namespace RavenBot.Core.Chat.Twitch
         }
         public class TwitchChannel : ICommandChannel
         {
-            public ulong Id => 0;
+            public ulong Id { get; }
 
             public string Name { get; }
-
+            public TwitchChannel(ulong id, string name)
+            {
+                Name = name;
+                Id = id;
+            }
             public TwitchChannel(string name)
             {
                 Name = name;

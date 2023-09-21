@@ -17,7 +17,7 @@ namespace RavenBot.Core.Ravenfall
             this.Arguments = arguments.AsUTF8();
             this.Command = command.AsUTF8();
             this.Channel = new TwitchCommand.TwitchChannel(channel);
-            this.CorrelationId = player.PlatformId;
+            //this.CorrelationId = player.PlatformId;
             this.Mention = "@" + player.Username;
         }
 

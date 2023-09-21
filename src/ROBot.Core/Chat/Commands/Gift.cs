@@ -28,7 +28,7 @@ namespace ROBot.Core.Chat.Commands
                 {
                     if (string.IsNullOrEmpty(cmd.Arguments) || !cmd.Arguments.Trim().Contains(" "))
                     {
-                        chat.SendReply(cmd, Localization.GIFT_HELP, cmd.Command);
+                        await chat.SendReplyAsync(cmd, Localization.GIFT_HELP, cmd.Command);
                         return;
                     }
 

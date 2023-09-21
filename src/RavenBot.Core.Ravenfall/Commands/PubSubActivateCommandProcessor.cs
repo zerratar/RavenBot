@@ -9,17 +9,17 @@ namespace RavenBot.Core.Ravenfall.Commands
         {
             if (chat.CanRecieveChannelPointRewards)
             {
-                chat.SendReply(cmd, "Channel Point Rewards is all good SeemsGood");
+                await chat.SendReplyAsync(cmd, "Channel Point Rewards is all good SeemsGood");
             }
             else
             {
                 if (cmd.Sender.IsBroadcaster)
                 {
-                    chat.SendReply(cmd, "Channel Point Rewards does not seem to be activated. Please go to https://www.ravenfall.stream/api/auth/activate-pubsub to activate it.");
+                    await chat.SendReplyAsync(cmd, "Channel Point Rewards does not seem to be activated. Please go to https://www.ravenfall.stream/api/auth/activate-pubsub to activate it.");
                 }
                 else
                 {
-                    chat.SendReply(cmd, "Channel Point Rewards does not seem to be activated.");
+                    await chat.SendReplyAsync(cmd, "Channel Point Rewards does not seem to be activated.");
                 }
             }
         }

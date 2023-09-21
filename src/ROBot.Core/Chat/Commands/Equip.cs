@@ -32,7 +32,7 @@ namespace ROBot.Core.Chat.Commands
                     if (string.IsNullOrEmpty(item))
                     {
 
-                        chat.SendReply(cmd, "You have to use !equip <item name> or !equip all for equipping your best items.");
+                        await chat.SendReplyAsync(cmd, "You have to use !equip <item name> or !equip all for equipping your best items.");
                         return;
                     }
 

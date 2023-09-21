@@ -28,7 +28,7 @@ namespace ROBot.Core.Chat.Commands
 
                     if (string.IsNullOrEmpty(cmd.Arguments) || !cmd.Arguments.Trim().Contains(" "))
                     {
-                        chat.SendReply(cmd, Localization.TRADE_NO_ARG, cmd.Command);
+                        await chat.SendReplyAsync(cmd, Localization.TRADE_NO_ARG, cmd.Command);
                         return;
                     }
 

@@ -9,8 +9,8 @@ namespace ROBot.Core.Chat
         Task StartAsync();
         void Stop();
 
-        void Broadcast(SessionGameMessageResponse message);
-        void SendReply(ICommand command, string format, params object[] args);
-        void SendMessage(ICommandChannel channel, string format, object[] args);
+        Task BroadcastAsync(SessionGameMessageResponse message);
+        Task SendReplyAsync(ICommand command, string format, params object[] args);
+        Task SendMessageAsync(ICommandChannel channel, string format, object[] args);
     }
 }

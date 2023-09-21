@@ -32,7 +32,7 @@ namespace ROBot.Core.Chat.Commands
             }
             else if (chat is Discord.DiscordCommandClient) // only for discord
             {
-                chat.SendReply(cmd, "There are currently no active Ravenfall game sessions in this channel.");
+                await chat.SendReplyAsync(cmd, "There are currently no active Ravenfall game sessions in this channel.");
             }
         }
     }

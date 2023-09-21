@@ -1,9 +1,11 @@
-﻿namespace ROBot.Core.Chat.Twitch
+﻿using System.Threading.Tasks;
+
+namespace ROBot.Core.Chat.Twitch
 {
     public interface ITwitchCommandClient : IChatCommandClient
     {
-        void JoinChannel(string channel);
-        void LeaveChannel(string channel);
+        Task JoinChannelAsync(string channel);
+        Task LeaveChannelAsync(string channel);
         bool InChannel(string name);
     }
 }

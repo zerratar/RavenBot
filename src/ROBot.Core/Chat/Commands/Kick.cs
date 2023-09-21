@@ -27,14 +27,14 @@ namespace ROBot.Core.Chat.Commands
                 {
                     if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator && !cmd.Sender.IsGameAdmin && !cmd.Sender.IsGameModerator)
                     {
-                        chat.SendReply(cmd, Localization.KICK_PERM);
+                        await chat.SendReplyAsync(cmd, Localization.KICK_PERM);
                         return;
                     }
 
                     var targetPlayerName = cmd.Arguments?.Trim();
                     if (string.IsNullOrEmpty(targetPlayerName))
                     {
-                        chat.SendReply(cmd, Localization.KICK_NO_USER);
+                        await chat.SendReplyAsync(cmd, Localization.KICK_NO_USER);
                         return;
                     }
 

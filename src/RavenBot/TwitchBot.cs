@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using RavenBot.Core;
 using RavenBot.Core.Chat;
@@ -10,7 +8,6 @@ using RavenBot.Core.Chat.Twitch;
 using RavenBot.Core.Handlers;
 using RavenBot.Core.Net;
 using RavenBot.Core.Ravenfall;
-using RavenBot.Core.Ravenfall.Models;
 using Shinobytes.Core;
 using TwitchLib.Client;
 using TwitchLib.Client.Events;
@@ -99,6 +96,10 @@ namespace RavenBot
                     var settings = session.Settings;
                     if (string.IsNullOrEmpty(twitchId))
                         twitchId = this.ravenfallSession.Owner.PlatformId;
+
+                    // this should also be the broadccaster.
+
+                    playerProvider.SetBroadcaster(session.Owner.Username, twitchId);
                 }
 
                 if (tryPubSubAuthWithOAuthToken)
@@ -210,7 +211,7 @@ namespace RavenBot
                     e.ChatMessage.Bits)
             );
 
-            this.Announce(Localization.Twitch.THANK_YOU_BITS, e.ChatMessage.DisplayName, e.ChatMessage.Bits);
+            this.AnnounceAsync(Localization.Twitch.THANK_YOU_BITS, e.ChatMessage.DisplayName, e.ChatMessage.Bits);
         }
 
         private async Task OnCommandReceivedAsync(object sender, OnChatCommandReceivedArgs e)
@@ -224,25 +225,25 @@ namespace RavenBot
         {
             if (isInitialized) return;
             if (this.broadcastSubscription == null)
-                this.broadcastSubscription = messageBus.Subscribe<GameMessageResponse>(MessageBus.Broadcast, Broadcast);
+                this.broadcastSubscription = messageBus.Subscribe<GameMessageResponse>(MessageBus.Broadcast, BroadcastAsync);
 
             client.Initialize(credentialsProvider.Get(), channelProvider.Get());
 
             isInitialized = true;
         }
 
-        public void Broadcast(GameMessageResponse message)
+        public async Task BroadcastAsync(GameMessageResponse message)
         {
             if (message.Recipent.Platform == "system")
             {
                 // system message
-                SendMessage(message.Format, message.Args);
+                await SendMessageAsync(message.Format, message.Args);
                 return;
             }
 
             if (message.Recipent.Platform == "twitch")
             {
-                SendReply(message.Format, message.Args, message.CorrelationId, message.Recipent.PlatformUserName);
+                await SendReplyAsync(message.Format, message.Args, message.CorrelationId, message.Recipent.PlatformUserName);
 
                 //if (!string.IsNullOrEmpty(message.CorrelationId))
                 //{
@@ -258,17 +259,17 @@ namespace RavenBot
             //  SendMessage(message.Format, message.Args);
         }
 
-        public void Announce(string format, params object[] args)
+        public Task AnnounceAsync(string format, params object[] args)
         {
-            SendMessage(format, args);
+            return SendMessageAsync(format, args);
         }
 
-        public void SendReply(ICommand cmd, string message, params object[] args)
+        public Task SendReplyAsync(ICommand cmd, string message, params object[] args)
         {
-            SendReply(message, args, cmd.CorrelationId, cmd.Mention);
+            return SendReplyAsync(message, args, cmd.CorrelationId, cmd.Mention);
         }
 
-        public void SendReply(string format, object[] args, string correlationId, string mention)
+        public async Task SendReplyAsync(string format, object[] args, string correlationId, string mention)
         {
             if (!this.client.IsConnected || string.IsNullOrWhiteSpace(format))
                 return;
@@ -297,10 +298,10 @@ namespace RavenBot
                 msg = mention + ", " + msg;
             }
 
-            SendMessage(msg);
+            await SendMessageAsync(msg);
         }
 
-        public void SendMessage(string format, object[] args)
+        public async Task SendMessageAsync(string format, object[] args)
         {
             if (!this.client.IsConnected || string.IsNullOrWhiteSpace(format))
                 return;
@@ -309,16 +310,21 @@ namespace RavenBot
             if (string.IsNullOrEmpty(msg))
                 return;
 
-            SendMessage(msg);
+            await SendMessageAsync(msg);
         }
 
-        private void SendMessage(string msg)
+        private async Task SendMessageAsync(string msg)
         {
             var channel = this.channelProvider.Get();
             if (client.JoinedChannels.Count == 0)
+            {
                 client.JoinChannel(channel);
+                await client.JoinChannelAsync(channel);
+                await Task.Delay(1000);
+            }
 
-            client.SendMessage(channel, msg);
+            if (client.JoinedChannels.Count > 0)
+                client.SendMessage(channel, msg);
         }
 
         private void CreateTwitchClient()
@@ -477,7 +483,7 @@ namespace RavenBot
 
         private async Task OnRaidNotificationAsync(object sender, OnRaidNotificationArgs e)
         {
-            this.Announce(Localization.Twitch.THANK_YOU_RAID, e.RaidNotification.DisplayName);
+            this.AnnounceAsync(Localization.Twitch.THANK_YOU_RAID, e.RaidNotification.DisplayName);
         }
 
         private void Subscribe()

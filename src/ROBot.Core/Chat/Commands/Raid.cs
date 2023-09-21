@@ -61,7 +61,7 @@ namespace ROBot.Core.Chat.Commands
 
                         if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsGameAdmin)
                         {
-                            chat.SendReply(cmd, Localization.PERMISSION_DENIED);
+                            await chat.SendReplyAsync(cmd, Localization.PERMISSION_DENIED);
                             return;
                         }
 

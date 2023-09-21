@@ -310,6 +310,10 @@ namespace ROBot.Core.GameServer
         public IGameSession GetSession(ICommandChannel channel)
         {
             var s = sessionManager.GetByName(channel.Name);
+            if (s == null)
+            {
+                s = sessionManager.GetByChannelId(channel.Id);
+            }
             if (s != null)
             {
                 s.Channel = channel;

@@ -31,7 +31,7 @@ namespace RavenBot.Core.Ravenfall.Commands
         {
             if (!await this.game.ProcessAsync(ServerPort))
             {
-                chat.SendReply(cmd, Localization.GAME_NOT_STARTED);
+                await chat.SendReplyAsync(cmd, Localization.GAME_NOT_STARTED);
                 return;
             }
 
@@ -53,7 +53,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             var skill = arg?.Split(' ').LastOrDefault();
             if (string.IsNullOrEmpty(skill))
             {
-                chat.SendReply(cmd, Localization.TRAIN_NO_ARG, string.Join(", ", trainableSkills));
+                await chat.SendReplyAsync(cmd, Localization.TRAIN_NO_ARG, string.Join(", ", trainableSkills));
                 return;
             }
 
@@ -66,7 +66,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                 var value = GetSkillTypeFromString(skill);
                 if (value == -1)
                 {
-                    chat.SendReply(cmd, Localization.TRAIN_INVALID, skill);
+                    await chat.SendReplyAsync(cmd, Localization.TRAIN_INVALID, skill);
                 }
                 else
                 {

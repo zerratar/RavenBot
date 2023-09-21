@@ -16,6 +16,7 @@ namespace ROBot.Core.GameServer
         IReadOnlyList<IGameSession> All();
         IGameSession Get(Guid id);
         IGameSession GetByName(string name);
+        IGameSession GetByChannelId(ulong channelId);
         IGameSession GetByUserId(Guid ravenfallUserId);
         void ClearAll();
     }

@@ -20,13 +20,13 @@ namespace RavenBot.Core.Ravenfall.Commands
         {
             if (!await this.game.ProcessAsync(Settings.UNITY_SERVER_PORT))
             {
-                chat.SendReply(cmd, Localization.GAME_NOT_STARTED);
+                await chat.SendReplyAsync(cmd, Localization.GAME_NOT_STARTED);
                 return;
             }
 
             if (string.IsNullOrEmpty(cmd.Arguments))
             {
-                chat.SendReply(cmd, Localization.TOGGLE_NO_ARG);
+                await chat.SendReplyAsync(cmd, Localization.TOGGLE_NO_ARG);
                 return;
             }
 
@@ -42,7 +42,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             }
             else
             {
-                chat.SendReply(cmd, Localization.TOGGLE_INVALID, cmd.Arguments);
+                await chat.SendReplyAsync(cmd, Localization.TOGGLE_INVALID, cmd.Arguments);
             }
         }
     }

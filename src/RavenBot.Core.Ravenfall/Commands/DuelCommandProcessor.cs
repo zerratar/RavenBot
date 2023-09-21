@@ -20,14 +20,14 @@ namespace RavenBot.Core.Ravenfall.Commands
         {
             if (!await this.game.ProcessAsync(Settings.UNITY_SERVER_PORT))
             {
-                chat.SendReply(cmd, Localization.GAME_NOT_STARTED);
+                await chat.SendReplyAsync(cmd, Localization.GAME_NOT_STARTED);
                 return;
             }
 
             var sub = cmd.Arguments?.Trim();
             if (string.IsNullOrEmpty(sub))
             {
-                chat.SendReply(cmd,
+                await chat.SendReplyAsync(cmd,
                     "To duel a player you need to specify their name. ex: '!duel JohnDoe', to accept or decline a duel request use '!duel accept' or '!duel decline'. You may also cancel an ongoing request by using '!duel cancel'");
                 return;
             }

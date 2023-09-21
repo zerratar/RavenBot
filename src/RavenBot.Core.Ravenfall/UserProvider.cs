@@ -2,6 +2,7 @@
 using RavenBot.Core.Ravenfall.Models;
 using System;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace RavenBot.Core.Ravenfall
 {
@@ -132,7 +133,6 @@ namespace RavenBot.Core.Ravenfall
 
         public User Get(string username, string platform)
         {
-
             lock (mutex)
             {
                 if (string.IsNullOrEmpty(username)) return null;
@@ -140,22 +140,27 @@ namespace RavenBot.Core.Ravenfall
                 var user = users.FirstOrDefault(x => x.Username.Equals(username, StringComparison.OrdinalIgnoreCase)
                 && x.Platform.Equals(platform, StringComparison.OrdinalIgnoreCase));
                 if (user != null) return user;
-
                 user = CreateUser(username, null, platform);
-
                 users.Add(user);
                 return user;
             }
         }
 
-        public User GetByUserId(string twitchUserId, string platform = "twitch")
+        public void SetBroadcaster(string platformId, string username, string platform = "twitch")
         {
             lock (mutex)
             {
-                return users.FirstOrDefault(x => x.PlatformId == twitchUserId && x.Platform == platform);
+                var existing = GetByUserId(platformId, platform);
+                if (existing != null)
+                {
+                    existing.IsBroadcaster = true;
+                    return;
+                }
+
+                var user = Get(platformId, username, platform);
+                user.IsBroadcaster = true;
             }
         }
-
 
         public bool Contains(User player)
         {
@@ -167,6 +172,14 @@ namespace RavenBot.Core.Ravenfall
                 return GetById(player.PlatformId) != null; ;
             }
         }
+
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public User GetByUserId(string twitchUserId, string platform = "twitch")
+        {
+            return GetById(twitchUserId, platform);
+        }
+
 
         public User GetById(string userId, string platform = "twitch")
         {

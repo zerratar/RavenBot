@@ -13,7 +13,7 @@ namespace ROBot.Core.Chat.Commands
 
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
         {
-            chat.SendReply(cmd, "Please see all available game commands at https://www.ravenfall.stream/commands");
+            await chat.SendReplyAsync(cmd, "Please see all available game commands at https://www.ravenfall.stream/commands");
         }
     }
 }

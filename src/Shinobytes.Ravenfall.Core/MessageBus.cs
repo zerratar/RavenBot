@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Shinobytes.Core
 {
@@ -55,6 +56,28 @@ namespace Shinobytes.Core
                     try
                     {
                         onMessage((T)o);
+                    }
+                    catch (Exception exc)
+                    {
+                        var errMessage = $"MessageBus Callback for '{key}' threw an Exception: " + exc;
+                        Console.WriteLine(errMessage);
+                        Send(MessageBusException, errMessage);
+                    }
+                }, this);
+                subscriptions.Add(messageBusSubscription);
+                return messageBusSubscription;
+            }
+        }
+
+        public IMessageBusSubscription Subscribe<T>(string key, Func<T, Task> onMessage)
+        {
+            lock (mutex)
+            {
+                var messageBusSubscription = new Subscription(key, async o =>
+                {
+                    try
+                    {
+                        await onMessage((T)o);
                     }
                     catch (Exception exc)
                     {

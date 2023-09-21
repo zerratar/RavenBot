@@ -71,7 +71,7 @@ namespace ROBot.Core.Chat.Discord
             commandHandler.ExportCommandDescriptors();
 
             messager = new DiscordFormatMessager();
-            broadcastSubscription = messageBus.Subscribe<SessionGameMessageResponse>(MessageBus.Broadcast, Broadcast);
+            broadcastSubscription = messageBus.Subscribe<SessionGameMessageResponse>(MessageBus.Broadcast, BroadcastAsync);
 
             discord = new DiscordSocketClient(new DiscordSocketConfig
             {
@@ -202,9 +202,9 @@ namespace ROBot.Core.Chat.Discord
             channels.Clear();
         }
 
-        public async void Broadcast(SessionGameMessageResponse cmd)
+        public async Task BroadcastAsync(SessionGameMessageResponse cmd)
         {
-            if (this.discord.ConnectionState != ConnectionState.Connected 
+            if (this.discord.ConnectionState != ConnectionState.Connected
                 || cmd == null || cmd.Session?.Name == null)
             {
                 return;
@@ -222,7 +222,7 @@ namespace ROBot.Core.Chat.Discord
                 if (message.Recipent.Platform == "system")
                 {
                     // system message
-                    SendMessage(channel, message.Format, message.Args);
+                    await SendMessageAsync(channel, message.Format, message.Args);
                     return;
                 }
 
@@ -230,18 +230,18 @@ namespace ROBot.Core.Chat.Discord
                 {
                     if (!string.IsNullOrEmpty(message.CorrelationId) && ulong.TryParse(message.CorrelationId, out var replyId) && replyId != 0)
                     {
-                        SendReply(channel, cmd.Message.Recipent, message.Format, message.Args, message.Category, message.Tags, replyId);
+                        await SendReplyAsync(channel, cmd.Message.Recipent, message.Format, message.Args, message.Category, message.Tags, replyId);
                         return;
                     }
 
                     // if we can't reply we should mention the recipent.
                     if (ulong.TryParse(message.Recipent.PlatformId, out var uid))
                     {
-                        SendMessage(channel, message.Recipent, MentionUtils.MentionUser(uid) + " " + message.Format, message.Args, message.Category, message.Tags);
+                        await SendMessageAsync(channel, message.Recipent, MentionUtils.MentionUser(uid) + " " + message.Format, message.Args, message.Category, message.Tags);
                     }
                     else
                     {
-                        SendMessage(channel, message.Format, message.Args);
+                        await SendMessageAsync(channel, message.Format, message.Args);
                     }
                     return;
                 }
@@ -252,19 +252,19 @@ namespace ROBot.Core.Chat.Discord
         }
 
 
-        public async void SendReply(ICommand cmd, string message, params object[] args)
+        public async Task SendReplyAsync(ICommand cmd, string message, params object[] args)
         {
             var channel = cmd.Channel;
             if (!string.IsNullOrEmpty(cmd.CorrelationId) && ulong.TryParse(cmd.CorrelationId, out var replyId) && replyId != 0)
             {
-                SendReply(channel, cmd.Sender, message, args, string.Empty, new string[0], replyId);
+                await SendReplyAsync(channel, cmd.Sender, message, args, string.Empty, new string[0], replyId);
                 return;
             }
 
-            SendMessage(channel, message, args);
+            await SendMessageAsync(channel, message, args);
         }
 
-        public async void SendReply(
+        public async Task SendReplyAsync(
             ICommandChannel channel, ICommandSender recipent, string format, object[] args, string category, string[] tags, ulong replyId)
         {
             // unique to Discord, we can generate embeds and format our messages a bit more pretty
@@ -276,10 +276,10 @@ namespace ROBot.Core.Chat.Discord
                 await messager.HandleCustomReplyAsync(targetChannel, new UserReference(recipent), new MessageReference(replyId), args, category, tags))
                 return;
 
-            SendReply(channel, format, args, replyId);
+            await SendReply(channel, format, args, replyId);
         }
 
-        public async void SendReply(
+        public async Task SendReplyAsync(
             ICommandChannel channel, GameMessageRecipent recipent, string format, object[] args, string category, string[] tags, ulong replyId)
         {
             var targetChannel = await GetChannelAsync(channel);
@@ -287,10 +287,10 @@ namespace ROBot.Core.Chat.Discord
                 await messager.HandleCustomReplyAsync(targetChannel, new UserReference(recipent), new MessageReference(replyId), args, category, tags))
                 return;
 
-            SendReply(channel, format, args, replyId);
+            await SendReply(channel, format, args, replyId);
         }
 
-        public async void SendMessage(
+        public async Task SendMessageAsync(
             ICommandChannel channel, GameMessageRecipent recipent, string format, object[] args, string category, string[] tags)
         {
             var targetChannel = await GetChannelAsync(channel);
@@ -298,10 +298,10 @@ namespace ROBot.Core.Chat.Discord
                 await messager.HandleCustomReplyAsync(targetChannel, new UserReference(recipent), null, args, category, tags))
                 return;
 
-            SendMessage(channel, format, args);
+            await SendMessageAsync(channel, format, args);
         }
 
-        public async void SendReply(ICommandChannel channel, string format, object[] args, ulong replyId)
+        public async Task SendReply(ICommandChannel channel, string format, object[] args, ulong replyId)
         {
             if (string.IsNullOrWhiteSpace(format))
             {
@@ -315,7 +315,7 @@ namespace ROBot.Core.Chat.Discord
             await SendChatMessageAsync(channel, msg, new MessageReference(replyId));
         }
 
-        public async void SendMessage(ICommandChannel channel, string format, object[] args)
+        public async Task SendMessageAsync(ICommandChannel channel, string format, object[] args)
         {
             if (string.IsNullOrWhiteSpace(format))
             {

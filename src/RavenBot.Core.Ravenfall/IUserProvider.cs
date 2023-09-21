@@ -11,7 +11,8 @@ namespace RavenBot.Core.Ravenfall
         User Get(string userId, string username, string platform = "twitch");
         User Get(ICommandSender sender, string identifier = null);
         User Get(string username, string platform = "twitch");
-        User GetByUserId(string twitchUserId, string platform = "twitch");
+        User GetByUserId(string platformId, string platform = "twitch");
         User GetBroadcaster();
+        void SetBroadcaster(string platformId, string username, string platform = "twitch");
     }
 }
