@@ -8,9 +8,10 @@ namespace ROBot.Core.Chat.Twitch.PubSub
 {
     public class TwitchPubSubClient : IDisposable
     {
-        private TwitchPubSub client;
         private readonly ILogger logger;
-        private readonly TwitchPubSubData pubsub;
+
+        private TwitchPubSub client;
+        private TwitchPubSubData pubsub;
 
         private bool disposed;
         private PubSubState state;
@@ -28,6 +29,11 @@ namespace ROBot.Core.Chat.Twitch.PubSub
 
             CreateClient();
             Connect();
+        }
+
+        public void UpdatePubSubData(TwitchPubSubData pubsubData)
+        {
+            this.pubsub = pubsubData;
         }
 
         public string GetInstanceKey()

@@ -56,7 +56,7 @@ namespace ROBot.Core.Chat.Twitch.PubSub
                     twitchPubSub = ps.ToString();
 
                 pubsubs[info.Owner.Username.ToLower()] = new TwitchPubSubData { PubSubToken = twitchPubSub, SessionInfo = info, TwitchUserId = twitchUserId };
-                
+
                 PubSubConnect(info.Owner.Username);
             }
         }
@@ -112,17 +112,6 @@ namespace ROBot.Core.Chat.Twitch.PubSub
         {
             var key = channel.ToLower();
 
-            if (pubsubClients.TryGetValue(key, out var client))
-            {
-                if (!client.IsReady && !client.IsConnecting)
-                {
-                    logger.LogDebug("[TWITCH] PubSub Client Already Exists (Channel: " + channel + " Connected: " + client.IsConnected + " Ready: " + client.IsReady + ")");
-
-                    Disconnect(channel);
-                }
-                return;
-            }
-
             if (!pubsubs.TryGetValue(key, out var pubsub))
             {
                 return;
@@ -133,6 +122,18 @@ namespace ROBot.Core.Chat.Twitch.PubSub
                 logger.LogDebug("[RVNFLL] No Token Found (Channel: " + channel + ")");
                 return;
             }
+
+            if (pubsubClients.TryGetValue(key, out var client))
+            {
+                if (!client.IsReady && !client.IsConnecting)
+                {
+                    //logger.LogDebug("[TWITCH] PubSub Client Already Exists (Channel: " + channel + " Connected: " + client.IsConnected + " Ready: " + client.IsReady + ")");
+                    //Disconnect(channel);
+                }
+                client.UpdatePubSubData(pubsub);
+                return;
+            }
+
 
             client = new TwitchPubSubClient(logger, pubsub);
             client.OnChannelPointsRewardRedeemed += Client_OnChannelPointsRewardRedeemed;
