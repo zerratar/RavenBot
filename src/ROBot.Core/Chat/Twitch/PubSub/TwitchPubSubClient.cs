@@ -31,6 +31,8 @@ namespace ROBot.Core.Chat.Twitch.PubSub
             Connect();
         }
 
+        public PubSubState State => state;
+
         public void UpdatePubSubData(TwitchPubSubData pubsubData)
         {
             allowReconnect = allowReconnect || this.pubsub.PubSubToken != pubsubData.PubSubToken;

@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace ROBot.Core.Chat.Commands
 {
+
     public class Train : ChatCommandHandler
     {
         private readonly string[] trainableSkills = new string[]
@@ -59,6 +60,18 @@ namespace ROBot.Core.Chat.Commands
                     if (string.IsNullOrEmpty(skill))
                     {
                         await chat.SendReplyAsync(cmd, Localization.TRAIN_NO_ARG, string.Join(", ", trainableSkills));
+                        return;
+                    }
+
+                    if (skill.ToLower().StartsWith("slay") || arg.StartsWith("slay"))
+                    {
+                        await chat.SendReplyAsync(cmd, "To train Slayer you need to join raids and dungeons.");
+                        return;
+                    }
+
+                    if (skill.ToLower().StartsWith("sail") || arg.StartsWith("sail"))
+                    {
+                        await connection[cmd].TravelAsync(player, string.Empty);
                         return;
                     }
 

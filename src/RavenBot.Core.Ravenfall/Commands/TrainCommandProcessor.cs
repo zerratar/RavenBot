@@ -57,6 +57,18 @@ namespace RavenBot.Core.Ravenfall.Commands
                 return;
             }
 
+            if (skill.ToLower().StartsWith("slay") || arg.StartsWith("slay"))
+            {
+                await chat.SendReplyAsync(cmd, "To train Slayer you need to join raids and dungeons.");
+                return;
+            }
+
+            if (skill.ToLower().StartsWith("sail") || arg.StartsWith("sail"))
+            {
+                await this.game[cmd.CorrelationId].TravelAsync(player, string.Empty);
+                return;
+            }
+
             if (GetCombatTypeFromString(skill) != -1)
             {
                 await this.game[cmd.CorrelationId].SendPlayerTaskAsync(player, PlayerTask.Fighting, skill);

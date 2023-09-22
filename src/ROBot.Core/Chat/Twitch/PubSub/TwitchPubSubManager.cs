@@ -18,9 +18,6 @@ namespace ROBot.Core.Chat.Twitch.PubSub
 
     public class TwitchPubSubManager : ITwitchPubSubManager
     {
-        private const string TwitchClientID = "757vrtjoawg2rtquprnfb35nqah1w4";
-        private const string TwitchRedirectUri = "https://id.twitch.tv/oauth2/authorize";
-        private readonly Random random = new Random();
         private readonly IMessageBus messageBus;
         private readonly ILogger logger;
         private readonly IMessageBusSubscription subscription;
@@ -61,7 +58,7 @@ namespace ROBot.Core.Chat.Twitch.PubSub
             }
         }
 
-        public string GetActivationLink(string userId, string username)
+        public string GetActivationLink()
         {
             //return GetAccessTokenRequestUrl(GenerateValidationToken());
             return "https://www.ravenfall.stream/api/auth/activate-pubsub";
@@ -139,6 +136,16 @@ namespace ROBot.Core.Chat.Twitch.PubSub
             client.OnChannelPointsRewardRedeemed += Client_OnChannelPointsRewardRedeemed;
             client.OnDispose += OnClientDisposed;
             pubsubClients[channel.ToLower()] = client;
+        }
+
+        public TwitchPubSubClient GetPubSubClient(string channel)
+        {
+            var key = channel.ToLower();
+            if (!pubsubClients.TryGetValue(key, out var client))
+            {
+                return null;
+            }
+            return client;
         }
 
         private void OnClientDisposed(object sender, TwitchPubSubClient e)

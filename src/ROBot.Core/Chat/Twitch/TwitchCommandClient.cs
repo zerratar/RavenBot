@@ -93,6 +93,22 @@ namespace ROBot.Core.Chat.Twitch
             broadcastSubscription = messageBus.Subscribe<SessionGameMessageResponse>(MessageBus.Broadcast, BroadcastAsync);
         }
 
+        public string GetPubSubActivationLink()
+        {
+            return pubSubManager.GetActivationLink();
+        }
+
+        public PubSubState GetPubSubState(ICommandChannel channel)
+        {
+            var client = pubSubManager.GetPubSubClient(channel.Name);
+            if (client == null)
+            {
+                return PubSubState.Disconnected;
+            }
+
+            return client.State;
+        }
+
         /*
          * Object Logic
          */
@@ -402,7 +418,7 @@ namespace ROBot.Core.Chat.Twitch
                 {
                     return;
                 }
-                
+
                 pubSubManager.Disconnect(channel);
                 await client.LeaveChannelAsync(channel);
             }
@@ -596,18 +612,17 @@ namespace ROBot.Core.Chat.Twitch
                 return;
             }
 
-            if (!string.IsNullOrEmpty(e.Command.CommandText) && e.Command.CommandText.Equals("pubsub"))
-            {
-                if (!e.Command.ChatMessage.IsBroadcaster)
-                {
-                    return;
-                }
-
-                if (string.IsNullOrEmpty(e.Command.ArgumentsAsString))
-                {
-                    return;
-                }
-            }
+            //if (!string.IsNullOrEmpty(e.Command.CommandText) && e.Command.CommandText.Equals("pubsub"))
+            //{
+            //    if (!e.Command.ChatMessage.IsBroadcaster)
+            //    {
+            //        return;
+            //    }
+            //    if (string.IsNullOrEmpty(e.Command.ArgumentsAsString))
+            //    {
+            //        return;
+            //    }
+            //}
 
             if (await commandHandler.HandleAsync(game, this, e.Command))
             {
