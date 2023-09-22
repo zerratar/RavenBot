@@ -71,7 +71,7 @@ namespace ROBot.Core.Chat.Commands
 
                     if (skill.ToLower().StartsWith("sail") || arg.StartsWith("sail"))
                     {
-                        await connection[cmd].TravelAsync(player, string.Empty);
+                        await connection[cmd].EmbarkFerryAsync(player);
                         return;
                     }
 

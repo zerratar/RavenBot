@@ -65,7 +65,7 @@ namespace RavenBot.Core.Ravenfall.Commands
 
             if (skill.ToLower().StartsWith("sail") || arg.StartsWith("sail"))
             {
-                await this.game[cmd.CorrelationId].TravelAsync(player, string.Empty);
+                await this.game[cmd.CorrelationId].EmbarkFerryAsync(player);
                 return;
             }
 
