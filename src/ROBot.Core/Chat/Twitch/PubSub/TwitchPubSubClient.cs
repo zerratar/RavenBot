@@ -33,7 +33,14 @@ namespace ROBot.Core.Chat.Twitch.PubSub
 
         public void UpdatePubSubData(TwitchPubSubData pubsubData)
         {
+            allowReconnect = allowReconnect || this.pubsub.PubSubToken != pubsubData.PubSubToken;
             this.pubsub = pubsubData;
+
+            if (allowReconnect && !IsConnected && !IsConnecting && !IsReady)
+            {
+                CreateClient();
+                Connect();
+            }
         }
 
         public string GetInstanceKey()
@@ -119,14 +126,20 @@ namespace ROBot.Core.Chat.Twitch.PubSub
             }
 
             allowReconnect = allowReconnect && wasReady;
-            await ReconnectAsync();
+            if (allowReconnect)
+            {
+                await ReconnectAsync();
+            }
         }
 
         private async void Client_OnPubSubServiceClosed(object sender, EventArgs e)
         {
             state = PubSubState.Disconnected;
             logger.LogError("[TWITCH] PubSub Connection Closed for " + pubsub.SessionInfo.Owner.Username);
-            await ReconnectAsync();
+            if (allowReconnect)
+            {
+                await ReconnectAsync();
+            }
         }
 
         private void Client_OnPubSubServiceConnected(object sender, EventArgs e)

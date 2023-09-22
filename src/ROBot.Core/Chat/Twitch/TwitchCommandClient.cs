@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using RavenBot.Core.Chat;
@@ -48,7 +49,6 @@ namespace ROBot.Core.Chat.Twitch
         private readonly ConcurrentQueue<string> channelJoinQueue
             = new ConcurrentQueue<string>();
 
-        private readonly object channelMutex = new object();
         private readonly HashSet<string> joinedChannels = new HashSet<string>();
         private readonly HashSet<string> suspendedChannels = new HashSet<string>();
 
@@ -319,19 +319,16 @@ namespace ROBot.Core.Chat.Twitch
          * Twitch Channels Logic
          */
 
-        private void RejoinChannels()
+        private async Task RejoinChannelsAsync()
         {
-            lock (channelMutex)
+            foreach (var c in joinedChannels)
             {
-                foreach (var c in joinedChannels)
-                {
-                    JoinChannelAsync(c);
-                }
+                await JoinChannelAsync(c);
             }
 
             while (channelJoinQueue.TryDequeue(out var channel))
             {
-                JoinChannelAsync(channel);
+                await JoinChannelAsync(channel);
             }
         }
         public async Task JoinChannelAsync(string channel)
@@ -368,11 +365,7 @@ namespace ROBot.Core.Chat.Twitch
                 if (WaitForConnection(5))
                 {
                     currentlyJoiningChannels[channel] = DateTime.UtcNow;
-
-                    lock (channelMutex)
-                    {
-                        joinedChannels.Add(channel);
-                    }
+                    joinedChannels.Add(channel);
 
                     logger.LogDebug("[TWITCH] Joining Channel (Channel: " + channel + ")");
                     stats.AddChAttempt();
@@ -396,26 +389,27 @@ namespace ROBot.Core.Chat.Twitch
         }
         public async Task LeaveChannelAsync(string channel)
         {
-            lock (channelMutex)
+            try
             {
                 joinedChannels.Remove(channel);
-            }
 
-            if (!InChannel(channel))
+                if (!InChannel(channel))
+                {
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(channel))
+                {
+                    return;
+                }
+                
+                pubSubManager.Disconnect(channel);
+                await client.LeaveChannelAsync(channel);
+            }
+            catch (Exception exc)
             {
-                return;
+                logger.LogError("[TWITCH] Join Channel failed: " + exc);
             }
-
-            if (string.IsNullOrEmpty(channel))
-            {
-                //logger.LogDebug("[TWITCH] Unable to leave without channel name.");
-                return;
-            }
-
-            //logger.LogDebug("[TWITCH] Leaving Channel (Channel: " + channel + ")");
-
-            pubSubManager.Disconnect(channel);
-            await client.LeaveChannelAsync(channel);
         }
         public bool InChannel(string channel)
         {
@@ -512,7 +506,7 @@ namespace ROBot.Core.Chat.Twitch
             if (!InChannel(channelName))
             {
                 EnqueueChatMessage(channel, message);
-                JoinChannelAsync(channelName);
+                await JoinChannelAsync(channelName);
                 return;
             }
 
@@ -581,18 +575,6 @@ namespace ROBot.Core.Chat.Twitch
         private async Task OnUserLeftAsync(object sender, OnUserLeftArgs e)
         {
         }
-
-        //private void OnPubSubTokenReceived(PubSubToken obj)
-        //{
-        //    lock (channelMutex)
-        //    {
-        //        if (joinedChannels.Contains(obj.UserName))
-        //        {
-        //            logger.LogInformation("[RVNFLL] pubsub Token recieved for " + obj.UserName);
-        //            pubSubManager.PubSubConnect(obj.UserName);
-        //        }
-        //    }
-        //}
 
         private async Task OnUserJoinedAsync(object sender, OnUserJoinedArgs e)
         {
@@ -723,7 +705,7 @@ namespace ROBot.Core.Chat.Twitch
             hasConnectionError = false;
             stats.AddTwitchSuccess();
             stats.ResetTwitchAttempt();
-            RejoinChannels();
+            await RejoinChannelsAsync();
         }
 
         private async Task OnFailureToReceiveJoinConfirmationAsync(object sender, OnFailureToReceiveJoinConfirmationArgs e)
