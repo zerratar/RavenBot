@@ -7,6 +7,7 @@ namespace ROBot.Core.Chat.Twitch
     public interface ITwitchCommandClient : IChatCommandClient
     {
         string GetPubSubActivationLink();
+        string GetBotName();
         Task JoinChannelAsync(string channel);
         Task LeaveChannelAsync(string channel);
         bool InChannel(string name);

@@ -1,7 +1,5 @@
 ﻿using RavenBot.Core.Handlers;
-using ROBot.Core.Chat.Twitch;
 using ROBot.Core.GameServer;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ROBot.Core.Chat.Commands

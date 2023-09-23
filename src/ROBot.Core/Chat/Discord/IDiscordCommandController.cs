@@ -247,9 +247,9 @@ namespace ROBot.Core.Chat.Discord
 
             var targetFile = CommandDescriptorsFile;
 
-#if DEBUG
-            targetFile = @"C:\git\RavenNest\src\generated-data\commands.json";
-#endif
+//#if DEBUG
+//            targetFile = @"C:\git\RavenNest\src\generated-data\commands.json";
+//#endif
 
             System.IO.File.WriteAllText(targetFile, JsonConvert.SerializeObject(cmds, Formatting.Indented, new JsonSerializerSettings()
             {

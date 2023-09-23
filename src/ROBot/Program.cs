@@ -48,11 +48,11 @@ namespace ROBot
 
             ioc.RegisterShared<IMessageBus, MessageBus>();
 
-#if DEBUG
-            ioc.RegisterCustomShared<IUserSettingsManager>(() => new UserSettingsManager(@"C:\Ravenfall\user-settings"));
-#else
+//#if DEBUG && 
+//            ioc.RegisterCustomShared<IUserSettingsManager>(() => new UserSettingsManager(@"C:\Ravenfall\user-settings"));
+//#else
             ioc.RegisterCustomShared<IUserSettingsManager>(() => new UserSettingsManager());
-#endif
+//#endif
 
             ioc.RegisterShared<IStringProvider, StringProvider>();
             ioc.RegisterShared<IStringTemplateParser, StringTemplateParser>();

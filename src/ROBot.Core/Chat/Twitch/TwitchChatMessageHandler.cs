@@ -20,16 +20,15 @@ namespace ROBot.Core.Chat.Twitch
             this.messageBus = messageBus;
         }
 
-        public Task HandleAsync(
+        public async Task HandleAsync(
             IBotServer game,
             ITwitchCommandClient twitch,
             TwitchLib.Client.Models.ChatMessage msg)
         {
-            var channel = msg.Channel;
-            var session = game.GetSession(new TwitchCommand.TwitchChannel(channel));
+            var channel = new TwitchCommand.TwitchChannel(msg.Channel);
+            var session = game.GetSession(channel);
             if (session != null)
             {
-                //session.SendChatMessage(msg.Username, msg.Message);
                 if (msg.Bits > 0)
                 {
                     messageBus.Send(
@@ -46,9 +45,24 @@ namespace ROBot.Core.Chat.Twitch
                             msg.Bits)
                     );
                 }
+                else
+                {
+                    // check if this contains the name of the bot
+                    var mention = "@" + twitch.GetBotName();
+                    var m = msg.Message;
+                    if (string.IsNullOrEmpty(m))
+                    {
+                        return;
+                    }
 
+                    if (msg.Message.ToLower().Contains(mention.ToLower()))
+                    {
+                        // check if message contains any known command names
+                        // if so, use chatgpt with description of all commands on how they can be used.
+                        // ooor. just return the description of the command.
+                    }
+                }
             }
-            return Task.CompletedTask;
         }
     }
 }

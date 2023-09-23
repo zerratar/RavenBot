@@ -179,6 +179,12 @@ namespace ROBot.Core.Chat.Twitch
             }
         }
 
+        public string GetBotName()
+        {
+            var c = credentialsProvider.Get();
+            if (c == null) return "RavenfallOfficial";
+            return c.TwitchUsername;
+        }
 
         public async Task StartAsync()
         {
