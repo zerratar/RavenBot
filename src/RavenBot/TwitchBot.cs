@@ -275,8 +275,11 @@ namespace RavenBot
                 return;
 
             var channel = this.channelProvider.Get();
-            if (client.JoinedChannels.Count == 0)
-                client.JoinChannel(channel);
+            var joinedChannels = client.JoinedChannels;
+            if (joinedChannels.Count == 0)
+            {
+                await client.JoinChannelAsync(channel, true);
+            }
 
             var msg = messageFormatter.Format(format, args);
             if (string.IsNullOrEmpty(msg))
@@ -318,13 +321,14 @@ namespace RavenBot
             var channel = this.channelProvider.Get();
             if (client.JoinedChannels.Count == 0)
             {
-                client.JoinChannel(channel);
-                await client.JoinChannelAsync(channel);
+                await client.JoinChannelAsync(channel, true);
                 await Task.Delay(1000);
             }
 
             if (client.JoinedChannels.Count > 0)
+            {
                 client.SendMessage(channel, msg);
+            }
         }
 
         private void CreateTwitchClient()

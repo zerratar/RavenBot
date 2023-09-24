@@ -21,17 +21,23 @@ namespace RavenBot.Core.Ravenfall.Commands
                 await chat.SendReplyAsync(cmd, Localization.GAME_NOT_STARTED);
                 return;
             }
-
+            var player = playerProvider.Get(cmd.Sender);
             if (!string.IsNullOrEmpty(cmd.Arguments) && (cmd.Sender.IsBroadcaster || cmd.Sender.IsModerator || cmd.Sender.IsGameAdmin || cmd.Sender.IsGameModerator))
             {
-                var player = playerProvider.Get(cmd.Arguments);
+                if (cmd.Arguments.Trim().Equals("all", System.StringComparison.OrdinalIgnoreCase) || cmd.Arguments.Trim().Equals("everyone", System.StringComparison.OrdinalIgnoreCase))
+                {
+                    await this.game[cmd.CorrelationId].UnstuckAsync(player, cmd.Arguments);
+                    return;
+                }
+
+                player = playerProvider.Get(cmd.Arguments);
                 if (player != null)
-                    await this.game[cmd.CorrelationId].UnstuckAsync(player);
+                    await this.game[cmd.CorrelationId].UnstuckAsync(player, cmd.Arguments);
             }
             else
             {
-                var player = playerProvider.Get(cmd.Sender, cmd.Arguments);
-                await this.game[cmd.CorrelationId].UnstuckAsync(player);
+                player = playerProvider.Get(cmd.Sender, cmd.Arguments);
+                await this.game[cmd.CorrelationId].UnstuckAsync(player, cmd.Arguments);
             }
 
         }

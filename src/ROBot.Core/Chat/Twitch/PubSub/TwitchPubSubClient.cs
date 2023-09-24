@@ -21,7 +21,8 @@ namespace ROBot.Core.Chat.Twitch.PubSub
         public bool IsConnected => client != null && state >= PubSubState.Connected;
         public bool IsReady => client != null && state == PubSubState.Ready;
         public bool IsConnecting => state == PubSubState.Connecting || state == PubSubState.Authenticating;
-        private bool allowReconnect = true;
+        private bool badAuth;
+
         public TwitchPubSubClient(ILogger logger, TwitchPubSubData pubsub)
         {
             this.logger = logger;
@@ -35,10 +36,11 @@ namespace ROBot.Core.Chat.Twitch.PubSub
 
         public void UpdatePubSubData(TwitchPubSubData pubsubData)
         {
-            allowReconnect = allowReconnect || this.pubsub.PubSubToken != pubsubData.PubSubToken;
+            badAuth = badAuth && this.pubsub.PubSubToken == pubsubData.PubSubToken;
+
             this.pubsub = pubsubData;
 
-            if (allowReconnect && !IsConnected && !IsConnecting && !IsReady)
+            if (!IsConnected && !IsConnecting && !IsReady && !badAuth)
             {
                 CreateClient();
                 Connect();
@@ -103,22 +105,21 @@ namespace ROBot.Core.Chat.Twitch.PubSub
             }
         }
 
-        private async Task ReconnectAsync()
-        {
-            if (!allowReconnect)
-            {
-                Dispose();
-                return;
-            }
-
-            logger.LogWarning("[TWITCH] Attempting to Reconnect to PubSub (Username: " + pubsub.SessionInfo.Owner.Username + ")");
-            await Task.Delay(1000);
-            Connect();
-        }
+        //private async Task ReconnectAsync()
+        //{
+        //    if (!allowReconnect)
+        //    {
+        //        //Dispose();
+        //        return;
+        //    }
+        //    logger.LogWarning("[TWITCH] Attempting to Reconnect to PubSub (Username: " + pubsub.SessionInfo.Owner.Username + ")");
+        //    await Task.Delay(1000);
+        //    Connect();
+        //}
 
         private async void Client_OnPubSubServiceError(object sender, OnPubSubServiceErrorArgs e)
         {
-            var wasReady = IsReady;
+            //var wasReady = IsReady;
 
             state = PubSubState.Disconnected;
 
@@ -127,21 +128,21 @@ namespace ROBot.Core.Chat.Twitch.PubSub
                 logger.LogError("[TWITCH] PubSub Error (Username: " + pubsub.SessionInfo.Owner.Username + " Exception: " + e.Exception.Message + ")");
             }
 
-            allowReconnect = allowReconnect && wasReady;
-            if (allowReconnect)
-            {
-                await ReconnectAsync();
-            }
+            //allowReconnect = allowReconnect && wasReady;
+            //if (allowReconnect)
+            //{
+            //    await ReconnectAsync();
+            //}
         }
 
         private async void Client_OnPubSubServiceClosed(object sender, EventArgs e)
         {
             state = PubSubState.Disconnected;
             logger.LogError("[TWITCH] PubSub Connection Closed for " + pubsub.SessionInfo.Owner.Username);
-            if (allowReconnect)
-            {
-                await ReconnectAsync();
-            }
+            //if (!badAuth)
+            //{
+            //    await ReconnectAsync();
+            //}
         }
 
         private void Client_OnPubSubServiceConnected(object sender, EventArgs e)
@@ -163,7 +164,7 @@ namespace ROBot.Core.Chat.Twitch.PubSub
         {
             if (e.Successful)
             {
-                allowReconnect = true;
+                badAuth = false;
                 state = PubSubState.Ready;
                 logger.LogDebug("[TWITCH] PubSub Listen Success (Topic: " + e.Topic + " Username: " + pubsub.SessionInfo.Owner.Username + ")");
             }
@@ -174,7 +175,7 @@ namespace ROBot.Core.Chat.Twitch.PubSub
 
                 if (e.Response.Error == "ERR_BADAUTH")
                 {
-                    allowReconnect = false;
+                    badAuth = true;
                     // Remove the token, we don't want to use this one.
                 }
             }
@@ -194,13 +195,12 @@ namespace ROBot.Core.Chat.Twitch.PubSub
                 return;
             }
 
+            UnsubscribeClient();
             disposed = true;
-            allowReconnect = false;
             state = PubSubState.Disposed;
 
             logger.LogDebug("[TWITCH] PubSub Disposed (Username: " + pubsub.SessionInfo.Owner.Username + ")");
 
-            UnsubscribeClient();
 
             try
             {

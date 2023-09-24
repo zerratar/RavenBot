@@ -19,7 +19,7 @@ namespace RavenBot.Core.Ravenfall
             this.correlationId = correlationId;
         }
 
-        public Task UnstuckAsync(User player) => SendAsync("unstuck", player);
+        public Task UnstuckAsync(User player, string args) => SendAsync("unstuck", player, args);
         public Task JoinAsync(User player) => SendAsync("join", player);
         public Task InspectPlayerAsync(User player) => SendAsync("inspect", player);
         public Task GetStreamerTokenCountAsync(User player) => SendAsync("token_count", player);
@@ -200,7 +200,7 @@ namespace RavenBot.Core.Ravenfall
         Task TurnIntoMonsterAsync(User author);
         Task RestartGameAsync(User author);
         Task KickPlayerFromArenaAsync(User author, User targetPlayer);
-        Task UnstuckAsync(User author);
+        Task UnstuckAsync(User author, string args);
         Task InspectPlayerAsync(User author);
         Task AddPlayerToArenaAsync(User author, User targetPlayer);
         Task KickAsync(User author, User targetPlayer);
