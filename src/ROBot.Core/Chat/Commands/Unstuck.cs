@@ -32,7 +32,9 @@ namespace ROBot.Core.Chat.Commands
                     var player = session.Get(cmd);
                     if (!string.IsNullOrEmpty(cmd.Arguments) && (cmd.Sender.IsBroadcaster || cmd.Sender.IsModerator || cmd.Sender.IsGameAdmin || cmd.Sender.IsGameModerator))
                     {
-                        if (cmd.Arguments.Trim().Equals("all", System.StringComparison.OrdinalIgnoreCase) || cmd.Arguments.Trim().Equals("everyone", System.StringComparison.OrdinalIgnoreCase))
+                        if (cmd.Arguments.Trim().Equals("all", System.StringComparison.OrdinalIgnoreCase) || 
+                            cmd.Arguments.Trim().Equals("everyone", System.StringComparison.OrdinalIgnoreCase) ||
+                            cmd.Arguments.Trim().Equals("training", System.StringComparison.OrdinalIgnoreCase))
                         {
                             await connection[cmd.CorrelationId].UnstuckAsync(player, cmd.Arguments);
                             return;
