@@ -17,12 +17,23 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.31.0" />
-    <PackageReference Include="TwitchLib.Client" Version="4.0.0-preview-fd131763416cb9f1a31705ca609566d7e7e7fac8" />
     <PackageReference Include="TwitchLib.PubSub" Version="4.0.0-preview-f833b1ab1ebef37618dba3fbb1e0a661ff183af5" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Shinobytes.Ravenfall.Core\Shinobytes.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="TwitchLib.Client">
+      <HintPath>..\..\TwitchLib\Debug\net6.0\TwitchLib.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="TwitchLib.Client.Enums">
+      <HintPath>..\..\TwitchLib\Debug\net6.0\TwitchLib.Client.Enums.dll</HintPath>
+    </Reference>
+    <Reference Include="TwitchLib.Client.Models">
+      <HintPath>..\..\TwitchLib\Debug\net6.0\TwitchLib.Client.Models.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

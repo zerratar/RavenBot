@@ -231,7 +231,7 @@ namespace ROBot.Core.Chat.Twitch
 
             allowReconnection = false;
             if (client.IsConnected)
-                client.Disconnect();
+                client.DisconnectAsync();
 
             pubSubManager.Dispose();
 
@@ -295,7 +295,7 @@ namespace ROBot.Core.Chat.Twitch
             {
                 wasConnected = true;
                 //logger.LogError("[TWITCH] Recieved a Disconnect Event. Still connected, disconnecting");
-                client.Disconnect(); //Thinks we're still connected after reciving Disconnection event, attempting to disconnect
+                await client.DisconnectAsync(); //Thinks we're still connected after reciving Disconnection event, attempting to disconnect
             }
 
             attemptingReconnection = true;
@@ -303,7 +303,7 @@ namespace ROBot.Core.Chat.Twitch
 
             if (stats.TwitchConnectionCurrentAttempt % 10 != 0)
             {
-                client.Connect(); //Rather than restarting the whole process, will just redo a connection
+                await client.ConnectAsync(); //Rather than restarting the whole process, will just redo a connection
             }
             else
             {
@@ -553,7 +553,7 @@ namespace ROBot.Core.Chat.Twitch
                 return;
             }
 
-            client.SendReply(channel.Name, correlationId, message);
+            await client.SendReplyAsync(channel.Name, correlationId, message);
         }
         private async Task<string> ApplyMessageTransformationAsync(ICommandChannel channel, string message)
         {
@@ -630,7 +630,7 @@ namespace ROBot.Core.Chat.Twitch
             //    }
             //}
 
-            if (await commandHandler.HandleAsync(game, this, e.Command))
+            if (await commandHandler.HandleAsync(game, this, e.Command, e.ChatMessage))
             {
                 stats.AddRFCommandCount();
             }
@@ -713,13 +713,13 @@ namespace ROBot.Core.Chat.Twitch
             stats.AddMsgSent(e.SentMessage.Channel, e.SentMessage.Message);
         }
 
-        private async Task OnRateLimitAsync(object sender, OnRateLimitArgs e)
+        private async Task OnRateLimitAsync(object sender, NoticeEventArgs e)
         {
             stats.AddLastRateLimit(e);
             logger.LogError("[TWITCH] RateLimited (OnRateLimitArgs: " + e.ToString() + ")");
         }
 
-        private async Task OnConnectedAsync(object sender, OnConnectedArgs e)
+        private async Task OnConnectedAsync(object sender, TwitchLib.Client.Events.OnConnectedEventArgs e)
         {
             logger.LogDebug("[TWITCH] Connected");
             isConnectedToTwitch = true;

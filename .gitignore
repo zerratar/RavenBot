@@ -13,7 +13,7 @@
 *.userprefs
 
 # Build results
-[Dd]ebug/
+#[Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
@@ -26,6 +26,15 @@ bld/
 
 settings.json
 appsettings-ravenbot.json
+
+
+!/TwitchLib/[Dd]ebug/net6.0/*.dll
+!/TwitchLib/[Dd]ebug/net6.0/*.pdb
+!/TwitchLib/[Dd]ebug/net6.0/*.xml
+
+!TwitchLib/[Dd]ebug/net6.0/*dll
+!TwitchLib/[Dd]ebug/net6.0/*.pdb
+!TwitchLib/[Dd]ebug/net6.0/*.xml
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/

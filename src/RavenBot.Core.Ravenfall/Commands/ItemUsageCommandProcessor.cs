@@ -22,12 +22,6 @@ namespace RavenBot.Core.Ravenfall.Commands
                 return;
             }
 
-            if (string.IsNullOrEmpty(cmd.Arguments) || !cmd.Arguments.Trim().Contains(" "))
-            {
-                await chat.SendReplyAsync(cmd, Localization.CRAFT_HELP, cmd.Command);
-                return;
-            }
-
             var player = playerProvider.Get(cmd);
             await this.game[cmd.CorrelationId].GetItemUsageAsync(player, cmd.Arguments);
         }

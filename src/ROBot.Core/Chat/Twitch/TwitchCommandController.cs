@@ -61,15 +61,15 @@ namespace ROBot.Core.Chat.Twitch
             }
         }
 
-        public async Task<bool> HandleAsync(IBotServer game, IChatCommandClient chat, TwitchLib.Client.Models.ChatCommand command)
+        public async Task<bool> HandleAsync(IBotServer game, IChatCommandClient chat, TwitchLib.Client.Models.CommandInfo command, TwitchLib.Client.Models.ChatMessage msg)
         {
             try
             {
-                if (command == null || string.IsNullOrEmpty(command.CommandText))
+                if (command == null || string.IsNullOrEmpty(command.Name))
                 {
-                    if (command != null && command.ChatMessage != null)
+                    if (command != null && msg != null)
                     {
-                        logger.LogError("[BOT] Error handling command. Command is null. Message: " + command.ChatMessage.Username + ": " + command.ChatMessage.Message + " @" + command.ChatMessage.Channel);
+                        logger.LogError("[BOT] Error handling command. Command is null. Message: " + msg.Username + ": " + msg.Message + " @" + msg.Channel);
                     }
                     else
                     {
@@ -79,9 +79,9 @@ namespace ROBot.Core.Chat.Twitch
                 }
                 var argString = !string.IsNullOrEmpty(command.ArgumentsAsString) ? " (args: " + command.ArgumentsAsString + ")" : "";
 
-                var uid = command.ChatMessage.UserId;
+                var uid = msg.UserId;
                 var settings = userSettingsManager.Get(uid, "twitch");
-                var cmd = new TwitchCommand(command, settings?.IsAdministrator ?? false, settings?.IsModerator ?? false);
+                var cmd = new TwitchCommand(command, msg, settings?.IsAdministrator ?? false, settings?.IsModerator ?? false);
 
                 var session = game.GetSession(cmd.Channel);
 
@@ -96,9 +96,9 @@ namespace ROBot.Core.Chat.Twitch
                 if (await HandleAsync(game, chat as ITwitchCommandClient, cmd))
                 {
                     if (session != null)
-                        logger.LogDebug("[BOT] Twitch Command Recieved (SessionName: " + session.Name + " Command: " + key + argString + " From: " + command.ChatMessage.Username + ")");
+                        logger.LogDebug("[BOT] Twitch Command Recieved (SessionName: " + session.Name + " Command: " + key + argString + " From: " + msg.Username + ")");
                     else
-                        logger.LogDebug("[BOT] Twitch Command Recieved (Command: " + key + argString + " From: " + command.ChatMessage.Username + " Channel: " + command.ChatMessage.Channel + ")");
+                        logger.LogDebug("[BOT] Twitch Command Recieved (Command: " + key + argString + " From: " + msg.Username + " Channel: " + msg.Channel + ")");
 
                     return true;
                 }
@@ -107,7 +107,7 @@ namespace ROBot.Core.Chat.Twitch
             }
             catch (Exception exc)
             {
-                logger.LogError("[BOT] Error handling command (Command: " + command?.CommandText + " Exception: " + exc.ToString() + ")");
+                logger.LogError("[BOT] Error handling command (Command: " + command?.Name + " Exception: " + exc.ToString() + ")");
                 return false;
             }
         }

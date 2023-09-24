@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using RavenBot.Core;
 using RavenBot.Core.Chat;
@@ -167,7 +169,7 @@ namespace RavenBot
             if (!kernel.Started) kernel.Start();
             EnsureInitialized();
             Subscribe();
-            client.Connect();
+            client.ConnectAsync();
         }
 
         public void Dispose()
@@ -216,9 +218,9 @@ namespace RavenBot
 
         private async Task OnCommandReceivedAsync(object sender, OnChatCommandReceivedArgs e)
         {
-            var uid = e.Command.ChatMessage.UserId;
+            var uid = e.ChatMessage.UserId;
             var settings = userSettingsManager.Get(uid, "twitch");
-            await commandHandler.HandleAsync(this, new TwitchCommand(e.Command, settings.IsAdministrator, settings.IsModerator));
+            await commandHandler.HandleAsync(this, new TwitchCommand(e.Command, e.ChatMessage, settings.IsAdministrator, settings.IsModerator));
         }
 
         private void EnsureInitialized()
@@ -271,37 +273,44 @@ namespace RavenBot
 
         public async Task SendReplyAsync(string format, object[] args, string correlationId, string mention)
         {
-            if (!this.client.IsConnected || string.IsNullOrWhiteSpace(format))
-                return;
-
-            var channel = this.channelProvider.Get();
-            var joinedChannels = client.JoinedChannels;
-            if (joinedChannels.Count == 0)
+            try
             {
-                await client.JoinChannelAsync(channel, true);
-            }
+                if (!this.client.IsConnected || string.IsNullOrWhiteSpace(format))
+                    return;
 
-            var msg = messageFormatter.Format(format, args);
-            if (string.IsNullOrEmpty(msg))
-                return;
-
-            if (!string.IsNullOrEmpty(correlationId))
-            {
-                client.SendReply(channel, correlationId, msg);
-                return;
-            }
-
-            if (!string.IsNullOrEmpty(mention))
-            {
-                if (!mention.StartsWith("@"))
+                var channel = this.channelProvider.Get();
+                var joinedChannels = client.JoinedChannels;
+                if (joinedChannels.Count == 0)
                 {
-                    mention = "@" + mention;
+                    await client.JoinChannelAsync(channel, true);
                 }
 
-                msg = mention + ", " + msg;
-            }
+                var msg = messageFormatter.Format(format, args);
+                if (string.IsNullOrEmpty(msg))
+                    return;
 
-            await SendMessageAsync(msg);
+                if (!string.IsNullOrEmpty(correlationId))
+                {
+                    await client.SendReplyAsync(channel, correlationId, msg);
+                    return;
+                }
+
+                if (!string.IsNullOrEmpty(mention))
+                {
+                    if (!mention.StartsWith("@"))
+                    {
+                        mention = "@" + mention;
+                    }
+
+                    msg = mention + ", " + msg;
+                }
+
+                await SendMessageAsync(msg);
+            }
+            catch (Exception exc)
+            {
+                logger.WriteError($"Error sending following message: \"{format}\", args: {string.Join(", ", args.Select(x => "\"" + x + "\""))}, mention: {mention}, correlation id: {correlationId}, exception: {exc}");
+            }
         }
 
         public async Task SendMessageAsync(string format, object[] args)
@@ -456,7 +465,7 @@ namespace RavenBot
 
             tryToReconnect = false;
             if (client.IsConnected)
-                client.Disconnect();
+                client.DisconnectAsync();
 
             try
             {
@@ -473,7 +482,7 @@ namespace RavenBot
             broadcastSubscription?.Unsubscribe();
         }
 
-        private async Task OnConnectedAsync(object sender, OnConnectedArgs e)
+        private async Task OnConnectedAsync(object sender, TwitchLib.Client.Events.OnConnectedEventArgs e)
         {
             logger.WriteDebug("Connected to Twitch IRC Server");
             messageBus.Send("twitch", "");
@@ -492,7 +501,13 @@ namespace RavenBot
 
         private void Subscribe()
         {
+            client.OnChannelStateChanged += OnChannelStateChanged;
             client.OnChatCommandReceived += OnCommandReceivedAsync;
+            client.OnLeftChannel += OnLeftChannel;
+            client.OnUserStateChanged += OnUserStateChanged;
+
+            client.OnSendReceiveData += OnSendReceiveData;
+
             client.OnMessageReceived += OnMessageReceivedAsync;
             client.OnConnected += OnConnectedAsync;
             client.OnReconnected += OnReconnectedAsync;
@@ -512,7 +527,27 @@ namespace RavenBot
             pubsub.OnChannelPointsRewardRedeemed += Pubsub_OnChannelPointsRewardRedeemed;
         }
 
-        private async Task OnReconnectedAsync(object sender, OnConnectedArgs e)
+        private async Task OnSendReceiveData(object sender, OnSendReceiveDataArgs e)
+        {
+            //logger.WriteDebug("[" + e.Direction + "] " + e.Data);
+        }
+
+        private async Task OnUserStateChanged(object sender, OnUserStateChangedArgs e)
+        {
+            //logger.WriteWarning("Bot user state changed: " + Newtonsoft.Json.JsonConvert.SerializeObject(e.UserState));
+        }
+
+        private async Task OnLeftChannel(object sender, OnLeftChannelArgs e)
+        {
+            //logger.WriteWarning("Bot left channel: " + e.Channel);
+        }
+
+        private async Task OnChannelStateChanged(object sender, OnChannelStateChangedArgs e)
+        {
+            //logger.WriteDebug("Channel state changed: " + e.Channel + ", state: " + e.ChannelState);
+        }
+
+        private async Task OnReconnectedAsync(object sender, TwitchLib.Client.Events.OnConnectedEventArgs e)
         {
             logger.WriteDebug("Reconnected to Twitch IRC Server");
             messageBus.Send("twitch", "");
@@ -592,9 +627,15 @@ namespace RavenBot
 
         private void Unsubscribe()
         {
+            client.OnChannelStateChanged -= OnChannelStateChanged;
             client.OnChatCommandReceived -= OnCommandReceivedAsync;
+            client.OnLeftChannel -= OnLeftChannel;
+            client.OnUserStateChanged -= OnUserStateChanged;
+            client.OnSendReceiveData -= OnSendReceiveData;
+
             client.OnMessageReceived -= OnMessageReceivedAsync;
             client.OnConnected -= OnConnectedAsync;
+            client.OnReconnected -= OnReconnectedAsync;
             client.OnDisconnected -= OnDisconnectedAsync;
             client.OnUserJoined -= OnUserJoinedAsync;
             client.OnUserLeft -= OnUserLeftAsync;
@@ -603,8 +644,11 @@ namespace RavenBot
             client.OnNewSubscriber -= OnNewSubAsync;
             client.OnReSubscriber -= OnReSubAsync;
             client.OnRaidNotification -= OnRaidNotificationAsync;
-
             client.OnConnectionError -= OnConnectionErrorAsync;
+            pubsub.OnListenResponse -= Pubsub_OnListenResponse;
+            pubsub.OnPubSubServiceConnected -= Pubsub_OnPubSubServiceConnected;
+            pubsub.OnPubSubServiceError -= Pubsub_OnPubSubServiceError;
+            pubsub.OnPubSubServiceClosed -= Pubsub_OnPubSubServiceClosed;
             pubsub.OnChannelPointsRewardRedeemed -= Pubsub_OnChannelPointsRewardRedeemed;
         }
     }

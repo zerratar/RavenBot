@@ -3,7 +3,6 @@ using RavenBot.Core.Ravenfall.Commands;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using TwitchLib.Client.Models;
 
 namespace ROBot.Tests
 {
