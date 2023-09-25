@@ -27,18 +27,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="TwitchLib.Client">
-      <HintPath>..\..\TwitchLib\Debug\net6.0\TwitchLib.Client.dll</HintPath>
-    </Reference>
-    <Reference Include="TwitchLib.Client.Enums">
-      <HintPath>..\..\TwitchLib\Debug\net6.0\TwitchLib.Client.Enums.dll</HintPath>
-    </Reference>
-    <Reference Include="TwitchLib.Client.Models">
-      <HintPath>..\..\TwitchLib\Debug\net6.0\TwitchLib.Client.Models.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
-  <ItemGroup>
     <None Update="settings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

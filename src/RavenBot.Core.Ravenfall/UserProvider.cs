@@ -222,12 +222,14 @@ namespace RavenBot.Core.Ravenfall
 
         private User CreateUser(string username, string platformId, string platform)
         {
-            var user = new User(Guid.Empty, Guid.Empty, username, username, null, platform, platformId, false, false, false, false, "1");
             var settings = settingsManager.Get(platformId, platform);
+            var user = new User(Guid.Empty, Guid.Empty, username, username, null, platform, platformId, false, false, false, false, false, false, "1");
             if (settings.HasValues)
             {
                 user.Id = settings.RavenfallUserId;
                 user.Platform = platform;
+                user.IsGameAdministrator = settings.IsAdministrator;
+                user.IsGameModerator = settings.IsModerator;
 
                 switch (platform)
                 {

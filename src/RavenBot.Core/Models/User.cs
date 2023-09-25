@@ -25,6 +25,8 @@ namespace RavenBot.Core.Ravenfall.Models
               bool isModerator,
               bool isSubscriber,
               bool isVip,
+              bool isGameAdministrator,
+              bool isGameModerator,
               string identifier)
         {
             if (string.IsNullOrEmpty(username)) throw new ArgumentNullException(nameof(username));
@@ -39,6 +41,8 @@ namespace RavenBot.Core.Ravenfall.Models
             IsModerator = isModerator;
             IsSubscriber = isSubscriber;
             IsVip = isVip;
+            IsGameAdministrator = isGameAdministrator;
+            IsGameModerator = isGameModerator;
             Identifier = identifier;
         }
         public Guid Id { get; set; }
@@ -52,6 +56,8 @@ namespace RavenBot.Core.Ravenfall.Models
         public bool IsModerator { get; set; }
         public bool IsSubscriber { get; set; }
         public bool IsVip { get; set; }
+        public bool IsGameAdministrator { get; set; }
+        public bool IsGameModerator { get; set; }
         public int SubTier { get; set; }
         public string Identifier { get; set; }
 

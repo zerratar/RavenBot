@@ -2,11 +2,11 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-	<TargetFramework>net6.0-windows</TargetFramework>
+	  <TargetFramework>net6.0-windows</TargetFramework>
     <!--<PublishTrimmed>true</PublishTrimmed>-->
 
-	<PublishSingleFile Condition="'$(Configuration)' == 'Release'">true</PublishSingleFile>
-	<UseWindowsForms>true</UseWindowsForms>
+	  <PublishSingleFile Condition="'$(Configuration)' == 'Release'">true</PublishSingleFile>
+	  <UseWindowsForms>true</UseWindowsForms>
     <PublishReadyToRun>true</PublishReadyToRun>
     <PublishSingleFile>true</PublishSingleFile>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
@@ -30,18 +30,6 @@
     <ProjectReference Include="..\RavenBot.Core.Ravenfall\RavenBot.Core.Ravenfall.csproj" />
     <ProjectReference Include="..\RavenBot.Core\RavenBot.Core.csproj" />
     <ProjectReference Include="..\Shinobytes.Ravenfall.Core\Shinobytes.Core.csproj" />
+    <ProjectReference Include="..\TwitchLib\TwitchLib.Client\TwitchLib.Client.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="TwitchLib.Client">
-      <HintPath>..\..\TwitchLib\Debug\net6.0\TwitchLib.Client.dll</HintPath>
-    </Reference>
-    <Reference Include="TwitchLib.Client.Enums">
-      <HintPath>..\..\TwitchLib\Debug\net6.0\TwitchLib.Client.Enums.dll</HintPath>
-    </Reference>
-    <Reference Include="TwitchLib.Client.Models">
-      <HintPath>..\..\TwitchLib\Debug\net6.0\TwitchLib.Client.Models.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
 </Project>
