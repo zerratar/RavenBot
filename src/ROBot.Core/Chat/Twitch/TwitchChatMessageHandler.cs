@@ -47,20 +47,31 @@ namespace ROBot.Core.Chat.Twitch
                 }
                 else
                 {
-                    // check if this contains the name of the bot
-                    var mention = "@" + twitch.GetBotName();
                     var m = msg.Message;
                     if (string.IsNullOrEmpty(m))
                     {
                         return;
                     }
 
-                    if (msg.Message.ToLower().Contains(mention.ToLower()))
+                    var connection = game.GetConnection(session);
+                    if (connection != null)
                     {
-                        // check if message contains any known command names
-                        // if so, use chatgpt with description of all commands on how they can be used.
-                        // ooor. just return the description of the command.
+                        var player = session.Get(msg.UserId);
+                        if (player != null && !string.IsNullOrEmpty(player.Username))
+                        {
+                            await connection[msg.Id].SendChatMessageAsync(player, msg.Message);
+                        }
                     }
+
+                    // check if this contains the name of the bot
+                    //var mention = "@" + twitch.GetBotName();
+
+                    //if (msg.Message.ToLower().Contains(mention.ToLower()))
+                    //{
+                    //    // check if message contains any known command names
+                    //    // if so, use chatgpt with description of all commands on how they can be used.
+                    //    // ooor. just return the description of the command.
+                    //}
                 }
             }
         }

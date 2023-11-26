@@ -30,7 +30,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                 await this.game[cmd.CorrelationId].JoinDungeonAsync(player, null);
                 return;
             }
-            else if (cmd.Arguments.Contains("join ", System.StringComparison.OrdinalIgnoreCase))
+            else if (cmd.Arguments.Contains("join ", System.StringComparison.OrdinalIgnoreCase) || cmd.Arguments.Contains("auto ", System.StringComparison.OrdinalIgnoreCase))
             {
                 await game[cmd.CorrelationId].AutoJoinDungeonAsync(player, cmd.Arguments.Split(' ').LastOrDefault());
             }

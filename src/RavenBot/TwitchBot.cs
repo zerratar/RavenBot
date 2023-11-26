@@ -197,7 +197,11 @@ namespace RavenBot
 
         private async Task OnMessageReceivedAsync(object sender, OnMessageReceivedArgs e)
         {
-            if (e.ChatMessage.Bits == 0) return;
+            if (e.ChatMessage.Bits == 0)
+            {
+#warning TODO: chat messages and send them to the game.
+                return;
+            }
 
             this.messageBus.Send(
                 nameof(CheerBitsEvent),
@@ -565,7 +569,7 @@ namespace RavenBot
                 return;
             }
 
-            logger.WriteError("PubSub Service Error: " + e.Exception);
+            //logger.WriteError("PubSub Service Error: " + e.Exception);
         }
 
         private void Pubsub_OnPubSubServiceClosed(object sender, EventArgs e)

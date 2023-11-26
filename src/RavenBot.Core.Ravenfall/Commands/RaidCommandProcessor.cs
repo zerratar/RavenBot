@@ -42,7 +42,7 @@ namespace RavenBot.Core.Ravenfall.Commands
 
             if (!string.IsNullOrEmpty(cmd.Arguments))
             {
-                if (cmd.Arguments.Contains("join ", System.StringComparison.OrdinalIgnoreCase))
+                if (cmd.Arguments.Contains("join ", System.StringComparison.OrdinalIgnoreCase) || cmd.Arguments.Contains("auto ", System.StringComparison.OrdinalIgnoreCase))
                 {
                     await game[cmd.CorrelationId].AutoJoinRaidAsync(player, cmd.Arguments.Split(' ').LastOrDefault());
                     return;

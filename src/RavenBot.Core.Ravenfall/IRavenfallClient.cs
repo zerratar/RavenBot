@@ -73,6 +73,7 @@ namespace RavenBot.Core.Ravenfall
         public Task ToggleHelmetAsync(User player) => SendAsync("toggle_helmet", player);
         public Task TogglePetAsync(User player) => SendAsync("toggle_pet", player);
         public Task SetAllVillageHutsAsync(User player, string skill) => SendAsync("set_village_huts", player, skill);
+        public Task GetVillageStatsAsync(User author) => SendAsync("village_stats", author);
         public Task SellItemAsync(User player, string itemQuery) => SendAsync("sell_item", player, itemQuery);
         public Task BuyItemAsync(User player, string itemQuery) => SendAsync("buy_item", player, itemQuery);
         public Task UseItemAsync(User player, string itemQuery) => SendAsync("use_item", player, itemQuery);
@@ -87,6 +88,8 @@ namespace RavenBot.Core.Ravenfall
         public Task ValueItemAsync(User player, string itemQuery) => SendAsync("value_item", player, itemQuery);
         public Task CraftRequirementAsync(User player, string itemName) => SendAsync("req_item", player, itemName);
         public Task GetItemUsageAsync(User player, string itemName) => SendAsync("item_usage", player, itemName);
+        public Task SendChatMessageAsync(User player, string message) => SendAsync("chat_message", player, message);
+
         public Task SendPlayerTaskAsync(User player, PlayerTask task, params string[] args) => SendAsync("task", player, new PlayerTaskRequest(task.ToString(), args));
 
         public Task JoinArenaAsync(User player) => SendAsync("arena_join", player);
@@ -236,6 +239,7 @@ namespace RavenBot.Core.Ravenfall
         Task GetMaxMultiplierAsync(User author);
         Task GetVillageBoostAsync(User author);
         Task SetAllVillageHutsAsync(User author, string skill);
+        Task GetVillageStatsAsync(User author);
         Task JoinRaidAsync(User author, string code);
         Task AutoJoinRaidAsync(User player, string query);
         Task StopRaidAsync(User author);
@@ -326,6 +330,7 @@ namespace RavenBot.Core.Ravenfall
         Task TeleportAsync(User player, string island);
         Task GetStatusEffectsAsync(User player, string arguments);
         Task GetItemUsageAsync(User player, string arguments);
+        Task SendChatMessageAsync(User player, string message);
     }
 
     public interface IRavenfallClient

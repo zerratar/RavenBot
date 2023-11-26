@@ -5,6 +5,22 @@ using System.Threading.Tasks;
 
 namespace ROBot.Core.Chat.Commands
 {
+    //public class Auto : ChatCommandHandler
+    //{
+    //    public override string Category => "Events";
+    //    public override string Description => "Automatically interact with certain events.";
+    //    public override System.Collections.Generic.IReadOnlyList<ChatCommandInput> Inputs { get; } = new System.Collections.Generic.List<ChatCommandInput>
+    //    {
+    //        ChatCommandInput.Create("event", "What kind of event to interact with", "dungeon", "raid"),
+    //        ChatCommandInput.Create("action", "What kind of action", "join", "stop"),
+    //    };
+    //    public override Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
+    //    {
+    //      // Auto start new raids, dungeons every N minute or second? auto join? auto something? :)
+    //      // Auto craft? auto cook? auto brew? auto something else? All interactions costs coins
+    //    }
+    //}
+
     public class Dungeon : ChatCommandHandler
     {
         public override string Category => "Events";
@@ -29,7 +45,7 @@ namespace ROBot.Core.Chat.Commands
                         await connection[cmd].JoinDungeonAsync(player, null);
                         return;
                     }
-                    else if (cmd.Arguments.Contains("join ", System.StringComparison.OrdinalIgnoreCase))
+                    else if (cmd.Arguments.Contains("join ", System.StringComparison.OrdinalIgnoreCase) || cmd.Arguments.Contains("auto ", System.StringComparison.OrdinalIgnoreCase))
                     {
                         await connection[cmd].AutoJoinDungeonAsync(player, cmd.Arguments.Split(' ').LastOrDefault());
                     }

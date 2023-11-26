@@ -32,12 +32,17 @@ namespace ROBot.Core.Chat.Commands
                             return;
                         }
 
+                        if (arg.Equals("stats") || arg.Equals("level"))
+                        {
+                            await connection[cmd].GetVillageStatsAsync(player);
+                            return;
+                        }
+
                         await connection[cmd].SetAllVillageHutsAsync(player, cmd.Arguments);
+                        return;
                     }
-                    else
-                    {
-                        await connection[cmd].GetVillageBoostAsync(player);
-                    }
+
+                    await connection[cmd].GetVillageBoostAsync(player);
                 }
             }
         }
