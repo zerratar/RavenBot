@@ -48,7 +48,7 @@ namespace ROBot.Core.Chat.Twitch
                 else
                 {
                     var m = msg.Message;
-                    if (string.IsNullOrEmpty(m))
+                    if (string.IsNullOrEmpty(m) || m.StartsWith("!"))
                     {
                         return;
                     }

@@ -42,6 +42,9 @@ namespace ROBot.Core.Chat.Twitch
         {
             try
             {
+                if (message == null || string.IsNullOrEmpty(message.Message) || message.Message.StartsWith("!"))
+                    return true;
+
                 if (messageHandler == null)
                     messageHandler = ioc.Resolve<ITwitchChatMessageHandler>();
 
