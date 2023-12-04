@@ -48,11 +48,11 @@ namespace ROBot
 
             ioc.RegisterShared<IMessageBus, MessageBus>();
 
-//#if DEBUG && 
-//            ioc.RegisterCustomShared<IUserSettingsManager>(() => new UserSettingsManager(@"C:\Ravenfall\user-settings"));
-//#else
+            //#if DEBUG && 
+            //            ioc.RegisterCustomShared<IUserSettingsManager>(() => new UserSettingsManager(@"C:\Ravenfall\user-settings"));
+            //#else
             ioc.RegisterCustomShared<IUserSettingsManager>(() => new UserSettingsManager());
-//#endif
+            //#endif
 
             ioc.RegisterShared<IStringProvider, StringProvider>();
             ioc.RegisterShared<IStringTemplateParser, StringTemplateParser>();
@@ -92,6 +92,10 @@ namespace ROBot
             ioc.RegisterShared<IServerPacketHandlerProvider, ServerPacketHandlerProvider>();
             ioc.RegisterShared<IServerPacketSerializer, BinaryServerPacketSerializer>();
             ioc.RegisterShared<IAdminAPIEndpointServer, AdminTcpAPIEndpointServer>();
+
+            var mb = ioc.Resolve<IMessageBus>();
+
+            ioc.RegisterCustomShared<ILogger>(() => new PersistedConsoleLogger(mb));
 
             ioc.RegisterShared<ILogger, PersistedConsoleLogger>();
 

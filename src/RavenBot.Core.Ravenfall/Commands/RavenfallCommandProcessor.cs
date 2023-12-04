@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using RavenBot.Core.Handlers;
-using RavenBot.Core.Net;
 using RavenBot.Core.Ravenfall.Models;
 
 namespace RavenBot.Core.Ravenfall.Commands
@@ -32,6 +31,14 @@ namespace RavenBot.Core.Ravenfall.Commands
                 return;
             }
 
+            var player = playerProvider.Get(cmd);
+
+            if (arg.StartsWith("update"))
+            {
+                await this.game[cmd.CorrelationId].UpdateGameAsync(player);
+                return;
+            }
+
             if (arg.StartsWith("help"))
             {
                 await chat.SendReplyAsync(cmd, Localization.HELP);
@@ -40,13 +47,11 @@ namespace RavenBot.Core.Ravenfall.Commands
 
             if (arg.StartsWith("join"))
             {
-                var player = playerProvider.Get(cmd);
                 await this.game[cmd.CorrelationId].JoinAsync(player);
             }
 
             if (arg.StartsWith("task"))
             {
-                var player = playerProvider.Get(cmd);
                 var task = arg.Split(' ').LastOrDefault();
 
                 var availableTasks = Enum.GetValues(typeof(PlayerTask))

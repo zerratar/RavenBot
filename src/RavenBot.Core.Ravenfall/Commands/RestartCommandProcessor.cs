@@ -13,6 +13,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             this.game = game;
             this.playerProvider = playerProvider;
         }
+
         public override async Task ProcessAsync(IMessageChat chat, ICommand cmd)
         {
             if (!await this.game.ProcessAsync(Settings.UNITY_SERVER_PORT))

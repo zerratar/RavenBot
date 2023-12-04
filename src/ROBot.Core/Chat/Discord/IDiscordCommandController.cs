@@ -247,16 +247,20 @@ namespace ROBot.Core.Chat.Discord
 
             var targetFile = CommandDescriptorsFile;
 
-//#if DEBUG
-//            targetFile = @"C:\git\RavenNest\src\generated-data\commands.json";
-//#endif
+            //#if DEBUG
+            //            targetFile = @"C:\git\RavenNest\src\generated-data\commands.json";
+            //#endif
 
-            System.IO.File.WriteAllText(targetFile, JsonConvert.SerializeObject(cmds, Formatting.Indented, new JsonSerializerSettings()
+            var dir = System.IO.Path.GetDirectoryName(targetFile);
+            if (System.IO.Directory.Exists(dir))
             {
-                Converters = new List<JsonConverter> { new Newtonsoft.Json.Converters.StringEnumConverter() },
-                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                NullValueHandling = NullValueHandling.Ignore,
-            }));
+                System.IO.File.WriteAllText(targetFile, JsonConvert.SerializeObject(cmds, Formatting.Indented, new JsonSerializerSettings()
+                {
+                    Converters = new List<JsonConverter> { new Newtonsoft.Json.Converters.StringEnumConverter() },
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                    NullValueHandling = NullValueHandling.Ignore,
+                }));
+            }
         }
 
         public IReadOnlyList<SlashCommandProperties> GetCommandDescriptors()

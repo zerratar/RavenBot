@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Numerics;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using RavenBot.Core.Net;
 using RavenBot.Core.Ravenfall.Models;
@@ -137,9 +139,55 @@ namespace RavenBot.Core.Ravenfall
         public Task PromoteClanMemberAsync(User player, User targetPlayer, string argument) => SendAsync("clan_promote", player, new Arguments(targetPlayer, argument));
         public Task DemoteClanMemberAsync(User player, User targetPlayer, string argument) => SendAsync("clan_demote", player, new Arguments(targetPlayer, argument));
 
-        public Task RestartGameAsync(User sender)
+        public async Task RestartGameAsync(User player)
         {
-            return Task.CompletedTask; // not supported here.
+            await SendAsync("restart", player);
+
+            var ravenfallProcesses = System.Diagnostics.Process.GetProcessesByName("Ravenfall.exe");
+            if (ravenfallProcesses.Length == 0)
+            {
+                //logger.WriteWarning("User issued !restart command but no Ravenfall is seemingly running.");
+                return;
+            }
+
+            //logger.WriteWarning("Sending restart command to game...");
+
+            var rf = ravenfallProcesses.FirstOrDefault();
+
+            //logger.WriteWarning("Waiting for game to exit..");
+            try
+            {
+                var a = rf.WaitForExitAsync();
+                var b = Task.Delay(10000);
+                await Task.WhenAny(a, b);
+            }
+            catch
+            {
+                //logger.WriteWarning("Error occurred waiting for game to exit. We will wait 5s before attempting to start the game.");
+                await Task.Delay(5000);
+
+            }
+
+            if (IsRavenfallRunning())
+            {
+                //logger.WriteWarning("Game is still running. Unable to restart game");
+                return;
+            }
+            /*
+                Now we need to wait for the game to be completely exited so we can try and start it again.
+             */
+
+        }
+
+        private bool IsRavenfallRunning()
+        {
+            var ravenfallProcesses = System.Diagnostics.Process.GetProcessesByName("Ravenfall.exe");
+            if (ravenfallProcesses.Length == 0)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         private Task SendAsync(string type, User sender)

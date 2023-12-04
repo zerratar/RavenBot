@@ -5,10 +5,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ROBot.API
 {
-    public class PersistedConsoleLogger : ILogger, IDisposable
+    public class PersistedConsoleLogger : ILogger, RavenBot.Core.ILogger, IDisposable
     {
         const string logsDir = "../logs";
         const double logsLifespanDays = 7;
@@ -100,6 +101,27 @@ namespace ROBot.API
             logger.Log(logLevel, eventId, state, exception, formatter);
             var message = formatter != null ? formatter(state, exception) : state.ToString();
             PersistLine(message, logLevel);
+        }
+
+
+        public void WriteMessage(string message)
+        {
+            this.LogInformation(message);
+        }
+
+        public void WriteError(string error)
+        {
+            this.LogError(error);
+        }
+
+        public void WriteDebug(string message)
+        {
+            this.LogDebug(message);
+        }
+
+        public void WriteWarning(string message)
+        {
+            this.LogWarning(message);
         }
 
         public bool IsEnabled(LogLevel logLevel) => logger.IsEnabled(logLevel);
