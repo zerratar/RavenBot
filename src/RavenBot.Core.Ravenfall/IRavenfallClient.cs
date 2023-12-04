@@ -50,6 +50,7 @@ namespace RavenBot.Core.Ravenfall
         public Task AutoJoinDungeonAsync(User player, string code) => SendAsync("dungeon_auto", player, code);
         public Task JoinDungeonAsync(User player, string code) => SendAsync("dungeon_join", player, code);
         public Task ReloadGameAsync(User player) => SendAsync("reload", player);
+        public Task UpdateGameAsync(User player) => SendAsync("update", player);
         public Task GetMaxMultiplierAsync(User player) => SendAsync("multiplier", player);
         public Task EquipAsync(User player, string pet) => SendAsync("equip", player, pet);
         public Task EnchantAsync(User player, string item) => SendAsync("enchant", player, item);
@@ -291,6 +292,8 @@ namespace RavenBot.Core.Ravenfall
         Task ResetTicTacToeAsync(User author);
         Task ResetPetRacingAsync(User author);
         Task PlayPetRacingAsync(User author);
+
+        Task UpdateGameAsync(User player);
 
         // KEEP ALIVE
         Task Ping(int correlationId);

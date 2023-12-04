@@ -74,6 +74,7 @@ namespace RavenBot
             Register<PetCommandProcessor>(commandBindingProvider.Get("pet"));
             Register<MultiplierCommandProcessor>(commandBindingProvider.Get("multiplier"));
             Register<ReloadCommandProcessor>(commandBindingProvider.Get("reload"));
+            Register<UpdateCommandProcessor>(commandBindingProvider.Get("update"));
             Register<RestartCommandProcessor>(commandBindingProvider.Get("restart"));
 
             Register<UnequipCommandProcessor>(commandBindingProvider.Get("unequip"));
