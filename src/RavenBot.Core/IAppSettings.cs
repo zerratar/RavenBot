@@ -2,8 +2,10 @@
 {
     public interface IAppSettings
     {
-        string TwitchBotUsername { get; }
-        string TwitchBotAuthToken { get; }
-        string TwitchChannel { get; }
+        string TwitchBotUsername { get; set; }
+        string TwitchBotAuthToken { get; set; }
+        string TwitchChannel { get; set; }
+
+        void Save();
     }
 }

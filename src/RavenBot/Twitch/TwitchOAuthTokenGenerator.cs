@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿#if WINDOWS
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -74,7 +75,8 @@ namespace RavenBot.Twitch
                     if (listener == null || !listener.IsListening)
                     {
                         listener = new HttpListener();
-                        listener.Prefixes.Add("http://*:8182/");
+                        //listener.Prefixes.Add("http://*:8182/");
+                        listener.Prefixes.Add("http://127.0.0.1:8182/");
                         listener.Start();
                     }
 
@@ -200,3 +202,4 @@ namespace RavenBot.Twitch
         public string User { get; set; }
     }
 }
+#endif

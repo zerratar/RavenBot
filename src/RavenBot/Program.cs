@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
 using RavenBot.Core;
 using RavenBot.Core.Chat.Twitch;
 using RavenBot.Core.Handlers;
 using RavenBot.Core.Net;
 using RavenBot.Core.Ravenfall;
 using RavenBot.Core.Templating;
+using System.Windows.Forms;
 using RavenBot.Forms;
 using Shinobytes.Core;
 using ConsoleLogger = RavenBot.Core.ConsoleLogger;
@@ -65,16 +65,15 @@ namespace RavenBot
 
 
             var appSettings = ioc.Resolve<IAppSettings>();
+
             if (string.IsNullOrEmpty(appSettings.TwitchBotUsername) || string.IsNullOrEmpty(appSettings.TwitchBotAuthToken))
             {
                 Application.SetHighDpiMode(HighDpiMode.SystemAware);
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
                 Application.Run(new SettingsConfigurationForm());
-
                 ioc.ReplaceSharedInstance(new AppSettingsProvider().Get());
             }
-
 
             using (var cmdListener = ioc.Resolve<ITwitchBot>())
             {

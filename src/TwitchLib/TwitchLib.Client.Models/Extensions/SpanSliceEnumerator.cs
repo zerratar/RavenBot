@@ -11,7 +11,6 @@ internal ref struct SpanSliceEnumerator
     {
         _span = span;
         _char = @char;
-        Current = span;
     }
 
     public SpanSliceEnumerator(string str, char @char) : this(str.AsSpan(), @char)

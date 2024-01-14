@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace TwitchLib.Client.Extensions
 {
-    public static class SplitExtensions
+    internal static class SplitExtensions
     {
         /// <summary>
         /// Splits the string into two parts at the first occurrence of a separator.
@@ -13,7 +13,7 @@ namespace TwitchLib.Client.Extensions
         /// <param name="separator">Separator value</param>
         /// <returns>A split pair of Segment and Remainder, deconstructible with tuple pattern.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySplitPair<char> SplitFirst(this string source, char separator)
+        internal static ReadOnlySplitPair<char> SplitFirst(this string source, char separator)
         {
             return SplitFirst(source.AsSpan(), separator);
         }
@@ -27,7 +27,7 @@ namespace TwitchLib.Client.Extensions
         /// <param name="separator">Separator value</param>
         /// <returns>A split pair of Segment and Remainder, deconstructible with tuple pattern.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySplitPair<T> SplitFirst<T>(this ReadOnlySpan<T> source, T separator)
+        internal static ReadOnlySplitPair<T> SplitFirst<T>(this ReadOnlySpan<T> source, T separator)
             where T : IEquatable<T>
         {
             var separatorIndex = source.IndexOf(separator);
@@ -43,7 +43,7 @@ namespace TwitchLib.Client.Extensions
         /// <param name="separator">Separator value</param>
         /// <returns>A split pair of Segment and Remainder, deconstructible with tuple pattern.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySplitPair<char> SplitLast(this string source, char separator)
+        internal static ReadOnlySplitPair<char> SplitLast(this string source, char separator)
         {
             return SplitLast(source.AsSpan(), separator);
         }
@@ -57,7 +57,7 @@ namespace TwitchLib.Client.Extensions
         /// <param name="separator">Separator value</param>
         /// <returns>A split pair of Segment and Remainder, deconstructible with tuple pattern.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySplitPair<T> SplitLast<T>(this ReadOnlySpan<T> source, T separator)
+        internal static ReadOnlySplitPair<T> SplitLast<T>(this ReadOnlySpan<T> source, T separator)
             where T : IEquatable<T>
         {
             var separatorIndex = source.LastIndexOf(separator);
@@ -66,12 +66,12 @@ namespace TwitchLib.Client.Extensions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySplitPair<T> SplitNotFound<T>(this ReadOnlySpan<T> source)
+        internal static ReadOnlySplitPair<T> SplitNotFound<T>(this ReadOnlySpan<T> source)
         {
             return new(source, source.Length, 0);
         }
 
-        public readonly ref struct ReadOnlySplitPair<T>
+        internal readonly ref struct ReadOnlySplitPair<T>
         {
             private readonly ReadOnlySpan<T> _source;
             private readonly int _offset;

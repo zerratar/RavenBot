@@ -340,7 +340,7 @@ namespace RavenBot
 
             if (client.JoinedChannels.Count > 0)
             {
-                client.SendMessage(channel, msg);
+                await client.SendMessageAsync(channel, msg);
             }
         }
 
@@ -376,7 +376,7 @@ namespace RavenBot
                     null,
                     e.ReSubscriber.IsModerator,
                     e.ReSubscriber.IsSubscriber,
-                    e.ReSubscriber.Months,
+                    e.ReSubscriber.MsgParamCumulativeMonths,
                     false));
 
             //this.Broadcast("", Localization.Twitch.THANK_YOU_RESUB, e.ReSubscriber.DisplayName);

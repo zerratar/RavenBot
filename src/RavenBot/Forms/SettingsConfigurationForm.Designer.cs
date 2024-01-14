@@ -1,5 +1,4 @@
-﻿
-namespace RavenBot.Forms
+﻿namespace RavenBot.Forms
 {
     partial class SettingsConfigurationForm
     {

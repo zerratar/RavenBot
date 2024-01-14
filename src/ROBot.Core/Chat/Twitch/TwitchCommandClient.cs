@@ -549,7 +549,7 @@ namespace ROBot.Core.Chat.Twitch
                     message = mention + ", " + message;
                 }
 
-                client.SendMessage(channel.Name, message);
+                await client.SendMessageAsync(channel.Name, message);
                 return;
             }
 
@@ -647,7 +647,7 @@ namespace ROBot.Core.Chat.Twitch
             messageBus.Send(nameof(UserSubscriptionEvent),
                  new UserSubscriptionEvent(
                      "twitch", e.Channel, e.ReSubscriber.UserId, e.ReSubscriber.Login, e.ReSubscriber.DisplayName, null,
-                     e.ReSubscriber.IsModerator, e.ReSubscriber.IsSubscriber, e.ReSubscriber.Months, false));
+                     e.ReSubscriber.IsModerator, e.ReSubscriber.IsSubscriber, e.ReSubscriber.MsgParamCumulativeMonths, false));
         }
 
         private async Task OnNewSubAsync(object sender, OnNewSubscriberArgs e)

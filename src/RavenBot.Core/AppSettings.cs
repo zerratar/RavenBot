@@ -9,9 +9,15 @@
             TwitchChannel = twitchChannel;
         }
 
-        public string TwitchBotUsername { get; }
-        public string TwitchBotAuthToken { get; }
+        public string TwitchBotUsername { get; set; }
+        public string TwitchBotAuthToken { get; set; }
 
-        public string TwitchChannel { get; }
+        public string TwitchChannel { get; set; }
+
+        public void Save()
+        {
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(this);
+            System.IO.File.WriteAllText("settings.json", json);
+        }
     }
 }

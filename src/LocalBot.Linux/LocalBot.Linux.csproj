@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TargetName>RavenBot</TargetName>
+    <AssemblyName>RavenBot</AssemblyName>
+    <RootNamespace>RavenBot</RootNamespace>
+    <PackageId>$(AssemblyName)</PackageId>
+  </PropertyGroup>
+
+  <Import Project="..\LocalBot.Shared\LocalBot.Shared.projitems" Label="Shared" />
+
+  <ItemGroup>
+    <ProjectReference Include="..\RavenBot.Core.Ravenfall\RavenBot.Core.Ravenfall.csproj" />
+    <ProjectReference Include="..\RavenBot.Core\RavenBot.Core.csproj" />
+    <ProjectReference Include="..\Shinobytes.Ravenfall.Core\Shinobytes.Core.csproj" />
+    <ProjectReference Include="..\TwitchLib\TwitchLib.Client\TwitchLib.Client.csproj" />
+  </ItemGroup>
+
+</Project>

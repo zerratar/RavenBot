@@ -25,11 +25,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ROBot.Tests", "src\Tests\RO
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TwitchLib", "TwitchLib", "{CD9617E2-30F0-43ED-B7A9-6E1D479557E0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwitchLib.Client.Enums", "src\TwitchLib\TwitchLib.Client.Enums\TwitchLib.Client.Enums.csproj", "{ED2C9AFD-4EB0-4685-AFDF-04EE17F9B3CF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TwitchLib.Client.Enums", "src\TwitchLib\TwitchLib.Client.Enums\TwitchLib.Client.Enums.csproj", "{ED2C9AFD-4EB0-4685-AFDF-04EE17F9B3CF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwitchLib.Client.Models", "src\TwitchLib\TwitchLib.Client.Models\TwitchLib.Client.Models.csproj", "{A1EDC5AB-D575-4A3E-BD87-2D681244A956}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TwitchLib.Client.Models", "src\TwitchLib\TwitchLib.Client.Models\TwitchLib.Client.Models.csproj", "{A1EDC5AB-D575-4A3E-BD87-2D681244A956}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwitchLib.Client", "src\TwitchLib\TwitchLib.Client\TwitchLib.Client.csproj", "{FE40B52A-198A-45CD-BD60-1DB9BAD0E6AB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TwitchLib.Client", "src\TwitchLib\TwitchLib.Client\TwitchLib.Client.csproj", "{FE40B52A-198A-45CD-BD60-1DB9BAD0E6AB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LocalBot.Linux", "src\LocalBot.Linux\LocalBot.Linux.csproj", "{E8FDE56B-ED08-4053-BF2F-60153A2F5609}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "LocalBot.Shared", "src\LocalBot.Shared\LocalBot.Shared.shproj", "{89E229B2-9D14-4500-A2AE-246319917B25}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -127,6 +131,14 @@ Global
 		{FE40B52A-198A-45CD-BD60-1DB9BAD0E6AB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FE40B52A-198A-45CD-BD60-1DB9BAD0E6AB}.Release|x64.ActiveCfg = Release|Any CPU
 		{FE40B52A-198A-45CD-BD60-1DB9BAD0E6AB}.Release|x64.Build.0 = Release|Any CPU
+		{E8FDE56B-ED08-4053-BF2F-60153A2F5609}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E8FDE56B-ED08-4053-BF2F-60153A2F5609}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E8FDE56B-ED08-4053-BF2F-60153A2F5609}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E8FDE56B-ED08-4053-BF2F-60153A2F5609}.Debug|x64.Build.0 = Debug|Any CPU
+		{E8FDE56B-ED08-4053-BF2F-60153A2F5609}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E8FDE56B-ED08-4053-BF2F-60153A2F5609}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E8FDE56B-ED08-4053-BF2F-60153A2F5609}.Release|x64.ActiveCfg = Release|Any CPU
+		{E8FDE56B-ED08-4053-BF2F-60153A2F5609}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -144,5 +156,10 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7ACE9C06-C6C2-490E-9DCF-292B46D496EF}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		src\LocalBot.Shared\LocalBot.Shared.projitems*{89e229b2-9d14-4500-a2ae-246319917b25}*SharedItemsImports = 13
+		src\LocalBot.Shared\LocalBot.Shared.projitems*{bfc65109-89fe-40d5-8834-09a27de438f3}*SharedItemsImports = 5
+		src\LocalBot.Shared\LocalBot.Shared.projitems*{e8fde56b-ed08-4053-bf2f-60153a2f5609}*SharedItemsImports = 5
 	EndGlobalSection
 EndGlobal
