@@ -361,7 +361,7 @@ namespace RavenBot
              
              */
 
-            client = new TwitchClient(new WebSocketClient(options));
+            client = new TwitchClient(new TcpClient(options));// //WebSocketClient(options));
         }
 
         private async Task OnReSubAsync(object sender, OnReSubscriberArgs e)

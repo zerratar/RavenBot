@@ -148,7 +148,6 @@ namespace ROBot.Core.Chat.Twitch
 
         private void Unsubscribe()
         {
-
             if (client != null)
             {
                 //TwitchLib.Client
@@ -190,18 +189,19 @@ namespace ROBot.Core.Chat.Twitch
         {
             if (!kernel.Started) kernel.Start();
 
-            Unsubscribe(); //Abby: I don't understand why we're unsubscribing, hee
-                           //Karl: It is to make sure we there are no references left dangling
-                           //      Older version of .NET used to cause the client object to never
-                           //      be garbage collected since there were references to a live object (this class's methods)
-                           // one option is to never create a new client here
+            // if we already have a client
+            // clear previous event references to allow the
+            // garbage collector to clean up the old client
+            if (client != null)
+            {
+                Unsubscribe();
+            }
+
             try
             {
                 logger.LogInformation("[TWITCH] Starting...");
 
                 client = new TwitchClient(new TcpClient(new ClientOptions(clientType: ClientType.Chat)));
-
-                //client.AutoReListenOnException = true;
 
                 var credentials = credentialsProvider.Get();
 
@@ -219,7 +219,7 @@ namespace ROBot.Core.Chat.Twitch
             }
         }
 
-        public void Stop()
+        public async void Stop()
         {
             if (kernel.Started) kernel.Stop();
             if (client != null)
@@ -231,7 +231,7 @@ namespace ROBot.Core.Chat.Twitch
 
             allowReconnection = false;
             if (client.IsConnected)
-                client.DisconnectAsync();
+                await client.DisconnectAsync();
 
             pubSubManager.Dispose();
 
