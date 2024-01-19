@@ -29,7 +29,7 @@ namespace ROBot.Core.Chat.Commands
                 var connection = game.GetConnection(session);
                 if (connection != null)
                 {
-                    if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator && !cmd.Sender.IsSubscriber)
+                    if (!cmd.Sender.IsGameAdmin && !cmd.Sender.IsGameModerator && !cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator && !cmd.Sender.IsSubscriber)
                     {
                         await chat.SendReplyAsync(cmd, Localization.OBSERVE_PERM);
                         return;

@@ -11,6 +11,6 @@ namespace ROBot.Core.Chat.Twitch
         Task JoinChannelAsync(string channel);
         Task LeaveChannelAsync(string channel);
         bool InChannel(string name);
-        PubSubState GetPubSubState(ICommandChannel channel);
+        //PubSubState GetPubSubState(ICommandChannel channel);
     }
 }

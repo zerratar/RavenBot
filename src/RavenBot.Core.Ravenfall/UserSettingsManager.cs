@@ -125,6 +125,11 @@ namespace RavenBot.Core.Ravenfall
             return settings;
         }
 
+        public IReadOnlyList<UserSettings> GetAll()
+        {
+            return dict.Values.ToList();
+        }
+
         public T Get<T>(Guid userId, string key)
         {
             return Get(userId).Get<T>(key);
@@ -148,10 +153,11 @@ namespace RavenBot.Core.Ravenfall
         public void Set(Guid userId, Dictionary<string, object> userSettings)
         {
             var settings = Get(userId);
-            foreach(var s in userSettings)
+            foreach (var s in userSettings)
             {
                 settings.Set(s.Key, s.Value);
             }
         }
+
     }
 }

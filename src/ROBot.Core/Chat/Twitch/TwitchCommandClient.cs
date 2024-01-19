@@ -16,6 +16,7 @@ using ROBot.Core.Stats;
 using Shinobytes.Core;
 using TwitchLib.Client;
 using TwitchLib.Client.Events;
+using TwitchLib.Client.Models;
 using TwitchLib.Communication.Clients;
 using TwitchLib.Communication.Enums;
 using TwitchLib.Communication.Events;
@@ -63,6 +64,8 @@ namespace ROBot.Core.Chat.Twitch
         //private long connectionCurrentErrorCount = 0;
         //private long connectionCurrentAttemptCount = 0;
         private bool attemptingReconnection = false;
+        private bool rateLimited;
+        private readonly List<string> rateLimitedChannels = new List<string>();
 
         public TwitchCommandClient(
             ILogger logger,
@@ -98,16 +101,16 @@ namespace ROBot.Core.Chat.Twitch
             return pubSubManager.GetActivationLink();
         }
 
-        public PubSubState GetPubSubState(ICommandChannel channel)
-        {
-            var client = pubSubManager.GetPubSubClient(channel.Name);
-            if (client == null)
-            {
-                return PubSubState.Disconnected;
-            }
+        //public PubSubState GetPubSubState(ICommandChannel channel)
+        //{
+        //    var client = pubSubManager.GetPubSubClient(channel.Name);
+        //    if (client == null)
+        //    {
+        //        return PubSubState.Disconnected;
+        //    }
 
-            return client.State;
-        }
+        //    return client.State;
+        //}
 
         /*
          * Object Logic
@@ -460,13 +463,25 @@ namespace ROBot.Core.Chat.Twitch
                 var message = cmd.Message;
                 if (message.Recipent.Platform == "system")
                 {
-                    // system message
+                    // system message, to ensure we dont get rate limited
+
+                    if (rateLimited && rateLimitedChannels.Contains(channel.Name))
+                    {
+                        // wait 250ms before sending
+                        await Task.Delay(250);
+                    }
+
                     await SendMessageAsync(channel, message.Format, message.Args);
                     return;
                 }
 
                 if (message.Recipent.Platform == "twitch")
                 {
+                    if (rateLimited && rateLimitedChannels.Contains(channel.Name))
+                    {
+                        // wait 250ms before sending
+                        await Task.Delay(250);
+                    }
                     await SendReplyAsync(channel, message.Format, message.Args, message.CorrelationId, message.Recipent.PlatformUserName);
                 }
 
@@ -478,6 +493,13 @@ namespace ROBot.Core.Chat.Twitch
 
         private ICommandChannel TryResolveChannel(string name)
         {
+            var settings = settingsManager.GetAll();
+            var s = settings.FirstOrDefault(x => x.TwitchUserName != null && x.TwitchUserName.ToLower() == name);
+            if (s != null)
+            {
+                return new TwitchCommand.TwitchChannel(ulong.Parse(s.TwitchUserId), name);
+            }
+
             return new TwitchCommand.TwitchChannel(name);
         }
 
@@ -716,7 +738,9 @@ namespace ROBot.Core.Chat.Twitch
         private async Task OnRateLimitAsync(object sender, NoticeEventArgs e)
         {
             stats.AddLastRateLimit(e);
-            logger.LogError("[TWITCH] RateLimited (OnRateLimitArgs: " + e.ToString() + ")");
+            logger.LogError("[TWITCH] RateLimited (Channel: " + e.Channel + ", Message: " + e.Message + ")");
+            rateLimited = true;
+            rateLimitedChannels.Add(e.Channel);
         }
 
         private async Task OnConnectedAsync(object sender, TwitchLib.Client.Events.OnConnectedEventArgs e)

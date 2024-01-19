@@ -178,7 +178,7 @@ namespace ROBot
         {
             botStats.ConnectionCount = (UInt32)botServer.AllConnections().Count;
             botStats.SessionCount = (UInt32)sessionManager.All().Count;
-            return "[Clients: " + botStats.SessionCount + "/" + botStats.ConnectionCount + "] ";
+            return "[Connections: " + botStats.ConnectionCount + "] [Sessions: " + botStats.SessionCount + "] ";
         }
 
         private string GetUptime()

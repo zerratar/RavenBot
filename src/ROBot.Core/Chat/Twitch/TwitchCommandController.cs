@@ -18,6 +18,7 @@ namespace ROBot.Core.Chat.Twitch
     {
         private const string ChatMessageHandlerName = "MessageHandler";
         private readonly ILogger logger;
+        //private readonly IUserProvider userProvider;
         private readonly IoC ioc;
 
         private readonly ConcurrentDictionary<string, Type> handlerLookup = new ConcurrentDictionary<string, Type>();
@@ -29,9 +30,11 @@ namespace ROBot.Core.Chat.Twitch
 
         public TwitchCommandController(
             ILogger logger,
+            //IUserProvider userProvider,
             IoC ioc)
         {
             this.logger = logger;
+            //this.userProvider = userProvider;
             this.ioc = ioc;
 
             RegisterCommandHandlers();
@@ -133,8 +136,18 @@ namespace ROBot.Core.Chat.Twitch
                 var command = reward.RewardRedeemed.Redemption.Reward.Title;
                 var cmdParts = command.ToLower().Split(' ');
 
-                var channel = new TwitchCommand.TwitchChannel(channelId, arguments);
+                //var channelUser = userProvider.GetByUserId(channelId.ToString());
+                //channelUser?.Username ?? 
+
+                var settings = userSettingsManager.GetAll();
+                var s = settings.FirstOrDefault(x => x.TwitchUserId != null && x.TwitchUserId == reward.ChannelId);
+                var channel = new TwitchCommand.TwitchChannel(channelId,s?.TwitchUserName??arguments);
                 var session = game.GetSession(channel);
+                if (session == null)
+                {
+                    logger.LogError("Handle Channel Point Reward Failed: Session could not be found matching Twitch User Id: " + channelId + ", Ravenfall disconnected? Command: " + command + ", argument: " + arguments);
+                    return false;
+                }
 
                 // In case we use brackets to identify a command
                 cmd = cmdParts.FirstOrDefault(x => x.Contains("["));

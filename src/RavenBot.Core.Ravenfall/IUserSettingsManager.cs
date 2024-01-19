@@ -15,5 +15,6 @@ namespace RavenBot.Core.Ravenfall
 
         UserSettings Get(string platformId, string platform);
         Guid ResolveAccountId(string platformId, string platform);
+        IReadOnlyList<UserSettings> GetAll();
     }
 }

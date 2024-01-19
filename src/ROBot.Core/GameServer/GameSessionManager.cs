@@ -91,7 +91,9 @@ namespace ROBot.Core.GameServer
         {
             lock (sessionMutex)
             {
-                return sessions.FirstOrDefault(x => x.Channel.Id == id);
+                if (id == 0) return null;
+                var session = sessions.FirstOrDefault(x => (x.Channel != null && x.Channel.Id == id) || (x.Owner != null && x.Owner.PlatformId == id.ToString()));
+                return session;
             }
         }
 

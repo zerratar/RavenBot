@@ -21,6 +21,10 @@ namespace ROBot.Core.Chat.Twitch.PubSub
         public bool IsConnected => client != null && state >= PubSubState.Connected;
         public bool IsReady => client != null && state == PubSubState.Ready;
         public bool IsConnecting => state == PubSubState.Connecting || state == PubSubState.Authenticating;
+
+        public bool ClientCreated { get; private set; }
+        public int ClientInstanceCounter { get; private set; }
+
         private bool badAuth;
 
         public TwitchPubSubClient(ILogger logger, TwitchPubSubData pubsub)
@@ -33,6 +37,8 @@ namespace ROBot.Core.Chat.Twitch.PubSub
         }
 
         public PubSubState State => state;
+
+        
 
         public void UpdatePubSubData(TwitchPubSubData pubsubData)
         {
@@ -83,6 +89,8 @@ namespace ROBot.Core.Chat.Twitch.PubSub
             client.OnListenResponse += Client_OnListenResponse;
             client.OnChannelPointsRewardRedeemed += Client_OnChannelPointsRewardRedeemed;
             state = PubSubState.Disconnected;
+            ClientInstanceCounter++;
+            ClientCreated = true;
         }
 
         private void Connect()
@@ -152,6 +160,9 @@ namespace ROBot.Core.Chat.Twitch.PubSub
                 state = PubSubState.Authenticating;
 
                 client.SendTopics(pubsub.PubSubToken);
+
+                logger.LogInformation("[TWITCH] Connected to PubSub Service (Username: " + pubsub.SessionInfo.Owner.Username + ")");
+
                 //logger.LogDebug("[TWITCH] Sent PubSub Topics (Username: " + pubsub.SessionInfo.Owner.Username + " Token: " + pubsub.PubSubToken + ")");
             }
             catch (Exception exc)
@@ -194,13 +205,14 @@ namespace ROBot.Core.Chat.Twitch.PubSub
             {
                 return;
             }
+            
+            ClientInstanceCounter--;
 
             UnsubscribeClient();
             disposed = true;
             state = PubSubState.Disposed;
 
             logger.LogDebug("[TWITCH] PubSub Disposed (Username: " + pubsub.SessionInfo.Owner.Username + ")");
-
 
             try
             {

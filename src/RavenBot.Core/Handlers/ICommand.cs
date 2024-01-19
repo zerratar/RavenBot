@@ -21,8 +21,8 @@
 
     public interface ICommandChannel
     {
-        public ulong Id { get; }
-        public string Name { get; }
+        public ulong Id { get; set; }
+        public string Name { get; set; }
     }
 
     public interface ICommandSender

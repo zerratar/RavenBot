@@ -131,8 +131,8 @@ namespace RavenBot.Core.Chat.Discord
 
         public class DiscordChannel : ICommandChannel
         {
-            public ulong Id { get; }
-            public string Name { get; }
+            public ulong Id { get; set; }
+            public string Name { get; set; }
             public IMessageChannel Channel { get; }
 
             public DiscordChannel(IMessageChannel channel)

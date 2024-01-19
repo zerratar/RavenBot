@@ -31,9 +31,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TwitchLib.Client.Models", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TwitchLib.Client", "src\TwitchLib\TwitchLib.Client\TwitchLib.Client.csproj", "{FE40B52A-198A-45CD-BD60-1DB9BAD0E6AB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LocalBot.Linux", "src\LocalBot.Linux\LocalBot.Linux.csproj", "{E8FDE56B-ED08-4053-BF2F-60153A2F5609}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LocalBot.Linux", "src\LocalBot.Linux\LocalBot.Linux.csproj", "{E8FDE56B-ED08-4053-BF2F-60153A2F5609}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "LocalBot.Shared", "src\LocalBot.Shared\LocalBot.Shared.shproj", "{89E229B2-9D14-4500-A2AE-246319917B25}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TwitchLib.Communication", "src\TwitchLib\TwitchLib.Communication\TwitchLib.Communication.csproj", "{E63C5937-E160-413C-A67C-6C34292B0CCB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -139,6 +141,14 @@ Global
 		{E8FDE56B-ED08-4053-BF2F-60153A2F5609}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E8FDE56B-ED08-4053-BF2F-60153A2F5609}.Release|x64.ActiveCfg = Release|Any CPU
 		{E8FDE56B-ED08-4053-BF2F-60153A2F5609}.Release|x64.Build.0 = Release|Any CPU
+		{E63C5937-E160-413C-A67C-6C34292B0CCB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E63C5937-E160-413C-A67C-6C34292B0CCB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E63C5937-E160-413C-A67C-6C34292B0CCB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E63C5937-E160-413C-A67C-6C34292B0CCB}.Debug|x64.Build.0 = Debug|Any CPU
+		{E63C5937-E160-413C-A67C-6C34292B0CCB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E63C5937-E160-413C-A67C-6C34292B0CCB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E63C5937-E160-413C-A67C-6C34292B0CCB}.Release|x64.ActiveCfg = Release|Any CPU
+		{E63C5937-E160-413C-A67C-6C34292B0CCB}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -153,6 +163,7 @@ Global
 		{ED2C9AFD-4EB0-4685-AFDF-04EE17F9B3CF} = {CD9617E2-30F0-43ED-B7A9-6E1D479557E0}
 		{A1EDC5AB-D575-4A3E-BD87-2D681244A956} = {CD9617E2-30F0-43ED-B7A9-6E1D479557E0}
 		{FE40B52A-198A-45CD-BD60-1DB9BAD0E6AB} = {CD9617E2-30F0-43ED-B7A9-6E1D479557E0}
+		{E63C5937-E160-413C-A67C-6C34292B0CCB} = {CD9617E2-30F0-43ED-B7A9-6E1D479557E0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7ACE9C06-C6C2-490E-9DCF-292B46D496EF}
