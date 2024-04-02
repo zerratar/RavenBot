@@ -28,12 +28,12 @@ namespace RavenBot.Core.Ravenfall.Commands
                 return;
             }
 
-            if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator && !cmd.Sender.IsSubscriber)
+            if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator && !cmd.Sender.IsSubscriber && !cmd.Sender.IsVip)
             {
                 await chat.SendReplyAsync(cmd, Localization.OBSERVE_PERM);
                 return;
             }
-            var isSubscriber = cmd.Sender.IsSubscriber && !cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator;
+            var isSubscriber = cmd.Sender.IsSubscriber && !cmd.Sender.IsBroadcaster && !cmd.Sender.IsModerator && !cmd.Sender.IsVip;
             if (isSubscriber)
             {
                 var user = userStore.Get(cmd.Sender.Username);

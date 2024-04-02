@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using RavenBot.Core.Handlers;
-using RavenBot.Core.Ravenfall.Models;
 
 namespace RavenBot.Core.Ravenfall.Commands
 {

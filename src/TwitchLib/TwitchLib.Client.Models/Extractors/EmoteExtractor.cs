@@ -21,29 +21,21 @@ namespace TwitchLib.Client.Models.Extractors
                 // 25:5-9,28-32 => 5-9  28-32
                 foreach (var emote in new SpanSliceEnumerator(emoteData.Slice(index + 1), ','))
                 {
-                    try
-                    {
-                        index = emote.IndexOf('-');
-                        var startSlice = emote.Slice(0, index);
-                        var endSlice = emote.Slice(index + 1);
+                    index = emote.IndexOf('-');
+                    var startSlice = emote.Slice(0, index);
+                    var endSlice = emote.Slice(index + 1);
 #if NETSTANDARD2_0
                     var start = int.Parse(startSlice.ToString());
                     var end = int.Parse(endSlice.ToString());
 #else
-                        var start = int.Parse(startSlice);
-                        var end = int.Parse(endSlice);
+                    var start = int.Parse(startSlice);
+                    var end = int.Parse(endSlice);
 #endif
-                        int trueStart = messageInfo.SubstringByTextElements(0, start + 1).Length - 1;
-                        // king_ekdar Bear hugs @DrKrabby HAPPY BIRTHDAY with lots of love GivePLZ MonoSoga ~💕 ~❤️ ~ LuvHearts
-                        string name = messageInfo.SubstringByTextElements(start, end - start + 1);
-                        int trueEnd = trueStart + name.Length - 1;
+                    int trueStart = messageInfo.SubstringByTextElements(0, start + 1).Length - 1;
+                    string name = messageInfo.SubstringByTextElements(start, end - start + 1);
+                    int trueEnd = trueStart + name.Length - 1;
 
-                        emotes.Add(new(emoteId, name, trueStart, trueEnd));
-                    }
-                    catch
-                    {
-                        break;
-                    }
+                    emotes.Add(new(emoteId, name, trueStart, trueEnd));
                 }
             }
             return emotes;

@@ -211,9 +211,9 @@ namespace RavenBot
                     e.ChatMessage.Id,
                     e.ChatMessage.Username,
                     e.ChatMessage.DisplayName,
-                    e.ChatMessage.IsModerator,
-                    e.ChatMessage.IsSubscriber,
-                    e.ChatMessage.IsVip,
+                    e.ChatMessage.UserDetail.IsModerator,
+                    e.ChatMessage.UserDetail.IsSubscriber,
+                    e.ChatMessage.UserDetail.IsVip,
                     e.ChatMessage.Bits)
             );
 
@@ -374,8 +374,8 @@ namespace RavenBot
                     e.ReSubscriber.Login,
                     e.ReSubscriber.DisplayName,
                     null,
-                    e.ReSubscriber.IsModerator,
-                    e.ReSubscriber.IsSubscriber,
+                    e.ReSubscriber.UserDetail.IsModerator,
+                    e.ReSubscriber.UserDetail.IsSubscriber,
                     e.ReSubscriber.MsgParamCumulativeMonths,
                     false));
 
@@ -392,8 +392,8 @@ namespace RavenBot
                     e.Subscriber.Login,
                     e.Subscriber.DisplayName,
                     null,
-                    e.Subscriber.IsModerator,
-                    e.Subscriber.IsSubscriber,
+                    e.Subscriber.UserDetail.IsModerator,
+                    e.Subscriber.UserDetail.IsSubscriber,
                     1, true));
 
             //this.Broadcast("", Localization.Twitch.THANK_YOU_SUB, e.Subscriber.DisplayName);
@@ -409,8 +409,8 @@ namespace RavenBot
                     e.GiftedSubscription.Login,
                     e.GiftedSubscription.DisplayName,
                     null,
-                    e.GiftedSubscription.IsModerator,
-                    e.GiftedSubscription.IsSubscriber,
+                    e.GiftedSubscription.UserDetail.IsModerator,
+                    e.GiftedSubscription.UserDetail.IsSubscriber,
                     1, false));
 
             //this.Broadcast("", Localization.Twitch.THANK_YOU_SUB, e.GiftedSubscription.DisplayName);
@@ -425,8 +425,8 @@ namespace RavenBot
                 e.GiftedSubscription.Login,
                 e.GiftedSubscription.DisplayName,
                 e.GiftedSubscription.MsgParamRecipientId,
-                e.GiftedSubscription.IsModerator,
-                e.GiftedSubscription.IsSubscriber,
+                e.GiftedSubscription.UserDetail.IsModerator,
+                e.GiftedSubscription.UserDetail.IsSubscriber,
                 1,
                 false));
             //this.Broadcast("", Localization.Twitch.THANK_YOU_GIFT_SUB, e.GiftedSubscription.DisplayName);

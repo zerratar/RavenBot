@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using RavenBot.Core.Handlers;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -24,6 +25,8 @@ namespace ROBot.Core.GameServer
         private readonly List<IRavenfallConnection> connections = new List<IRavenfallConnection>();
         //private readonly object connectionMutex = new object();
         private readonly object SessionAuthMutex = new object();
+
+        private ConcurrentDictionary<string, RemoteEndpointStatus> remoteStatus = new();
 
         public BotServer(
             ILogger logger,
@@ -208,6 +211,18 @@ namespace ROBot.Core.GameServer
                     if (HandlePingRequest(client))
                         return;
 
+                    if (client.Client.RemoteEndPoint is IPEndPoint endpoint)
+                    {
+                        var address = endpoint.Address;
+
+                        // check if address is blacklisted or temporarily suspended (for instance: trying to reconnect too frequently)
+                        if (!CheckIfAddressIsAcceptable(address))
+                        {
+                            client.Dispose();
+                            return;
+                        }
+                    }
+
                     var connection = connectionProvider.Get(this, client);
                     if (connection == null)
                     {
@@ -216,6 +231,7 @@ namespace ROBot.Core.GameServer
 #endif
                         return;
                     }
+
 
                     logger.LogDebug("[RVNFLL] Ravenfall client connected. (EndPoint: " + connection.EndPointString + ")");
 
@@ -231,6 +247,34 @@ namespace ROBot.Core.GameServer
             {
                 logger.LogError(exc.ToString());
             }
+        }
+        private bool CheckIfAddressIsAcceptable(IPAddress address)
+        {
+            var addr = address.ToString();
+            if (!remoteStatus.TryGetValue(addr, out var status))
+            {
+                status = new RemoteEndpointStatus();
+            }
+
+            var ss = status.SampleStart;
+            var now = DateTime.UtcNow;
+
+            status.LastConnectionUtc = now;
+
+            if (now - ss > TimeSpan.FromMinutes(1))
+            {
+                status.SampleStart = now;
+                status.ConnectionTriesThisMinute = 1;
+            }
+            else
+            {
+                status.ConnectionTriesThisMinute++;
+            }
+            status.TotalCconnectionTries++;
+
+            remoteStatus[addr] = status;
+
+            return status.ConnectionTriesThisMinute < 5;
         }
 
         private bool HandlePingRequest(TcpClient client)
@@ -309,7 +353,7 @@ namespace ROBot.Core.GameServer
 
         public IGameSession GetSession(ICommandChannel channel)
         {
-            var s = sessionManager.GetByChannelId(channel.Id); 
+            var s = sessionManager.GetByChannelId(channel.Id);
             if (s == null)
             {
                 s = sessionManager.GetByName(channel.Name);
@@ -322,6 +366,14 @@ namespace ROBot.Core.GameServer
 
             return null;
         }
+    }
+
+    public struct RemoteEndpointStatus
+    {
+        public DateTime LastConnectionUtc;
+        public int TotalCconnectionTries;
+        public int ConnectionTriesThisMinute;
+        public DateTime SampleStart;
     }
 
     public enum ServerState

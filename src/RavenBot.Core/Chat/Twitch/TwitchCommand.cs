@@ -50,9 +50,9 @@ namespace RavenBot.Core.Chat.Twitch
 
             Channel = new TwitchChannel(chat.Channel);
 
-            var isVip = chat.IsVip;
-            var isModerator = chat.IsModerator;
-            var isSubscriber = chat.IsSubscriber;
+            var isVip = chat.UserDetail.IsVip;
+            var isModerator = chat.UserDetail.IsModerator;
+            var isSubscriber = chat.UserDetail.IsSubscriber;
             var isBroadcaster = chat.IsBroadcaster;
 
             if (!isBroadcaster)

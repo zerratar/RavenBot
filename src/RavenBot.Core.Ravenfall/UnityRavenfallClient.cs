@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RavenBot.Core.Chat;
 using RavenBot.Core.Chat.Twitch;
+using RavenBot.Core.Handlers;
 using RavenBot.Core.Net;
 using RavenBot.Core.Ravenfall.Models;
-using RavenBot.Core.Ravenfall.Requests;
 using Shinobytes.Core;
 
 namespace RavenBot.Core.Ravenfall
@@ -64,7 +63,7 @@ namespace RavenBot.Core.Ravenfall
             }
             this.keepAliveHandle = this.kernel.SetTimeout(KeepAlive, isConnected ? 5000 : 2000);
         }
-
+        public IRavenfallApi this[ICommand cmd] => Ref(cmd.CorrelationId);
         public IRavenfallApi this[string correlationid] => Ref(correlationid);
         public IRavenfallApi Ref(string correlationId)
         {
@@ -165,14 +164,6 @@ namespace RavenBot.Core.Ravenfall
         {
             this.requests.Enqueue(request);
         }
-    }
-
-    public class LocalGameSessionInfo
-    {
-        public Guid SessionId { get; set; }
-        public DateTime SessionStart { get; set; }
-        public User Owner { get; set; }
-        public Dictionary<string, object> Settings { get; set; }
     }
 
     //public class BroadcastMessage

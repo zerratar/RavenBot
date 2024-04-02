@@ -669,14 +669,14 @@ namespace ROBot.Core.Chat.Twitch
             messageBus.Send(nameof(UserSubscriptionEvent),
                  new UserSubscriptionEvent(
                      "twitch", e.Channel, e.ReSubscriber.UserId, e.ReSubscriber.Login, e.ReSubscriber.DisplayName, null,
-                     e.ReSubscriber.IsModerator, e.ReSubscriber.IsSubscriber, e.ReSubscriber.MsgParamCumulativeMonths, false));
+                     e.ReSubscriber.UserDetail.IsModerator, e.ReSubscriber.UserDetail.IsSubscriber, e.ReSubscriber.MsgParamCumulativeMonths, false));
         }
 
         private async Task OnNewSubAsync(object sender, OnNewSubscriberArgs e)
         {
             messageBus.Send(nameof(UserSubscriptionEvent),
                new UserSubscriptionEvent("twitch", e.Channel, e.Subscriber.UserId, e.Subscriber.Login, e.Subscriber.DisplayName,
-               null, e.Subscriber.IsModerator, e.Subscriber.IsSubscriber, 1, true));
+               null, e.Subscriber.UserDetail.IsModerator, e.Subscriber.UserDetail.IsSubscriber, 1, true));
             //this.Broadcast(e.Channel, "", Localization.Twitch.THANK_YOU_SUB, e.Subscriber.DisplayName);
         }
 
@@ -684,7 +684,7 @@ namespace ROBot.Core.Chat.Twitch
         {
             messageBus.Send(nameof(UserSubscriptionEvent),
                 new UserSubscriptionEvent("twitch", e.Channel, e.GiftedSubscription.UserId, e.GiftedSubscription.Login,
-                e.GiftedSubscription.DisplayName, null, e.GiftedSubscription.IsModerator, e.GiftedSubscription.IsSubscriber, 1, false));
+                e.GiftedSubscription.DisplayName, null, e.GiftedSubscription.UserDetail.IsModerator, e.GiftedSubscription.UserDetail.IsSubscriber, 1, false));
             //this.Broadcast(e.Channel, "", Localization.Twitch.THANK_YOU_SUB, e.GiftedSubscription.DisplayName);
         }
 
@@ -692,8 +692,8 @@ namespace ROBot.Core.Chat.Twitch
         {
             messageBus.Send(nameof(UserSubscriptionEvent),
                new UserSubscriptionEvent("twitch", e.Channel, e.GiftedSubscription.Id, e.GiftedSubscription.Login,
-               e.GiftedSubscription.DisplayName, e.GiftedSubscription.MsgParamRecipientId, e.GiftedSubscription.IsModerator,
-               e.GiftedSubscription.IsSubscriber, 1, false));
+               e.GiftedSubscription.DisplayName, e.GiftedSubscription.MsgParamRecipientId, e.GiftedSubscription.UserDetail.IsModerator,
+               e.GiftedSubscription.UserDetail.IsSubscriber, 1, false));
 
             //this.Broadcast(e.Channel, "", Localization.Twitch.THANK_YOU_GIFT_SUB, e.GiftedSubscription.DisplayName);
         }
@@ -814,7 +814,6 @@ namespace ROBot.Core.Chat.Twitch
         {
             stats.LeftChannel(e.Channel, client.JoinedChannels);
             logger.LogWarning("[TWITCH] Left Channel (Channel: " + e.Channel + ")");
-
             currentlyJoiningChannels.TryRemove(e.Channel, out _);
         }
 

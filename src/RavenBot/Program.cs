@@ -33,7 +33,7 @@ namespace RavenBot
             ioc.RegisterShared<IKernel, Kernel>();
 
 #if DEBUG
-            ioc.RegisterCustomShared<IUserSettingsManager>(() => new UserSettingsManager(@"C:\Ravenfall\user-settings"));
+            ioc.RegisterCustomShared<IUserSettingsManager>(() => new UserSettingsManager(@"G:\Ravenfall\Data\user-settings"));
 #else
             ioc.RegisterCustomShared<IUserSettingsManager>(() => new UserSettingsManager("./user-settings/"));
 #endif

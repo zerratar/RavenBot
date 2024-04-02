@@ -43,7 +43,7 @@ namespace TwitchLib.Client.Parsing
                 message = "";
             }
 
-            return new IrcMessage(rawMessage, command, [parameters, message], user, hostmask, tags);
+            return new IrcMessage(rawMessage, command, new[] { parameters, message }, user, hostmask, tags);
         }
 
         private static Dictionary<string, string>? ParseTags(ref ReadOnlySpan<char> source)
