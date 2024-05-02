@@ -22,22 +22,28 @@ namespace ROBot.Core.Chat.Commands
         {
             var channel = cmd.Channel;
             var session = game.GetSession(channel);
-            if (session != null)
+            if (session == null)
+                return;
+
+            var connection = game.GetConnection(session);
+            if (connection == null)
+                return;
+
+            var player = session.Get(cmd);
+            if (string.IsNullOrEmpty(cmd.Arguments) || !cmd.Arguments.Trim().Contains(" "))
             {
-                var connection = game.GetConnection(session);
-                if (connection != null)
-                {
-                    var player = session.Get(cmd);
-
-                    if (string.IsNullOrEmpty(cmd.Arguments) || !cmd.Arguments.Trim().Contains(" "))
-                    {
-                        await chat.SendReplyAsync(cmd, Localization.TRADE_NO_ARG, cmd.Command);
-                        return;
-                    }
-
-                    await connection[cmd].UseMarketAsync(player, cmd.Arguments);
-                }
+                await chat.SendReplyAsync(cmd, Localization.MARKET_TRADE_NO_ARG, cmd.Command);
+                return;
             }
+
+            var action = cmd.Arguments.Split(' ')[0].ToLower();
+            if (action != "buy" && action != "sell" && action != "value")
+            {
+                await chat.SendReplyAsync(cmd, Localization.MARKET_TRADE_INVALID_ACTION, cmd.Command);
+                return;
+            }
+
+            await connection[cmd].UseMarketAsync(player, cmd.Arguments);
         }
     }
 }

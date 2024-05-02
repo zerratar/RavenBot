@@ -37,6 +37,11 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "LocalBot.Shared", "src\Loca
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TwitchLib.Communication", "src\TwitchLib\TwitchLib.Communication\TwitchLib.Communication.csproj", "{E63C5937-E160-413C-A67C-6C34292B0CCB}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{64A12867-B97E-47C8-8746-B2585D15E127}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

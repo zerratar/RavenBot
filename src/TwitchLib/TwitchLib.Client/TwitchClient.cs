@@ -293,19 +293,19 @@ namespace TwitchLib.Client
 
         /// <inheritdoc/>
         public event AsyncEventHandler<OnAnonGiftPaidUpgradeArgs>? OnAnonGiftPaidUpgrade;
-       
+
         /// <inheritdoc/>
         public event AsyncEventHandler<OnUnraidNotificationArgs>? OnUnraidNotification;
-       
+
         /// <inheritdoc/>
         public event AsyncEventHandler<OnRitualArgs>? OnRitual;
-        
+
         /// <inheritdoc/>
         public event AsyncEventHandler<OnBitsBadgeTierArgs>? OnBitsBadgeTier;
-        
+
         /// <inheritdoc/>
         public event AsyncEventHandler<OnCommunityPayForwardArgs>? OnCommunityPayForward;
-       
+
         /// <inheritdoc/>
         public event AsyncEventHandler<OnStandardPayForwardArgs>? OnStandardPayForward;
         #endregion
@@ -339,7 +339,7 @@ namespace TwitchLib.Client
         public void Initialize(ConnectionCredentials credentials, string? channel = null)
         {
             var channels = new List<string>();
-            if(channel is not null)
+            if (channel is not null)
                 channels.Add(channel);
             Initialize(credentials, channels);
         }
@@ -456,7 +456,7 @@ namespace TwitchLib.Client
         /// <inheritdoc />
         public Task SendMessageAsync(JoinedChannel channel, string message, bool dryRun = false)
         {
-            SendTwitchMessage(channel, message,null, dryRun);
+            SendTwitchMessage(channel, message, null, dryRun);
             return Task.CompletedTask;
         }
 
@@ -629,7 +629,7 @@ namespace TwitchLib.Client
         {
             return OnMessageThrottled.TryInvoke(sender, e);
         }
-        
+
         private Task ThrottlerOnError(object? sender, OnErrorEventArgs e)
         {
             return OnError.TryInvoke(sender, e);
@@ -982,15 +982,16 @@ namespace TwitchLib.Client
         {
             if (string.Equals(TwitchUsername, ircMessage.User, StringComparison.InvariantCultureIgnoreCase))
             {
-                var channel = _awaitingJoins.Find(x => x.Key == ircMessage.Channel);
+                var channel = _awaitingJoins.Find(x => x.Key.Equals(ircMessage.Channel, StringComparison.OrdinalIgnoreCase));
+                
                 _awaitingJoins.Remove(channel);
 
                 return OnJoinedChannel.TryInvoke(this, new(ircMessage.Channel, TwitchUsername));
             }
-            else 
+            else
             {
                 return OnUserJoined.TryInvoke(this, new(ircMessage.Channel, ircMessage.User));
-            } 
+            }
         }
 
         /// <summary>
@@ -1004,7 +1005,7 @@ namespace TwitchLib.Client
                 _joinedChannelManager.RemoveJoinedChannel(ircMessage.Channel);
                 _hasSeenJoinedChannels.Remove(ircMessage.Channel);
 
-                return OnLeftChannel.TryInvoke(this,new(ircMessage.Channel, TwitchUsername));
+                return OnLeftChannel.TryInvoke(this, new(ircMessage.Channel, TwitchUsername));
             }
             else
             {

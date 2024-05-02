@@ -16,7 +16,11 @@
         public const string TRAIN_NO_ARG = "You need to specify a skill to train, currently supported skills: {skills} or !sail for sailing.";
         public const string REDEEM_NO_ARG = "You need to specify what to redeem, like: item, exp. See the options available in the Tavern.";
         public const string TOGGLE_NO_ARG = "You need to specify what to toggle, like: helm or pet";
-        public const string TRADE_NO_ARG = "{command} <item> (optional: <amount>, default 1) <price per item>";
+
+        public const string MARKET_TRADE_INVALID_ACTION = "Invalid market action, must be 'buy', 'sell' or 'value'.";
+        public const string MARKET_TRADE_NO_ARG = "{command} <action> <item> (optional: <amount>, default 1) <price per item>";
+        public const string OLD_TRADE_NO_ARG = "{command} <item> (optional: <amount>, default 1) <price per item>";
+
         public const string TRAVEL_NO_ARG = "You must specify a destination, !travel <destination>";
         public const string VALUE_NO_ARG = "{command} <item>";
         public const string VENDOR_NO_ARG = "{command} <item> (optional: <amount>, default 1)";

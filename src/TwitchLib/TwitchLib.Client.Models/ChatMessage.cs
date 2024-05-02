@@ -141,14 +141,14 @@ namespace TwitchLib.Client.Models
                     case Tags.BadgeInfo:
                         BadgeInfo = TagHelper.ToBadges(tagValue);
                         // check if founder is one of them, and get months from that
-                        var founderBadge = BadgeInfo.Find(b => b.Key == "founder");
+                        var founderBadge = BadgeInfo.Find(b => b.Key != null && b.Key.Equals("founder", StringComparison.OrdinalIgnoreCase));
                         if (!founderBadge.Equals(default(KeyValuePair<string, string>)))
                         {
                             SubscribedMonthCount = int.Parse(founderBadge.Value);
                         }
                         else
                         {
-                            var subBadge = BadgeInfo.Find(b => b.Key == "subscriber");
+                            var subBadge = BadgeInfo.Find(b => b.Key != null && b.Key.Equals("subscriber", StringComparison.OrdinalIgnoreCase));
                             // BadgeInfo has better accuracy than Badges subscriber value
                             if (!subBadge.Equals(default(KeyValuePair<string, string>)))
                             {
