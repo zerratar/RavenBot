@@ -8,6 +8,7 @@ using RavenBot.Core.Net;
 using RavenBot.Core.Ravenfall;
 using RavenBot.Core.Ravenfall.Models;
 using RavenBot.Core.Ravenfall.Requests;
+using ROBot.Core.Chat.Commands;
 using Shinobytes.Core;
 using System;
 using System.Collections.Concurrent;
@@ -37,6 +38,10 @@ namespace ROBot.Core.GameServer
         private int pongReceiveIndex = 0;
         private int missedPingCount = 0;
         private bool disposed;
+        private ConcurrentDictionary<string, ChannelStateChangedEvent> channelState =
+            new ConcurrentDictionary<string, ChannelStateChangedEvent>();
+
+        private RemoteGameSessionInfo sessionInfo;
         private readonly List<IMessageBusSubscription> subs = new List<IMessageBusSubscription>();
 
         public Guid InstanceId { get; } = Guid.NewGuid();
@@ -83,12 +88,18 @@ namespace ROBot.Core.GameServer
         private void OnChannelStateChanged(ChannelStateChangedEvent evt)
         {
             // only interesting if its our current channel.
+
+            // its not much data, so lets log to a dictionary
+            channelState[evt.ChannelName.ToLower()] = evt;
+
+            var channel = this.session?.Channel?.Name ?? sessionInfo?.Owner?.Username;
             if (this.session == null || this.session.Channel == null)
             {
                 return;
             }
 
-            if (evt.ChannelName != this.session.Channel.Name)
+            if (string.IsNullOrEmpty(evt.ChannelName) || string.IsNullOrEmpty(channel) ||
+                !evt.ChannelName.Equals(channel, StringComparison.OrdinalIgnoreCase))
             {
                 return;
             }
@@ -197,11 +208,7 @@ namespace ROBot.Core.GameServer
                 var player = playerProvider.Get(userId);
                 player.IsBroadcaster = true;
 
-                if (internalSessionInfoReceived == null)
-                {
-                    return;
-                }
-                var sessionInfo = new RemoteGameSessionInfo
+                this.sessionInfo = new RemoteGameSessionInfo
                 {
                     Created = sessionStart,
                     SessionId = sessionid,
@@ -210,9 +217,19 @@ namespace ROBot.Core.GameServer
                     Settings = userSettings
                 };
 
+                if (internalSessionInfoReceived == null)
+                {
+                    return;
+                }
+
                 internalSessionInfoReceived.Invoke(this, sessionInfo);
 
                 messageBus.Send("ravenfall_session", sessionInfo);
+
+                if (channelState.TryGetValue(sessionInfo.Owner.Username.ToLower(), out var evt))
+                {
+                    this.Api.SendChannelStateAsync(evt.Platform, evt.ChannelName, evt.InChannel, evt.Message);
+                }
             }
             catch (Exception exc)
             {

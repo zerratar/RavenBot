@@ -226,21 +226,21 @@ namespace ROBot
             try { kernel.Stop(); } catch { }
         }
 
-        private void OnSessionUpdated(object sender, GameSessionUpdateEventArgs e)
+        private async void OnSessionUpdated(object sender, GameSessionUpdateEventArgs e)
         {
             discord.EnsureSessionChannel(e.Session);
 
             if (e.OldName != e.Session.Name)
             {
                 //logger.LogWarning("[RVNFLL] Game Session Name Changed (OldName: " + e.OldName + " New: " + e.Session.Name + ")");
-                twitch.LeaveChannelAsync(e.OldName);
-                twitch.JoinChannelAsync(e.Session.Name);
+                await twitch.LeaveChannelAsync(e.OldName);
+                await twitch.JoinChannelAsync(e.Session.Name);
                 return;
             }
 
             if (!twitch.InChannel(e.Session.Name))
             {
-                twitch.JoinChannelAsync(e.Session.Name);
+                await twitch.JoinChannelAsync(e.Session.Name);
             }
         }
 
