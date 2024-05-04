@@ -156,5 +156,6 @@ namespace RavenBot.Core.Ravenfall
         Task AutoUseAsync(User player, int amount);
         Task StopAutoUseAsync(User player);
         Task RequestAutoUseStatusAsync(User player);
+        Task SendChannelStateAsync(string platform, string channelName, bool inChannel, string message);
     }
 }

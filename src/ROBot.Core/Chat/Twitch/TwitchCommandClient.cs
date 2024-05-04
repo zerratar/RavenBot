@@ -124,6 +124,7 @@ namespace ROBot.Core.Chat.Twitch
             client.OnConnectionError += OnConnectionErrorAsync;
             client.OnDisconnected += OnDisconnectedAsync;
             //in channel events
+
             client.OnChatCommandReceived += OnCommandReceivedAsync;
             client.OnMessageReceived += OnMessageReceivedAsync;
             client.OnUserJoined += OnUserJoinedAsync;
@@ -812,6 +813,7 @@ namespace ROBot.Core.Chat.Twitch
 
         private async Task OnLeftChannelAsync(object sender, OnLeftChannelArgs e)
         {
+            this.messageBus.Send(nameof(ChannelStateChangedEvent), new ChannelStateChangedEvent("twitch", e.Channel, false, null));
             stats.LeftChannel(e.Channel, client.JoinedChannels);
             logger.LogWarning("[TWITCH] Left Channel (Channel: " + e.Channel + ")");
             currentlyJoiningChannels.TryRemove(e.Channel, out _);
@@ -819,6 +821,7 @@ namespace ROBot.Core.Chat.Twitch
 
         private async Task OnJoinedChannelAsync(object sender, OnJoinedChannelArgs e)
         {
+            this.messageBus.Send(nameof(ChannelStateChangedEvent), new ChannelStateChangedEvent("twitch", e.Channel, true, null));
             stats.JoinedChannel(e.Channel, client.JoinedChannels);
             logger.LogInformation("[TWITCH] Joined (Channel: " + e.Channel + ")");
             if (chatMessageQueue.TryGetValue(e.Channel, out var queue))

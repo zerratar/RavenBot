@@ -508,6 +508,7 @@ namespace RavenBot
             client.OnChannelStateChanged += OnChannelStateChanged;
             client.OnChatCommandReceived += OnCommandReceivedAsync;
             client.OnLeftChannel += OnLeftChannel;
+            client.OnJoinedChannel += OnJoinedChannel;
             client.OnUserStateChanged += OnUserStateChanged;
 
             client.OnSendReceiveData += OnSendReceiveData;
@@ -531,6 +532,8 @@ namespace RavenBot
             pubsub.OnChannelPointsRewardRedeemed += Pubsub_OnChannelPointsRewardRedeemed;
         }
 
+
+
         private async Task OnSendReceiveData(object sender, OnSendReceiveDataArgs e)
         {
             //logger.WriteDebug("[" + e.Direction + "] " + e.Data);
@@ -540,9 +543,13 @@ namespace RavenBot
         {
             //logger.WriteWarning("Bot user state changed: " + Newtonsoft.Json.JsonConvert.SerializeObject(e.UserState));
         }
-
+        private async Task OnJoinedChannel(object sender, OnJoinedChannelArgs e)
+        {
+            this.messageBus.Send(nameof(ChannelStateChangedEvent), new ChannelStateChangedEvent("twitch", e.Channel, true, null));
+        }
         private async Task OnLeftChannel(object sender, OnLeftChannelArgs e)
         {
+            this.messageBus.Send(nameof(ChannelStateChangedEvent), new ChannelStateChangedEvent("twitch", e.Channel, false, null));
             //logger.WriteWarning("Bot left channel: " + e.Channel);
         }
 
@@ -634,6 +641,8 @@ namespace RavenBot
             client.OnChannelStateChanged -= OnChannelStateChanged;
             client.OnChatCommandReceived -= OnCommandReceivedAsync;
             client.OnLeftChannel -= OnLeftChannel;
+            client.OnJoinedChannel -= OnJoinedChannel;
+
             client.OnUserStateChanged -= OnUserStateChanged;
             client.OnSendReceiveData -= OnSendReceiveData;
 

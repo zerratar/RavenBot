@@ -61,7 +61,7 @@ namespace ROBot.Core.GameServer
             this.subs.Add(messageBus.Subscribe<UserLeftEvent>(nameof(UserLeftEvent), OnUserLeft));
             this.subs.Add(messageBus.Subscribe<CheerBitsEvent>(nameof(CheerBitsEvent), OnUserCheer));
             this.subs.Add(messageBus.Subscribe<UserSubscriptionEvent>(nameof(UserSubscriptionEvent), OnUserSub));
-
+            this.subs.Add(messageBus.Subscribe<ChannelStateChangedEvent>(nameof(ChannelStateChangedEvent), OnChannelStateChanged));
             this.client = client;
 
             this.Api = new RavenfallApi(client, EnqueueRequest, null);
@@ -79,6 +79,23 @@ namespace ROBot.Core.GameServer
             }
 
         }
+
+        private void OnChannelStateChanged(ChannelStateChangedEvent evt)
+        {
+            // only interesting if its our current channel.
+            if (this.session == null || this.session.Channel == null)
+            {
+                return;
+            }
+
+            if (evt.ChannelName != this.session.Channel.Name)
+            {
+                return;
+            }
+
+            this.Api.SendChannelStateAsync(evt.Platform, evt.ChannelName, evt.InChannel, evt.Message);
+        }
+
         public IRavenfallApi this[ICommand cmd] => Ref(cmd.CorrelationId);
         public IRavenfallApi this[string correlationid] => Ref(correlationid);
         public IRavenfallApi Ref(string correlationId)

@@ -143,6 +143,8 @@ namespace RavenBot.Core.Ravenfall
         public Task AutoUseAsync(User player, int amount) => SendAsync("auto_use", player, amount);
         public Task StopAutoUseAsync(User player) => SendAsync("auto_use_stop", player);
         public Task RequestAutoUseStatusAsync(User player) => SendAsync("auto_use_status", player);
+
+        public Task SendChannelStateAsync(string platform, string channelName, bool inChannel, string message) => SendAsync("channel_state", new Arguments(platform, channelName, inChannel, message));
         public async Task RestartGameAsync(User player)
         {
             await SendAsync("restart", player);
