@@ -138,17 +138,23 @@ namespace RavenBot.Core.Net
         private void HandleMessage(string message)
         {
             if (string.IsNullOrEmpty(message)) return;
-
-            var packet = JsonConvert.DeserializeObject<GameMessageResponse>(message);
-            if (packet != null)
+            try
             {
-                lock (mutex)
+                var packet = JsonConvert.DeserializeObject<GameMessageResponse>(message);
+                if (packet != null)
                 {
-                    foreach (var sub in subs.Where(x => x.Identifier == packet.Identifier))
+                    lock (mutex)
                     {
-                        sub.Invoke(packet);
+                        foreach (var sub in subs.Where(x => x.Identifier == packet.Identifier))
+                        {
+                            sub.Invoke(packet);
+                        }
                     }
                 }
+            }
+            catch (Exception exc)
+            {
+                logger.WriteError("Failed to handle message: " + exc.Message + "\nData from Client: " + message);
             }
         }
 

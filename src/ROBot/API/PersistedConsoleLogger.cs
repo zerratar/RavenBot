@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ROBot.API
 {
@@ -23,6 +22,7 @@ namespace ROBot.API
         private readonly int maxMessageStack = 1000;
         private DateTime lastSave = DateTime.UtcNow;
         private TimeSpan maxTimeBetweenSave = TimeSpan.FromSeconds(5);
+
         public PersistedConsoleLogger(IMessageBus messageBus)
         {
             logger = new ConsoleLogger();

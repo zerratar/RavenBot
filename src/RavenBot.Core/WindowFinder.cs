@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Shinobytes.Core.Utilities;
+using System;
 using System.Runtime.InteropServices;
 
 namespace RavenBot.Core

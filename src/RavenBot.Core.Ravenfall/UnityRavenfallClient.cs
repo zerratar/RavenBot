@@ -23,6 +23,7 @@ namespace RavenBot.Core.Ravenfall
         private readonly IGameClient client;
         private readonly IUserSettingsManager settingsManager;
         private ITimeoutHandle keepAliveHandle;
+        private ChannelStateChangedEvent lastChannelState;
 
         public IRavenfallApi Api { get; }
         public UnityRavenfallClient(
@@ -43,6 +44,7 @@ namespace RavenBot.Core.Ravenfall
             messageBus.Subscribe<UserLeftEvent>(nameof(UserLeftEvent), OnUserLeft);
             messageBus.Subscribe<CheerBitsEvent>(nameof(CheerBitsEvent), OnUserCheer);
             messageBus.Subscribe<UserSubscriptionEvent>(nameof(UserSubscriptionEvent), OnUserSub);
+            messageBus.Subscribe<ChannelStateChangedEvent>(nameof(ChannelStateChangedEvent), OnChannelStateChanged);
 
             this.client = client;
             this.Api = new RavenfallApi(client, EnqueueRequest, null);
@@ -52,6 +54,25 @@ namespace RavenBot.Core.Ravenfall
             this.client.Subscribe("message", SendResponseToTwitchChat);
             this.keepAliveHandle = this.kernel.SetTimeout(KeepAlive, 1000);
         }
+
+        private void OnChannelStateChanged(ChannelStateChangedEvent evt)
+        {
+            this.lastChannelState = evt;
+
+            var user = playerProvider.Get(evt.ChannelName);
+            if (user.Settings != null)
+            {
+                var userSettings = user.Settings;
+                var clientVersion = userSettings?.ClientVersion;
+                if (string.IsNullOrEmpty(clientVersion) || GameVersion.IsLessThanOrEquals(userSettings.ClientVersion, "0.9.1.7a"))
+                {
+                    return;
+                }
+
+                this.Api.SendChannelStateAsync(evt.Platform, evt.ChannelName, evt.InChannel, evt.Message);
+            }
+        }
+
 
         private void KeepAlive()
         {
@@ -103,6 +124,19 @@ namespace RavenBot.Core.Ravenfall
                 Settings = userSettings,
                 Owner = player
             });
+
+            if (userSettings == null 
+                || !userSettings.TryGetValue("client_version", out var clientVersionString) 
+                || GameVersion.IsLessThanOrEquals(clientVersionString?.ToString(), "0.9.1.7a"))
+            {
+                return;
+            }
+
+            var evt = lastChannelState;
+            if (evt != null)
+            {
+                this.Api.SendChannelStateAsync(evt.Platform, evt.ChannelName, evt.InChannel, evt.Message);
+            }
         }
 
         public Task<bool> ProcessAsync(int serverPort)

@@ -12,7 +12,7 @@ namespace RavenBot.Core
                 return JsonConvert.DeserializeObject<AppSettings>(text);
             }
 
-            return new AppSettings(null, null, null);
+            return new AppSettings(null, null, null, null);
         }
     }
 }

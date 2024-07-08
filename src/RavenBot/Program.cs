@@ -29,7 +29,9 @@ namespace RavenBot
 
             var ioc = new IoC();
             ioc.RegisterCustomShared<IoC>(() => ioc);
-            ioc.RegisterShared<ILogger, ConsoleLogger>();
+            ioc.RegisterCustomShared<IAppSettings>(() => new AppSettingsProvider().Get());
+
+            ioc.RegisterShared<ILogger, FileLogger>();
             ioc.RegisterShared<IKernel, Kernel>();
 
 #if DEBUG
@@ -38,7 +40,7 @@ namespace RavenBot
             ioc.RegisterCustomShared<IUserSettingsManager>(() => new UserSettingsManager("./user-settings/"));
 #endif
             ioc.RegisterShared<ITwitchUserStore, TwitchUserStore>();
-            ioc.RegisterCustomShared<IAppSettings>(() => new AppSettingsProvider().Get());
+            
 
             ioc.Register<IGameConnection, TcpGameConnection>();
             //ioc.Register<IGameClient, TcpGameClient>();
@@ -71,7 +73,8 @@ namespace RavenBot
                 Application.SetHighDpiMode(HighDpiMode.SystemAware);
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
-                Application.Run(new SettingsConfigurationForm());
+
+                Application.Run(new SettingsConfigurationForm(appSettings));
                 ioc.ReplaceSharedInstance(new AppSettingsProvider().Get());
             }
 

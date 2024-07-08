@@ -1,13 +1,6 @@
 ﻿using RavenBot.Core;
 using RavenBot.Twitch;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace RavenBot.Forms
@@ -15,15 +8,17 @@ namespace RavenBot.Forms
     public partial class SettingsConfigurationForm : Form
     {
         private TwitchOAuthResult authResult;
+        private readonly Core.IAppSettings existingAppSettings;
 
-        public SettingsConfigurationForm()
+        public SettingsConfigurationForm(Core.IAppSettings existingAppSettings)
         {
             InitializeComponent();
+            this.existingAppSettings = existingAppSettings;
         }
 
         private void btnSave_Click(object sender, EventArgs e)
         {
-            var settings = new AppSettings(authResult?.User ?? inputChannel.Text, inputToken.Text, inputChannel.Text);
+            var settings = new Core.AppSettings(authResult?.User ?? inputChannel.Text, inputToken.Text, inputChannel.Text, existingAppSettings?.LogFile);
             var settingsData = Newtonsoft.Json.JsonConvert.SerializeObject(settings);
             System.IO.File.WriteAllText("settings.json", settingsData);
             this.DialogResult = DialogResult.OK;

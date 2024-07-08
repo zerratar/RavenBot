@@ -1,20 +1,20 @@
 ﻿using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using RavenBot.Core;
 using RavenBot.Core.Chat;
 using RavenBot.Core.Chat.Twitch;
 using RavenBot.Core.Handlers;
 using RavenBot.Core.Net;
 using RavenBot.Core.Ravenfall;
 using RavenBot.Core.Ravenfall.Models;
-using RavenBot.Core.Ravenfall.Requests;
-using ROBot.Core.Chat.Commands;
 using Shinobytes.Core;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace ROBot.Core.GameServer
 {
@@ -100,6 +100,14 @@ namespace ROBot.Core.GameServer
 
             if (string.IsNullOrEmpty(evt.ChannelName) || string.IsNullOrEmpty(channel) ||
                 !evt.ChannelName.Equals(channel, StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            var userSettings = sessionInfo?.Settings;
+            if (userSettings == null
+                || !userSettings.TryGetValue("client_version", out var clientVersionString)
+                || GameVersion.IsLessThanOrEquals(clientVersionString?.ToString(), "0.9.1.7a"))
             {
                 return;
             }
@@ -225,6 +233,12 @@ namespace ROBot.Core.GameServer
                 internalSessionInfoReceived.Invoke(this, sessionInfo);
 
                 messageBus.Send("ravenfall_session", sessionInfo);
+
+                if (!userSettings.TryGetValue("client_version", out var clientVersionString) ||
+                    GameVersion.IsLessThanOrEquals(clientVersionString?.ToString(), "0.9.1.7a"))
+                {
+                    return;
+                }
 
                 if (channelState.TryGetValue(sessionInfo.Owner.Username.ToLower(), out var evt))
                 {

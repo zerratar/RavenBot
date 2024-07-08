@@ -42,6 +42,12 @@ namespace RavenBot.Core.Ravenfall.Models
             dict = new ConcurrentDictionary<string, object>();
         }
 
+        public string ClientVersion
+        {
+            get => Get<string>("client_version");
+            set => Set("client_version", value);
+        }
+
         public Guid RavenfallUserId
         {
             get => Get<Guid>("ravenfall_id");
