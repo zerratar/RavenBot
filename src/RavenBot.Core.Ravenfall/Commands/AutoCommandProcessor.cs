@@ -104,11 +104,20 @@ namespace RavenBot.Core.Ravenfall.Commands
 
         private async Task HandleAutoRestAsync(ICommand cmd, IRavenfallClient connection, User player, string[] arguments)
         {
+            var startRestTime = 0;
+            var endRestTime = 120;
+
             // when auto resting you will need to provide: "start rest time" and "stop rest time"
             // the "start rest time" is when the player should start resting (default: 0)
             // the "stop rest time" is when the player should stop resting and start training (default: 120)
             var arg = arguments.LastOrDefault();
-            if (arg == null) return;
+            // if no argument is provided, we will use the default settings.
+            if (arg == null)
+            {
+                await connection[cmd].AutoRestAsync(player, startRestTime, endRestTime);
+                return;
+            }
+
             if (arg.Equals("off", StringComparison.OrdinalIgnoreCase) || arg.Equals("stop", StringComparison.OrdinalIgnoreCase))
             {
                 await connection[cmd].StopAutoRestAsync(player);
@@ -121,8 +130,6 @@ namespace RavenBot.Core.Ravenfall.Commands
                 return;
             }
 
-            var startRestTime = 0;
-            var endRestTime = 120;
 
             if (arguments.Length == 1)
             {
