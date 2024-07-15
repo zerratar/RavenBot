@@ -143,6 +143,12 @@ namespace RavenBot.Core.Ravenfall
         public Task AutoUseAsync(User player, int amount) => SendAsync("auto_use", player, amount);
         public Task StopAutoUseAsync(User player) => SendAsync("auto_use_stop", player);
         public Task RequestAutoUseStatusAsync(User player) => SendAsync("auto_use_status", player);
+        public Task GetDpsAsync(User player) => SendAsync("dps", player);
+
+        public Task ClearDungeonCombatStyleAsync(User player) => SendAsync("dungeon_skill_clear", player);
+        public Task ClearRaidCombatStyleAsync(User player) => SendAsync("raid_skill_clear", player);
+        public Task SetRaidCombatStyleAsync(User player, string targetSkill) => SendAsync("raid_skill", player, targetSkill);
+        public Task SetDungeonCombatStyleAsync(User player, string targetSkill) => SendAsync("dungeon_skill", player, targetSkill);
 
         public Task SendChannelStateAsync(string platform, string channelName, bool inChannel, string message) => SendAsync("channel_state", new Arguments(platform, channelName, inChannel, message));
         public async Task RestartGameAsync(User player)

@@ -39,5 +39,4 @@ namespace RavenBot.Core.Ravenfall.Commands
         }
     }
 
-
 }

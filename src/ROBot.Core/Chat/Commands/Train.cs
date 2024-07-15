@@ -1,4 +1,5 @@
-﻿using RavenBot.Core.Handlers;
+﻿using RavenBot.Core.Extensions;
+using RavenBot.Core.Handlers;
 using RavenBot.Core.Ravenfall;
 using RavenBot.Core.Ravenfall.Models;
 using ROBot.Core.GameServer;
@@ -28,7 +29,8 @@ namespace ROBot.Core.Chat.Commands
             ChatCommandInput.Create("skill", "What skill do you want to train?",
                 "All", "Attack", "Defense", "Strength", "Magic", "Ranged", "Fishing", "Cooking",
                 "Crafting", "Woodcutting", "mining", "Farming", "Healing", "Gathering", "Alchemy"
-            ).Required()
+            ).Required(),
+            ChatCommandInput.Create("level", "Target level to train to. Player will stop gaining exp after reaching the target level.", "2", "3", "4", "5", "6", "7", "8", "9", "10", "2..999")
         };
 
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
@@ -56,7 +58,14 @@ namespace ROBot.Core.Chat.Commands
                     }
 
                     var arg = cmd.Arguments?.ToLower();
-                    var skill = arg?.Split(' ').LastOrDefault();
+
+                    var arguments = arg?.Split(' ');
+
+                    arguments = GetTargetLevelFromArguments(arguments, out var levelTarget);
+
+                    var skill = GetSkillFromArguments(arguments);
+
+                    //var skill = arg?.Split(' ').LastOrDefault();
                     if (string.IsNullOrEmpty(skill))
                     {
                         await chat.SendReplyAsync(cmd, Localization.TRAIN_NO_ARG, string.Join(", ", trainableSkills));
@@ -77,7 +86,14 @@ namespace ROBot.Core.Chat.Commands
 
                     if (GetCombatTypeFromString(skill) != -1)
                     {
-                        await connection[cmd].SendPlayerTaskAsync(player, PlayerTask.Fighting, skill);
+                        if (levelTarget != null)
+                        {
+                            await connection[cmd].SendPlayerTaskAsync(player, PlayerTask.Fighting, skill, levelTarget.ToString());
+                        }
+                        else
+                        {
+                            await connection[cmd].SendPlayerTaskAsync(player, PlayerTask.Fighting, skill);
+                        }
                     }
                     else
                     {
@@ -88,13 +104,54 @@ namespace ROBot.Core.Chat.Commands
                         }
                         else
                         {
-                            await connection[cmd].SendPlayerTaskAsync(player, (PlayerTask)value, skill);
+                            if (levelTarget != null)
+                            {
+                                await connection[cmd].SendPlayerTaskAsync(player, (PlayerTask)value, skill, levelTarget.ToString());
+                            }
+                            else
+                            {
+                                await connection[cmd].SendPlayerTaskAsync(player, (PlayerTask)value, skill);
+                            }
                         }
                     }
                 }
             }
         }
 
+        private string[] GetTargetLevelFromArguments(string[] arguments, out int? levelTarget)
+        {
+            levelTarget = null;
+            if (arguments == null || arguments.Length < 2)
+            {
+                return arguments;
+            }
+
+            var num = arguments.FirstOrDefault(x => int.TryParse(x, out _));
+            if (string.IsNullOrEmpty(num))
+            {
+                return arguments;
+            }
+
+            levelTarget = int.Parse(num);
+
+            return arguments.WhereNot(x => x == num).ToArray();
+        }
+
+        private string GetSkillFromArguments(string[] arguments)
+        {
+            if (arguments == null || arguments.Length < 1)
+            {
+                return null;
+            }
+
+            var skill = arguments.FirstOrDefault(x => GetCombatTypeFromString(x) != -1 || GetSkillTypeFromString(x) != -1);
+            if (string.IsNullOrEmpty(skill))
+            {
+                return arguments[0];
+            }
+
+            return skill;
+        }
 
         public int GetCombatTypeFromString(string val)
         {

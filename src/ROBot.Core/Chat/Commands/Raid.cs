@@ -46,17 +46,27 @@ namespace ROBot.Core.Chat.Commands
                             await connection[cmd].AutoJoinRaidAsync(player, cmd.Arguments.Split(' ').LastOrDefault());
                             return;
                         }
-
-                        if (cmd.Arguments.Contains("start", StringComparison.OrdinalIgnoreCase))
+                        else if (cmd.Arguments.Contains("start", StringComparison.OrdinalIgnoreCase))
                         {
                             await connection[cmd].RaidStartAsync(player);
                             return;
                         }
-
-                        if (cmd.Arguments.Contains("stop", StringComparison.OrdinalIgnoreCase))
+                        else if (cmd.Arguments.Contains("stop", StringComparison.OrdinalIgnoreCase))
                         {
                             await connection[cmd].StopRaidAsync(player);
                             return;
+                        }
+                        else if (cmd.Arguments.Contains("skill ", System.StringComparison.OrdinalIgnoreCase) || cmd.Arguments.Contains("style ", System.StringComparison.OrdinalIgnoreCase))
+                        {
+                            var targetSkill = cmd.Arguments.Split(' ').Skip(1).FirstOrDefault();
+                            if (targetSkill.Equals("reset", System.StringComparison.OrdinalIgnoreCase) || targetSkill.Equals("clear", System.StringComparison.OrdinalIgnoreCase))
+                            {
+                                await connection[cmd].ClearRaidCombatStyleAsync(player);
+                            }
+                            else
+                            {
+                                await connection[cmd].SetRaidCombatStyleAsync(player, targetSkill);
+                            }
                         }
 
                         if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsGameAdmin)

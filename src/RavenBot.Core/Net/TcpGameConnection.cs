@@ -86,7 +86,7 @@ namespace RavenBot.Core.Net
                 if (this.reader.BaseStream.CanRead)
                 {
                     var data = await this.reader.ReadLineAsync();
-                    if (!string.IsNullOrEmpty(data))
+                    if (data != null)
                     {
                         return data;
                     }

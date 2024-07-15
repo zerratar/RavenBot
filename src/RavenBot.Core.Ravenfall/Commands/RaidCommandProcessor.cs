@@ -47,17 +47,27 @@ namespace RavenBot.Core.Ravenfall.Commands
                     await game[cmd.CorrelationId].AutoJoinRaidAsync(player, cmd.Arguments.Split(' ').LastOrDefault());
                     return;
                 }
-
-                if (cmd.Arguments.Contains("start", StringComparison.OrdinalIgnoreCase))
+                else if (cmd.Arguments.Contains("start", StringComparison.OrdinalIgnoreCase))
                 {
                     await this.game[cmd.CorrelationId].RaidStartAsync(player);
                     return;
                 }
-
-                if (cmd.Arguments.Contains("stop", StringComparison.OrdinalIgnoreCase))
+                else if (cmd.Arguments.Contains("stop", StringComparison.OrdinalIgnoreCase))
                 {
                     await this.game[cmd.CorrelationId].StopRaidAsync(player);
                     return;
+                }
+                else if (cmd.Arguments.Contains("skill ", System.StringComparison.OrdinalIgnoreCase) || cmd.Arguments.Contains("style ", System.StringComparison.OrdinalIgnoreCase))
+                {
+                    var targetSkill = cmd.Arguments.Split(' ').Skip(1).FirstOrDefault();
+                    if (targetSkill.Equals("reset", System.StringComparison.OrdinalIgnoreCase) || targetSkill.Equals("clear", System.StringComparison.OrdinalIgnoreCase))
+                    {
+                        await game[cmd].ClearRaidCombatStyleAsync(player);
+                    }
+                    else
+                    {
+                        await game[cmd].SetRaidCombatStyleAsync(player, targetSkill);
+                    }
                 }
 
                 if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsGameAdmin)

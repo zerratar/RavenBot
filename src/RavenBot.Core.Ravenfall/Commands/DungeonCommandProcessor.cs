@@ -44,6 +44,18 @@ namespace RavenBot.Core.Ravenfall.Commands
             {
                 await this.game[cmd.CorrelationId].DungeonStartAsync(player);
             }
+            else if (cmd.Arguments.Contains("skill ", System.StringComparison.OrdinalIgnoreCase) || cmd.Arguments.Contains("style ", System.StringComparison.OrdinalIgnoreCase))
+            {
+                var targetSkill = cmd.Arguments.Split(' ').Skip(1).FirstOrDefault();
+                if (targetSkill.Equals("reset", System.StringComparison.OrdinalIgnoreCase) || targetSkill.Equals("clear", System.StringComparison.OrdinalIgnoreCase))
+                {
+                    await game[cmd].ClearDungeonCombatStyleAsync(player);
+                }
+                else
+                {
+                    await game[cmd].SetDungeonCombatStyleAsync(player, targetSkill);
+                }
+            }
         }
     }
 }

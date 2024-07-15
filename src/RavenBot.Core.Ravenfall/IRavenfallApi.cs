@@ -157,5 +157,10 @@ namespace RavenBot.Core.Ravenfall
         Task StopAutoUseAsync(User player);
         Task RequestAutoUseStatusAsync(User player);
         Task SendChannelStateAsync(string platform, string channelName, bool inChannel, string message);
+        Task GetDpsAsync(User player);
+        Task SetRaidCombatStyleAsync(User player, string targetSkill);
+        Task SetDungeonCombatStyleAsync(User player, string targetSkill);
+        Task ClearDungeonCombatStyleAsync(User player);
+        Task ClearRaidCombatStyleAsync(User player);
     }
 }

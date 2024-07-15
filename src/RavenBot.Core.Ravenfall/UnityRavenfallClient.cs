@@ -59,7 +59,14 @@ namespace RavenBot.Core.Ravenfall
         {
             this.lastChannelState = evt;
 
-            var user = playerProvider.Get(evt.ChannelName);
+            // local bot only supports twitch, so we can search for ravenfall user and twitch user.
+
+            var user = playerProvider.Get(evt.ChannelName, "ravenfall");
+            if (user == null)
+            {
+                user = playerProvider.Get(evt.ChannelName);
+            }
+
             if (user.Settings != null)
             {
                 var userSettings = user.Settings;
@@ -68,9 +75,9 @@ namespace RavenBot.Core.Ravenfall
                 {
                     return;
                 }
-
-                this.Api.SendChannelStateAsync(evt.Platform, evt.ChannelName, evt.InChannel, evt.Message);
             }
+
+            this.Api.SendChannelStateAsync(evt.Platform, evt.ChannelName, evt.InChannel, evt.Message);
         }
 
 
@@ -125,8 +132,8 @@ namespace RavenBot.Core.Ravenfall
                 Owner = player
             });
 
-            if (userSettings == null 
-                || !userSettings.TryGetValue("client_version", out var clientVersionString) 
+            if (userSettings == null
+                || !userSettings.TryGetValue("client_version", out var clientVersionString)
                 || GameVersion.IsLessThanOrEquals(clientVersionString?.ToString(), "0.9.1.7a"))
             {
                 return;

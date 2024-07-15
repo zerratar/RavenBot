@@ -101,7 +101,7 @@ namespace RavenBot
 
                     // this should also be the broadccaster.
 
-                    playerProvider.SetBroadcaster(session.Owner.Username, twitchId);
+                    playerProvider.SetBroadcaster(twitchId, session.Owner.Username);
                 }
 
                 if (tryPubSubAuthWithOAuthToken)

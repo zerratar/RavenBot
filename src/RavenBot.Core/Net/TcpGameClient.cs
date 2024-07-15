@@ -111,9 +111,16 @@ namespace RavenBot.Core.Net
                 try
                 {
                     var message = await this.connection.ReceiveAsync();
-                    if (string.IsNullOrEmpty(message))
+
+                    if (message == null)
                     {
                         DisconnectedFromServer();
+                        continue;
+                    }
+
+                    if (!IsValidMessage(message))
+                    {
+                        logger.WriteWarning("Received jibberish from the game: " + message);
                         continue;
                     }
 
@@ -126,6 +133,21 @@ namespace RavenBot.Core.Net
                     await Task.Delay(1000);
                 }
             }
+        }
+
+        private bool IsValidMessage(string message)
+        {
+            if (string.IsNullOrEmpty(message))
+            {
+                return false;
+            }
+
+            if (!message.Contains("{") || !message.Contains("}"))
+            {
+                return false;
+            }
+
+            return true;
         }
 
         private void DisconnectedFromServer()
