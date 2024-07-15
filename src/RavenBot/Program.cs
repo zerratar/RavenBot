@@ -80,7 +80,7 @@ namespace RavenBot
 
             using (var cmdListener = ioc.Resolve<ITwitchBot>())
             {
-                cmdListener.Start();
+                cmdListener.StartAsync();
 
                 while (true)
                 {

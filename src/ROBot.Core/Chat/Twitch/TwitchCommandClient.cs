@@ -123,6 +123,7 @@ namespace ROBot.Core.Chat.Twitch
             client.OnConnected += OnConnectedAsync;
             client.OnConnectionError += OnConnectionErrorAsync;
             client.OnDisconnected += OnDisconnectedAsync;
+            client.OnIncorrectLogin += Client_OnIncorrectLogin;
             //in channel events
 
             client.OnChatCommandReceived += OnCommandReceivedAsync;
@@ -150,6 +151,11 @@ namespace ROBot.Core.Chat.Twitch
             pubSubManager.OnChannelPointsRewardRedeemed += OnChannelPointsRewardRedeemed;
         }
 
+        private async Task Client_OnIncorrectLogin(object sender, OnIncorrectLoginArgs e)
+        {
+            logger.LogError("Failed to connect to Twitch IRC Server. Authentication Error: " + e.Exception);
+        }
+
         private void Unsubscribe()
         {
             if (client != null)
@@ -159,6 +165,7 @@ namespace ROBot.Core.Chat.Twitch
                 client.OnMessageReceived -= OnMessageReceivedAsync;
                 client.OnConnected -= OnConnectedAsync;
                 client.OnDisconnected -= OnDisconnectedAsync;
+                client.OnIncorrectLogin -= Client_OnIncorrectLogin;
                 client.OnUserJoined -= OnUserJoinedAsync;
                 client.OnUserLeft -= OnUserLeftAsync;
                 client.OnGiftedSubscription -= OnGiftedSubAsync;

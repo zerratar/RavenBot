@@ -50,7 +50,6 @@ namespace RavenBot.Core.Ravenfall.Commands
                 return;
             }
 
-
             var arg = cmd.Arguments?.ToLower();
             var arguments = arg?.Split(' ');
             arguments = GetTargetLevelFromArguments(arguments, out var levelTarget);
@@ -77,7 +76,14 @@ namespace RavenBot.Core.Ravenfall.Commands
 
             if (GetCombatTypeFromString(skill) != -1)
             {
-                await this.game[cmd.CorrelationId].SendPlayerTaskAsync(player, PlayerTask.Fighting, skill);
+                if (levelTarget != null)
+                {
+                    await this.game[cmd.CorrelationId].SendPlayerTaskAsync(player, PlayerTask.Fighting, skill, levelTarget.ToString());
+                }
+                else
+                {
+                    await this.game[cmd.CorrelationId].SendPlayerTaskAsync(player, PlayerTask.Fighting, skill);
+                }
             }
             else
             {
@@ -88,7 +94,14 @@ namespace RavenBot.Core.Ravenfall.Commands
                 }
                 else
                 {
-                    await this.game[cmd.CorrelationId].SendPlayerTaskAsync(player, (PlayerTask)value, skill);
+                    if (levelTarget != null)
+                    {
+                        await this.game[cmd.CorrelationId].SendPlayerTaskAsync(player, (PlayerTask)value, skill, levelTarget.ToString());
+                    }
+                    else
+                    {
+                        await this.game[cmd.CorrelationId].SendPlayerTaskAsync(player, (PlayerTask)value, skill);
+                    }
                 }
             }
         }

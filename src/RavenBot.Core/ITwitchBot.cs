@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace RavenBot.Core
 {
     public interface ITwitchBot : IDisposable
     {
-        void Start();
+        Task StartAsync();
         void Stop();
     }
 }

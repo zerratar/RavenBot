@@ -164,12 +164,12 @@ namespace RavenBot
             }
         }
 
-        public void Start()
+        public async Task StartAsync()
         {
             if (!kernel.Started) kernel.Start();
             EnsureInitialized();
             Subscribe();
-            client.ConnectAsync();
+            await client.ConnectAsync();
         }
 
         public void Dispose()
@@ -233,7 +233,9 @@ namespace RavenBot
             if (this.broadcastSubscription == null)
                 this.broadcastSubscription = messageBus.Subscribe<GameMessageResponse>(MessageBus.Broadcast, BroadcastAsync);
 
-            client.Initialize(credentialsProvider.Get(), channelProvider.Get());
+            var token = credentialsProvider.Get();
+            var channel = channelProvider.Get();
+            client.Initialize(token, channel);
 
             isInitialized = true;
         }
@@ -445,7 +447,7 @@ namespace RavenBot
                 Unsubscribe();
                 isInitialized = false;
                 CreateTwitchClient();
-                Start();
+                StartAsync();
             }
             catch (Exception)
             {
@@ -486,6 +488,12 @@ namespace RavenBot
             broadcastSubscription?.Unsubscribe();
         }
 
+        private async Task Client_OnIncorrectLogin(object sender, OnIncorrectLoginArgs e)
+        {
+            logger.WriteError("Failed to connect to Twitch IRC Server. Authentication Error: " + e.Exception);
+        }
+
+
         private async Task OnConnectedAsync(object sender, TwitchLib.Client.Events.OnConnectedEventArgs e)
         {
             logger.WriteDebug("Connected to Twitch IRC Server");
@@ -514,6 +522,7 @@ namespace RavenBot
             client.OnSendReceiveData += OnSendReceiveData;
 
             client.OnMessageReceived += OnMessageReceivedAsync;
+            client.OnIncorrectLogin += Client_OnIncorrectLogin;
             client.OnConnected += OnConnectedAsync;
             client.OnReconnected += OnReconnectedAsync;
             client.OnDisconnected += OnDisconnectedAsync;
@@ -531,8 +540,6 @@ namespace RavenBot
             pubsub.OnPubSubServiceClosed += Pubsub_OnPubSubServiceClosed;
             pubsub.OnChannelPointsRewardRedeemed += Pubsub_OnChannelPointsRewardRedeemed;
         }
-
-
 
         private async Task OnSendReceiveData(object sender, OnSendReceiveDataArgs e)
         {
@@ -642,7 +649,7 @@ namespace RavenBot
             client.OnChatCommandReceived -= OnCommandReceivedAsync;
             client.OnLeftChannel -= OnLeftChannel;
             client.OnJoinedChannel -= OnJoinedChannel;
-
+            client.OnIncorrectLogin -= Client_OnIncorrectLogin;
             client.OnUserStateChanged -= OnUserStateChanged;
             client.OnSendReceiveData -= OnSendReceiveData;
 

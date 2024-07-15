@@ -15,7 +15,7 @@ namespace RavenBot
 {
     class Program
     {
-        static void Main(string[] args)
+        async static Task Main(string[] args)
         {
             if (args != null && args.Any(x => x != null && !x.ToLower().Contains("ravenbot") && !x.ToLower().Contains("/") && x.ToLower().Contains("install")))
             {
@@ -89,7 +89,7 @@ namespace RavenBot
             var installAsService = false;
             using (var cmdListener = ioc.Resolve<ITwitchBot>())
             {
-                cmdListener.Start();
+                await cmdListener.StartAsync();
 
                 while (true)
                 {
