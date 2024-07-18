@@ -50,6 +50,7 @@ namespace RavenBot
             Register<LeaveCommandProcessor>(commandBindingProvider.Get("leave"));//, "exit", "quit") ;
             Register<IslandInfoCommandProcessor>(commandBindingProvider.Get("where"));//"island", "position", "where"); ;
             Register<TrainingInfoCommandProcessor>(commandBindingProvider.Get("training"));//"skill", "training"); 
+            Register<LootCommandProcessor>(commandBindingProvider.Get("loot"));
 
             Register<VendorItemCommandProcessor>(commandBindingProvider.Get("vendor"));
             Register<DisenchantItemCommandProcessor>(commandBindingProvider.Get("disenchant"));

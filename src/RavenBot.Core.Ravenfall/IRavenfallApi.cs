@@ -162,5 +162,6 @@ namespace RavenBot.Core.Ravenfall
         Task SetDungeonCombatStyleAsync(User player, string targetSkill);
         Task ClearDungeonCombatStyleAsync(User player);
         Task ClearRaidCombatStyleAsync(User player);
+        Task GetLootAsync(User player, string filter);
     }
 }

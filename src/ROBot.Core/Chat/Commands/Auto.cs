@@ -95,9 +95,15 @@ namespace ROBot.Core.Chat.Commands
             }
 
             if (itemName.Equals("stop", StringComparison.OrdinalIgnoreCase)
+                || itemName.Equals("clear", StringComparison.OrdinalIgnoreCase)
+                || itemName.Equals("reset", StringComparison.OrdinalIgnoreCase)
                 || itemName.Equals("off", StringComparison.OrdinalIgnoreCase)
+                || itemName.Equals("false", StringComparison.OrdinalIgnoreCase)
                 || arguments[^1].Equals("stop", StringComparison.OrdinalIgnoreCase)
-                || arguments[^1].Equals("off", StringComparison.OrdinalIgnoreCase))
+                || arguments[^1].Equals("clear", StringComparison.OrdinalIgnoreCase)
+                || arguments[^1].Equals("reset", StringComparison.OrdinalIgnoreCase)
+                || arguments[^1].Equals("off", StringComparison.OrdinalIgnoreCase)
+                || arguments[^1].Equals("false", StringComparison.OrdinalIgnoreCase))
             {
                 return connection[cmd].StopAutoUseAsync(player);
             }
@@ -122,7 +128,11 @@ namespace ROBot.Core.Chat.Commands
                 return;
             }
 
-            if (arg.Equals("off", StringComparison.OrdinalIgnoreCase) || arg.Equals("stop", StringComparison.OrdinalIgnoreCase))
+            if (arg.Equals("off", StringComparison.OrdinalIgnoreCase)
+                || arg.Equals("stop", StringComparison.OrdinalIgnoreCase)
+                || arg.Equals("clear", StringComparison.OrdinalIgnoreCase)
+                || arg.Equals("reset", StringComparison.OrdinalIgnoreCase)
+                || arg.Equals("false", StringComparison.OrdinalIgnoreCase))
             {
                 await connection[cmd].StopAutoRestAsync(player);
                 return;
@@ -147,4 +157,5 @@ namespace ROBot.Core.Chat.Commands
             await connection[cmd].AutoRestAsync(player, startRestTime, endRestTime);
         }
     }
+
 }

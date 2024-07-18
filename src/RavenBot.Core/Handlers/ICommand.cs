@@ -1,5 +1,40 @@
 ﻿namespace RavenBot.Core.Handlers
 {
+    public static class CommandExtensions
+    {
+        public static bool IsModeratorPlus(this ICommandSender sender)
+        {
+            return sender.IsModerator || sender.IsBroadcaster || sender.IsGameModerator || sender.IsGameAdmin;
+        }
+
+        public static bool IsVipPlus(this ICommandSender sender)
+        {
+            return sender.IsVip || sender.IsModeratorPlus();
+        }
+
+
+        public static bool IsGameModeratorPlus(this ICommandSender sender)
+        {
+            return sender.IsGameModerator || sender.IsGameAdmin;
+        }
+
+        public static bool IsModeratorPlus(this ICommand cmd)
+        {
+            return cmd.Sender.IsModerator || cmd.Sender.IsBroadcaster || 
+                cmd.Sender.IsGameModerator || cmd.Sender.IsGameAdmin;
+        }
+
+        public static bool IsVipPlus(this ICommand cmd)
+        {
+            return cmd.Sender.IsVip || cmd.Sender.IsModeratorPlus();
+        }
+
+        public static bool IsGameModeratorPlus(this ICommand cmd)
+        {
+            return cmd.Sender.IsGameModerator || cmd.Sender.IsGameAdmin;
+        }
+
+    }
 
     public interface ICommand
     {

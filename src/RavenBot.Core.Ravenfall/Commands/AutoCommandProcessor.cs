@@ -6,6 +6,7 @@ using RavenBot.Core.Ravenfall.Models;
 
 namespace RavenBot.Core.Ravenfall.Commands
 {
+
     public class AutoCommandProcessor : Net.RavenfallCommandProcessor
     {
         private readonly IRavenfallClient connection;
@@ -118,7 +119,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                 return;
             }
 
-            if (arg.Equals("off", StringComparison.OrdinalIgnoreCase) || arg.Equals("stop", StringComparison.OrdinalIgnoreCase))
+            if (arg.Equals("off", StringComparison.OrdinalIgnoreCase) || arg.Equals("reset", StringComparison.OrdinalIgnoreCase) || arg.Equals("clear", StringComparison.OrdinalIgnoreCase) || arg.Equals("stop", StringComparison.OrdinalIgnoreCase))
             {
                 await connection[cmd].StopAutoRestAsync(player);
                 return;
