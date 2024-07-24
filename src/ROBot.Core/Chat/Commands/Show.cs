@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace ROBot.Core.Chat.Commands
 {
+
     public class Show : ChatCommandHandler
     {
         public Show()

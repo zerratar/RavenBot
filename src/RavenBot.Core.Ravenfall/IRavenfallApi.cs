@@ -88,6 +88,7 @@ namespace RavenBot.Core.Ravenfall
         Task BuyItemAsync(User author, string itemQuery);
         Task VendorItemAsync(User author, string itemQuery);
         Task GiftItemAsync(User author, string itemQuery);
+        Task SendItemAsync(User player, string query);
         Task ValueItemAsync(User author, string itemQuery);
         Task DisembarkFerryAsync(User author);
         Task EmbarkFerryAsync(User author);

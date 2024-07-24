@@ -84,8 +84,8 @@ namespace RavenBot.Core.Ravenfall
         public Task GetStatusEffectsAsync(User player, string arguments) => SendAsync("get_status_effects", player, arguments);
         public Task UseMarketAsync(User player, string itemQuery) => SendAsync("marketplace", player, itemQuery);
         public Task UseVendorAsync(User player, string itemQuery) => SendAsync("vendor", player, itemQuery);
-
         public Task GiftItemAsync(User player, string itemQuery) => SendAsync("gift_item", player, itemQuery);
+        public Task SendItemAsync(User player, string itemQuery) => SendAsync("send_item", player, itemQuery);
         public Task VendorItemAsync(User player, string itemQuery) => SendAsync("vendor_item", player, itemQuery);
         public Task ValueItemAsync(User player, string itemQuery) => SendAsync("value_item", player, itemQuery);
         public Task CraftRequirementAsync(User player, string itemName) => SendAsync("req_item", player, itemName);

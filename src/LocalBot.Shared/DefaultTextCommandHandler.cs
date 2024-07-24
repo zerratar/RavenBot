@@ -62,6 +62,7 @@ namespace RavenBot
             Register<ToggleCommandProcessor>(commandBindingProvider.Get("toggle"));
             Register<RavenfallCommandProcessor>(commandBindingProvider.Get("rpg"));
             Register<ObserveCommandProcessor>(commandBindingProvider.Get("show"));//"observe", "show", "display");
+            Register<SendItemCommandProcessor>(commandBindingProvider.Get("send", "transfer"));
             Register<MonsterCommandProcessor>(commandBindingProvider.Get("monster"));
 
             Register<TinyPlayerCommandProcessor>(commandBindingProvider.Get("small"));

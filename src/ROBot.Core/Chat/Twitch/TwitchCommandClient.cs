@@ -776,7 +776,7 @@ namespace ROBot.Core.Chat.Twitch
                 }
             }
 
-            if (err == "")
+            if (string.IsNullOrEmpty(err))
             {
                 logger.LogWarning("[TWITCH] Failed To Get Join Confirmation Without Reported Errors (Channel: " + e.Exception.Channel + ")");
             }
@@ -804,13 +804,13 @@ namespace ROBot.Core.Chat.Twitch
 
         private async Task OnErrorAsync(object sender, OnErrorEventArgs e)
         {
-            logger.LogError("[TWITCH] onError (Error: " + e.ToString() + ")");
+            logger.LogError("[TWITCH] Error: " + e.Exception);
             stats.AddTwitchError(e);
         }
 
         private async Task OnConnectionErrorAsync(object sender, OnConnectionErrorArgs e)
         {
-            logger.LogError("[TWITCH] OnConnectionError (Error: " + e.Error.Message + ")");
+            logger.LogError("[TWITCH] Connection Error: " + e.Error.Message);
             stats.AddTwitchError(e);
             hasConnectionError = true;
             isConnectedToTwitch = false;
@@ -822,7 +822,7 @@ namespace ROBot.Core.Chat.Twitch
         {
             this.messageBus.Send(nameof(ChannelStateChangedEvent), new ChannelStateChangedEvent("twitch", e.Channel, false, null));
             stats.LeftChannel(e.Channel, client.JoinedChannels);
-            logger.LogWarning("[TWITCH] Left Channel (Channel: " + e.Channel + ")");
+            logger.LogWarning("[TWITCH] Left Channel: " + e.Channel);
             currentlyJoiningChannels.TryRemove(e.Channel, out _);
         }
 
@@ -830,7 +830,7 @@ namespace ROBot.Core.Chat.Twitch
         {
             this.messageBus.Send(nameof(ChannelStateChangedEvent), new ChannelStateChangedEvent("twitch", e.Channel, true, null));
             stats.JoinedChannel(e.Channel, client.JoinedChannels);
-            logger.LogInformation("[TWITCH] Joined (Channel: " + e.Channel + ")");
+            logger.LogInformation("[TWITCH] Joined Channel: " + e.Channel);
             if (chatMessageQueue.TryGetValue(e.Channel, out var queue))
             {
                 if (queue.Count > 0)

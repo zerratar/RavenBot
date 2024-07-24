@@ -3,8 +3,6 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using RavenBot.Core.Chat.Twitch;
 using RavenBot.Core.Handlers;
-using RavenBot.Core.Net;
-using static System.Collections.Specialized.BitVector32;
 
 namespace RavenBot.Core.Ravenfall.Commands
 {

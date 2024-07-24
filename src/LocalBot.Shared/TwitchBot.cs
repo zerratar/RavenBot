@@ -573,7 +573,7 @@ namespace RavenBot
 
         private async Task OnConnectionErrorAsync(object sender, OnConnectionErrorArgs e)
         {
-            logger.WriteError("Error connecting to Twitch: " + e.Error + ". Maybe time to refresh the access token?");
+            logger.WriteError("Error connecting to Twitch: " + e.Error?.Message);
         }
 
         private void Pubsub_OnPubSubServiceError(object sender, TwitchLib.PubSub.Events.OnPubSubServiceErrorArgs e)
