@@ -13,7 +13,7 @@ namespace ROBot.Core.Chat.Commands
         public override string Category => "Game";
         public override System.Collections.Generic.IReadOnlyList<ChatCommandInput> Inputs { get; } = new System.Collections.Generic.List<ChatCommandInput>
         {
-            ChatCommandInput.Create("action", "What kind of interaction you want to do", "info", "stats", "leave", "join", "remove", "kick", "invite", "accept", "decline", "promote", "demote").Required(),
+            ChatCommandInput.Create("action", "What kind of interaction you want to do", "info", "rank", "role", "stats", "leave", "join", "remove", "kick", "invite", "accept", "decline", "promote", "demote").Required(),
             ChatCommandInput.Create("target", "When joining a clan, clan name may be provided or player name if it's a player action."),
             ChatCommandInput.Create("rank", "When inviting, kicking, promoting or demoting a player, the new rank needs to be specified"),
         };
@@ -66,6 +66,12 @@ namespace ROBot.Core.Chat.Commands
                     // how many members, clan skill levels
                     // how many members of each type
                     await connection[cmd].GetClanStatsAsync(player, argument);
+                    return;
+
+                case "rank":
+                case "role":
+                    // gets the clan rank of the current user.
+                    await connection[cmd].GetClanRankAsync(player, argument);
                     return;
 
                 case "leave":

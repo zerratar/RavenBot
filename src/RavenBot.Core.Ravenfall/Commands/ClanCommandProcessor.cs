@@ -53,6 +53,11 @@ namespace RavenBot.Core.Ravenfall.Commands
                     await this.game[cmd.CorrelationId].GetClanStatsAsync(player, argument);
                     return;
 
+                case "rank":
+                case "role":
+                    await this.game[cmd.CorrelationId].GetClanRankAsync(player, argument);
+                    return;
+
                 case "leave":
                     await this.game[cmd.CorrelationId].LeaveClanAsync(player, argument);
                     return;

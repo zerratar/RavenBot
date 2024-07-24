@@ -146,6 +146,8 @@ namespace RavenBot.Core.Ravenfall
         /// <param name="player"></param>
         /// <returns></returns>
         Task GetClanStatsAsync(User author, string argument);
+        Task GetClanRankAsync(User author, string argument);
+
         Task UseItemAsync(User player, string arguments);
         Task TeleportAsync(User player, string island);
         Task GetStatusEffectsAsync(User player, string arguments);

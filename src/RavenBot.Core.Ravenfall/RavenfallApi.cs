@@ -129,6 +129,7 @@ namespace RavenBot.Core.Ravenfall
         public Task GetClientVersionAsync(User player) => SendAsync("client_version", player);
         public Task GetClanInfoAsync(User player, string arg) => SendAsync("clan_info", player, arg);
         public Task GetClanStatsAsync(User player, string arg) => SendAsync("clan_stats", player, arg);
+        public Task GetClanRankAsync(User player, string arg) => SendAsync("clan_rank", player, arg);
         public Task JoinClanAsync(User player, string arguments) => SendAsync("clan_join", player, arguments);
         public Task LeaveClanAsync(User player, string argument) => SendAsync("clan_leave", player, argument);
         public Task RemoveFromClanAsync(User player, User targetPlayer) => SendAsync("clan_remove", player, targetPlayer);
