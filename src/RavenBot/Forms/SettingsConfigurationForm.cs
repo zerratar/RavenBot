@@ -18,7 +18,7 @@ namespace RavenBot.Forms
 
         private void btnSave_Click(object sender, EventArgs e)
         {
-            var settings = new Core.AppSettings(authResult?.User ?? inputChannel.Text, inputToken.Text, inputChannel.Text, existingAppSettings?.LogFile);
+            var settings = new Core.AppSettings(authResult?.User ?? inputChannel.Text, inputToken.Text, inputChannel.Text, existingAppSettings?.LogFile, existingAppSettings?.Port ?? 4040);
             var settingsData = Newtonsoft.Json.JsonConvert.SerializeObject(settings);
             System.IO.File.WriteAllText("settings.json", settingsData);
             this.DialogResult = DialogResult.OK;

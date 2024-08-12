@@ -10,8 +10,6 @@ namespace RavenBot.Core.Ravenfall.Commands
 {
     public class TrainCommandProcessor : Net.RavenfallCommandProcessor
     {
-        private const int ServerPort = 4040;
-
         private readonly IRavenfallClient game;
         private readonly IUserProvider playerProvider;
 
@@ -30,7 +28,7 @@ namespace RavenBot.Core.Ravenfall.Commands
 
         public override async Task ProcessAsync(IMessageChat chat, ICommand cmd)
         {
-            if (!await this.game.ProcessAsync(ServerPort))
+            if (!await this.game.ProcessAsync(Settings.UNITY_SERVER_PORT))
             {
                 await chat.SendReplyAsync(cmd, Localization.GAME_NOT_STARTED);
                 return;

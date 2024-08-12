@@ -21,6 +21,7 @@ namespace RavenBot.Core.Ravenfall
         private readonly IUserProvider playerProvider;
         private readonly IMessageBus messageBus;
         private readonly IGameClient client;
+        private readonly IAppSettings appSettings;
         private readonly IUserSettingsManager settingsManager;
         private ITimeoutHandle keepAliveHandle;
         private ChannelStateChangedEvent lastChannelState;
@@ -32,6 +33,7 @@ namespace RavenBot.Core.Ravenfall
             IUserProvider playerProvider,
             IMessageBus messageBus,
             IGameClient client,
+            IAppSettings appSettings,
             IUserSettingsManager settingsManager)
         {
             this.kernel = kernel;
@@ -40,6 +42,11 @@ namespace RavenBot.Core.Ravenfall
             this.playerProvider = playerProvider;
             this.messageBus = messageBus;
 
+            if (appSettings != null && appSettings.Port > 0)
+            {
+                Settings.UNITY_SERVER_PORT = appSettings.Port;
+            }
+
             messageBus.Subscribe<UserJoinedEvent>(nameof(UserJoinedEvent), OnUserJoined);
             messageBus.Subscribe<UserLeftEvent>(nameof(UserLeftEvent), OnUserLeft);
             messageBus.Subscribe<CheerBitsEvent>(nameof(CheerBitsEvent), OnUserCheer);
@@ -47,6 +54,7 @@ namespace RavenBot.Core.Ravenfall
             messageBus.Subscribe<ChannelStateChangedEvent>(nameof(ChannelStateChangedEvent), OnChannelStateChanged);
 
             this.client = client;
+            this.appSettings = appSettings;
             this.Api = new RavenfallApi(client, EnqueueRequest, null);
             this.client.Connected += Client_OnConnect;
             this.client.Subscribe("session", RegisterSession);

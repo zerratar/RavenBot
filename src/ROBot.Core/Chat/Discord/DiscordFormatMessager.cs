@@ -120,7 +120,7 @@ namespace ROBot.Core.Chat.Discord
                 var eq = inspect.EquipmentStats;
 
                 builder.AddField("\u200B", "**__Equipment Stats__**", false);
-
+                
                 builder.AddField("Weapon Aim", eq.WeaponAim, true);
                 builder.AddField("Weapon Power", eq.WeaponPower, true);
 

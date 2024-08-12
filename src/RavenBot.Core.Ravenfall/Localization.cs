@@ -2,7 +2,7 @@
 {
     public static class Settings
     {
-        public const int UNITY_SERVER_PORT = 4040;
+        public static int UNITY_SERVER_PORT = 4040;
     }
 
     public static class Localization
