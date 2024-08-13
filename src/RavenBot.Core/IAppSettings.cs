@@ -7,6 +7,7 @@
         string TwitchChannel { get; set; }
         int Port { get; set; }
         string LogFile { get; set; }
+        char? CommandIdentifier { get; }
         void Save();
     }
 }

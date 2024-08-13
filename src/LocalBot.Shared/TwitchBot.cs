@@ -24,6 +24,7 @@ namespace RavenBot
     public class TwitchBot : ITwitchBot, IMessageChat
     {
         private readonly ILogger logger;
+        private readonly Core.IAppSettings settings;
         private readonly IKernel kernel;
         private readonly IUserSettingsManager userSettingsManager;
         private readonly IRavenfallClient ravenfall;
@@ -52,6 +53,7 @@ namespace RavenBot
         private readonly object pubsubListenMutex = new object();
         public TwitchBot(
             ILogger logger,
+            Core.IAppSettings settings,
             IKernel kernel,
             IUserSettingsManager userSettingsManager,
             IRavenfallClient ravenfall,
@@ -64,6 +66,7 @@ namespace RavenBot
             IConnectionCredentialsProvider credentialsProvider)
         {
             this.logger = logger;
+            this.settings = settings;
             this.kernel = kernel;
             this.userSettingsManager = userSettingsManager;
             this.ravenfall = ravenfall;
@@ -513,6 +516,13 @@ namespace RavenBot
 
         private void Subscribe()
         {
+            if (settings.CommandIdentifier != null)
+            {
+                var cmdIdentifier = settings.CommandIdentifier.Value;
+                client.ChatCommandIdentifiers.Clear();
+                client.ChatCommandIdentifiers.Add(cmdIdentifier);
+            }
+
             client.OnChannelStateChanged += OnChannelStateChanged;
             client.OnChatCommandReceived += OnCommandReceivedAsync;
             client.OnLeftChannel += OnLeftChannel;
