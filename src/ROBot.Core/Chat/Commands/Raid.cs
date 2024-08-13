@@ -67,6 +67,7 @@ namespace ROBot.Core.Chat.Commands
                             {
                                 await connection[cmd].SetRaidCombatStyleAsync(player, targetSkill);
                             }
+                            return;
                         }
 
                         if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsGameAdmin)

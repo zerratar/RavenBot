@@ -68,6 +68,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                     {
                         await game[cmd].SetRaidCombatStyleAsync(player, targetSkill);
                     }
+                    return;
                 }
 
                 if (!cmd.Sender.IsBroadcaster && !cmd.Sender.IsGameAdmin)
