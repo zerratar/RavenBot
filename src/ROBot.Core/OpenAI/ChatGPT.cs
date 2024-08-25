@@ -206,7 +206,7 @@ namespace ROBot.Core.OpenAI
             return await RequestAsync<ChatCompletionRequest, ChatCompletionResponse>("https://api.openai.com/v1/chat/completions", new ChatCompletionRequest
             {
                 //Model = "text-davinci-003",
-                Model = "gpt-3.5-turbo",
+                Model = "gpt-4o-mini",
                 //Model = "davinci:ft-shinobytes-2023-02-20-14-02-16",
                 // Prompt = "What if Nicholas Cage played the lead role in Superman?",
                 Messages = msgs.ToArray()

@@ -50,6 +50,7 @@ namespace RavenBot.Core.Ravenfall
         Task EnchantAsync(User author, string item);
         Task DisenchantAsync(User author, string item);
         Task ClearEnchantmentCooldownAsync(User author);
+
         Task GetEnchantmentCooldownAsync(User author);
         Task SetPetAsync(User author, string pet);
         Task GetPetAsync(User author);
@@ -165,6 +166,8 @@ namespace RavenBot.Core.Ravenfall
         Task SetDungeonCombatStyleAsync(User player, string targetSkill);
         Task ClearDungeonCombatStyleAsync(User player);
         Task ClearRaidCombatStyleAsync(User player);
+        Task GetDungeonCombatStyleAsync(User player);
+        Task GetRaidCombatStyleAsync(User player);
         Task GetLootAsync(User player, string filter);
     }
 }

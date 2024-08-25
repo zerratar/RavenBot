@@ -58,7 +58,7 @@ namespace ROBot
             ioc.RegisterShared<IStringTemplateParser, StringTemplateParser>();
             ioc.RegisterShared<IStringTemplateProcessor, StringTemplateProcessor>();
             ioc.RegisterShared<RavenBot.Core.IChatMessageFormatter, RavenBot.Core.ChatMessageFormatter>();
-            ioc.RegisterShared<RavenBot.Core.IChatMessageTransformer, ChatGPT35MessageTransformer>();
+            ioc.RegisterShared<RavenBot.Core.IChatMessageTransformer, ChatGPTMessageTransformer>();
 
 
             // Ravenfall stuff

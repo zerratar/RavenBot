@@ -146,6 +146,8 @@ namespace RavenBot.Core.Ravenfall
         public Task RequestAutoUseStatusAsync(User player) => SendAsync("auto_use_status", player);
         public Task GetDpsAsync(User player) => SendAsync("dps", player);
         public Task ClearDungeonCombatStyleAsync(User player) => SendAsync("dungeon_skill_clear", player);
+        public Task GetDungeonCombatStyleAsync(User player) => SendAsync("dungeon_get_skill", player);
+        public Task GetRaidCombatStyleAsync(User player) => SendAsync("raid_get_skill", player);
         public Task ClearRaidCombatStyleAsync(User player) => SendAsync("raid_skill_clear", player);
         public Task SetRaidCombatStyleAsync(User player, string targetSkill) => SendAsync("raid_skill", player, targetSkill);
         public Task SetDungeonCombatStyleAsync(User player, string targetSkill) => SendAsync("dungeon_skill", player, targetSkill);

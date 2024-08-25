@@ -57,6 +57,10 @@ namespace RavenBot.Core.Ravenfall.Commands
                     await this.game[cmd.CorrelationId].StopRaidAsync(player);
                     return;
                 }
+                else if (cmd.Arguments.Equals("skill", System.StringComparison.OrdinalIgnoreCase))
+                {
+                    await this.game[cmd.CorrelationId].GetRaidCombatStyleAsync(player);
+                }
                 else if (cmd.Arguments.Contains("skill ", System.StringComparison.OrdinalIgnoreCase) || cmd.Arguments.Contains("style ", System.StringComparison.OrdinalIgnoreCase))
                 {
                     var targetSkill = cmd.Arguments.Split(' ').Skip(1).FirstOrDefault();

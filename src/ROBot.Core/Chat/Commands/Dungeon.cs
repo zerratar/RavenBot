@@ -45,6 +45,10 @@ namespace ROBot.Core.Chat.Commands
                     {
                         await connection[cmd].DungeonStartAsync(player);
                     }
+                    else if (cmd.Arguments.Equals("skill", System.StringComparison.OrdinalIgnoreCase))
+                    {
+                        await connection[cmd].GetDungeonCombatStyleAsync(player);
+                    }
                     else if (cmd.Arguments.Contains("skill ", System.StringComparison.OrdinalIgnoreCase) || cmd.Arguments.Contains("style ", System.StringComparison.OrdinalIgnoreCase))
                     {
                         var targetSkill = cmd.Arguments.Split(' ').Skip(1).FirstOrDefault();
