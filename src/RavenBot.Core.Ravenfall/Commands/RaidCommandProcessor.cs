@@ -60,6 +60,7 @@ namespace RavenBot.Core.Ravenfall.Commands
                 else if (cmd.Arguments.Equals("skill", System.StringComparison.OrdinalIgnoreCase))
                 {
                     await this.game[cmd.CorrelationId].GetRaidCombatStyleAsync(player);
+                    return;
                 }
                 else if (cmd.Arguments.Contains("skill ", System.StringComparison.OrdinalIgnoreCase) || cmd.Arguments.Contains("style ", System.StringComparison.OrdinalIgnoreCase))
                 {

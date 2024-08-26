@@ -3,7 +3,7 @@
     public class Req : Requirement
     {
         public override string Category => "Items";
-        public override string Description => "Check what the crafting requirements are for a target item.";
+        public override string Description => "Check what the crafting and level requirements are for a target item.";
         public override string UsageExample => "!req rune 2h sword";
         public override System.Collections.Generic.IReadOnlyList<ChatCommandInput> Inputs { get; } = new System.Collections.Generic.List<ChatCommandInput>
         {

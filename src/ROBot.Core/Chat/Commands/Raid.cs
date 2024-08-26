@@ -59,6 +59,7 @@ namespace ROBot.Core.Chat.Commands
                         else if (cmd.Arguments.Equals("skill", System.StringComparison.OrdinalIgnoreCase))
                         {
                             await connection[cmd].GetRaidCombatStyleAsync(player);
+                            return;
                         }
                         else if (cmd.Arguments.Contains("skill ", System.StringComparison.OrdinalIgnoreCase) || cmd.Arguments.Contains("style ", System.StringComparison.OrdinalIgnoreCase))
                         {
