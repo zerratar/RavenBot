@@ -48,6 +48,9 @@ namespace RavenBot.Core.Ravenfall
         public Task RaidStartAsync(User player) => SendAsync("raid_force", player);
         public Task StopDungeonAsync(User player) => SendAsync("dungeon_stop", player);
         public Task DungeonStartAsync(User player) => SendAsync("dungeon_force", player);
+        public Task ProceedDungeonAsync(User player) => SendAsync("dungeon_proceed", player);
+        public Task KillDungeonBossAsync(User player) => SendAsync("dungeon_kill_boss", player);
+        public Task KillRaidBossAsync(User player) => SendAsync("raid_kill_boss", player);
         public Task AutoJoinDungeonAsync(User player, string code) => SendAsync("dungeon_auto", player, code);
         public Task JoinDungeonAsync(User player, string code) => SendAsync("dungeon_join", player, code);
         public Task ReloadGameAsync(User player) => SendAsync("reload", player);

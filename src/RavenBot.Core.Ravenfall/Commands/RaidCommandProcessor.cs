@@ -52,6 +52,11 @@ namespace RavenBot.Core.Ravenfall.Commands
                     await this.game[cmd.CorrelationId].RaidStartAsync(player);
                     return;
                 }
+                else if (cmd.Arguments.Contains("kill boss", StringComparison.OrdinalIgnoreCase))
+                {
+                    await this.game[cmd].KillRaidBossAsync(player);
+                    return;
+                }
                 else if (cmd.Arguments.Contains("stop", StringComparison.OrdinalIgnoreCase))
                 {
                     await this.game[cmd.CorrelationId].StopRaidAsync(player);

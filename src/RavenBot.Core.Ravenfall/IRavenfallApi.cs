@@ -169,5 +169,8 @@ namespace RavenBot.Core.Ravenfall
         Task GetDungeonCombatStyleAsync(User player);
         Task GetRaidCombatStyleAsync(User player);
         Task GetLootAsync(User player, string filter);
+        Task ProceedDungeonAsync(User player);
+        Task KillDungeonBossAsync(User player);
+        Task KillRaidBossAsync(User player);
     }
 }

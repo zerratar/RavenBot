@@ -34,6 +34,14 @@ namespace ROBot.Core.Chat.Commands
                     {
                         await connection[cmd].AutoJoinDungeonAsync(player, cmd.Arguments.Split(' ').LastOrDefault());
                     }
+                    else if (cmd.Arguments.Contains("proceed", System.StringComparison.OrdinalIgnoreCase) || cmd.Arguments.Contains("next room", System.StringComparison.OrdinalIgnoreCase))
+                    {
+                        await connection[cmd].ProceedDungeonAsync(player);
+                    }
+                    else if (cmd.Arguments.Contains("kill boss", System.StringComparison.OrdinalIgnoreCase))
+                    {
+                        await connection[cmd].KillDungeonBossAsync(player);
+                    }
                     else if (cmd.Arguments.Contains("stop", System.StringComparison.OrdinalIgnoreCase))
                     {
                         if (player.IsBroadcaster || player.IsModerator)

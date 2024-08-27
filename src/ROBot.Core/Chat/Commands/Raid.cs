@@ -56,6 +56,11 @@ namespace ROBot.Core.Chat.Commands
                             await connection[cmd].StopRaidAsync(player);
                             return;
                         }
+                        else if (cmd.Arguments.Contains("kill boss", System.StringComparison.OrdinalIgnoreCase))
+                        {
+                            await connection[cmd].KillRaidBossAsync(player);
+                            return;
+                        }
                         else if (cmd.Arguments.Equals("skill", System.StringComparison.OrdinalIgnoreCase))
                         {
                             await connection[cmd].GetRaidCombatStyleAsync(player);

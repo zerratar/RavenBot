@@ -40,6 +40,14 @@ namespace RavenBot.Core.Ravenfall.Commands
                     await this.game[cmd.CorrelationId].StopDungeonAsync(player);
                 }
             }
+            else if (cmd.Arguments.Contains("proceed", System.StringComparison.OrdinalIgnoreCase) || cmd.Arguments.Contains("next room", System.StringComparison.OrdinalIgnoreCase))
+            {
+                await game[cmd].ProceedDungeonAsync(player);
+            }
+            else if (cmd.Arguments.Contains("kill boss", System.StringComparison.OrdinalIgnoreCase))
+            {
+                await game[cmd].KillDungeonBossAsync(player);
+            }
             else if (cmd.Arguments.Contains("start", System.StringComparison.OrdinalIgnoreCase))
             {
                 await this.game[cmd.CorrelationId].DungeonStartAsync(player);
