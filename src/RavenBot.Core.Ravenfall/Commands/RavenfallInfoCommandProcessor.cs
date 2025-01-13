@@ -16,11 +16,12 @@ namespace RavenBot.Core.Ravenfall.Commands
 
         public override async Task ProcessAsync(IMessageChat chat, ICommand cmd)
         {
-            if (cmd.Arguments == null || cmd.Arguments.Length == 0)
-            {
-                await chat.AnnounceAsync("Ravenfall is a Twitch idle game where you can train, craft, fight together against huge raid bosses or fight against eachother.");
-            }
-            else if (cmd.Arguments.StartsWith("reload", System.StringComparison.OrdinalIgnoreCase))
+            //if (cmd.Arguments == null || cmd.Arguments.Length == 0)
+            //{
+            //    await chat.AnnounceAsync("Ravenfall is a Twitch idle game where you can train, craft, fight together against huge raid bosses or fight against each other.");
+            //}
+            //else 
+            if (cmd.Arguments.StartsWith("reload", System.StringComparison.OrdinalIgnoreCase))
             {
                 var player = playerProvider.Get(cmd);
                 await this.game[cmd.CorrelationId].ReloadGameAsync(player);

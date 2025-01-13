@@ -40,12 +40,13 @@ namespace RavenBot
             ioc.RegisterCustomShared<IUserSettingsManager>(() => new UserSettingsManager("./user-settings/"));
 #endif
             ioc.RegisterShared<ITwitchUserStore, TwitchUserStore>();
-            
+
 
             ioc.Register<IGameConnection, TcpGameConnection>();
             //ioc.Register<IGameClient, TcpGameClient>();
 
-            ioc.RegisterShared<IMessageBus, MessageBus>();
+            //ioc.RegisterShared<IMessageBus, MessageBus>();
+            ioc.RegisterCustomShared<IMessageBus>(() => MessageBus.Instance);
             ioc.RegisterShared<IChannelProvider, DefaultChannelProvider>();
             ioc.RegisterShared<IConnectionCredentialsProvider, DefaultConnectionCredentialsProvider>();
             ioc.RegisterShared<ICommandHandler, DefaultTextCommandHandler>();

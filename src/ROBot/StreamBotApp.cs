@@ -11,6 +11,8 @@ using IKernel = Shinobytes.Core.IKernel;
 using ROBot.Core.Chat.Discord;
 using ROBot.Core.Chat.Twitch;
 using Shinobytes.Core;
+using RavenBot.Core.Chat;
+using System.Collections.Concurrent;
 
 namespace ROBot
 {
@@ -33,10 +35,15 @@ namespace ROBot
         private bool canUpdateCmdTitle = true;
         private DateTime lastDetailsUpdate;
         private HttpClient httpClient;
+        private ITimeoutHandle queueTimeoutHandle;
+
+        private readonly ConcurrentQueue<UserSubscriptionEvent> subQueue = new ConcurrentQueue<UserSubscriptionEvent>();
+        private readonly ConcurrentQueue<CheerBitsEvent> cheerBitsQueue = new ConcurrentQueue<CheerBitsEvent>();
 
         public StreamBotApp(
             ILogger logger,
             IKernel kernel,
+            IMessageBus messageBus,
             IGameSessionManager sessionManager,
             IBotServer ravenfall,
             ITwitchCommandClient twitch,
@@ -51,7 +58,6 @@ namespace ROBot
             this.discord = discord;
             this.botStats = botStats;
 
-
             var handler = new HttpClientHandler();
             handler.ServerCertificateCustomValidationCallback = (httpRequestMessage, cert, cetChain, policyErrors) => true;
             httpClient = new HttpClient(handler);
@@ -61,6 +67,42 @@ namespace ROBot
             sessionManager.SessionStarted += OnSessionStarted;
             sessionManager.SessionEnded += OnSessionEnded;
             sessionManager.SessionUpdated += OnSessionUpdated;
+
+            messageBus.Subscribe<CheerBitsEvent>(nameof(CheerBitsEvent), OnUserCheer);
+            messageBus.Subscribe<UserSubscriptionEvent>(nameof(UserSubscriptionEvent), OnUserSub);
+
+            this.queueTimeoutHandle = kernel.SetTimeout(HandleTwitchEventQueue, 30000);
+        }
+
+        private async void HandleTwitchEventQueue()
+        {
+            try
+            {
+                while (cheerBitsQueue.TryDequeue(out var evt))
+                {
+                    if (!await OnUserCheerImplAsync(evt, false))
+                    {
+                        cheerBitsQueue.Enqueue(evt);
+                        break; // try again later
+                    }
+                }
+            }
+            catch { }
+
+            try
+            {
+                while (subQueue.TryDequeue(out var evt))
+                {
+                    if (!await OnUserSubImplAsync(evt, false))
+                    {
+                        subQueue.Enqueue(evt);
+                        break; // try again later
+                    }
+                }
+            }
+            catch { }
+
+            this.queueTimeoutHandle = kernel.SetTimeout(HandleTwitchEventQueue, 30000);
         }
 
         public async Task RunAsync()
@@ -113,6 +155,78 @@ namespace ROBot
             this.timeoutHandle = this.kernel.SetTimeout(UpdateTitle, delay);
         }
 
+        private async void OnUserSub(UserSubscriptionEvent @event)
+        {
+            await OnUserSubImplAsync(@event, true);
+        }
+
+        private async void OnUserCheer(CheerBitsEvent @event)
+        {
+            await OnUserCheerImplAsync(@event, true);
+        }
+
+        private async Task<bool> OnUserCheerImplAsync(CheerBitsEvent @event, bool addToQueueOnFailure)
+        {
+            // TODO: implement
+            // 1. try send to raven nest
+            // 2. if failed, add to a retry queue with the same object
+            // return false if failed, true if success
+            try
+            {
+                var json = JsonConvert.SerializeObject(@event);
+                var statsData = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+#if DEBUG
+                using (var response = await httpClient.PostAsync("https://localhost:5001/api/robot/twitch-cheer", statsData))
+#else
+                using (var response = await httpClient.PostAsync("https://www.ravenfall.stream/api/robot/twitch-cheer", statsData))
+#endif
+                {
+                    response.EnsureSuccessStatusCode();
+                }
+
+                return true;
+            }
+            catch
+            {
+                if (addToQueueOnFailure)
+                {
+                    cheerBitsQueue.Enqueue(@event);
+                }
+                return false;
+            }
+        }
+
+        private async Task<bool> OnUserSubImplAsync(UserSubscriptionEvent @event, bool addToQueueOnFailure)
+        {
+            // TODO: implement
+            // 1. try send to raven nest
+            // 2. if failed, add to a retry queue with the same object
+            // return false if failed, true if success
+            try
+            {
+                var json = JsonConvert.SerializeObject(@event);
+                var statsData = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+#if DEBUG
+                using (var response = await httpClient.PostAsync("https://localhost:5001/api/robot/twitch-sub", statsData))
+#else
+                using (var response = await httpClient.PostAsync("https://www.ravenfall.stream/api/robot/twitch-sub", statsData))
+#endif
+                {
+                    response.EnsureSuccessStatusCode();
+                }
+
+                return true;
+            }
+            catch
+            {
+                if (addToQueueOnFailure)
+                {
+                    subQueue.Enqueue(@event);
+                }
+                return false;
+            }
+        }
+
         private async void SendDetailsToRavenNest()
         {
             try
@@ -130,8 +244,11 @@ namespace ROBot
 
                 var json = JsonConvert.SerializeObject(botStats);
                 var statsData = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+#if DEBUG
+                using (var response = await httpClient.PostAsync("https://localhost:5001/api/robot/stats", statsData))
+#else
                 using (var response = await httpClient.PostAsync("https://www.ravenfall.stream/api/robot/stats", statsData))
-                //using (var response = await www.PostAsync("https://localhost:5001/api/robot/stats", statsData))
+#endif
                 {
                     response.EnsureSuccessStatusCode();
                     detailsDelayTimer = 0;

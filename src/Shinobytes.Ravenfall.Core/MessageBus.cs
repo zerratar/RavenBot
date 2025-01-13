@@ -14,6 +14,8 @@ namespace Shinobytes.Core
         private readonly object mutex = new object();
         private readonly List<Subscription> subscriptions = new List<Subscription>();
 
+        public static MessageBus Instance { get; private set; } = new MessageBus();
+
         public void Send<T>(string key, T message)
         {
             lock (mutex)

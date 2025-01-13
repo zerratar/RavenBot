@@ -8,7 +8,11 @@ namespace ROBot.Core.Chat.Commands
     {
         public override bool RequiresBroadcaster => false;
         public override string Category => "Game";
-        public override string Description => "Forces the game to load the update scene. This is the same as restarting the game to initiate an update. Only broadcaster, game admin and moderators can use this command.";
+        public override string Description => "Can be used to reload the game, force an update or retrieving the how-to-play guide link.";
+        public override System.Collections.Generic.IReadOnlyList<ChatCommandInput> Inputs { get; } = new System.Collections.Generic.List<ChatCommandInput>
+        {
+            ChatCommandInput.Create("action", "Whether you want some help, update or reload the game.", "update", "reload", "help").Required(),
+        };
 
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
         {
@@ -19,11 +23,12 @@ namespace ROBot.Core.Chat.Commands
                 var connection = game.GetConnection(session);
                 if (connection != null)
                 {
-                    if (cmd.Arguments == null || cmd.Arguments.Length == 0)
-                    {
-                        await chat.SendMessageAsync(cmd.Channel, "Ravenfall is a Twitch idle game where you can train, craft, fight together against huge raid bosses or fight against eachother.", new object[0]);
-                    }
-                    else if (cmd.Arguments.StartsWith("update", System.StringComparison.OrdinalIgnoreCase))
+                    //if (cmd.Arguments == null || cmd.Arguments.Length == 0)
+                    //{
+                    //    await chat.SendMessageAsync(cmd.Channel, "Ravenfall is a Twitch idle game where you can train, craft, fight together against huge raid bosses or fight against each other.", new object[0]);
+                    //}
+                    //else 
+                    if (cmd.Arguments.StartsWith("update", System.StringComparison.OrdinalIgnoreCase))
                     {
                         var player = session.Get(cmd);
                         await connection[cmd].UpdateGameAsync(player);
@@ -41,27 +46,4 @@ namespace ROBot.Core.Chat.Commands
             }
         }
     }
-
-    //public class Update : ChatCommandHandler
-    //{
-    //    public override bool RequiresBroadcaster => true;
-    //    public override string Category => "Game";
-    //    public override string Description => "Forces the game to load the update scene. This is the same as restarting the game to initiate an update. Only broadcaster, game admin and moderators can use this command.";
-
-    //    public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
-    //    {
-    //        var channel = cmd.Channel;
-    //        var session = game.GetSession(channel);
-    //        if (session != null)
-    //        {
-    //            var connection = game.GetConnection(session);
-    //            if (connection != null)
-    //            {
-    //                var player = session.Get(cmd);
-    //                await connection[cmd].UpdateGameAsync(player);
-    //            }
-    //        }
-    //    }
-    //}
-
 }

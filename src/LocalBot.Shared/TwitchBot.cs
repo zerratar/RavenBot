@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using RavenBot.Core;
 using RavenBot.Core.Chat;
 using RavenBot.Core.Chat.Twitch;
@@ -50,7 +53,13 @@ namespace RavenBot
         private PubSubState pubsubState;
         private bool tryPubSubAuthWithOAuthToken;
         private LocalGameSessionInfo ravenfallSession;
+        private ITimeoutHandle queueTimeoutHandle;
         private readonly object pubsubListenMutex = new object();
+        private readonly HttpClient httpClient;
+
+        private readonly ConcurrentQueue<UserSubscriptionEvent> subQueue = new ConcurrentQueue<UserSubscriptionEvent>();
+        private readonly ConcurrentQueue<CheerBitsEvent> cheerBitsQueue = new ConcurrentQueue<CheerBitsEvent>();
+
         public TwitchBot(
             ILogger logger,
             Core.IAppSettings settings,
@@ -78,6 +87,10 @@ namespace RavenBot
             this.commandHandler = commandHandler;
             this.channelProvider = channelProvider;
             this.credentialsProvider = credentialsProvider;
+
+            var handler = new HttpClientHandler();
+            handler.ServerCertificateCustomValidationCallback = (httpRequestMessage, cert, cetChain, policyErrors) => true;
+            httpClient = new HttpClient(handler);
 
             this.messageBus.Subscribe<string>("pubsub_token", data =>
             {
@@ -127,7 +140,41 @@ namespace RavenBot
             }
 
             ravenfall.ProcessAsync(Settings.UNITY_SERVER_PORT);
+
+            this.queueTimeoutHandle = kernel.SetTimeout(HandleTwitchEventQueue, 30000);
         }
+
+        private async void HandleTwitchEventQueue()
+        {
+            try
+            {
+                while (cheerBitsQueue.TryDequeue(out var evt))
+                {
+                    if (!await OnUserCheerImplAsync(evt, false))
+                    {
+                        cheerBitsQueue.Enqueue(evt);
+                        break; // try again later
+                    }
+                }
+            }
+            catch { }
+
+            try
+            {
+                while (subQueue.TryDequeue(out var evt))
+                {
+                    if (!await OnUserSubImplAsync(evt, false))
+                    {
+                        subQueue.Enqueue(evt);
+                        break; // try again later
+                    }
+                }
+            }
+            catch { }
+
+            this.queueTimeoutHandle = kernel.SetTimeout(HandleTwitchEventQueue, 30000);
+        }
+
 
         public bool CanRecieveChannelPointRewards => pubsubState == PubSubState.OK;
 
@@ -205,10 +252,7 @@ namespace RavenBot
 #warning TODO: chat messages and send them to the game.
                 return;
             }
-
-            this.messageBus.Send(
-                nameof(CheerBitsEvent),
-                new CheerBitsEvent(
+            var evt = new CheerBitsEvent(
                     "twitch",
                     e.ChatMessage.Channel,
                     e.ChatMessage.Id,
@@ -217,10 +261,10 @@ namespace RavenBot
                     e.ChatMessage.UserDetail.IsModerator,
                     e.ChatMessage.UserDetail.IsSubscriber,
                     e.ChatMessage.UserDetail.IsVip,
-                    e.ChatMessage.Bits)
-            );
-
-            this.AnnounceAsync(Localization.Twitch.THANK_YOU_BITS, e.ChatMessage.DisplayName, e.ChatMessage.Bits);
+                    e.ChatMessage.Bits);
+            this.messageBus.Send(nameof(CheerBitsEvent), evt);
+            await this.AnnounceAsync(Localization.Twitch.THANK_YOU_BITS, e.ChatMessage.DisplayName, e.ChatMessage.Bits);
+            await OnUserCheerImplAsync(evt, true);
         }
 
         private async Task OnCommandReceivedAsync(object sender, OnChatCommandReceivedArgs e)
@@ -389,8 +433,7 @@ namespace RavenBot
 
         private async Task OnNewSubAsync(object sender, OnNewSubscriberArgs e)
         {
-            this.messageBus.Send(nameof(UserSubscriptionEvent),
-                new UserSubscriptionEvent(
+            var sub = new UserSubscriptionEvent(
                     "twitch",
                     e.Channel,
                     e.Subscriber.UserId,
@@ -399,15 +442,15 @@ namespace RavenBot
                     null,
                     e.Subscriber.UserDetail.IsModerator,
                     e.Subscriber.UserDetail.IsSubscriber,
-                    1, true));
-
+                    1, true);
+            this.messageBus.Send(nameof(UserSubscriptionEvent), sub);
+            await OnUserSubImplAsync(sub, true);
             //this.Broadcast("", Localization.Twitch.THANK_YOU_SUB, e.Subscriber.DisplayName);
         }
 
         private async Task OnPrimeSubAsync(object sender, OnCommunitySubscriptionArgs e)
         {
-            this.messageBus.Send(nameof(UserSubscriptionEvent),
-                new UserSubscriptionEvent(
+            var sub = new UserSubscriptionEvent(
                     "twitch",
                     e.Channel,
                     e.GiftedSubscription.UserId,
@@ -416,15 +459,16 @@ namespace RavenBot
                     null,
                     e.GiftedSubscription.UserDetail.IsModerator,
                     e.GiftedSubscription.UserDetail.IsSubscriber,
-                    1, false));
+                    1, false);
 
+            this.messageBus.Send(nameof(UserSubscriptionEvent), sub);
+            await OnUserSubImplAsync(sub, true);
             //this.Broadcast("", Localization.Twitch.THANK_YOU_SUB, e.GiftedSubscription.DisplayName);
         }
 
         private async Task OnGiftedSubAsync(object sender, OnGiftedSubscriptionArgs e)
         {
-            this.messageBus.Send(nameof(UserSubscriptionEvent),
-            new UserSubscriptionEvent("twitch",
+            var sub = new UserSubscriptionEvent("twitch",
                 e.Channel,
                 e.GiftedSubscription.Id,
                 e.GiftedSubscription.Login,
@@ -433,7 +477,9 @@ namespace RavenBot
                 e.GiftedSubscription.UserDetail.IsModerator,
                 e.GiftedSubscription.UserDetail.IsSubscriber,
                 1,
-                false));
+                false);
+            this.messageBus.Send(nameof(UserSubscriptionEvent), sub);
+            await OnUserSubImplAsync(sub, true);
             //this.Broadcast("", Localization.Twitch.THANK_YOU_GIFT_SUB, e.GiftedSubscription.DisplayName);
         }
 
@@ -442,6 +488,61 @@ namespace RavenBot
             logger.WriteDebug("Disconnected from the Twitch IRC Server");
             TryToReconnect();
         }
+
+        private async Task<bool> OnUserCheerImplAsync(CheerBitsEvent @event, bool addToQueueOnFailure)
+        {
+            try
+            {
+                var json = JsonConvert.SerializeObject(@event);
+                var statsData = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+#if DEBUG
+                using (var response = await httpClient.PostAsync("https://localhost:5001/api/robot/twitch-cheer", statsData))
+#else
+                using (var response = await httpClient.PostAsync("https://www.ravenfall.stream/api/robot/twitch-cheer", statsData))
+#endif
+                {
+                    response.EnsureSuccessStatusCode();
+                }
+
+                return true;
+            }
+            catch
+            {
+                if (addToQueueOnFailure)
+                {
+                    cheerBitsQueue.Enqueue(@event);
+                }
+                return false;
+            }
+        }
+
+        private async Task<bool> OnUserSubImplAsync(UserSubscriptionEvent @event, bool addToQueueOnFailure)
+        {
+            try
+            {
+                var json = JsonConvert.SerializeObject(@event);
+                var statsData = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+#if DEBUG
+                using (var response = await httpClient.PostAsync("https://localhost:5001/api/robot/twitch-sub", statsData))
+#else
+                using (var response = await httpClient.PostAsync("https://www.ravenfall.stream/api/robot/twitch-sub", statsData))
+#endif
+                {
+                    response.EnsureSuccessStatusCode();
+                }
+
+                return true;
+            }
+            catch
+            {
+                if (addToQueueOnFailure)
+                {
+                    subQueue.Enqueue(@event);
+                }
+                return false;
+            }
+        }
+
 
         private void TryToReconnect()
         {

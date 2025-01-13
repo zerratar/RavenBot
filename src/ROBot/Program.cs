@@ -46,7 +46,8 @@ namespace ROBot
             ioc.RegisterShared<IKernel, Kernel>();
             ioc.RegisterShared<IStreamBotApplication, StreamBotApp>();
 
-            ioc.RegisterShared<IMessageBus, MessageBus>();
+            //ioc.RegisterShared<IMessageBus, MessageBus>();
+            ioc.RegisterCustomShared<IMessageBus>(() => MessageBus.Instance);
 
             //#if DEBUG && 
             //            ioc.RegisterCustomShared<IUserSettingsManager>(() => new UserSettingsManager(@"C:\Ravenfall\user-settings"));

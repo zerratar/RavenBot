@@ -348,6 +348,8 @@ namespace ROBot.Core.GameServer
 
             logger.LogDebug("[TWITCH] Sub Recieved (Channel: " + obj.Channel + " From: " + obj.DisplayName + " To: " + name + ")");
             await SendAsync("twitch_sub", obj);
+
+
         }
 
         private void OnUserLeft(UserLeftEvent obj) => logger.LogDebug("[TWITCH] " + " User left the channel (User: " + obj.Name + ")");
