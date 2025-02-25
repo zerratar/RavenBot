@@ -52,7 +52,13 @@ namespace ROBot
             //#if DEBUG && 
             //            ioc.RegisterCustomShared<IUserSettingsManager>(() => new UserSettingsManager(@"C:\Ravenfall\user-settings"));
             //#else
+
+#if Windows
+            ioc.RegisterCustomShared<IUserSettingsManager>(() => new UserSettingsManager("G:\\Ravenfall\\Data\\user-settings"));
+#else
             ioc.RegisterCustomShared<IUserSettingsManager>(() => new UserSettingsManager());
+#endif
+
             //#endif
 
             ioc.RegisterShared<IStringProvider, StringProvider>();

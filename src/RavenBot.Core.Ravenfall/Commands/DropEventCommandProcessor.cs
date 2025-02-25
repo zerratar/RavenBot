@@ -23,11 +23,6 @@ namespace RavenBot.Core.Ravenfall.Commands
                 return;
             }
 
-            if (!cmd.Sender.IsBroadcaster)
-            {
-                return;
-            }
-
             var item = cmd.Arguments?.Trim();
 
             if (string.IsNullOrEmpty(item))

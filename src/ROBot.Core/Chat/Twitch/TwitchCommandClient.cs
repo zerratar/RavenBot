@@ -65,6 +65,7 @@ namespace ROBot.Core.Chat.Twitch
         //private long connectionCurrentAttemptCount = 0;
         private bool attemptingReconnection = false;
         private bool rateLimited;
+        private readonly ConcurrentDictionary<ulong, DateTime> lastMessageSent = new ConcurrentDictionary<ulong, DateTime>();
         private readonly List<string> rateLimitedChannels = new List<string>();
 
         public TwitchCommandClient(
@@ -388,7 +389,7 @@ namespace ROBot.Core.Chat.Twitch
                 return;
             }
 
-            if (currentlyJoiningChannels.TryGetValue(channel, out var isJoining) && DateTime.UtcNow - isJoining <= TimeSpan.FromSeconds(20))
+            if (currentlyJoiningChannels.TryGetValue(channel, out var isJoining) && DateTime.UtcNow - isJoining <= TimeSpan.FromSeconds(10))
             {
                 return;
             }
@@ -399,7 +400,7 @@ namespace ROBot.Core.Chat.Twitch
                 {
                     currentlyJoiningChannels[channel] = DateTime.UtcNow;
                     joinedChannels.Add(channel);
-
+                    await Task.Delay(250).ConfigureAwait(false);
                     logger.LogDebug("[TWITCH] Joining Channel (Channel: " + channel + ")");
                     stats.AddChAttempt();
                     await client.JoinChannelAsync(channel);
@@ -472,24 +473,12 @@ namespace ROBot.Core.Chat.Twitch
                 if (message.Recipent.Platform == "system")
                 {
                     // system message, to ensure we dont get rate limited
-
-                    if (rateLimited && rateLimitedChannels.Contains(channel.Name))
-                    {
-                        // wait 250ms before sending
-                        await Task.Delay(250);
-                    }
-
                     await SendMessageAsync(channel, message.Format, message.Args);
                     return;
                 }
 
                 if (message.Recipent.Platform == "twitch")
                 {
-                    if (rateLimited && rateLimitedChannels.Contains(channel.Name))
-                    {
-                        // wait 250ms before sending
-                        await Task.Delay(250);
-                    }
                     await SendReplyAsync(channel, message.Format, message.Args, message.CorrelationId, message.Recipent.PlatformUserName);
                 }
 
@@ -558,15 +547,30 @@ namespace ROBot.Core.Chat.Twitch
             if (!InChannel(channelName))
             {
                 EnqueueChatMessage(channel, message);
-                await JoinChannelAsync(channelName);
+                await JoinChannelAsync(channelName).ConfigureAwait(false);
                 return;
             }
 
             // Process the chat message a final time before sending it off.
-            message = await ApplyMessageTransformationAsync(channel, message);
+            message = await ApplyMessageTransformationAsync(channel, message).ConfigureAwait(false);
             logger.LogDebug($"[TWITCH] Sending Message (Channel: {channel.Name} Message: {message})");
             stats.AddMsgSend(channel.Name, message);
 
+            if (lastMessageSent.TryGetValue(channel.Id, out DateTime sentTime))
+            {
+                var elapsed = DateTime.UtcNow - sentTime;
+                if (elapsed.TotalMilliseconds < 250)
+                {
+                    await Task.Delay(250).ConfigureAwait(false);
+                }
+            }
+
+            if (rateLimited && (rateLimitedChannels.Contains(channel.Name.ToLower()) || rateLimitedChannels.Contains(channel.Id.ToString())))
+            {
+                await Task.Delay(1000).ConfigureAwait(false);
+            }
+
+            lastMessageSent[channel.Id] = DateTime.UtcNow;
             if (string.IsNullOrEmpty(correlationId))
             {
                 if (!string.IsNullOrEmpty(mention))
@@ -579,11 +583,11 @@ namespace ROBot.Core.Chat.Twitch
                     message = mention + ", " + message;
                 }
 
-                await client.SendMessageAsync(channel.Name, message);
+                await client.SendMessageAsync(channel.Name, message).ConfigureAwait(false);
                 return;
             }
 
-            await client.SendReplyAsync(channel.Name, correlationId, message);
+            await client.SendReplyAsync(channel.Name, correlationId, message).ConfigureAwait(false);
         }
         private async Task<string> ApplyMessageTransformationAsync(ICommandChannel channel, string message)
         {
@@ -748,7 +752,7 @@ namespace ROBot.Core.Chat.Twitch
             stats.AddLastRateLimit(e);
             logger.LogError("[TWITCH] RateLimited (Channel: " + e.Channel + ", Message: " + e.Message + ")");
             rateLimited = true;
-            rateLimitedChannels.Add(e.Channel);
+            rateLimitedChannels.Add(e.Channel.ToLower());
         }
 
         private async Task OnConnectedAsync(object sender, TwitchLib.Client.Events.OnConnectedEventArgs e)

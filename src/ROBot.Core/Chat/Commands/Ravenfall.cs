@@ -23,6 +23,11 @@ namespace ROBot.Core.Chat.Commands
                 var connection = game.GetConnection(session);
                 if (connection != null)
                 {
+                    if (string.IsNullOrEmpty(cmd.Arguments))
+                    {
+                        return;
+                    }
+
                     //if (cmd.Arguments == null || cmd.Arguments.Length == 0)
                     //{
                     //    await chat.SendMessageAsync(cmd.Channel, "Ravenfall is a Twitch idle game where you can train, craft, fight together against huge raid bosses or fight against each other.", new object[0]);
