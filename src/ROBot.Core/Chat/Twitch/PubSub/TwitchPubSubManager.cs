@@ -22,6 +22,7 @@ namespace ROBot.Core.Chat.Twitch.PubSub
 
     public class TwitchPubSubManager : ITwitchPubSubManager
     {
+        private const bool enabled = false;
         private readonly IMessageBus messageBus;
         private readonly ILogger logger;
         private readonly IMessageBusSubscription subscription;
@@ -130,6 +131,7 @@ namespace ROBot.Core.Chat.Twitch.PubSub
 
         public void PubSubConnect(string channel)
         {
+            if (!enabled) return;
             var key = channel.ToLower();
 
             if (!pubsubs.TryGetValue(key, out var data))

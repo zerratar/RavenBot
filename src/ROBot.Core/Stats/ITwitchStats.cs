@@ -36,7 +36,7 @@ namespace ROBot.Core.Stats
         //void ReceivedLog(OnLogArgs e);
         void ResetReceivedCount();
         void ResetTwitchAttempt();
-        void AddLastRateLimit(NoticeEventArgs e);
+        void AddLastRateLimit(OnRateLimitArgs e);
         void AddTwitchError(OnConnectionErrorArgs e);
         void AddChError();
         void AddChAttempt();

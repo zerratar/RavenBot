@@ -118,6 +118,10 @@ namespace RavenBot.Core.Ravenfall
         public Task TravelAsync(User player, string destination) => SendAsync("ferry_travel", player, destination);
         public Task DisembarkFerryAsync(User player) => SendAsync("ferry_leave", player);
         public Task EmbarkFerryAsync(User player) => SendAsync("ferry_enter", player);
+
+        public Task GetFerryInfoAsync(User player) => SendAsync("ferry_info", player);
+        public Task UseFerryScrollAsync(User player) => SendAsync("ferry_boost", player);
+
         public Task ObservePlayerAsync(User player) => SendAsync("observe", player);
         public Task TurnIntoMonsterAsync(User player) => SendAsync("monster", player);
         public Task ItemDropEventAsync(User player, string item) => SendAsync("item_drop_event", player, item);

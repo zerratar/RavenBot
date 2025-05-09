@@ -152,6 +152,24 @@ namespace ROBot.Core.Chat.Twitch
             pubSubManager.OnChannelPointsRewardRedeemed += OnChannelPointsRewardRedeemed;
         }
 
+        private async Task OnRateLimitAsync(object sender, OnRateLimitArgs e)
+        {
+            stats.AddLastRateLimit(e);
+            logger.LogError("[TWITCH] RateLimited (Channel: " + e.Channel + ", Message: " + e.Message + ")");
+            rateLimited = true;
+            rateLimitedChannels.Add(e.Channel.ToLower());
+        }
+
+        private async Task OnConnectedAsync(object sender, OnConnectedArgs e)
+        {
+            logger.LogDebug("[TWITCH] Connected");
+            isConnectedToTwitch = true;
+            hasConnectionError = false;
+            stats.AddTwitchSuccess();
+            stats.ResetTwitchAttempt();
+            await RejoinChannelsAsync();
+        }
+
         private async Task Client_OnIncorrectLogin(object sender, OnIncorrectLoginArgs e)
         {
             logger.LogError("Failed to connect to Twitch IRC Server. Authentication Error: " + e.Exception);
@@ -582,8 +600,7 @@ namespace ROBot.Core.Chat.Twitch
 
                     message = mention + ", " + message;
                 }
-
-                await client.SendMessageAsync(channel.Name, message).ConfigureAwait(false);
+                client.SendMessage(channel.Name, message);
                 return;
             }
 
@@ -664,7 +681,7 @@ namespace ROBot.Core.Chat.Twitch
             //    }
             //}
 
-            if (await commandHandler.HandleAsync(game, this, e.Command, e.ChatMessage))
+            if (await commandHandler.HandleAsync(game, this, e.Command, e.Command.ChatMessage))
             {
                 stats.AddRFCommandCount();
             }
@@ -678,17 +695,18 @@ namespace ROBot.Core.Chat.Twitch
 
         private async Task OnReSubAsync(object sender, OnReSubscriberArgs e)
         {
+            int.TryParse(e.ReSubscriber.MsgParamCumulativeMonths, out var months);
             messageBus.Send(nameof(UserSubscriptionEvent),
                  new UserSubscriptionEvent(
                      "twitch", e.Channel, e.ReSubscriber.UserId, e.ReSubscriber.Login, e.ReSubscriber.DisplayName, null,
-                     e.ReSubscriber.UserDetail.IsModerator, e.ReSubscriber.UserDetail.IsSubscriber, e.ReSubscriber.MsgParamCumulativeMonths, false));
+                     e.ReSubscriber.IsModerator, e.ReSubscriber.IsSubscriber, months, false));
         }
 
         private async Task OnNewSubAsync(object sender, OnNewSubscriberArgs e)
         {
             messageBus.Send(nameof(UserSubscriptionEvent),
                new UserSubscriptionEvent("twitch", e.Channel, e.Subscriber.UserId, e.Subscriber.Login, e.Subscriber.DisplayName,
-               null, e.Subscriber.UserDetail.IsModerator, e.Subscriber.UserDetail.IsSubscriber, 1, true));
+               null, e.Subscriber.IsModerator, e.Subscriber.IsSubscriber, 1, true));
             //this.Broadcast(e.Channel, "", Localization.Twitch.THANK_YOU_SUB, e.Subscriber.DisplayName);
         }
 
@@ -696,7 +714,7 @@ namespace ROBot.Core.Chat.Twitch
         {
             messageBus.Send(nameof(UserSubscriptionEvent),
                 new UserSubscriptionEvent("twitch", e.Channel, e.GiftedSubscription.UserId, e.GiftedSubscription.Login,
-                e.GiftedSubscription.DisplayName, null, e.GiftedSubscription.UserDetail.IsModerator, e.GiftedSubscription.UserDetail.IsSubscriber, 1, false));
+                e.GiftedSubscription.DisplayName, null, e.GiftedSubscription.IsModerator, e.GiftedSubscription.IsSubscriber, 1, false));
             //this.Broadcast(e.Channel, "", Localization.Twitch.THANK_YOU_SUB, e.GiftedSubscription.DisplayName);
         }
 
@@ -704,8 +722,8 @@ namespace ROBot.Core.Chat.Twitch
         {
             messageBus.Send(nameof(UserSubscriptionEvent),
                new UserSubscriptionEvent("twitch", e.Channel, e.GiftedSubscription.Id, e.GiftedSubscription.Login,
-               e.GiftedSubscription.DisplayName, e.GiftedSubscription.MsgParamRecipientId, e.GiftedSubscription.UserDetail.IsModerator,
-               e.GiftedSubscription.UserDetail.IsSubscriber, 1, false));
+               e.GiftedSubscription.DisplayName, e.GiftedSubscription.MsgParamRecipientId, e.GiftedSubscription.IsModerator,
+               e.GiftedSubscription.IsSubscriber, 1, false));
 
             //this.Broadcast(e.Channel, "", Localization.Twitch.THANK_YOU_GIFT_SUB, e.GiftedSubscription.DisplayName);
         }
@@ -746,25 +764,6 @@ namespace ROBot.Core.Chat.Twitch
 
             stats.AddMsgSent(e.SentMessage.Channel, e.SentMessage.Message);
         }
-
-        private async Task OnRateLimitAsync(object sender, NoticeEventArgs e)
-        {
-            stats.AddLastRateLimit(e);
-            logger.LogError("[TWITCH] RateLimited (Channel: " + e.Channel + ", Message: " + e.Message + ")");
-            rateLimited = true;
-            rateLimitedChannels.Add(e.Channel.ToLower());
-        }
-
-        private async Task OnConnectedAsync(object sender, TwitchLib.Client.Events.OnConnectedEventArgs e)
-        {
-            logger.LogDebug("[TWITCH] Connected");
-            isConnectedToTwitch = true;
-            hasConnectionError = false;
-            stats.AddTwitchSuccess();
-            stats.ResetTwitchAttempt();
-            await RejoinChannelsAsync();
-        }
-
         private async Task OnFailureToReceiveJoinConfirmationAsync(object sender, OnFailureToReceiveJoinConfirmationArgs e)
         {
             stats.AddChError();

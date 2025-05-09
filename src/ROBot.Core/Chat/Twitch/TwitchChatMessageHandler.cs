@@ -39,9 +39,9 @@ namespace ROBot.Core.Chat.Twitch
                             msg.Id,
                             msg.Username,
                             msg.DisplayName,
-                            msg.UserDetail.IsModerator,
-                            msg.UserDetail.IsSubscriber,
-                            msg.UserDetail.IsVip,
+                            msg.IsModerator,
+                            msg.IsSubscriber,
+                            msg.IsVip,
                             msg.Bits)
                     );
                 }

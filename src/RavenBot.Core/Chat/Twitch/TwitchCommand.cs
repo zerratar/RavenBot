@@ -9,12 +9,12 @@ namespace RavenBot.Core.Chat.Twitch
 {
     public class TwitchCommand : ICommand
     {
-        public TwitchCommand(CommandInfo cmd, TwitchLib.Client.Models.ChatMessage chat, bool isGameAdmin = false, bool isGameModerator = false)
+        public TwitchCommand(TwitchLib.Client.Models.ChatCommand cmd, TwitchLib.Client.Models.ChatMessage chat, bool isGameAdmin = false, bool isGameModerator = false)
         {
             if (cmd == null) throw new ArgumentNullException(nameof(cmd));
             if (chat == null) throw new ArgumentException("ChatMessage was null. Unable to parse chat command.", nameof(cmd));
 
-            Command = cmd.Name.ToLower()?.AsUTF8();
+            Command = cmd.CommandText.ToLower()?.AsUTF8();
             Arguments = cmd.ArgumentsAsString?.AsUTF8();
 
             if (string.IsNullOrEmpty(Command) && !string.IsNullOrEmpty(Arguments))
@@ -50,9 +50,9 @@ namespace RavenBot.Core.Chat.Twitch
 
             Channel = new TwitchChannel(chat.Channel);
 
-            var isVip = chat.UserDetail.IsVip;
-            var isModerator = chat.UserDetail.IsModerator;
-            var isSubscriber = chat.UserDetail.IsSubscriber;
+            var isVip = chat.IsVip;
+            var isModerator = chat.IsModerator;
+            var isSubscriber = chat.IsSubscriber;
             var isBroadcaster = chat.IsBroadcaster;
 
             if (!isBroadcaster)
@@ -74,7 +74,7 @@ namespace RavenBot.Core.Chat.Twitch
                 isSubscriber,
                 isVip,
                 isVerifiedBot,
-                chat.HexColor);
+                chat.ColorHex);
 
             CorrelationId = chat.Id;
             Mention = chat.Username;

@@ -67,11 +67,11 @@ namespace ROBot.Core.Chat.Twitch
             }
         }
 
-        public async Task<bool> HandleAsync(IBotServer game, IChatCommandClient chat, TwitchLib.Client.Models.CommandInfo command, TwitchLib.Client.Models.ChatMessage msg)
+        public async Task<bool> HandleAsync(IBotServer game, IChatCommandClient chat, TwitchLib.Client.Models.ChatCommand command, TwitchLib.Client.Models.ChatMessage msg)
         {
             try
             {
-                if (command == null || string.IsNullOrEmpty(command.Name))
+                if (command == null || string.IsNullOrEmpty(command.CommandText))
                 {
                     if (command != null && msg != null)
                     {
@@ -113,7 +113,7 @@ namespace ROBot.Core.Chat.Twitch
             }
             catch (Exception exc)
             {
-                logger.LogError("[BOT] Error handling command (Command: " + command?.Name + " Exception: " + exc.ToString() + ")");
+                logger.LogError("[BOT] Error handling command (Command: " + command?.CommandText + " Exception: " + exc.ToString() + ")");
                 return false;
             }
         }
@@ -141,7 +141,7 @@ namespace ROBot.Core.Chat.Twitch
 
                 var settings = userSettingsManager.GetAll();
                 var s = settings.FirstOrDefault(x => x.TwitchUserId != null && x.TwitchUserId == reward.ChannelId);
-                var channel = new TwitchCommand.TwitchChannel(channelId,s?.TwitchUserName??arguments);
+                var channel = new TwitchCommand.TwitchChannel(channelId, s?.TwitchUserName ?? arguments);
                 var session = game.GetSession(channel);
                 if (session == null)
                 {

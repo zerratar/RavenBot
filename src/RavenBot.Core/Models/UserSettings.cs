@@ -162,7 +162,7 @@ namespace RavenBot.Core.Ravenfall.Models
         {
             ReloadIfNecessary();
             dict[key] = value;
-
+            var lockFile = file + ".lock";
             try
             {
                 var dir = System.IO.Path.GetDirectoryName(file);
@@ -171,6 +171,8 @@ namespace RavenBot.Core.Ravenfall.Models
 
                 lock (ioMutex)
                 {
+                    if (!System.IO.File.Exists(lockFile))
+                        System.IO.File.Create(lockFile).Dispose();
                     System.IO.File.WriteAllText(file, Newtonsoft.Json.JsonConvert.SerializeObject(dict));
                 }
             }
@@ -181,6 +183,11 @@ namespace RavenBot.Core.Ravenfall.Models
                 {
                     System.IO.File.WriteAllText(file + ".error", exc.ToString());
                 }
+            }
+            finally
+            {
+                if (System.IO.File.Exists(lockFile))
+                    System.IO.File.Delete(lockFile);
             }
         }
 

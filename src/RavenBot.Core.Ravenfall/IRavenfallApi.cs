@@ -172,5 +172,8 @@ namespace RavenBot.Core.Ravenfall
         Task ProceedDungeonAsync(User player);
         Task KillDungeonBossAsync(User player);
         Task KillRaidBossAsync(User player);
+
+        Task GetFerryInfoAsync(User player);
+        Task UseFerryScrollAsync(User player);
     }
 }

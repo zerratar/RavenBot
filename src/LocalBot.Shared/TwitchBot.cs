@@ -258,9 +258,9 @@ namespace RavenBot
                     e.ChatMessage.Id,
                     e.ChatMessage.Username,
                     e.ChatMessage.DisplayName,
-                    e.ChatMessage.UserDetail.IsModerator,
-                    e.ChatMessage.UserDetail.IsSubscriber,
-                    e.ChatMessage.UserDetail.IsVip,
+                    e.ChatMessage.IsModerator,
+                    e.ChatMessage.IsSubscriber,
+                    e.ChatMessage.IsVip,
                     e.ChatMessage.Bits);
             this.messageBus.Send(nameof(CheerBitsEvent), evt);
             await this.AnnounceAsync(Localization.Twitch.THANK_YOU_BITS, e.ChatMessage.DisplayName, e.ChatMessage.Bits);
@@ -269,9 +269,9 @@ namespace RavenBot
 
         private async Task OnCommandReceivedAsync(object sender, OnChatCommandReceivedArgs e)
         {
-            var uid = e.ChatMessage.UserId;
+            var uid = e.Command.ChatMessage.UserId;
             var settings = userSettingsManager.Get(uid, "twitch");
-            await commandHandler.HandleAsync(this, new TwitchCommand(e.Command, e.ChatMessage, settings.IsAdministrator, settings.IsModerator));
+            await commandHandler.HandleAsync(this, new TwitchCommand(e.Command, e.Command.ChatMessage, settings.IsAdministrator, settings.IsModerator));
         }
 
         private void EnsureInitialized()
@@ -389,7 +389,7 @@ namespace RavenBot
 
             if (client.JoinedChannels.Count > 0)
             {
-                await client.SendMessageAsync(channel, msg);
+                client.SendMessage(channel, msg);
             }
         }
 
@@ -415,6 +415,7 @@ namespace RavenBot
 
         private async Task OnReSubAsync(object sender, OnReSubscriberArgs e)
         {
+            int.TryParse(e.ReSubscriber.MsgParamCumulativeMonths, out var months);
             this.messageBus.Send(nameof(UserSubscriptionEvent),
                 new UserSubscriptionEvent(
                     "twitch",
@@ -423,9 +424,9 @@ namespace RavenBot
                     e.ReSubscriber.Login,
                     e.ReSubscriber.DisplayName,
                     null,
-                    e.ReSubscriber.UserDetail.IsModerator,
-                    e.ReSubscriber.UserDetail.IsSubscriber,
-                    e.ReSubscriber.MsgParamCumulativeMonths,
+                    e.ReSubscriber.IsModerator,
+                    e.ReSubscriber.IsSubscriber,
+                    months,
                     false));
 
             //this.Broadcast("", Localization.Twitch.THANK_YOU_RESUB, e.ReSubscriber.DisplayName);
@@ -440,8 +441,8 @@ namespace RavenBot
                     e.Subscriber.Login,
                     e.Subscriber.DisplayName,
                     null,
-                    e.Subscriber.UserDetail.IsModerator,
-                    e.Subscriber.UserDetail.IsSubscriber,
+                    e.Subscriber.IsModerator,
+                    e.Subscriber.IsSubscriber,
                     1, true);
             this.messageBus.Send(nameof(UserSubscriptionEvent), sub);
             await OnUserSubImplAsync(sub, true);
@@ -457,8 +458,8 @@ namespace RavenBot
                     e.GiftedSubscription.Login,
                     e.GiftedSubscription.DisplayName,
                     null,
-                    e.GiftedSubscription.UserDetail.IsModerator,
-                    e.GiftedSubscription.UserDetail.IsSubscriber,
+                    e.GiftedSubscription.IsModerator,
+                    e.GiftedSubscription.IsSubscriber,
                     1, false);
 
             this.messageBus.Send(nameof(UserSubscriptionEvent), sub);
@@ -474,8 +475,8 @@ namespace RavenBot
                 e.GiftedSubscription.Login,
                 e.GiftedSubscription.DisplayName,
                 e.GiftedSubscription.MsgParamRecipientId,
-                e.GiftedSubscription.UserDetail.IsModerator,
-                e.GiftedSubscription.UserDetail.IsSubscriber,
+                e.GiftedSubscription.IsModerator,
+                e.GiftedSubscription.IsSubscriber,
                 1,
                 false);
             this.messageBus.Send(nameof(UserSubscriptionEvent), sub);
@@ -598,11 +599,6 @@ namespace RavenBot
         }
 
 
-        private async Task OnConnectedAsync(object sender, TwitchLib.Client.Events.OnConnectedEventArgs e)
-        {
-            logger.WriteDebug("Connected to Twitch IRC Server");
-            messageBus.Send("twitch", "");
-        }
 
         //private void OnReconnected(object sender, OnReconnectedEventArgs e)
         //{
@@ -652,6 +648,18 @@ namespace RavenBot
             pubsub.OnChannelPointsRewardRedeemed += Pubsub_OnChannelPointsRewardRedeemed;
         }
 
+        private async Task OnReconnectedAsync(object sender, OnConnectedArgs e)
+        {
+            logger.WriteDebug("Reconnected to Twitch IRC Server");
+            messageBus.Send("twitch", "");
+        }
+
+        private async Task OnConnectedAsync(object sender, OnConnectedArgs e)
+        {
+            logger.WriteDebug("Connected to Twitch IRC Server");
+            messageBus.Send("twitch", "");
+        }
+
         private async Task OnSendReceiveData(object sender, OnSendReceiveDataArgs e)
         {
             //logger.WriteDebug("[" + e.Direction + "] " + e.Data);
@@ -674,12 +682,6 @@ namespace RavenBot
         private async Task OnChannelStateChanged(object sender, OnChannelStateChangedArgs e)
         {
             //logger.WriteDebug("Channel state changed: " + e.Channel + ", state: " + e.ChannelState);
-        }
-
-        private async Task OnReconnectedAsync(object sender, TwitchLib.Client.Events.OnConnectedEventArgs e)
-        {
-            logger.WriteDebug("Reconnected to Twitch IRC Server");
-            messageBus.Send("twitch", "");
         }
 
         private async Task OnConnectionErrorAsync(object sender, OnConnectionErrorArgs e)

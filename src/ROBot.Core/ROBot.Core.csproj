@@ -17,6 +17,11 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="System.Drawing.Common" Version="8.0.1" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.1.2" />
+    <PackageReference Include="TwitchLib.Client" Version="4.0.0-preview-fd131763416cb9f1a31705ca609566d7e7e7fac8" />
+    <PackageReference Include="TwitchLib.Client.Enums" Version="4.0.0-preview-fd131763416cb9f1a31705ca609566d7e7e7fac8" />
+    <PackageReference Include="TwitchLib.Client.Models" Version="4.0.0-preview-fd131763416cb9f1a31705ca609566d7e7e7fac8" />
+    <PackageReference Include="TwitchLib.EventSub.Core" Version="2.5.3-preview-e1a92de" />
+    <PackageReference Include="TwitchLib.EventSub.Websockets" Version="0.6.0-preview-dbc970c" />
     <PackageReference Include="TwitchLib.PubSub" Version="4.0.0-preview-f833b1ab1ebef37618dba3fbb1e0a661ff183af5" />
   </ItemGroup>
 
@@ -24,8 +29,6 @@
     <ProjectReference Include="..\RavenBot.Core.Ravenfall\RavenBot.Core.Ravenfall.csproj" />
     <ProjectReference Include="..\RavenBot.Core\RavenBot.Core.csproj" />
     <ProjectReference Include="..\Shinobytes.Ravenfall.Core\Shinobytes.Core.csproj" />
-    <ProjectReference Include="..\TwitchLib\TwitchLib.Client.Models\TwitchLib.Client.Models.csproj" />
-    <ProjectReference Include="..\TwitchLib\TwitchLib.Client\TwitchLib.Client.csproj" />
   </ItemGroup>
 
 </Project>

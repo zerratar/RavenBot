@@ -107,6 +107,7 @@ namespace RavenBot
             Register<TradeItemCommandProcessor>(commandBindingProvider.Get("sell", "buy"));
             Register<TrainCommandProcessor>(commandBindingProvider.Get("train", "task"));
             Register<SailCommandProcessor>(commandBindingProvider.Get("sail", "disembark"));
+            Register<FerryCommandProcessor>(commandBindingProvider.Get("ferry"));
 
             Register<OnsenCommandProcessor>(commandBindingProvider.Get("onsen", "rest"));
             Register<RestedCommandProcessor>(commandBindingProvider.Get("rested"));
