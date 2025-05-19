@@ -59,6 +59,7 @@ namespace ROBot.Core.Chat.Commands
 
                     var arg = cmd.Arguments?.ToLower();
 
+
                     var arguments = arg?.Split(' ');
 
                     arguments = GetTargetLevelFromArguments(arguments, out var levelTarget);

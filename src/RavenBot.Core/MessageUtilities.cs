@@ -1,4 +1,7 @@
-﻿namespace RavenBot.Core
+﻿using System.Collections.Generic;
+using System;
+
+namespace RavenBot.Core
 {
     public static class MessageUtilities
     {
@@ -8,6 +11,34 @@
 
         private const string CategoryStart = "%[category:";
         private const string CategoryEnd = "]%";
+
+        public static List<string> SplitMessage(string message, int maxLength = 499)
+        {
+            var result = new List<string>();
+            if (string.IsNullOrEmpty(message))
+                return result;
+
+            int currentIndex = 0;
+            while (currentIndex < message.Length)
+            {
+                int length = Math.Min(maxLength, message.Length - currentIndex);
+                int splitLength = length;
+
+                // Look for the last space within the current window
+                if (length < message.Length - currentIndex)
+                {
+                    int lastSpace = message.LastIndexOf(' ', currentIndex + length - 1, length);
+                    if (lastSpace >= currentIndex)
+                    {
+                        splitLength = lastSpace - currentIndex + 1;
+                    }
+                }
+
+                result.Add(message.Substring(currentIndex, splitLength).TrimEnd());
+                currentIndex += splitLength;
+            }
+            return result;
+        }
 
         public static string Meta(string category, params string[] tags)
         {

@@ -27,18 +27,23 @@ namespace ROBot.Core.Chat.Twitch.PubSub
 
         private bool badAuth;
 
+        private bool isEnabled = false;
+
         public TwitchPubSubClient(ILogger logger, TwitchPubSubData pubsub)
         {
             this.logger = logger;
             this.pubsub = pubsub;
 
-            CreateClient();
-            Connect();
+            if (isEnabled)
+            {
+                CreateClient();
+                Connect();
+            }
         }
 
         public PubSubState State => state;
 
-        
+
 
         public void UpdatePubSubData(TwitchPubSubData pubsubData)
         {
@@ -46,7 +51,7 @@ namespace ROBot.Core.Chat.Twitch.PubSub
 
             this.pubsub = pubsubData;
 
-            if (!IsConnected && !IsConnecting && !IsReady && !badAuth)
+            if (isEnabled && (!IsConnected && !IsConnecting && !IsReady && !badAuth))
             {
                 CreateClient();
                 Connect();
@@ -60,7 +65,7 @@ namespace ROBot.Core.Chat.Twitch.PubSub
 
         private void CreateClient()
         {
-            if (disposed)
+            if (disposed || !isEnabled)
             {
                 return;
             }
@@ -95,7 +100,7 @@ namespace ROBot.Core.Chat.Twitch.PubSub
 
         private void Connect()
         {
-            if (disposed)
+            if (disposed || !isEnabled)
             {
                 return;
             }
@@ -205,7 +210,7 @@ namespace ROBot.Core.Chat.Twitch.PubSub
             {
                 return;
             }
-            
+
             ClientInstanceCounter--;
 
             UnsubscribeClient();

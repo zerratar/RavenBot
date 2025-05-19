@@ -3,11 +3,11 @@ using RavenBot.Core.Handlers;
 
 namespace RavenBot.Core.Ravenfall.Commands
 {
-    public class FerryCommandProcessor : Net.RavenfallCommandProcessor
+    public class VillagersCommandProcessor : Net.RavenfallCommandProcessor
     {
         private readonly IRavenfallClient game;
         private readonly IUserProvider playerProvider;
-        public FerryCommandProcessor(IRavenfallClient game, IUserProvider playerProvider)
+        public VillagersCommandProcessor(IRavenfallClient game, IUserProvider playerProvider)
         {
             this.game = game;
             this.playerProvider = playerProvider;
@@ -22,17 +22,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             }
 
             var player = playerProvider.Get(cmd);
-            var connection = this.game;
-
-            var arg = cmd.Arguments?.ToLower();
-            
-            if (!string.IsNullOrEmpty(arg) && arg.StartsWith("boost"))
-            {
-                await connection[cmd].UseFerryScrollAsync(player);
-                return;
-            }
-
-            await connection[cmd].GetFerryInfoAsync(player);
+            await this.game[cmd].GetVillagersInfoAsync(player);
         }
     }
 }

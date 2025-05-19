@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+//using RavenBot.Core;
 using RavenBot.Core.Chat;
 using RavenBot.Core.Chat.Twitch;
 using RavenBot.Core.Handlers;
@@ -600,7 +601,18 @@ namespace ROBot.Core.Chat.Twitch
 
                     message = mention + ", " + message;
                 }
-                client.SendMessage(channel.Name, message);
+
+                var messages = RavenBot.Core.MessageUtilities.SplitMessage(message);
+                foreach (var part in messages)
+                {
+                    client.SendMessage(channel.Name, part);
+                    if (messages.Count > 1)
+                    {
+                        await Task.Delay(250).ConfigureAwait(false);
+                    }
+                }
+
+                //client.SendMessage(channel.Name, message);
                 return;
             }
 

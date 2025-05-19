@@ -1,4 +1,5 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using RavenBot.Core;
 using RavenBot.Core.Ravenfall.Commands;
 using System;
 using System.Linq;

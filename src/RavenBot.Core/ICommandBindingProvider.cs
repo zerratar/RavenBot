@@ -15,7 +15,7 @@ namespace RavenBot.Core
 
     public class CommandBindingProvider : ICommandBindingProvider
     {
-        private const string CommandBindingsFile = "G:\\Ravenfall\\Data\\generated-data\\commands.json";
+        private const string CommandBindingsFile = "commands.json";
         private readonly ConcurrentDictionary<string, CommandBinding> bindings
             = new ConcurrentDictionary<string, CommandBinding>();
 

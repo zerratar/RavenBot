@@ -45,7 +45,7 @@ namespace ROBot.Core.Chat.Commands
                     }
                     else if (cmd.Arguments.Contains("help", System.StringComparison.OrdinalIgnoreCase))
                     {
-                        await chat.SendMessageAsync(cmd.Channel, "Please see https://www.ravenfall.stream/how-to-play on how to play Ravenfall. This guide is still being updated so make sure to check it out frequently.", new object[0]);
+                        await chat.SendMessageAsync(cmd.Channel, "Please see https://ravenfall.fandom.com/wiki/Ravenfall on how to play Ravenfall. This guide is still being updated so make sure to check it out frequently.", new object[0]);
                     }
                 }
             }

@@ -180,6 +180,7 @@ namespace RavenBot
 
         private void ListenToChannelPoints(ILogger logger, string data)
         {
+            return;
             lock (pubsubListenMutex)
             {
                 if (pubsubState == PubSubState.Connecting || pubsubState == PubSubState.OK || pubsubState == PubSubState.Authenticating)
@@ -389,7 +390,15 @@ namespace RavenBot
 
             if (client.JoinedChannels.Count > 0)
             {
-                client.SendMessage(channel, msg);
+                var messages = MessageUtilities.SplitMessage(msg);
+                foreach (var part in messages)
+                {
+                    client.SendMessage(channel, part);
+                    if (messages.Count > 1)
+                    {
+                        await Task.Delay(250);
+                    }
+                }
             }
         }
 

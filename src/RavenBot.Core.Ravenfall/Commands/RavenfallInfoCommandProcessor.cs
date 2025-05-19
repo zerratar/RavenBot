@@ -33,7 +33,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             }
             else if (cmd.Arguments.Contains("help", System.StringComparison.OrdinalIgnoreCase))
             {
-                await chat.AnnounceAsync("Please see https://www.ravenfall.stream/how-to-play on how to play Ravenfall. This guide is still being updated so make sure to check it out frequently.");
+                await chat.AnnounceAsync("Please see https://ravenfall.fandom.com/wiki/Ravenfall on how to play Ravenfall. This guide is still being updated so make sure to check it out frequently.");
             }
         }
     }

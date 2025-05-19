@@ -162,6 +162,9 @@ namespace RavenBot.Core.Ravenfall
         public Task GetLootAsync(User player, string filter) => SendAsync("get_loot", player, filter);
 
         public Task SendChannelStateAsync(string platform, string channelName, bool inChannel, string message) => SendAsync("channel_state", new Arguments(platform, channelName, inChannel, message));
+
+        public Task GetVillagersInfoAsync(User player) => SendAsync("villagers", player);
+
         public async Task RestartGameAsync(User player)
         {
             await SendAsync("restart", player);

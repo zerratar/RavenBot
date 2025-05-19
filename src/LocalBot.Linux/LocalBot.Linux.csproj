@@ -17,7 +17,7 @@
     <PackageReference Include="TwitchLib.Client" Version="4.0.0-preview-fd131763416cb9f1a31705ca609566d7e7e7fac8" />
     <PackageReference Include="TwitchLib.Client.Enums" Version="4.0.0-preview-fd131763416cb9f1a31705ca609566d7e7e7fac8" />
     <PackageReference Include="TwitchLib.Client.Models" Version="4.0.0-preview-fd131763416cb9f1a31705ca609566d7e7e7fac8" />
-    <PackageReference Include="TwitchLib.EventSub.Core" Version="2.5.3-preview-e1a92de" />
+    <PackageReference Include="TwitchLib.EventSub.Core" Version="2.5.3-preview-e4631fd" />
     <PackageReference Include="TwitchLib.EventSub.Websockets" Version="0.6.0-preview-dbc970c" />
   </ItemGroup>
 

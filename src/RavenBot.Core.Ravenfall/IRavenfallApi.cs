@@ -175,5 +175,6 @@ namespace RavenBot.Core.Ravenfall
 
         Task GetFerryInfoAsync(User player);
         Task UseFerryScrollAsync(User player);
+        Task GetVillagersInfoAsync(User player);
     }
 }

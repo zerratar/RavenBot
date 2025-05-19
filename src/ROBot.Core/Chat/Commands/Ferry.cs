@@ -27,7 +27,7 @@ namespace ROBot.Core.Chat.Commands
 
                     var arg = cmd.Arguments?.ToLower();
 
-                    if (arg.StartsWith("boost"))
+                    if (!string.IsNullOrEmpty(arg) && arg.StartsWith("boost"))
                     {
                         await connection[cmd].UseFerryScrollAsync(player);
                         return;
