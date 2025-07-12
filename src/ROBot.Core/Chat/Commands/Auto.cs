@@ -11,10 +11,11 @@ namespace ROBot.Core.Chat.Commands
     {
         public override string Category => "Events";
         public override string Description => "Automatically trigger actions in the game.";
+        public override string UsageExample => "!auto dungeon on\n!auto raid on\n!auto rest";
         public override System.Collections.Generic.IReadOnlyList<ChatCommandInput> Inputs { get; } = new System.Collections.Generic.List<ChatCommandInput>
         {
-            //ChatCommandInput.Create("event", "What kind of event to interact with", "dungeon", "raid"),
-            //ChatCommandInput.Create("action", "What kind of action", "join", "stop"),
+            ChatCommandInput.Create("event", "What kind of event to interact with", "dungeon", "raid", "rest").Required(),
+            ChatCommandInput.Create("action", "What kind of action", "on", "stop", "status"),
         };
         public override Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
         {
@@ -54,6 +55,20 @@ namespace ROBot.Core.Chat.Commands
             // check if its a raid or dungeon action
             var action = options[0];
             var arguments = options.Length > 1 ? options[1..] : [];
+
+            if (action.Equals("join", StringComparison.OrdinalIgnoreCase) && arguments != null && arguments.Length > 0)
+            {
+                var lastArgument = arguments.LastOrDefault();
+                if (arguments[0].Equals("dungeon"))
+                {
+                    return connection[cmd].AutoJoinDungeonAsync(player, arguments.LastOrDefault());
+                }
+
+                if (arguments[0].Equals("raid"))
+                {
+                    return connection[cmd].AutoJoinDungeonAsync(player, arguments.LastOrDefault());
+                }
+            }
 
             switch (action)
             {

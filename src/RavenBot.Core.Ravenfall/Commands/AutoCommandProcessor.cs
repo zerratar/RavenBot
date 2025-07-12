@@ -48,6 +48,21 @@ namespace RavenBot.Core.Ravenfall.Commands
             var action = options[0];
             var arguments = options.Length > 1 ? options[1..] : [];
 
+            if (action.Equals("join", StringComparison.OrdinalIgnoreCase) && arguments != null && arguments.Length > 0)
+            {
+                var lastArgument = arguments.LastOrDefault();
+                if (arguments[0].Equals("dungeon"))
+                {
+                    await connection[cmd].AutoJoinDungeonAsync(player, arguments.LastOrDefault());
+                    return;
+                }
+
+                if (arguments[0].Equals("raid"))
+                {
+                    await connection[cmd].AutoJoinDungeonAsync(player, arguments.LastOrDefault());
+                    return;
+                }
+            }
             switch (action)
             {
                 case "dungeon":

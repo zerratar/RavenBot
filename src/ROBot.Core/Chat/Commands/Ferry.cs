@@ -13,7 +13,7 @@ namespace ROBot.Core.Chat.Commands
         {
             ChatCommandInput.Create("action", "Type of action", "boost", "info")
         };
-
+        public override string UsageExample => "!ferry boost";
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
         {
             var channel = cmd.Channel;
