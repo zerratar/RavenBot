@@ -104,16 +104,35 @@ namespace RavenBot
                 if (session != null)
                 {
                     this.ravenfallSession = session;
-
-                    if (session.Settings.TryGetValue("twitch_id", out var v))
-                        twitchId = v.ToString();
-
-                    if (session.Settings.TryGetValue("twitch_pubsub", out v))
-                        pubsubToken = v.ToString();
-
                     var settings = session.Settings;
+
+                    if (settings != null)
+                    {
+
+                        if (settings.TryGetValue("twitch_id", out var v))
+                            twitchId = v?.ToString() ?? string.Empty;
+
+                        if (settings.TryGetValue("twitch_pubsub", out var ps))
+                            pubsubToken = ps?.ToString() ?? string.Empty;
+                    }
+                    else
+                    {
+                        logger.WriteWarning("Ravenfall sent empty session settings.");
+                        try
+                        {
+                            logger.WriteWarning("Data Received:\n" + JsonConvert.SerializeObject(session));
+                        }
+                        catch
+                        {
+                            // ignored
+                        }
+                    }
+
+
                     if (string.IsNullOrEmpty(twitchId))
+                    {
                         twitchId = this.ravenfallSession.Owner.PlatformId;
+                    }
 
                     // this should also be the broadccaster.
 
