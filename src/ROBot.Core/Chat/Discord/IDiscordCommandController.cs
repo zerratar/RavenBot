@@ -37,7 +37,7 @@ namespace ROBot.Core.Chat.Discord
 
     public class DiscordCommandController : IDiscordCommandController
     {
-        public const string GeneratedData = "G:\\Ravenfall\\Data\\generated-data";
+        public const string GeneratedData = "C:\\Ravenfall\\Data\\generated-data";
         private const string CommandDescriptorsFile = GeneratedData + "\\commands.json";
 
         private readonly ConcurrentDictionary<string, Type> handlerLookup = new();
