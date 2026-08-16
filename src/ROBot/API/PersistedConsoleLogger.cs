@@ -81,8 +81,12 @@ namespace ROBot.API
             {
                 try
                 {
+                    // Older than the lifespan, so the cutoff has to be in the past. This compared
+                    // against UtcNow.AddDays(+7) and deleted only files created a week into the
+                    // future, which is none of them, so nothing was ever cleaned up and the folder
+                    // grew without limit.
                     var fi = new FileInfo(log);
-                    if (fi.CreationTimeUtc >= DateTime.UtcNow.AddDays(logsLifespanDays))
+                    if (fi.CreationTimeUtc <= DateTime.UtcNow.AddDays(-logsLifespanDays))
                     {
                         fi.Delete();
                     }
