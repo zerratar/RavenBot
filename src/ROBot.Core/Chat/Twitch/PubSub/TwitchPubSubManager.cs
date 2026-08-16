@@ -51,34 +51,50 @@ namespace ROBot.Core.Chat.Twitch.PubSub
 
         private void OnGameSessionInfoReceived(RemoteGameSessionInfo info)
         {
+            if (info == null||!enabled)
+                return;
+
             if (info.Settings != null)
             {
-                var twitchUserId = "";
-                if (info.Settings.TryGetValue("twitch_id", out var tid))
-                    twitchUserId = tid.ToString();
-
-                var twitchPubSub = "";
-                if (info.Settings.TryGetValue("twitch_pubsub", out var ps))
-                    twitchPubSub = ps.ToString();
-
-                var key = info.Owner.Username.ToLower();
-
-                if (pubsubs.TryGetValue(key, out var existing))
+                try
                 {
-                    if (existing.IsBadAuth && existing.PubSubToken != twitchPubSub)
+                    var twitchUserId = "";
+                    if (info.Settings.TryGetValue("twitch_id", out var tid))
+                        twitchUserId = tid.ToString();
+
+                    var twitchPubSub = "";
+                    if (info.Settings.TryGetValue("twitch_pubsub", out var ps))
+                        twitchPubSub = ps.ToString();
+
+                    if (info.Owner == null)
+                        return;
+
+                    var user = info.Owner.Username;
+                    if (string.IsNullOrEmpty(user))
+                        return;
+
+                    var key = info.Owner.Username.ToLower();
+                    if (pubsubs.TryGetValue(key, out var existing))
                     {
-                        existing.IsBadAuth = false;
-                    }
+                        if (existing.IsBadAuth && existing.PubSubToken != twitchPubSub)
+                        {
+                            existing.IsBadAuth = false;
+                        }
 
-                    existing.PubSubToken = twitchPubSub;
-                    existing.SessionInfo = info;
-                    existing.TwitchUserId = twitchUserId;
+                        existing.PubSubToken = twitchPubSub;
+                        existing.SessionInfo = info;
+                        existing.TwitchUserId = twitchUserId;
+                    }
+                    else
+                    {
+                        pubsubs[key] = new TwitchPubSubData { PubSubToken = twitchPubSub, SessionInfo = info, TwitchUserId = twitchUserId };
+                    }
+                    PubSubConnect(info.Owner.Username);
                 }
-                else
+                catch (Exception exc)
                 {
-                    pubsubs[key] = new TwitchPubSubData { PubSubToken = twitchPubSub, SessionInfo = info, TwitchUserId = twitchUserId };
+                    logger.LogError("[TWITCH] Error while processing PubSub data. " + exc.Message);
                 }
-                PubSubConnect(info.Owner.Username);
             }
         }
 

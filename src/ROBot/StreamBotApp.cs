@@ -12,6 +12,7 @@ using ROBot.Core.Chat.Discord;
 using ROBot.Core.Chat.Twitch;
 using Shinobytes.Core;
 using RavenBot.Core.Chat;
+using RavenBot.Core.Ravenfall;
 using System.Collections.Concurrent;
 
 namespace ROBot
@@ -21,6 +22,7 @@ namespace ROBot
     public class StreamBotApp : IStreamBotApplication
     {
         private readonly IBotStats botStats;
+        private readonly IUserProvider userProvider;
         private readonly ILogger logger;
         private readonly IKernel kernel;
         private readonly IGameSessionManager sessionManager;
@@ -36,6 +38,7 @@ namespace ROBot
         private DateTime lastDetailsUpdate;
         private HttpClient httpClient;
         private ITimeoutHandle queueTimeoutHandle;
+        private ITimeoutHandle nameCheckTimeoutHandle;
 
         private readonly ConcurrentQueue<UserSubscriptionEvent> subQueue = new ConcurrentQueue<UserSubscriptionEvent>();
         private readonly ConcurrentQueue<CheerBitsEvent> cheerBitsQueue = new ConcurrentQueue<CheerBitsEvent>();
@@ -48,7 +51,8 @@ namespace ROBot
             IBotServer ravenfall,
             ITwitchCommandClient twitch,
             IDiscordCommandClient discord,
-            IBotStats botStats)
+            IBotStats botStats,
+            IUserProvider userProvider)
         {
             this.logger = logger;
             this.kernel = kernel;
@@ -57,6 +61,7 @@ namespace ROBot
             this.twitch = twitch;
             this.discord = discord;
             this.botStats = botStats;
+            this.userProvider = userProvider;
 
             var handler = new HttpClientHandler();
             handler.ServerCertificateCustomValidationCallback = (httpRequestMessage, cert, cetChain, policyErrors) => true;
@@ -72,6 +77,61 @@ namespace ROBot
             messageBus.Subscribe<UserSubscriptionEvent>(nameof(UserSubscriptionEvent), OnUserSub);
 
             this.queueTimeoutHandle = kernel.SetTimeout(HandleTwitchEventQueue, 30000);
+            this.nameCheckTimeoutHandle = kernel.SetTimeout(CheckSessionOwnerNames, SessionNameCheckInterval);
+        }
+
+        /// <summary>
+        /// How often live sessions are checked for a renamed owner. Only reads local settings files,
+        /// which reload themselves when Ravenfall rewrites them, so this is cheap enough to run
+        /// often and still picks a rename up within a few seconds of it being pushed.
+        /// </summary>
+        private const int SessionNameCheckInterval = 15000;
+
+        /// <summary>
+        /// Moves live sessions to the renamed channel when their owner changes name on the platform.
+        /// </summary>
+        /// <remarks>
+        /// The session owner's name is otherwise only read when a session registers, so a rename
+        /// made part way through a stream left the bot sitting in the old channel until the streamer
+        /// restarted the game. Ravenfall pushes the new name by rewriting the user's settings file;
+        /// this notices and hands it to the session manager, which raises the update that leaves the
+        /// old channel and joins the new one.
+        /// </remarks>
+        private void CheckSessionOwnerNames()
+        {
+            try
+            {
+                foreach (var session in sessionManager.All())
+                {
+                    if (session == null || session.RavenfallUserId == Guid.Empty)
+                    {
+                        continue;
+                    }
+
+                    // Re-reads the name from settings as a side effect.
+                    var owner = userProvider.Get(session.RavenfallUserId);
+                    if (owner == null || string.IsNullOrEmpty(owner.Username))
+                    {
+                        continue;
+                    }
+
+                    if (string.Equals(session.Name, owner.Username, StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
+
+                    logger.LogWarning("[BOT] Session owner renamed (Old: " + session.Name
+                        + " New: " + owner.Username + "). Moving channels.");
+
+                    sessionManager.Update(session.Id, session.RavenfallUserId, owner);
+                }
+            }
+            catch (Exception exc)
+            {
+                logger.LogError("[BOT] Session owner name check failed: " + exc);
+            }
+
+            this.nameCheckTimeoutHandle = kernel.SetTimeout(CheckSessionOwnerNames, SessionNameCheckInterval);
         }
 
         private async void HandleTwitchEventQueue()
@@ -338,6 +398,8 @@ namespace ROBot
             sessionManager.SessionUpdated -= OnSessionUpdated;
             disposed = true;
             kernel.ClearTimeout(this.timeoutHandle);
+            kernel.ClearTimeout(this.nameCheckTimeoutHandle);
+            kernel.ClearTimeout(this.queueTimeoutHandle);
             twitch.Dispose();
             botServer.Dispose();
             try { kernel.Stop(); } catch { }

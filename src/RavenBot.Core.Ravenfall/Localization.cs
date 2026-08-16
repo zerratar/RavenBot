@@ -32,6 +32,7 @@
         public const string COMMAND_COOLDOWN = "You must wait another {secondsLeft} secs to use that command.";
 
         public const string GIFT_HELP = "{command} <playername> <item> (optional: <amount>, default 1)";
+        public const string SEND_HELP = "{command} <index or alias> <item> (optional: <amount>, default 1)";
         public const string CRAFT_HELP = "{command} <item>";
 
         public const string OBSERVE_PERM = "You do not have permission to set the currently observed player.";

@@ -165,6 +165,17 @@ namespace RavenBot.Core.Ravenfall
 
         public Task GetVillagersInfoAsync(User player) => SendAsync("villagers", player);
 
+        public Task UploadAsync(User player, string type)
+        {
+            switch (type.ToLower().Trim())
+            {
+                case "log":
+                    return SendAsync("upload_log", player);
+                default:
+                    return SendAsync("upload_state", player);
+            }
+        }
+
         public async Task RestartGameAsync(User player)
         {
             await SendAsync("restart", player);

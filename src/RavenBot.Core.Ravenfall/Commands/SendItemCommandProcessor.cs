@@ -28,6 +28,12 @@ namespace RavenBot.Core.Ravenfall.Commands
 
             var player = playerProvider.Get(cmd);
             var query = cmd.Arguments?.Trim();
+            if (string.IsNullOrEmpty(cmd.Arguments) || !cmd.Arguments.Trim().Contains(" "))
+            {
+                await chat.SendReplyAsync(cmd, Localization.SEND_HELP, cmd.Command);
+                return;
+            }
+
             await this.game[cmd.CorrelationId].SendItemAsync(player, query);
         }
     }

@@ -39,25 +39,74 @@ namespace RavenBot.Core.Ravenfall
                 {
                     player = new User();
                     player.Id = userId;
-
-                    var settings = settingsManager.Get(userId);
-                    if (settings.HasValues)
-                    {
-                        player.DisplayName = player.Username = settings.RavenfallUserName;
-                        player.PlatformId = userId.ToString();
-                        player.Platform = "ravenfall";
-                        player.Settings = settings;
-                    }
-                    else
-                    {
-                        player.Platform = "unknown";
-                        player.PlatformId = null;
-                    }
-
+                    player.Platform = "unknown";
+                    player.PlatformId = null;
                     users.Add(player);
                 }
 
+                // Re-read the name on every call, not only when the user is first seen.
+                //
+                // This list is process wide and the bot stays up for weeks, so a cached user used to
+                // keep whatever name they had the first time we saw them. That is what made a Twitch
+                // rename stick: the session owner kept the old name, every channel the bot joins
+                // comes from that name, so the bot rejoined the old channel forever and only a
+                // restart cleared it. The current name is already sitting in settings by the time we
+                // get here, both from the session packet and from Ravenfall pushing settings when
+                // the streamer logs in on the website.
+                ApplySettings(player, settingsManager.Get(userId));
+
                 return player;
+            }
+        }
+
+        /// <summary>
+        /// Copies the current name and account id from Ravenfall user settings onto a cached user.
+        /// Safe to call repeatedly, and only writes values that are actually present so a user we
+        /// have no settings for keeps whatever chat told us about them.
+        /// </summary>
+        private static void ApplySettings(User player, UserSettings settings)
+        {
+            if (settings == null)
+            {
+                return;
+            }
+
+            // Ravenfall pushes a rename by rewriting the settings file, so the file is re-read
+            // before anything is looked at. HasValues reads the dictionary directly and would
+            // otherwise report empty for a user whose file has not been opened yet, which would skip
+            // the whole update.
+            settings.ReloadIfNecessary();
+
+            if (!settings.HasValues)
+            {
+                return;
+            }
+
+            player.Settings = settings;
+
+            var name = settings.RavenfallUserName;
+            if (!string.IsNullOrEmpty(name) && !name.Equals(player.Username, StringComparison.Ordinal))
+            {
+                // A display name that came from the platform is better than the login name, so it is
+                // only replaced when it was derived from the old login rather than set from chat.
+                var displayNameWasDerived = string.IsNullOrEmpty(player.DisplayName)
+                    || string.IsNullOrEmpty(player.Username)
+                    || player.DisplayName.Equals(player.Username, StringComparison.OrdinalIgnoreCase);
+
+                player.Username = name;
+
+                if (displayNameWasDerived)
+                {
+                    player.DisplayName = name;
+                }
+            }
+
+            // Only claim the account as the identity when nothing better is known. A user first seen
+            // in chat already carries their real platform id, which must not be overwritten.
+            if (string.IsNullOrEmpty(player.PlatformId) || player.Platform == "unknown")
+            {
+                player.PlatformId = player.Id.ToString();
+                player.Platform = "ravenfall";
             }
         }
 
@@ -107,7 +156,15 @@ namespace RavenBot.Core.Ravenfall
                 {
                     user.Platform = platform;
                     user.PlatformId = userId;
-                    user.DisplayName = username;
+                    // Username is assigned as well as DisplayName. This is the path that matches on a
+                    // platform id, which is the one thing a rename does not change, so it is exactly
+                    // where a renamed user is found; leaving Username alone here meant the match
+                    // succeeded and then kept the old name anyway.
+                    if (!string.IsNullOrEmpty(username))
+                    {
+                        user.Username = username;
+                        user.DisplayName = username;
+                    }
                     return user;
                 }
                 user = CreateUser(username, userId, platform);
