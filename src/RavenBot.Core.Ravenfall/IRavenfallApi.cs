@@ -40,6 +40,7 @@ namespace RavenBot.Core.Ravenfall
         Task CancelDuelRequestAsync(User author);
         Task PlayerCountAsync(User author);
         Task SetTimeOfDayAsync(User author, int totalTime, int freezeTime);
+        Task SetWeatherAsync(User author, string weather);
         Task AcceptDuelRequestAsync(User author);
         Task RedeemStreamerTokenAsync(User author, string query);
         Task GetStreamerTokenCountAsync(User author);
