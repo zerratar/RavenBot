@@ -444,6 +444,11 @@ namespace ROBot.Tests
             return Task.CompletedTask;
         }
 
+        public Task SetWeatherAsync(User player, string weather)
+        {
+            return Task.CompletedTask;
+        }
+
         public Task StartArenaAsync(User player)
         {
             return Task.CompletedTask;

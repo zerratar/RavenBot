@@ -38,6 +38,7 @@ namespace RavenBot.Core.Ravenfall
         public Task UseExpMultiplierScrollAsync(User player, int number) => SendAsync("use_exp_scroll", player, number);
         public Task SetExpMultiplierLimitAsync(User player, int number) => SendAsync("exp_multiplier_limit", player, number);
         public Task SetTimeOfDayAsync(User player, int totalTime, int freezeTime) => SendAsync("set_time", player, new SetTimeOfDayRequest(totalTime, freezeTime));
+        public Task SetWeatherAsync(User player, string weather) => SendAsync("set_weather", player, weather ?? string.Empty);
         public Task DuelRequestAsync(User player, User target) => SendAsync("duel", player, target);
         public Task CancelDuelRequestAsync(User player) => SendAsync("duel_cancel", player);
         public Task AcceptDuelRequestAsync(User player) => SendAsync("duel_accept", player);

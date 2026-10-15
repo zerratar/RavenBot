@@ -70,6 +70,7 @@ namespace RavenBot
 
             Register<SetDayCommandProcessor>(commandBindingProvider.Get("day"));
             Register<SetNightCommandProcessor>(commandBindingProvider.Get("night"));
+            Register<WeatherCommandProcessor>(commandBindingProvider.Get("weather"));
 
             Register<TravelCommandProcessor>(commandBindingProvider.Get("travel"));
             Register<PlayerCountCommandProcessor>(commandBindingProvider.Get("online"));//, "players");
