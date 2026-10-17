@@ -334,7 +334,8 @@ namespace ROBot.Core.GameServer
 
                         if (existingConnection.InstanceId != connection.InstanceId)
                         {
-                            if (existingConnection.Session.Created > e.Created)
+                            var existingSession = existingConnection.Session;
+                            if (existingSession != null && SessionCreatedTime.IsOlder(e.Created, existingSession.Created))
                             {
                                 logger.LogDebug("[RVNFLL] Ravenfall client sent a second auth with a created date less than current. (EndPoint: " + connection.EndPointString + ")");
                                 return;

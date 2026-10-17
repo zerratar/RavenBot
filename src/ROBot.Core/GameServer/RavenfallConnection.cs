@@ -204,7 +204,10 @@ namespace ROBot.Core.GameServer
 
                 Guid.TryParse(obj.Args[0].ToString(), out var sessionid);
                 Guid.TryParse(obj.Args[1].ToString(), out var userId);
-                DateTime.TryParse(obj.Args[2].ToString(), out var sessionStart);
+                if (!SessionCreatedTime.TryParse(obj.Args[2], out var sessionStart))
+                {
+                    logger.LogDebug("[RVNFLL] Could not read the session created time '" + obj.Args[2] + "', treating it as unknown.");
+                }
 
                 var token = obj.Args[3] as JToken;
                 var userSettings = JsonConvert.DeserializeObject<Dictionary<string, object>>(token.ToString());
