@@ -116,22 +116,35 @@ namespace ROBot.Core.GameServer
             {
                 try
                 {
-                    if (!this.reader.BaseStream.CanRead)
+                    var r = this.reader;
+                    if (r == null || !r.BaseStream.CanRead)
                     {
                         GameDisconnected();
                         return;
                     }
 
-                    var message = await this.reader.ReadLineAsync();
-                    if (string.IsNullOrEmpty(message))
+                    var message = await r.ReadLineAsync();
+
+                    // only the end of the stream means the game went away, an empty line is just skipped.
+                    if (message == null)
                     {
                         GameDisconnected();
                         return;
+                    }
+
+                    if (string.IsNullOrWhiteSpace(message))
+                    {
+                        continue;
                     }
 
                     HandleMessage(message);
                 }
-                catch (IOException exc)
+                catch (IOException)
+                {
+                    GameDisconnected();
+                    return;
+                }
+                catch (ObjectDisposedException)
                 {
                     GameDisconnected();
                     return;

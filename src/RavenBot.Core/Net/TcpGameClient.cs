@@ -118,6 +118,12 @@ namespace RavenBot.Core.Net
                         continue;
                     }
 
+                    // an empty line is not a disconnect and not worth a warning, just skip it.
+                    if (string.IsNullOrWhiteSpace(message))
+                    {
+                        continue;
+                    }
+
                     if (!IsValidMessage(message))
                     {
                         logger.WriteWarning("Received jibberish from the game: " + message);
