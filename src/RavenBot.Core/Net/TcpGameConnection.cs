@@ -3,6 +3,7 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Net.WebSockets;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace RavenBot.Core.Net
@@ -10,6 +11,8 @@ namespace RavenBot.Core.Net
     public class TcpGameConnection : IGameConnection, IDisposable
     {
         private readonly ILogger logger;
+        // one writer at a time, concurrent writes on a StreamWriter throw and drop the link.
+        private readonly SemaphoreSlim writeLock = new SemaphoreSlim(1, 1);
         private TcpClient client;
         private StreamReader reader;
         private StreamWriter writer;
@@ -62,18 +65,24 @@ namespace RavenBot.Core.Net
 
         public async Task SendAsync(string msg)
         {
+            await this.writeLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                if (this.writer.BaseStream.CanWrite)
+                var w = this.writer;
+                if (w != null && w.BaseStream.CanWrite)
                 {
-                    await this.writer.WriteLineAsync(msg);
-                    await this.writer.FlushAsync();
+                    await w.WriteLineAsync(msg).ConfigureAwait(false);
+                    await w.FlushAsync().ConfigureAwait(false);
                     return;
                 }
             }
             catch (Exception exc)
             {
                 this.logger.WriteError(exc.ToString());
+            }
+            finally
+            {
+                this.writeLock.Release();
             }
 
             Disconnect();

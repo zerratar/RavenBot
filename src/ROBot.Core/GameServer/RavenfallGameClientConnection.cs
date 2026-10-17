@@ -16,6 +16,8 @@ namespace ROBot.Core.GameServer
     public class RavenfallGameClientConnection : IGameClient
     {
         private readonly object mutex = new object();
+        // one writer at a time: pings, chat handlers and message bus callbacks all send from different threads.
+        private readonly SemaphoreSlim writeLock = new SemaphoreSlim(1, 1);
         private readonly List<Subscription> subs = new List<Subscription>();
         private readonly IBotServer server;
         private readonly ILogger logger;
@@ -26,7 +28,8 @@ namespace ROBot.Core.GameServer
 
         private Thread gameReaderThread;
         private bool readActive;
-        private bool disposed;
+        private int disposed;
+        private int disconnected;
 
         public event EventHandler Connected;
         public event EventHandler Disconnected;
@@ -143,6 +146,13 @@ namespace ROBot.Core.GameServer
 
         private void GameDisconnected()
         {
+            // the reader, a failed write and the heartbeat can all notice the drop; only report it once.
+            if (Interlocked.Exchange(ref this.disconnected, 1) == 1)
+            {
+                Dispose();
+                return;
+            }
+
             //logger.LogDebug("Game Disconnected");
             if (Disconnected != null)
                 Disconnected.Invoke(this, EventArgs.Empty);
@@ -175,37 +185,53 @@ namespace ROBot.Core.GameServer
 
         public void Dispose()
         {
-            if (this.disposed) return;
+            if (Interlocked.Exchange(ref this.disposed, 1) == 1) return;
             readActive = false;
 
-            if (connection != null)
+            var c = connection;
+            if (c != null)
             {
-                try { writer.Dispose(); } catch { }
-                try { reader.Dispose(); } catch { }
-                try { connection.Close(); } catch { }
-                try { connection.Dispose(); } catch { }
+                // close the socket first so a write stuck on a full buffer fails instead of blocking the dispose.
+                try { c.Close(); } catch { }
+                try { writer?.Dispose(); } catch { }
+                try { reader?.Dispose(); } catch { }
+                try { c.Dispose(); } catch { }
                 writer = null;
                 reader = null;
                 connection = null;
             }
-
-            this.disposed = true;
         }
 
         public async Task SendAsync(string message)
         {
+            if (this.writer == null || this.disposed == 1)
+            {
+                return;
+            }
+
+            var failed = false;
+            await this.writeLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                if (this.writer.BaseStream.CanWrite)
+                var w = this.writer;
+                if (w != null && w.BaseStream.CanWrite)
                 {
-                    await this.writer.WriteLineAsync(message.AsUTF8());
-                    await this.writer.FlushAsync();
-                    return;
+                    await w.WriteLineAsync(message.AsUTF8()).ConfigureAwait(false);
+                    await w.FlushAsync().ConfigureAwait(false);
                 }
             }
             catch (Exception exc)
             {
                 this.logger.LogError(exc.ToString());
+                failed = true;
+            }
+            finally
+            {
+                this.writeLock.Release();
+            }
+
+            if (failed)
+            {
                 GameDisconnected();
             }
         }
