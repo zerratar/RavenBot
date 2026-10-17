@@ -14,6 +14,10 @@ namespace ROBot.Core.GameServer
     {
         private const string BotStatusPingIP = "216.245.221.92";
 
+        // A game that loses its link reconnects right away, so allow a fair number of tries
+        // per address before refusing; 4 a minute could stall a game after a few quick drops.
+        private const int MaxConnectionsPerAddressPerMinute = 20;
+
         private readonly ILogger logger;
         private readonly IGameSessionManager sessionManager;
         private readonly IRavenfallConnectionProvider connectionProvider;
@@ -286,7 +290,13 @@ namespace ROBot.Core.GameServer
 
             remoteStatus[addr] = status;
 
-            return status.ConnectionTriesThisMinute < 5;
+            if (status.ConnectionTriesThisMinute > MaxConnectionsPerAddressPerMinute)
+            {
+                logger.LogDebug("[RVNFLL] Refused a connection, too many tries this minute. (Address: " + addr + " Tries: " + status.ConnectionTriesThisMinute + ")");
+                return false;
+            }
+
+            return true;
         }
 
         private bool HandlePingRequest(TcpClient client)
