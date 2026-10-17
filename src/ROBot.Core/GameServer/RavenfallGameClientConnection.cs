@@ -30,6 +30,7 @@ namespace ROBot.Core.GameServer
         private bool readActive;
         private int disposed;
         private int disconnected;
+        private long lastMessageReceivedTicks = DateTime.UtcNow.Ticks;
 
         public event EventHandler Connected;
         public event EventHandler Disconnected;
@@ -50,6 +51,12 @@ namespace ROBot.Core.GameServer
         }
 
         public IGameSession Session { get; internal set; }
+
+        /// <summary>
+        /// When anything at all last arrived from the game (UTC), used by the heartbeat.
+        /// Starts at the time the connection was made.
+        /// </summary>
+        public DateTime LastMessageReceivedUtc => new DateTime(Interlocked.Read(ref lastMessageReceivedTicks), DateTimeKind.Utc);
 
         public bool IsConnected => this.connection != null && this.connection.Connected;
 
@@ -131,6 +138,8 @@ namespace ROBot.Core.GameServer
                         GameDisconnected();
                         return;
                     }
+
+                    Interlocked.Exchange(ref lastMessageReceivedTicks, DateTime.UtcNow.Ticks);
 
                     if (string.IsNullOrWhiteSpace(message))
                     {

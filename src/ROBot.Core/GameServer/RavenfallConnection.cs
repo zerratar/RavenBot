@@ -20,6 +20,12 @@ namespace ROBot.Core.GameServer
 {
     public class RavenfallConnection : IRavenfallConnection
     {
+        private const int PingIntervalMs = 3000;
+
+        // Old games answer pings through a slow one-command-per-frame queue, so be generous and
+        // count anything received as a sign of life, not only pongs.
+        private static readonly TimeSpan SilenceTimeout = TimeSpan.FromSeconds(45);
+
         private readonly ConcurrentQueue<string> requests = new ConcurrentQueue<string>();
         private readonly ILogger logger;
         private readonly IKernel kernel;
@@ -37,6 +43,7 @@ namespace ROBot.Core.GameServer
         private int pingSendIndex = 0;
         private int pongReceiveIndex = 0;
         private int missedPingCount = 0;
+        private volatile bool hasReceivedPong;
         private bool disposed;
         private ConcurrentDictionary<string, ChannelStateChangedEvent> channelState =
             new ConcurrentDictionary<string, ChannelStateChangedEvent>();
@@ -192,6 +199,7 @@ namespace ROBot.Core.GameServer
         {
             int.TryParse(obj.CorrelationId, out pongReceiveIndex);
             missedPingCount = 0;
+            hasReceivedPong = true;
         }
 
 
@@ -306,18 +314,30 @@ namespace ROBot.Core.GameServer
 
         private void PingPong()
         {
+            if (disposed)
+            {
+                return;
+            }
+
             if (pingSendIndex != pongReceiveIndex)
             {
-                logger.LogDebug("[RVNFALL] Connection has not sent any pong back. since last update. Ping " + pingSendIndex + ", Pong " + pongReceiveIndex);
-                // Do nothing as of for now. Since clients have not been updated.
-                // But otherwise we should have a fail count
                 missedPingCount++;
-                // and if that goes beyond 2, client should be disconnected. So the game can force reconnect.
-                if (missedPingCount > 2)
+            }
+
+            // Only games that have answered a ping on this link are held to the heartbeat,
+            // so a game too old to answer pings is never dropped for it.
+            var silentFor = DateTime.UtcNow - client.LastMessageReceivedUtc;
+            if (hasReceivedPong && silentFor > SilenceTimeout)
+            {
+                logger.LogWarning("[RVNFLL] Nothing heard from the game for " + (int)silentFor.TotalSeconds + "s, closing the link so it can reconnect. (" + this + " Ping " + pingSendIndex + ", Pong " + pongReceiveIndex + ")");
+                if (activePing != null)
                 {
-                    // this.client.Close();
-                    // return;
+                    kernel.ClearTimeout(activePing);
+                    activePing = null;
                 }
+
+                Close();
+                return;
             }
 
             if (activePing != null)
@@ -325,7 +345,7 @@ namespace ROBot.Core.GameServer
 
             Api.Ping(pingSendIndex++);
 
-            activePing = kernel.SetTimeout(() => PingPong(), 3000);
+            activePing = kernel.SetTimeout(() => PingPong(), PingIntervalMs);
         }
 
         private async void OnUserCheer(CheerBitsEvent obj)

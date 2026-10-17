@@ -265,7 +265,11 @@ namespace RavenBot.Core.Ravenfall
             var request = JsonConvert.SerializeObject(msg);
             if (!this.client.IsConnected)
             {
-                enqueueRequest(request);
+                // a ping is only worth anything right now, never replay it later.
+                if (msg.Identifier != "ping")
+                {
+                    enqueueRequest(request);
+                }
                 return;
             }
             await this.client.SendAsync(request);
