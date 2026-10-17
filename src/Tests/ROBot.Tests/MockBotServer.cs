@@ -46,6 +46,11 @@ namespace ROBot.Tests
         {
         }
 
+        public bool EnqueuePendingRequest(Guid ravenfallUserId, string request)
+        {
+            return false;
+        }
+
         public void Start()
         {
         }

@@ -21,6 +21,13 @@ namespace ROBot.Tests
 
         public IRavenfallApi Api => throw new NotImplementedException();
 
+        public bool IsConnected => true;
+
+        public Task SendRawAsync(string request)
+        {
+            return Task.CompletedTask;
+        }
+
         public IRavenfallApi this[ICommand cmd] => throw new NotImplementedException();
 
         public event EventHandler<RemoteGameSessionInfo> OnSessionInfoReceived;

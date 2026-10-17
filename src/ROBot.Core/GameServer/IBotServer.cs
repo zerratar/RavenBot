@@ -12,5 +12,11 @@ namespace ROBot.Core.GameServer
         void OnClientDisconnected(IRavenfallConnection connection);
         IRavenfallConnection GetConnection(IGameSession ravenfallGameSession);
         IRavenfallConnection GetConnectionByUserId(Guid ravenfallUserId);
+
+        /// <summary>
+        /// Holds a command for the user's game session while its link is down, or sends it right away
+        /// if another link already serves that session. Returns false if it could not be taken.
+        /// </summary>
+        bool EnqueuePendingRequest(Guid ravenfallUserId, string request);
     }
 }

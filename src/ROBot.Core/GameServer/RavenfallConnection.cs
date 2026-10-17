@@ -34,8 +34,11 @@ namespace ROBot.Core.GameServer
         private readonly IMessageBus messageBus;
         private readonly IUserSettingsManager settingsManager;
         private readonly RavenfallGameClientConnection client;
+        private readonly object sessionInfoMutex = new object();
         private RemoteGameSessionInfo queuedSessionInfo;
         private IGameSession session;
+        // the user this link last served, so commands sent after its session moved on still find a home.
+        private Guid lastRavenfallUserId;
         private ITimeoutHandle activePing;
 
         private IPEndPoint endPoint;
@@ -90,6 +93,8 @@ namespace ROBot.Core.GameServer
                 Client_Connected(this, EventArgs.Empty);
             }
 
+            // read only now that every subscription is in place.
+            this.client.StartReading();
         }
 
         private void OnChannelStateChanged(ChannelStateChangedEvent evt)
@@ -136,15 +141,27 @@ namespace ROBot.Core.GameServer
         {
             add
             {
-                internalSessionInfoReceived += value;
-                //if (value != null && queuedSessionInfo != null)
-                //{
-                //    internalSessionInfoReceived.Invoke(this, queuedSessionInfo);
-                //}
+                // the game sends its session info once, right after connecting; if it came before
+                // anyone listened, hand it over now instead of losing it.
+                RemoteGameSessionInfo queued;
+                lock (sessionInfoMutex)
+                {
+                    internalSessionInfoReceived += value;
+                    queued = queuedSessionInfo;
+                    queuedSessionInfo = null;
+                }
+
+                if (queued != null)
+                {
+                    PublishSessionInfo(queued);
+                }
             }
             remove
             {
-                internalSessionInfoReceived -= value;
+                lock (sessionInfoMutex)
+                {
+                    internalSessionInfoReceived -= value;
+                }
             }
         }
 
@@ -157,7 +174,18 @@ namespace ROBot.Core.GameServer
             {
                 session = value;
                 client.Session = value;
+                if (value != null && value.RavenfallUserId != Guid.Empty)
+                {
+                    lastRavenfallUserId = value.RavenfallUserId;
+                }
             }
+        }
+
+        public bool IsConnected => this.client.IsConnected;
+
+        public Task SendRawAsync(string request)
+        {
+            return this.client.SendAsync(request);
         }
 
         public IPEndPoint EndPoint
@@ -227,7 +255,7 @@ namespace ROBot.Core.GameServer
                 var player = playerProvider.Get(userId);
                 player.IsBroadcaster = true;
 
-                this.sessionInfo = new RemoteGameSessionInfo
+                var info = new RemoteGameSessionInfo
                 {
                     Created = sessionStart,
                     SessionId = sessionid,
@@ -236,22 +264,53 @@ namespace ROBot.Core.GameServer
                     Settings = userSettings
                 };
 
-                if (internalSessionInfoReceived == null)
+                this.sessionInfo = info;
+
+                lock (sessionInfoMutex)
+                {
+                    if (internalSessionInfoReceived == null)
+                    {
+                        queuedSessionInfo = info;
+                        return;
+                    }
+                }
+
+                PublishSessionInfo(info);
+            }
+            catch (Exception exc)
+            {
+                logger.LogError($"RegisterSessionOwner session: {Session?.Name}, failed: " + exc);
+            }
+        }
+
+        private void PublishSessionInfo(RemoteGameSessionInfo info)
+        {
+            try
+            {
+                EventHandler<RemoteGameSessionInfo> handler;
+                lock (sessionInfoMutex)
+                {
+                    handler = internalSessionInfoReceived;
+                }
+
+                if (handler == null)
                 {
                     return;
                 }
 
-                internalSessionInfoReceived.Invoke(this, sessionInfo);
+                handler.Invoke(this, info);
 
-                messageBus.Send("ravenfall_session", sessionInfo);
+                messageBus.Send("ravenfall_session", info);
 
-                if (!userSettings.TryGetValue("client_version", out var clientVersionString) ||
+                var userSettings = info.Settings;
+                if (userSettings == null ||
+                    !userSettings.TryGetValue("client_version", out var clientVersionString) ||
                     GameVersion.IsLessThanOrEquals(clientVersionString?.ToString(), "0.9.1.7a"))
                 {
                     return;
                 }
 
-                if (channelState.TryGetValue(sessionInfo.Owner.Username.ToLower(), out var evt))
+                if (channelState.TryGetValue(info.Owner.Username.ToLower(), out var evt))
                 {
                     this.Api.SendChannelStateAsync(evt.Platform, evt.ChannelName, evt.InChannel, evt.Message);
                 }
@@ -416,6 +475,19 @@ namespace ROBot.Core.GameServer
 
         private void EnqueueRequest(string request)
         {
+            // Commands belong to the game session, not to this link: a new link for the same
+            // session sends them when it takes over. Before any session is known keep them here.
+            var userId = session?.RavenfallUserId ?? Guid.Empty;
+            if (userId == Guid.Empty)
+            {
+                userId = lastRavenfallUserId;
+            }
+
+            if (userId != Guid.Empty && server.EnqueuePendingRequest(userId, request))
+            {
+                return;
+            }
+
             this.requests.Enqueue(request);
         }
 

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace ROBot.Core.GameServer
 {
@@ -17,6 +18,11 @@ namespace ROBot.Core.GameServer
         // A game that loses its link reconnects right away, so allow a fair number of tries
         // per address before refusing; 4 a minute could stall a game after a few quick drops.
         private const int MaxConnectionsPerAddressPerMinute = 20;
+
+        // When a game link drops, its session (and the chat channel) is kept this long so a quick
+        // reconnect takes it over without the bot leaving and rejoining the channel. Commands typed
+        // meanwhile wait in the pending queue and are sent on the new link.
+        private static readonly TimeSpan SessionHoldTime = TimeSpan.FromSeconds(90);
 
         private readonly ILogger logger;
         private readonly IGameSessionManager sessionManager;
@@ -29,6 +35,7 @@ namespace ROBot.Core.GameServer
         private readonly List<IRavenfallConnection> connections = new List<IRavenfallConnection>();
         private readonly object connectionMutex = new object();
         private readonly object SessionAuthMutex = new object();
+        private readonly PendingCommandQueue pendingCommands = new PendingCommandQueue();
 
         private ConcurrentDictionary<string, RemoteEndpointStatus> remoteStatus = new();
 
@@ -57,7 +64,11 @@ namespace ROBot.Core.GameServer
 
             lock (connectionMutex)
             {
-                return connections.FirstOrDefault(x => x.Session?.Name == ravenfallGameSession.Name);
+                // a link that is up beats one held after a drop.
+                return connections
+                    .Where(x => x.Session?.Name == ravenfallGameSession.Name)
+                    .OrderByDescending(x => x.IsConnected)
+                    .FirstOrDefault();
             }
         }
 
@@ -73,7 +84,10 @@ namespace ROBot.Core.GameServer
 
             lock (connectionMutex)
             {
-                return connections.FirstOrDefault(x => x?.Session?.RavenfallUserId == ravenfallId);
+                return connections
+                    .Where(x => x?.Session?.RavenfallUserId == ravenfallId)
+                    .OrderByDescending(x => x.IsConnected)
+                    .FirstOrDefault();
             }
         }
 
@@ -129,7 +143,18 @@ namespace ROBot.Core.GameServer
 
         public void OnClientDisconnected(IRavenfallConnection connection)
         {
-            RemoveConnection(connection);
+            var session = connection.Session;
+            if (session != null && state == ServerState.Started)
+            {
+                // keep the session for a while so a reconnect can take it over.
+                connection.OnSessionInfoReceived -= Connection_OnSessionInfoReceived;
+                logger.LogDebug("[RVNFLL] Ravenfall client link dropped, holding the session for " + (int)SessionHoldTime.TotalSeconds + "s. (User: " + session.Name + " EndPoint: " + connection.EndPointString + ")");
+                _ = ReleaseHeldSessionAsync(connection);
+            }
+            else
+            {
+                RemoveConnection(connection);
+            }
 
             IRavenfallConnection[] badConnections;
             lock (connectionMutex)
@@ -147,6 +172,113 @@ namespace ROBot.Core.GameServer
             if (badConnectionCount > 0)
             {
                 logger.LogDebug("[RVNFLL] Cleaned up bad connections (Count: " + badConnectionCount + ")");
+            }
+        }
+
+        private async Task ReleaseHeldSessionAsync(IRavenfallConnection connection)
+        {
+            try
+            {
+                await Task.Delay(SessionHoldTime).ConfigureAwait(false);
+
+                lock (SessionAuthMutex)
+                {
+                    bool stillHeld;
+                    lock (connectionMutex)
+                    {
+                        stillHeld = connections.Contains(connection);
+                    }
+
+                    // taken over by a new link already.
+                    if (!stillHeld)
+                    {
+                        return;
+                    }
+
+                    var session = connection.Session;
+                    RemoveConnection(connection);
+
+                    if (session != null)
+                    {
+                        logger.LogDebug("[RVNFLL] Ravenfall client did not come back, session ended. (User: " + session.Name + ")");
+                        if (session.RavenfallUserId != Guid.Empty && GetConnectionByUserId(session.RavenfallUserId) == null)
+                        {
+                            pendingCommands.Clear(session.RavenfallUserId);
+                        }
+                    }
+                }
+            }
+            catch (Exception exc)
+            {
+                logger.LogError("[RVNFLL] Failed to release a held session: " + exc);
+            }
+        }
+
+        public bool EnqueuePendingRequest(Guid ravenfallUserId, string request)
+        {
+            if (ravenfallUserId == Guid.Empty || string.IsNullOrEmpty(request))
+            {
+                return false;
+            }
+
+            // another link may already serve this session, send it there right away.
+            IRavenfallConnection live;
+            lock (connectionMutex)
+            {
+                live = connections.FirstOrDefault(x => x.IsConnected && x.Session?.RavenfallUserId == ravenfallUserId);
+            }
+
+            if (live != null)
+            {
+                _ = SendRawAsync(live, request);
+                return true;
+            }
+
+            pendingCommands.Enqueue(ravenfallUserId, request);
+            return true;
+        }
+
+        private async Task SendRawAsync(IRavenfallConnection connection, string request)
+        {
+            try
+            {
+                await connection.SendRawAsync(request).ConfigureAwait(false);
+            }
+            catch (Exception exc)
+            {
+                logger.LogError("[RVNFLL] Failed to send a queued command: " + exc);
+            }
+        }
+
+        private async Task SendPendingCommandsAsync(IRavenfallConnection connection, Guid ravenfallUserId)
+        {
+            try
+            {
+                var requests = pendingCommands.TakeAll(ravenfallUserId);
+                if (requests.Count == 0)
+                {
+                    return;
+                }
+
+                logger.LogDebug("[RVNFLL] Sending " + requests.Count + " command(s) queued while the game was away. (User: " + connection.Session?.Name + ")");
+                for (var i = 0; i < requests.Count; ++i)
+                {
+                    if (!connection.IsConnected)
+                    {
+                        // dropped again, keep the rest for the next link.
+                        for (var j = i; j < requests.Count; ++j)
+                        {
+                            pendingCommands.Enqueue(ravenfallUserId, requests[j]);
+                        }
+                        return;
+                    }
+
+                    await connection.SendRawAsync(requests[i]).ConfigureAwait(false);
+                }
+            }
+            catch (Exception exc)
+            {
+                logger.LogError("[RVNFLL] Failed to send queued commands: " + exc);
             }
         }
 
@@ -329,40 +461,92 @@ namespace ROBot.Core.GameServer
 
         private void Connection_OnSessionInfoReceived(object sender, RemoteGameSessionInfo e)
         {
+            if (!(sender is IRavenfallConnection connection))
+            {
+                return;
+            }
+
             lock (SessionAuthMutex)
             {
-                if (sender is IRavenfallConnection connection)
+                // the same link sending its session info again only refreshes the owner.
+                var current = connection.Session;
+                if (current != null && current.RavenfallUserId == e.UserId)
                 {
-                    // check for existing connections using the same session details
-                    var existingConnection = GetConnectionByUserId(e.UserId);
-                    if (existingConnection != null)
+                    sessionManager.Update(current.Id, e.UserId, e.Owner);
+                    return;
+                }
+
+                // other links (live or held after a drop) for the same user
+                IRavenfallConnection[] others;
+                lock (connectionMutex)
+                {
+                    others = connections
+                        .Where(x => x != null && x.InstanceId != connection.InstanceId && x.Session != null && x.Session.RavenfallUserId == e.UserId)
+                        .ToArray();
+                }
+
+                // a live link with a newer session wins; a dropped link or the same session never does.
+                foreach (var other in others)
+                {
+                    var otherSession = other.Session;
+                    if (otherSession != null && otherSession.Id != e.SessionId && other.IsConnected
+                        && SessionCreatedTime.IsOlder(e.Created, otherSession.Created))
                     {
-                        if (existingConnection.Session != null)
-                        {
-                            sessionManager.Update(existingConnection.Session.Id, e.UserId, e.Owner);
-                        }
+                        sessionManager.Update(otherSession.Id, e.UserId, e.Owner);
+                        logger.LogDebug("[RVNFLL] Ravenfall client sent a second auth with a created date less than current. (EndPoint: " + connection.EndPointString + ")");
+                        return;
+                    }
+                }
 
-                        if (existingConnection.InstanceId != connection.InstanceId)
-                        {
-                            var existingSession = existingConnection.Session;
-                            if (existingSession != null && SessionCreatedTime.IsOlder(e.Created, existingSession.Created))
-                            {
-                                logger.LogDebug("[RVNFLL] Ravenfall client sent a second auth with a created date less than current. (EndPoint: " + connection.EndPointString + ")");
-                                return;
-                            }
-
-                            existingConnection.Close();
-                        }
-                        else if (existingConnection.Session != null)
-                        {
-                            return;
-                        }
+                // take over: a link for the same session keeps the session (and the chat channel),
+                // a different session ends the old one as before.
+                IGameSession reused = null;
+                var ended = new List<IGameSession>();
+                foreach (var other in others)
+                {
+                    var otherSession = other.Session;
+                    if (otherSession == null)
+                    {
+                        continue;
                     }
 
+                    // detach first so closing the old link neither ends the session nor holds it.
+                    other.Session = null;
+                    if (otherSession.Id == e.SessionId && (reused == null || reused == otherSession))
+                    {
+                        reused = otherSession;
+                    }
+                    else if (!ended.Contains(otherSession))
+                    {
+                        ended.Add(otherSession);
+                    }
+
+                    other.Close();
+                    RemoveConnection(other);
+                }
+
+                foreach (var s in ended)
+                {
+                    if (s != reused)
+                    {
+                        sessionManager.Remove(s);
+                    }
+                }
+
+                if (reused != null)
+                {
+                    connection.Session = reused;
+                    sessionManager.Update(reused.Id, e.UserId, e.Owner);
+                    logger.LogDebug("[RVNFLL] Ravenfall client reconnected and took over its session. (TwitchName: " + e.Owner.Username + " User: " + reused.Name + " EndPoint: " + connection.EndPointString + ")");
+                }
+                else
+                {
                     connection.Session = sessionManager.Add(this, e.SessionId, e.UserId, e.Owner, e.Created);
                     logger.LogDebug("[RVNFLL] Ravenfall client authenticated. (TwitchName: " + e.Owner.Username + " User: " + connection.Session.Name + " EndPoint: " + connection.EndPointString + ")");
                 }
             }
+
+            _ = SendPendingCommandsAsync(connection, e.UserId);
         }
 
         public void Dispose()

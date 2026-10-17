@@ -30,6 +30,7 @@ namespace ROBot.Core.GameServer
         private bool readActive;
         private int disposed;
         private int disconnected;
+        private int readingStarted;
         private long lastMessageReceivedTicks = DateTime.UtcNow.Ticks;
 
         public event EventHandler Connected;
@@ -45,7 +46,6 @@ namespace ROBot.Core.GameServer
                 var stream = connection.GetStream();
                 this.writer = new StreamWriter(stream);
                 this.reader = new StreamReader(stream);
-                BeginReceiveData();
                 OnConnectionEstablished();
             }
         }
@@ -81,6 +81,20 @@ namespace ROBot.Core.GameServer
         public Task<bool> ProcessAsync(int serverPort)
         {
             return Task.FromResult(IsConnected);
+        }
+
+        /// <summary>
+        /// Starts reading from the game. Called once the owner has subscribed to the messages,
+        /// otherwise the session info the game sends right after connecting can be lost.
+        /// </summary>
+        internal void StartReading()
+        {
+            if (!IsConnected || Interlocked.Exchange(ref readingStarted, 1) == 1)
+            {
+                return;
+            }
+
+            BeginReceiveData();
         }
 
         private void BeginReceiveData()
