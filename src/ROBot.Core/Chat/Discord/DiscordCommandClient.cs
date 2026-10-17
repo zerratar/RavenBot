@@ -406,7 +406,12 @@ namespace ROBot.Core.Chat.Discord
                     logger.LogDebug($"[DISCORD] Sending Message (Channel: {channel} Message: {message})");
                 }
 
-                await c.SendMessageAsync(message, messageReference: replyReference);
+                // Discord refuses messages over 2000 characters; the first part is the reply, the rest follow it.
+                var parts = RavenBot.Core.MessageUtilities.SplitMessage(message, RavenBot.Core.MessageUtilities.DiscordMaxMessageLength);
+                for (var i = 0; i < parts.Count; ++i)
+                {
+                    await c.SendMessageAsync(parts[i], messageReference: i == 0 ? replyReference : null);
+                }
             }
             else
             {

@@ -12,7 +12,13 @@ namespace RavenBot.Core
         private const string CategoryStart = "%[category:";
         private const string CategoryEnd = "]%";
 
-        public static List<string> SplitMessage(string message, int maxLength = 499)
+        /// <summary>Twitch drops chat messages and replies longer than 500 characters.</summary>
+        public const int TwitchMaxMessageLength = 499;
+
+        /// <summary>Discord refuses messages longer than 2000 characters.</summary>
+        public const int DiscordMaxMessageLength = 2000;
+
+        public static List<string> SplitMessage(string message, int maxLength = TwitchMaxMessageLength)
         {
             var result = new List<string>();
             if (string.IsNullOrEmpty(message))

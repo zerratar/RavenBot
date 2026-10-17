@@ -616,7 +616,17 @@ namespace ROBot.Core.Chat.Twitch
                 return;
             }
 
-            await client.SendReplyAsync(channel.Name, correlationId, message).ConfigureAwait(false);
+            // Twitch drops a reply over 500 characters, so long replies go out in parts, each threaded to the same message.
+            var replyParts = RavenBot.Core.MessageUtilities.SplitMessage(message);
+            for (var i = 0; i < replyParts.Count; ++i)
+            {
+                if (i > 0)
+                {
+                    await Task.Delay(250).ConfigureAwait(false);
+                }
+
+                await client.SendReplyAsync(channel.Name, correlationId, replyParts[i]).ConfigureAwait(false);
+            }
         }
         private async Task<string> ApplyMessageTransformationAsync(ICommandChannel channel, string message)
         {
