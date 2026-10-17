@@ -23,7 +23,7 @@ namespace ROBot.Core.GameServer
         private ServerState state;
         private Thread connectionAcceptThread;
         private readonly List<IRavenfallConnection> connections = new List<IRavenfallConnection>();
-        //private readonly object connectionMutex = new object();
+        private readonly object connectionMutex = new object();
         private readonly object SessionAuthMutex = new object();
 
         private ConcurrentDictionary<string, RemoteEndpointStatus> remoteStatus = new();
@@ -43,39 +43,39 @@ namespace ROBot.Core.GameServer
 
         public IRavenfallConnection GetConnection(IGameSession ravenfallGameSession)
         {
-            //lock (connectionMutex)
+            if (ravenfallGameSession == null)
             {
-                if (ravenfallGameSession == null)
-                {
 #if DEBUG
-                    logger.LogDebug("[RVNFLL] BotServer::GetConnection Trying to get connection using null game session.");
+                logger.LogDebug("[RVNFLL] BotServer::GetConnection Trying to get connection using null game session.");
 #endif
-                    return null;
-                }
+                return null;
+            }
 
+            lock (connectionMutex)
+            {
                 return connections.FirstOrDefault(x => x.Session?.Name == ravenfallGameSession.Name);
             }
         }
 
         public IRavenfallConnection GetConnectionByUserId(Guid ravenfallId)
         {
-            //lock (connectionMutex)
+            if (ravenfallId == Guid.Empty)
             {
-                if (ravenfallId == Guid.Empty)
-                {
 #if DEBUG
-                    logger.LogDebug("[RVNFLL] BotServer::GetConnectionByUserId Trying to get connection using null or empty user id.");
+                logger.LogDebug("[RVNFLL] BotServer::GetConnectionByUserId Trying to get connection using null or empty user id.");
 #endif
-                    return null;
-                }
+                return null;
+            }
 
+            lock (connectionMutex)
+            {
                 return connections.FirstOrDefault(x => x?.Session?.RavenfallUserId == ravenfallId);
             }
         }
 
         public IReadOnlyList<IRavenfallConnection> AllConnections()
         {
-            //lock (connectionMutex)
+            lock (connectionMutex)
             {
                 return connections.ToList();
             }
@@ -127,15 +127,16 @@ namespace ROBot.Core.GameServer
         {
             RemoveConnection(connection);
 
-            var badConnectionCount = 0;
-            //lock (connectionMutex)
+            IRavenfallConnection[] badConnections;
+            lock (connectionMutex)
             {
-                var badConnections = connections.Where(x => x != null && x.EndPointString == "Unknown").ToArray();
-                badConnectionCount = badConnections.Length;
-                foreach (var badConnection in badConnections)
-                {
-                    RemoveConnection(badConnection);
-                }
+                badConnections = connections.Where(x => x != null && x.EndPointString == "Unknown").ToArray();
+            }
+
+            var badConnectionCount = badConnections.Length;
+            foreach (var badConnection in badConnections)
+            {
+                RemoveConnection(badConnection);
             }
             var fromStr = connection.Session?.Name ?? connection.EndPointString;
             logger.LogDebug("[RVNFLL] Ravenfall client disconnected. (EndPoint: " + fromStr + ")");
@@ -147,16 +148,23 @@ namespace ROBot.Core.GameServer
 
         private void RemoveConnection(IRavenfallConnection connection)
         {
-            //lock (connectionMutex)
+            connection.OnSessionInfoReceived -= Connection_OnSessionInfoReceived;
+
+            var session = connection.Session;
+            var sessionStillInUse = false;
+            lock (connectionMutex)
             {
-                connection.OnSessionInfoReceived -= Connection_OnSessionInfoReceived;
-
-                if (connection.Session != null)
-                {
-                    sessionManager.Remove(connection.Session);
-                }
-
                 connections.Remove(connection);
+                if (session != null)
+                {
+                    sessionStillInUse = connections.Any(x => x.Session == session);
+                }
+            }
+
+            // the session manager raises events, so never call it while holding the connection lock.
+            if (session != null && !sessionStillInUse)
+            {
+                sessionManager.Remove(session);
             }
         }
 
@@ -173,18 +181,22 @@ namespace ROBot.Core.GameServer
                     }
                     catch { }
 
+                    IRavenfallConnection[] toDispose;
+                    lock (connectionMutex)
                     {
-                        foreach (var c in this.connections)
-                        {
-                            this.sessionManager.Remove(c.Session);
-
-                            try
-                            {
-                                c.Dispose();
-                            }
-                            catch { }
-                        }
+                        toDispose = connections.ToArray();
                         connections.Clear();
+                    }
+
+                    foreach (var c in toDispose)
+                    {
+                        this.sessionManager.Remove(c.Session);
+
+                        try
+                        {
+                            c.Dispose();
+                        }
+                        catch { }
                     }
 
                     this.sessionManager.ClearAll();
@@ -235,7 +247,7 @@ namespace ROBot.Core.GameServer
 
                     logger.LogDebug("[RVNFLL] Ravenfall client connected. (EndPoint: " + connection.EndPointString + ")");
 
-                    //lock (connectionMutex)
+                    lock (connectionMutex)
                     {
                         connections.Add(connection);
                     }
