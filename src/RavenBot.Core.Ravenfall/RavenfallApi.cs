@@ -171,6 +171,7 @@ namespace RavenBot.Core.Ravenfall
             switch (type.ToLower().Trim())
             {
                 case "log":
+                case "logs":
                     return SendAsync("upload_log", player);
                 default:
                     return SendAsync("upload_state", player);

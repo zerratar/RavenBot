@@ -89,7 +89,10 @@ namespace RavenBot
             this.credentialsProvider = credentialsProvider;
 
             var handler = new HttpClientHandler();
+#if DEBUG
+            // debug builds post to a local server with a development certificate
             handler.ServerCertificateCustomValidationCallback = (httpRequestMessage, cert, cetChain, policyErrors) => true;
+#endif
             httpClient = new HttpClient(handler);
 
             this.messageBus.Subscribe<string>("pubsub_token", data =>

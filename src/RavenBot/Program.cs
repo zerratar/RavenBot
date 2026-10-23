@@ -26,6 +26,7 @@ namespace RavenBot
         static void Main(string[] args)
         {
             NativeMethods.AllocConsole();
+            Console.WriteLine("RavenBot v" + System.Reflection.Assembly.GetEntryAssembly()?.GetName().Version?.ToString(3));
 
             var ioc = new IoC();
             ioc.RegisterCustomShared<IoC>(() => ioc);

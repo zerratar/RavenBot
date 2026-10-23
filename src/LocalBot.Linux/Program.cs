@@ -86,6 +86,7 @@ namespace RavenBot
             //    ioc.ReplaceSharedInstance(new AppSettingsProvider().Get());
             //}
 
+            Console.WriteLine("RavenBot v" + System.Reflection.Assembly.GetEntryAssembly()?.GetName().Version?.ToString(3));
             Console.WriteLine("Press Q to exit at any time.");
             Console.WriteLine("Press I to install as service. (This will restart the bot)");
             var installAsService = false;

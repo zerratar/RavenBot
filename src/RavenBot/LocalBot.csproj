@@ -12,6 +12,8 @@
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <TargetName>RavenBot</TargetName>
     <AssemblyName>RavenBot</AssemblyName>
+    <!-- the local bot's version: shown at startup, kept in step with the game release it was shipped with -->
+    <Version>0.9.5.0</Version>
     <RootNamespace>RavenBot</RootNamespace>
     <ApplicationIcon />
     <StartupObject />

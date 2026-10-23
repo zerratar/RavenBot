@@ -17,7 +17,7 @@ namespace RavenBot
 #endif
             Register<RavenfallInfoCommandProcessor>(commandBindingProvider.Get("ravenfall"));
             Register<AppearanceCommandProcessor>(commandBindingProvider.Get("appearance"));//, "looks");
-            Register<StatsCommandProcessor>(commandBindingProvider.Get("stats"));//, "status");
+            Register<StatsCommandProcessor>(commandBindingProvider.Get("stats", "skills"));//, "status");
             Register<EquipmentCommandProcessor>(commandBindingProvider.Get("eq", "equipment"));
 
             Register<ResourcesCommandProcessor>(commandBindingProvider.Get("coins", "gold", "res", "resources", "resource"));
@@ -45,10 +45,10 @@ namespace RavenBot
 
             Register<JoinCommandProcessor>(commandBindingProvider.Get("join"));//, "play");
 
-            Register<UnstuckCommandProcessor>(commandBindingProvider.Get("unstuck"));//, "play");
+            Register<UnstuckCommandProcessor>(commandBindingProvider.Get("unstuck", "stuck"));
 
             Register<LeaveCommandProcessor>(commandBindingProvider.Get("leave"));//, "exit", "quit") ;
-            Register<IslandInfoCommandProcessor>(commandBindingProvider.Get("where"));//"island", "position", "where"); ;
+            Register<IslandInfoCommandProcessor>(commandBindingProvider.Get("where", "island"));
             Register<TrainingInfoCommandProcessor>(commandBindingProvider.Get("training"));//"skill", "training"); 
             Register<LootCommandProcessor>(commandBindingProvider.Get("loot"));
 
@@ -57,7 +57,7 @@ namespace RavenBot
 
             Register<GiftItemCommandProcessor>(commandBindingProvider.Get("gift"));
             Register<ValueItemCommandProcessor>(commandBindingProvider.Get("value"));
-            Register<CraftRequirementCommandProcessor>(commandBindingProvider.Get("req"));//, "requirement", "requirements");
+            Register<CraftRequirementCommandProcessor>(commandBindingProvider.Get("req", "requirement"));
 
             Register<ToggleCommandProcessor>(commandBindingProvider.Get("toggle"));
             Register<RavenfallCommandProcessor>(commandBindingProvider.Get("rpg"));
@@ -109,6 +109,8 @@ namespace RavenBot
             Register<TrainCommandProcessor>(commandBindingProvider.Get("train", "task"));
             Register<SailCommandProcessor>(commandBindingProvider.Get("sail", "disembark"));
             Register<FerryCommandProcessor>(commandBindingProvider.Get("ferry"));
+            Register<MarketCommandProcessor>(commandBindingProvider.Get("market"));
+            Register<HelpCommandProcessor>(commandBindingProvider.Get("help"));
 
             Register<OnsenCommandProcessor>(commandBindingProvider.Get("onsen", "rest"));
             Register<RestedCommandProcessor>(commandBindingProvider.Get("rested"));
