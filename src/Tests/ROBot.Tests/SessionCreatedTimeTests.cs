@@ -46,6 +46,41 @@ namespace ROBot.Tests
         }
 
         [TestMethod]
+        public void ParsesTheFormatsOlderGamesSendFromOtherCultures()
+        {
+            var now = new DateTime(2026, 10, 23, 20, 0, 0);
+            var expected = new DateTime(2026, 10, 23, 19, 15, 30);
+            foreach (var text in new[]
+            {
+                "23/10/2026 19:15:30",      // en-GB, fr-FR, es-ES
+                "10/23/2026 7:15:30 PM",    // en-US
+                "23.10.2026 19:15:30",      // de-DE, pl-PL, ru-RU
+                "23.10.2026 19.15.30",      // fi-FI
+                "23-10-2026 19:15:30",      // nl-NL
+                "2026-10-23 19:15:30",      // sv-SE
+                "2026/10/23 19:15:30",      // ja-JP
+            })
+            {
+                Assert.IsTrue(SessionCreatedTime.TryParse(text, now, out var created), text);
+                Assert.AreEqual(expected, created, text);
+            }
+        }
+
+        [TestMethod]
+        public void AnAmbiguousDayAndMonthIsTheOneClosestToNow()
+        {
+            // 05/10/2026 is 5 October day first, or 10 May month first; a session is recent, so 5 October
+            var now = new DateTime(2026, 10, 6, 12, 0, 0);
+            Assert.IsTrue(SessionCreatedTime.TryParse("05/10/2026 09:00:00", now, out var created));
+            Assert.AreEqual(new DateTime(2026, 10, 5, 9, 0, 0), created);
+
+            // and the other way round in May
+            now = new DateTime(2026, 5, 11, 12, 0, 0);
+            Assert.IsTrue(SessionCreatedTime.TryParse("05/10/2026 09:00:00", now, out created));
+            Assert.AreEqual(new DateTime(2026, 5, 10, 9, 0, 0), created);
+        }
+
+        [TestMethod]
         public void AcceptsDateAlreadyParsedByJson()
         {
             // Newtonsoft turns an ISO string inside object[] into a DateTime.

@@ -231,6 +231,8 @@ namespace ROBot.Core.GameServer
         }
 
 
+        private static readonly System.Collections.Concurrent.ConcurrentDictionary<Guid, bool> unreadableCreatedTimeLogged = new();
+
         private void RegisterSession(GameMessageResponse obj)
         {
             try
@@ -240,8 +242,9 @@ namespace ROBot.Core.GameServer
 
                 Guid.TryParse(obj.Args[0].ToString(), out var sessionid);
                 Guid.TryParse(obj.Args[1].ToString(), out var userId);
-                if (!SessionCreatedTime.TryParse(obj.Args[2], out var sessionStart))
+                if (!SessionCreatedTime.TryParse(obj.Args[2], out var sessionStart) && unreadableCreatedTimeLogged.TryAdd(sessionid, true))
                 {
+                    // the game sends its session on every connect, so once per session is enough
                     logger.LogDebug("[RVNFLL] Could not read the session created time '" + obj.Args[2] + "', treating it as unknown.");
                 }
 
