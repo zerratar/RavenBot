@@ -66,7 +66,7 @@ namespace ROBot.Core.Chat.Commands
 
                 if (arguments[0].Equals("raid"))
                 {
-                    return connection[cmd].AutoJoinDungeonAsync(player, arguments.LastOrDefault());
+                    return connection[cmd].AutoJoinRaidAsync(player, arguments.LastOrDefault());
                 }
             }
 

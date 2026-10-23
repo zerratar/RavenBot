@@ -59,7 +59,7 @@ namespace RavenBot.Core.Ravenfall.Commands
 
                 if (arguments[0].Equals("raid"))
                 {
-                    await connection[cmd].AutoJoinDungeonAsync(player, arguments.LastOrDefault());
+                    await connection[cmd].AutoJoinRaidAsync(player, arguments.LastOrDefault());
                     return;
                 }
             }
