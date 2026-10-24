@@ -8,11 +8,11 @@ namespace ROBot.Core.Chat.Commands
     public class Redeem : ChatCommandHandler
     {
         public override string Category => "Items";
-        public override string Description => "Redeem items using seasonal Tokens like Halloween Tokens and Christmas Tokens";
+        public override string Description => "Redeem items with seasonal tokens (Halloween, Christmas), or buy from the streamer's tavern shelves with coins (the coins go to the village)";
         public override System.Collections.Generic.IReadOnlyList<ChatCommandInput> Inputs { get; } = new System.Collections.Generic.List<ChatCommandInput>
         {
-            ChatCommandInput.Create("item", "What item you want to redeem").Required(),
-            ChatCommandInput.Create("amount", "How many of the said item you want to redeem")
+            ChatCommandInput.Create("item", "The item, or the number of a tavern shelf").Required(),
+            ChatCommandInput.Create("amount", "How many to buy from a tavern shelf (1 when left out)")
         };
 
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
