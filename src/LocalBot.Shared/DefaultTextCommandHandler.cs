@@ -130,6 +130,7 @@ namespace RavenBot
             Register<TicTacToeCommandProcessor>(commandBindingProvider.Get("tictactoe", "ttt"));
             Register<RacingCommandProcessor>(commandBindingProvider.Get("race", "racing"));
             Register<QuestCommandProcessor>(commandBindingProvider.Get("quest", "quests"));
+            Register<ShopCommandProcessor>(commandBindingProvider.Get("shop", "shelves"));
 
             commandBindingProvider.EnsureBindingsFile();
         }

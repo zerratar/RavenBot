@@ -32,6 +32,7 @@ namespace RavenBot.Core.Ravenfall
         public Task ResetPetRacingAsync(User player) => SendAsync("pet_race_reset", player);
         public Task PlayPetRacingAsync(User player) => SendAsync("pet_race_play", player);
         public Task QuestInfoAsync(User player) => SendAsync("quest_info", player);
+        public Task ShopAsync(User player, string arguments) => SendAsync("shop_command", player, arguments);
         public Task GetVillageBoostAsync(User player) => SendAsync("get_village_boost", player);
         public Task ToggleDiaperModeAsync(User player) => SendAsync("toggle_diaper_mode", player);
         public Task ToggleItemRequirementsAsync(User player) => SendAsync("toggle_item_requirements", player);

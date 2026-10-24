@@ -112,6 +112,7 @@ namespace RavenBot.Core.Ravenfall
         Task ResetPetRacingAsync(User author);
         Task PlayPetRacingAsync(User author);
         Task QuestInfoAsync(User author);
+        Task ShopAsync(User author, string arguments);
 
         Task UpdateGameAsync(User player);
 
