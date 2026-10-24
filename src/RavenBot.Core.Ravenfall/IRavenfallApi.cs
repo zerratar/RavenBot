@@ -111,6 +111,7 @@ namespace RavenBot.Core.Ravenfall
         Task ResetTicTacToeAsync(User author);
         Task ResetPetRacingAsync(User author);
         Task PlayPetRacingAsync(User author);
+        Task QuestInfoAsync(User author);
 
         Task UpdateGameAsync(User player);
 

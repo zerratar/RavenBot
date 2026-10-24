@@ -300,6 +300,11 @@ namespace ROBot.Tests
             return Task.CompletedTask;
         }
 
+        public Task QuestInfoAsync(User player)
+        {
+            return Task.CompletedTask;
+        }
+
         public Task PlayTicTacToeAsync(User player, int num)
         {
             return Task.CompletedTask;
