@@ -113,6 +113,7 @@ namespace RavenBot.Core.Ravenfall
         Task PlayPetRacingAsync(User author);
         Task QuestInfoAsync(User author);
         Task ShopAsync(User author, string arguments);
+        Task DecorAsync(User author, string arguments);
 
         Task UpdateGameAsync(User player);
 
