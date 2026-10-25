@@ -50,6 +50,16 @@ namespace RavenBot.Core.Ravenfall.Commands
         protected override string ArgumentsFor(ICommand cmd) => ("ravebridge " + (cmd.Arguments ?? string.Empty)).Trim();
     }
 
+    /// <summary>!hero: hero mode's chat (!quest hero): join, heal, taunt, cheer, revive.</summary>
+    public class HeroCommandProcessor : QuestCommandProcessor
+    {
+        public HeroCommandProcessor(IRavenfallClient game, IUserProvider playerProvider) : base(game, playerProvider)
+        {
+        }
+
+        protected override string ArgumentsFor(ICommand cmd) => ("hero " + (cmd.Arguments ?? string.Empty)).Trim();
+    }
+
     /// <summary>!achievements: the medals reached and the closest next ones (!quest achievements).</summary>
     public class AchievementsCommandProcessor : QuestCommandProcessor
     {
