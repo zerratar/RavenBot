@@ -23,7 +23,30 @@ namespace RavenBot.Core.Ravenfall.Commands
 
             var player = playerProvider.Get(cmd);
             // the local bot ships with the game, so it is always the game's own version
-            await this.game[cmd.CorrelationId].QuestAsync(player, cmd.Arguments ?? string.Empty);
+            await this.game[cmd.CorrelationId].QuestAsync(player, ArgumentsFor(cmd));
         }
+
+        /// <summary>What the game is sent after quest_command: the chat's words, or a sub command first (!title, !achievements).</summary>
+        protected virtual string ArgumentsFor(ICommand cmd) => cmd.Arguments ?? string.Empty;
+    }
+
+    /// <summary>!title: the titles earned, and !title 2 or !title off (!quest title).</summary>
+    public class TitleCommandProcessor : QuestCommandProcessor
+    {
+        public TitleCommandProcessor(IRavenfallClient game, IUserProvider playerProvider) : base(game, playerProvider)
+        {
+        }
+
+        protected override string ArgumentsFor(ICommand cmd) => ("title " + (cmd.Arguments ?? string.Empty)).Trim();
+    }
+
+    /// <summary>!achievements: the medals reached and the closest next ones (!quest achievements).</summary>
+    public class AchievementsCommandProcessor : QuestCommandProcessor
+    {
+        public AchievementsCommandProcessor(IRavenfallClient game, IUserProvider playerProvider) : base(game, playerProvider)
+        {
+        }
+
+        protected override string ArgumentsFor(ICommand cmd) => "achievements";
     }
 }
