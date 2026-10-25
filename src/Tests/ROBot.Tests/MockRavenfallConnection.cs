@@ -11,6 +11,8 @@ namespace ROBot.Tests
 {
     public class MockRavenfallConnection : IRavenfallConnection
     {
+        public string ClientVersion => null;
+
         public Guid InstanceId => Guid.NewGuid();
 
         public IGameSession Session { get; set; }
@@ -311,6 +313,11 @@ namespace ROBot.Tests
         }
 
         public Task DecorAsync(User player, string arguments)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task QuestAsync(User player, string arguments)
         {
             return Task.CompletedTask;
         }

@@ -1,3 +1,4 @@
+using RavenBot.Core;
 using RavenBot.Core.Handlers;
 using ROBot.Core.Chat.Twitch;
 using ROBot.Core.GameServer;
@@ -23,7 +24,11 @@ namespace ROBot.Core.Chat.Commands
                     if (player == null)
                         return;
 
-                    await connection[cmd].QuestInfoAsync(player);
+                    // games from 0.9.6 have quests to take and give up (!quest accept 2); older ones only the teaser
+                    if (connection.ClientVersion != null && !GameVersion.IsLessThanOrEquals(connection.ClientVersion, "0.9.5.9"))
+                        await connection[cmd].QuestAsync(player, cmd.Arguments ?? string.Empty);
+                    else
+                        await connection[cmd].QuestInfoAsync(player);
                 }
             }
         }

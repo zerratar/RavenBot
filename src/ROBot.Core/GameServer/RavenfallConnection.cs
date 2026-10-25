@@ -50,6 +50,9 @@ namespace ROBot.Core.GameServer
         private bool disposed;
 
         private RemoteGameSessionInfo sessionInfo;
+
+        public string ClientVersion =>
+            sessionInfo?.Settings != null && sessionInfo.Settings.TryGetValue("client_version", out var version) ? version?.ToString() : null;
         private readonly List<IMessageBusSubscription> subs = new List<IMessageBusSubscription>();
 
         public Guid InstanceId { get; } = Guid.NewGuid();

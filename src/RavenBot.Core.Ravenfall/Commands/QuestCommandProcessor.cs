@@ -22,7 +22,8 @@ namespace RavenBot.Core.Ravenfall.Commands
             }
 
             var player = playerProvider.Get(cmd);
-            await this.game[cmd.CorrelationId].QuestInfoAsync(player);
+            // the local bot ships with the game, so it is always the game's own version
+            await this.game[cmd.CorrelationId].QuestAsync(player, cmd.Arguments ?? string.Empty);
         }
     }
 }

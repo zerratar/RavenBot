@@ -20,6 +20,9 @@ namespace ROBot.Core.GameServer
         /// <summary>True while the game link is up.</summary>
         bool IsConnected { get; }
 
+        /// <summary>The game's version, from its session info; null until it has sent one.</summary>
+        string ClientVersion { get; }
+
         /// <summary>Sends an already serialized game message as is, used to send commands queued while the link was down.</summary>
         Task SendRawAsync(string request);
         IRavenfallApi Ref(string correlationId);
