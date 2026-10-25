@@ -40,6 +40,16 @@ namespace RavenBot.Core.Ravenfall.Commands
         protected override string ArgumentsFor(ICommand cmd) => ("title " + (cmd.Arguments ?? string.Empty)).Trim();
     }
 
+    /// <summary>!ravebridge: the Ravebridge event (!quest ravebridge): join, leave, follow, heal, start, end.</summary>
+    public class RavebridgeCommandProcessor : QuestCommandProcessor
+    {
+        public RavebridgeCommandProcessor(IRavenfallClient game, IUserProvider playerProvider) : base(game, playerProvider)
+        {
+        }
+
+        protected override string ArgumentsFor(ICommand cmd) => ("ravebridge " + (cmd.Arguments ?? string.Empty)).Trim();
+    }
+
     /// <summary>!achievements: the medals reached and the closest next ones (!quest achievements).</summary>
     public class AchievementsCommandProcessor : QuestCommandProcessor
     {

@@ -132,6 +132,7 @@ namespace RavenBot
             Register<QuestCommandProcessor>(commandBindingProvider.Get("quest", "quests"));
             Register<TitleCommandProcessor>(commandBindingProvider.Get("title", "titles"));
             Register<AchievementsCommandProcessor>(commandBindingProvider.Get("achievements", "achievement"));
+            Register<RavebridgeCommandProcessor>(commandBindingProvider.Get("ravebridge", "rb"));
             Register<ShopCommandProcessor>(commandBindingProvider.Get("shop", "shelves"));
             Register<DecorCommandProcessor>(commandBindingProvider.Get("decor"));
 
