@@ -48,8 +48,6 @@ namespace ROBot.Core.GameServer
         private int missedPingCount = 0;
         private volatile bool hasReceivedPong;
         private bool disposed;
-        private ConcurrentDictionary<string, ChannelStateChangedEvent> channelState =
-            new ConcurrentDictionary<string, ChannelStateChangedEvent>();
 
         private RemoteGameSessionInfo sessionInfo;
         private readonly List<IMessageBusSubscription> subs = new List<IMessageBusSubscription>();
@@ -101,8 +99,7 @@ namespace ROBot.Core.GameServer
         {
             // only interesting if its our current channel.
 
-            // its not much data, so lets log to a dictionary
-            channelState[evt.ChannelName.ToLower()] = evt;
+            // the bot's channel states are kept for the whole bot (ChannelStates), so a game that connects later is told too
 
             var channel = this.session?.Channel?.Name ?? sessionInfo?.Owner?.Username;
             if (this.session == null || this.session.Channel == null)
@@ -313,7 +310,7 @@ namespace ROBot.Core.GameServer
                     return;
                 }
 
-                if (channelState.TryGetValue(info.Owner.Username.ToLower(), out var evt))
+                if (ChannelStates.TryGet(info.Owner.Username, out var evt))
                 {
                     this.Api.SendChannelStateAsync(evt.Platform, evt.ChannelName, evt.InChannel, evt.Message);
                 }
