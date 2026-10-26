@@ -115,6 +115,9 @@ namespace RavenBot.Core.Ravenfall
         Task ShopAsync(User author, string arguments);
         Task DecorAsync(User author, string arguments);
 
+        /// <summary>!boat with what came after it (build sloop, list); games from 0.9.6 read it.</summary>
+        Task BoatAsync(User author, string arguments);
+
         /// <summary>!quest with what came after it (accept 2, abandon 1); games from 0.9.6 read it.</summary>
         Task QuestAsync(User author, string arguments);
 

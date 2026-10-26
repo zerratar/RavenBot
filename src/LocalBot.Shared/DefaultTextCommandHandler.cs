@@ -136,6 +136,7 @@ namespace RavenBot
             Register<HeroCommandProcessor>(commandBindingProvider.Get("hero"));
             Register<ShopCommandProcessor>(commandBindingProvider.Get("shop", "shelves"));
             Register<DecorCommandProcessor>(commandBindingProvider.Get("decor"));
+            Register<BoatCommandProcessor>(commandBindingProvider.Get("boat"));
 
             commandBindingProvider.EnsureBindingsFile();
         }
