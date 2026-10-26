@@ -65,9 +65,11 @@ namespace ROBot.Core.Chat.Twitch
         //private long connectionCurrentErrorCount = 0;
         //private long connectionCurrentAttemptCount = 0;
         private bool attemptingReconnection = false;
-        private bool rateLimited;
-        private readonly ConcurrentDictionary<ulong, DateTime> lastMessageSent = new ConcurrentDictionary<ulong, DateTime>();
-        private readonly List<string> rateLimitedChannels = new List<string>();
+        // every message to chat goes through the pacer, which keeps to Twitch's limits instead of losing what does not fit
+        private readonly ChatPacer pacer = new ChatPacer();
+        private Task pacerTask;
+        private int reportedDropped;
+        private DateTime droppedReportedAt;
 
         public TwitchCommandClient(
             ILogger logger,
@@ -96,6 +98,39 @@ namespace ROBot.Core.Chat.Twitch
 
             //this.messageBus.Subscribe<PubSubToken>("pubsub", OnPubSubTokenReceived);
             broadcastSubscription = messageBus.Subscribe<SessionGameMessageResponse>(MessageBus.Broadcast, BroadcastAsync);
+        }
+
+        /// <summary>Sends what the pacer lets through, as long as the bot runs.</summary>
+        private async Task SendPacedAsync()
+        {
+            while (!disposed)
+            {
+                try
+                {
+                    var c = client;
+                    if (c != null && c.IsConnected)
+                    {
+                        while (pacer.TryTake(out var message))
+                        {
+                            if (message.ReplyTo != null) await c.SendReplyAsync(message.Channel, message.ReplyTo, message.Text).ConfigureAwait(false);
+                            else c.SendMessage(message.Channel, message.Text);
+                        }
+                    }
+
+                    if (pacer.Dropped > reportedDropped && DateTime.UtcNow - droppedReportedAt > TimeSpan.FromMinutes(1))
+                    {
+                        logger.LogWarning("[TWITCH] " + (pacer.Dropped - reportedDropped) + " chat messages waited too long and were not sent (" + pacer.Waiting + " waiting)");
+                        reportedDropped = pacer.Dropped;
+                        droppedReportedAt = DateTime.UtcNow;
+                    }
+                }
+                catch (Exception exc)
+                {
+                    logger.LogError("[TWITCH] Sending chat failed: " + exc.Message);
+                }
+
+                await Task.Delay(50).ConfigureAwait(false);
+            }
         }
 
         public string GetPubSubActivationLink()
@@ -157,8 +192,7 @@ namespace ROBot.Core.Chat.Twitch
         {
             stats.AddLastRateLimit(e);
             logger.LogError("[TWITCH] RateLimited (Channel: " + e.Channel + ", Message: " + e.Message + ")");
-            rateLimited = true;
-            rateLimitedChannels.Add(e.Channel.ToLower());
+            pacer.Slow(e.Channel, TimeSpan.FromSeconds(10));
         }
 
         private async Task OnConnectedAsync(object sender, OnConnectedArgs e)
@@ -232,7 +266,10 @@ namespace ROBot.Core.Chat.Twitch
             {
                 logger.LogInformation("[TWITCH] Starting...");
 
-                client = new TwitchClient(new TcpClient(new ClientOptions(clientType: ClientType.Chat)));
+                // TwitchLib's own throttle dropped messages over 20 per 30 s for all channels together; the pacer keeps
+                // to the real limits, so this one only has to stay out of the way
+                client = new TwitchClient(new TcpClient(new ClientOptions(clientType: ClientType.Chat)), sendOptions: new SendOptions(sendsAllowedInPeriod: 7500));
+                pacerTask ??= Task.Run(SendPacedAsync);
 
                 var credentials = credentialsProvider.Get();
 
@@ -575,57 +612,21 @@ namespace ROBot.Core.Chat.Twitch
             logger.LogDebug($"[TWITCH] Sending Message (Channel: {channel.Name} Message: {message})");
             stats.AddMsgSend(channel.Name, message);
 
-            if (lastMessageSent.TryGetValue(channel.Id, out DateTime sentTime))
+            if (string.IsNullOrEmpty(correlationId) && !string.IsNullOrEmpty(mention))
             {
-                var elapsed = DateTime.UtcNow - sentTime;
-                if (elapsed.TotalMilliseconds < 250)
+                if (!mention.StartsWith("@"))
                 {
-                    await Task.Delay(250).ConfigureAwait(false);
+                    mention = "@" + mention;
                 }
+
+                message = mention + ", " + message;
             }
 
-            if (rateLimited && (rateLimitedChannels.Contains(channel.Name.ToLower()) || rateLimitedChannels.Contains(channel.Id.ToString())))
+            // Twitch drops a message over 500 characters, so long ones go in parts (each reply part threaded to the same
+            // message); the pacer sends them as Twitch's limits allow and joins short announcements waiting together
+            foreach (var part in RavenBot.Core.MessageUtilities.SplitMessage(message))
             {
-                await Task.Delay(1000).ConfigureAwait(false);
-            }
-
-            lastMessageSent[channel.Id] = DateTime.UtcNow;
-            if (string.IsNullOrEmpty(correlationId))
-            {
-                if (!string.IsNullOrEmpty(mention))
-                {
-                    if (!mention.StartsWith("@"))
-                    {
-                        mention = "@" + mention;
-                    }
-
-                    message = mention + ", " + message;
-                }
-
-                var messages = RavenBot.Core.MessageUtilities.SplitMessage(message);
-                foreach (var part in messages)
-                {
-                    client.SendMessage(channel.Name, part);
-                    if (messages.Count > 1)
-                    {
-                        await Task.Delay(250).ConfigureAwait(false);
-                    }
-                }
-
-                //client.SendMessage(channel.Name, message);
-                return;
-            }
-
-            // Twitch drops a reply over 500 characters, so long replies go out in parts, each threaded to the same message.
-            var replyParts = RavenBot.Core.MessageUtilities.SplitMessage(message);
-            for (var i = 0; i < replyParts.Count; ++i)
-            {
-                if (i > 0)
-                {
-                    await Task.Delay(250).ConfigureAwait(false);
-                }
-
-                await client.SendReplyAsync(channel.Name, correlationId, replyParts[i]).ConfigureAwait(false);
+                pacer.Enqueue(channelName, part, string.IsNullOrEmpty(correlationId) ? null : correlationId);
             }
         }
         private async Task<string> ApplyMessageTransformationAsync(ICommandChannel channel, string message)
@@ -774,7 +775,13 @@ namespace ROBot.Core.Chat.Twitch
 
         private async Task OnUserStateChangedAsync(object sender, OnUserStateChangedArgs e)
         {
-            //logger.LogDebug("[TWITCH] Client_OnUserStateChanged: " + e.ToString());
+            // moderator, VIP or broadcaster in that channel: Twitch allows the bot 100 messages per 30 s there, not 20
+            var state = e.UserState;
+            if (state == null || string.IsNullOrEmpty(state.Channel)) return;
+            var privileged = state.IsModerator
+                || state.Badges.Any(b => b.Key == "vip" || b.Key == "broadcaster" || b.Key == "moderator")
+                || string.Equals(state.Channel, GetBotName(), StringComparison.OrdinalIgnoreCase);
+            pacer.SetPrivileged(state.Channel, privileged);
         }
 
         private async Task OnMessageSentAsync(object sender, OnMessageSentArgs e)
