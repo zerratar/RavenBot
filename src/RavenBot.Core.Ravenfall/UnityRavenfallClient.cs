@@ -75,7 +75,8 @@ namespace RavenBot.Core.Ravenfall
                 user = playerProvider.Get(evt.ChannelName);
             }
 
-            if (user.Settings != null)
+            // an owner not looked up yet threw here and the game was never told; it is told now, as on a new session
+            if (user?.Settings != null)
             {
                 var userSettings = user.Settings;
                 var clientVersion = userSettings?.ClientVersion;
