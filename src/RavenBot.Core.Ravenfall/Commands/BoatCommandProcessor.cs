@@ -3,7 +3,7 @@ using RavenBot.Core.Handlers;
 
 namespace RavenBot.Core.Ravenfall.Commands
 {
-    /// <summary>!boat: the player's own boat; !boat build fishing boat (or sloop) at the shipwright on Away; !boat list.</summary>
+    /// <summary>!boat: the player's own boat; !boat build fishing boat (or sloop) at the shipwright on Away; !boat list; guests with !boat invite, join, accept, decline and leave (the game answers them all).</summary>
     public class BoatCommandProcessor : Net.RavenfallCommandProcessor
     {
         private readonly IRavenfallClient game;

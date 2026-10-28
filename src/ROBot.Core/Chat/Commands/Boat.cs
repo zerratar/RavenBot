@@ -8,8 +8,8 @@ namespace ROBot.Core.Chat.Commands
     public class Boat : ChatCommandHandler
     {
         public override string Category => "Sailing";
-        public override string Description => "Your own boat: where it is and how fast it sails. !boat build fishing boat (or sloop) has the shipwright on Away build one from crafted parts and coins; !boat list says what each needs.";
-        public override string UsageExample => "!boat, !boat build fishing boat, !boat list";
+        public override string Description => "Your own boat: where it is and how fast it sails. !boat build fishing boat (or sloop) has the shipwright on Away build one from crafted parts and coins; !boat list says what each needs. Guests: !boat invite <player> or !boat join <player>, answered with !boat accept or !boat decline; !boat leave gets a guest off.";
+        public override string UsageExample => "!boat, !boat build fishing boat, !boat list, !boat invite <player>, !boat join <player>, !boat accept, !boat leave";
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
         {
             var channel = cmd.Channel;
