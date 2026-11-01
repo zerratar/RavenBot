@@ -118,6 +118,9 @@ namespace RavenBot.Core.Ravenfall
         /// <summary>!boat with what came after it (build sloop, list); games from 0.9.6 read it.</summary>
         Task BoatAsync(User author, string arguments);
 
+        /// <summary>The banana island's !dig, !banana, !regatta and !pirates: the command first, then its arguments.</summary>
+        Task MangroveAsync(User author, string arguments);
+
         /// <summary>!quest with what came after it (accept 2, abandon 1); games from 0.9.6 read it.</summary>
         Task QuestAsync(User author, string arguments);
 
