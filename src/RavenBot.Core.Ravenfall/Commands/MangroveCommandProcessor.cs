@@ -5,8 +5,8 @@ namespace RavenBot.Core.Ravenfall.Commands
 {
     /// <summary>
     /// The banana island's commands (the game's docs/banana-island.md), all sent to the game as one packet with the
-    /// command first: !dig joins a treasure dig, !banana (feed, golden) the monkeys' pile, !regatta (start, leave) the
-    /// boat race, !pirates calls the pirates' raid. The game answers them all.
+    /// command first: !dig joins a treasure dig, !banana (feed, golden) the monkeys' pile, !regatta (start, leave; keg,
+    /// wind and kraken to meddle in a race) the boat race, !pirates calls the pirates' raid. The game answers them all.
     /// </summary>
     public abstract class MangroveCommandProcessor : Net.RavenfallCommandProcessor
     {
