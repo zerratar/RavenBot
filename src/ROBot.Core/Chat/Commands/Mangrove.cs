@@ -42,8 +42,8 @@ namespace ROBot.Core.Chat.Commands
     public class Regatta : ChatCommandHandler
     {
         public override string Category => "Sailing";
-        public override string Description => "Race your own boat round the banana island. The first !regatta opens the sign-up; the streamer can start it at once with !regatta start. Places pay coins and Sailing exp. Not racing? Meddle: !regatta keg throws a powder keg in front of a racer, !regatta wind fills a racer's sails (free once a minute, add a name to aim it for coins); the streamer can wake the Kraken once a race with !regatta kraken.";
-        public override string UsageExample => "!regatta, !regatta start, !regatta leave, !regatta keg, !regatta wind <name>, !regatta kraken";
+        public override string Description => "Race your own boat round the banana island. The first !regatta opens the sign-up; the streamer can start it at once with !regatta start. Places pay coins and Sailing exp. Not racing? Meddle: !regatta keg throws a powder keg in front of a racer, !regatta wind fills a racer's sails (free once a minute, add a name to aim it for coins); the streamer can wake the Kraken once a race with !regatta kraken. Just for laughs, free: !regatta swim sends a racer overboard to tow their boat, !regatta propeller makes them its propeller.";
+        public override string UsageExample => "!regatta, !regatta start, !regatta leave, !regatta keg, !regatta wind <name>, !regatta kraken, !regatta swim <name>, !regatta propeller <name>";
         public override Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd) => Mangrove.SendAsync(game, cmd, "regatta");
     }
 
