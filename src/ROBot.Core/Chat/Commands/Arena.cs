@@ -10,10 +10,11 @@ namespace ROBot.Core.Chat.Commands
     public class Arena : ChatCommandHandler
     {
         public override string Category => "PvP";
-        public override string Description => "Arena command is used for interacting with the Arena, such as joining, leaving, starting, etc.";
+        public override string Description => "Join the arena on the island you are on to fight other players. !arena on its own signs you up too.";
+        public override string UsageExample => "!arena join";
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {
-            ChatCommandInput.Create("interaction", "How you will interact with the arena", "join", "leave")
+            ChatCommandInput.Create("action", "Type join, or leave it out, to sign up for the arena.", "join")
             //.WithOptions(ChatCommandInput.Create("join", "joins the arena"),
             //             ChatCommandInput.Create("leave", "leaves the arena"))
         };

@@ -8,12 +8,12 @@ namespace ROBot.Core.Chat.Commands
     public class Gift : ChatCommandHandler
     {
         public override string Category => "Items";
-        public override string Description => "Gift items to a target player. The order of item and amount does not matter as long as they are distinguishable of what is what. But player name must always be the first argument.";
+        public override string Description => "Give items or coins from your inventory to another player. The player's name always comes first; the item and the amount can come in either order. Add set to give a whole item set, such as !gift zerratar rune set.";
         public override System.Collections.Generic.IReadOnlyList<ChatCommandInput> Inputs { get; } = new System.Collections.Generic.List<ChatCommandInput>
         {
-            ChatCommandInput.Create("player", "The player that you want to gift an item to.").Required(),
-            ChatCommandInput.Create("item", "The item that you want to give.").Required(),
-            ChatCommandInput.Create("amount", "The amount of that item you want to give. Default is 1, you can use 'k', 'm', 't', 'b'"),
+            ChatCommandInput.Create("player", "The name of the player to give to. It must come first.").Required(),
+            ChatCommandInput.Create("item", "The item to give, coins to give coins (!gift zerratar coins 5000), or an item set followed by the word set (rune set). Soulbound items cannot be given.").Required(),
+            ChatCommandInput.Create("amount", "How many to give, or how many of each piece for a set; leave it out for one. Shorthands like 10k or 2m work.").NotRequired(),
         };
 
         public override string UsageExample => "!gift zerratar 1k burned shrimps";

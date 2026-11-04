@@ -9,10 +9,10 @@ namespace ROBot.Core.Chat.Commands
     {
         public override bool RequiresBroadcaster => true;
         public override string Category => "Game";
-        public override string Description => "Kick target player or afk players, this command can only be used by the broadcaster or a moderator.";
+        public override string Description => "Remove a player from the game, or everyone who is away or idle. Only the streamer and moderators can use it.";
         public override System.Collections.Generic.IReadOnlyList<ChatCommandInput> Inputs { get; } = new System.Collections.Generic.List<ChatCommandInput>
         {
-            ChatCommandInput.Create("target", "Who do you want to kick?", "<player name>", "afk").Required(),
+            ChatCommandInput.Create("target", "The player's name, or afk to kick everyone marked away plus anyone standing idle with nothing to do (players resting, raiding, in a dungeon, the arena, a duel or on the ferry stay).", "afk").Required(),
         };
         public override string UsageExample => "!kick zerratar";
 

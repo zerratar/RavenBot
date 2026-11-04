@@ -7,12 +7,12 @@ namespace ROBot.Core.Chat.Commands
 {
     public class Teleport : ChatCommandHandler
     {
-        public override string Description => "This command allows for using a tome to teleport the player to a target island";
+        public override string Description => "Use a Teleportation Tome from your inventory to teleport straight to an island. You cannot teleport during a raid, dungeon, duel, arena fight, raid war or on Ravebridge.";
         public override string UsageExample => "!teleport kyo";
         public override string Category => "Character";
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {
-            ChatCommandInput.Create("island", "Which island do you wish to teleport to?").Required()
+            ChatCommandInput.Create("island", "The island to teleport to. You need a tome for that island.", "Home", "Away", "Ironhill", "Kyo", "Heim", "Atria", "Eldara").Required()
         };
 
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)

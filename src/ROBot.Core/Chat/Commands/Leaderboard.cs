@@ -7,12 +7,12 @@ namespace ROBot.Core.Chat.Commands
 {
     public class Leaderboard : ChatCommandHandler
     {
-        public override string Description => "Check how you are faring on the leaderboard. See https://www.ravenfall.stream/leaderboard";
+        public override string Description => "See your character's rank on the global leaderboard, overall or in one skill. The full list is at https://www.ravenfall.stream/leaderboard";
         public override string UsageExample => "!leaderboard fishing";
         public override string Category => "Competition";
         public override System.Collections.Generic.IReadOnlyList<ChatCommandInput> Inputs { get; } = new System.Collections.Generic.List<ChatCommandInput>
         {
-            ChatCommandInput.Create("skill", "Which skill do you want to check? Leave empty for overall"),
+            ChatCommandInput.Create("skill", "The skill to check, such as fishing; leave it out (or type all) for your overall rank.").NotRequired(),
         };
 
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)

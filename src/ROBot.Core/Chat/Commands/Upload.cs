@@ -7,11 +7,11 @@ namespace ROBot.Core.Chat.Commands
 {
     public class Upload : ChatCommandHandler
     {
-        public override string Description => "Use this command to trigger a log or game state upload.";
+        public override string Description => "Uploads the game's log or game state to the Ravenfall server so the developers can look into a problem. For the streamer and moderators only.";
         public override string UsageExample => "!upload log";
         public override System.Collections.Generic.IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {
-            ChatCommandInput.Create("option", "What to upload to the server. ('state' is default if value left empty)", "log", "state").Required()
+            ChatCommandInput.Create("option", "log uploads the game's log file, state uploads the game state. Leave empty for state.", "log", "state").NotRequired()
         };
 
         public override string Category => "Game";

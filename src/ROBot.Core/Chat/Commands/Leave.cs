@@ -7,7 +7,8 @@ namespace ROBot.Core.Chat.Commands
     public class Leave : ChatCommandHandler
     {
         public override string Category => "Game";
-        public override string Description => "Use this command to leave the game with your current character. This is required if you want to play with another character.";
+        public override string Description => "Leave the game with your current character. Leave first if you want to !join with another one.";
+        public override string UsageExample => "!leave";
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
         {
             var session = game.GetSession(cmd.Channel);

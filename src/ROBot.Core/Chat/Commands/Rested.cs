@@ -8,7 +8,8 @@ namespace ROBot.Core.Chat.Commands
     public class Rested : ChatCommandHandler
     {
         public override string Category => "Game";
-        public override string Description => "Gets how much rested status you have left.";
+        public override string Description => "Shows how much rested time you have left. While rested you gain extra exp; rest at an onsen with !onsen to build it up.";
+        public override string UsageExample => "!rested";
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
         {
             var channel = cmd.Channel;

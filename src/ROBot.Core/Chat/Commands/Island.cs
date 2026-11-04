@@ -10,7 +10,12 @@ namespace ROBot.Core.Chat.Commands
     {
 
         public override string Category => "Game";
-        public override string Description => "Check which island your character is currently on.";
+        public override string Description => "See which island your character, or another player's, is on right now, or where the ferry is taking them.";
+        public override string UsageExample => "!island zerratar";
+        public override System.Collections.Generic.IReadOnlyList<ChatCommandInput> Inputs { get; } = new System.Collections.Generic.List<ChatCommandInput>
+        {
+            ChatCommandInput.Create("player", "The name of a player in this stream; leave it out to check yourself.").NotRequired(),
+        };
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
         {
             var channel = cmd.Channel;

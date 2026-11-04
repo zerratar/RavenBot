@@ -8,10 +8,10 @@ namespace ROBot.Core.Chat.Commands
     public class Farm : ChatCommandHandler
     {
         public override string Category => "Skills";
-        public override string Description => "This command allows you to train farming but to only collect certain resource.";
+        public override string Description => "Train Farming. Name a crop to farm only that one, or leave it out to farm anything your level allows.";
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {
-            ChatCommandInput.Create("target", "What kind of resource you want to collect.").Required(),
+            ChatCommandInput.Create("crop", "The crop to farm, such as potato or wheat; leave it out to farm anything.").NotRequired(),
         };
 
         public override string UsageExample => "!farm potato";

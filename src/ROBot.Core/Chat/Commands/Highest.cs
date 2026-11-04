@@ -8,11 +8,11 @@ namespace ROBot.Core.Chat.Commands
 {
     public class Highest : ChatCommandHandler
     {
-        public override string Description => "This command allows for checking which player in the current game that has the highest skill";
+        public override string Description => "See which player in this stream has the highest level in a skill, the highest combat level, or the highest total level.";
         public override string UsageExample => "!highest fishing";
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {
-            ChatCommandInput.Create("skill", "Which skill to check").Required()
+            ChatCommandInput.Create("skill", "A skill name such as fishing or attack, combat for the highest combat level, or all for the highest total level.").Required()
         };
 
         public override string Category => "Competition";

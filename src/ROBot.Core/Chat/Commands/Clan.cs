@@ -8,14 +8,13 @@ namespace ROBot.Core.Chat.Commands
 {
     public class Clan : ChatCommandHandler
     {
-        public override string Description => "Interact with a clan";
-        public override string UsageExample => "!clan kick zerratar";
+        public override string Description => "Your clan: see its info, stats and your rank, join or leave one, and answer invites. Members with the right role can also invite, kick, promote and demote players.";
+        public override string UsageExample => "!clan info, !clan join, !clan invite zerratar, !clan promote zerratar";
         public override string Category => "Game";
         public override System.Collections.Generic.IReadOnlyList<ChatCommandInput> Inputs { get; } = new System.Collections.Generic.List<ChatCommandInput>
         {
-            ChatCommandInput.Create("action", "What kind of interaction you want to do", "info", "rank", "role", "stats", "leave", "join", "remove", "kick", "invite", "accept", "decline", "promote", "demote").Required(),
-            ChatCommandInput.Create("target", "When joining a clan, clan name may be provided or player name if it's a player action."),
-            ChatCommandInput.Create("rank", "When inviting, kicking, promoting or demoting a player, the new rank needs to be specified"),
+            ChatCommandInput.Create("action", "info shows your clan, its owner, roles and members; stats its skill levels; rank (or role) your role in it. join joins a clan that needs no invite, leave leaves yours, accept or decline answers an invite. invite, kick (or remove), promote and demote act on another player, one role step at a time.", "info", "stats", "rank", "join", "leave", "accept", "decline", "invite", "kick", "promote", "demote").Required(),
+            ChatCommandInput.Create("target", "For invite, kick, promote and demote: the player. For join: the clan's name or a player in it; leave it out to join the streamer's clan.").NotRequired(),
         };
 
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)

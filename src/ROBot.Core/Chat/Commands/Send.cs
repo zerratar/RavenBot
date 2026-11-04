@@ -15,9 +15,9 @@ namespace ROBot.Core.Chat.Commands
         public override string UsageExample => "!send 2 iron ore 10\n!send brute iron set";
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {
-            ChatCommandInput.Create("target", "The target character (index or alias) to send the item to.").Required(),
-            ChatCommandInput.Create("item", "The item to send.").Required(),
-            ChatCommandInput.Create("amount", "The amount of the item to send.")
+            ChatCommandInput.Create("target", "Your other character, by its number (1-3) or its alias.").Required(),
+            ChatCommandInput.Create("item", "The name of the item to send.").Required(),
+            ChatCommandInput.Create("amount", "How many to send (1 when left out).").NotRequired()
         };
 
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)

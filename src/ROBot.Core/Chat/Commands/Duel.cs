@@ -9,13 +9,12 @@ namespace ROBot.Core.Chat.Commands
     public class Duel : ChatCommandHandler
     {
         public override string Category => "PvP";
-        public override string Description => "This command allows for duelling other players";
+        public override string Description => "Challenge another player to a duel. They answer with !duel accept or !duel decline, and you can take your request back with !duel cancel.";
         public override string UsageExample => "!duel zerratar";
 
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {
-            ChatCommandInput.Create("action", "What kind of action you want to take with an ongoing duel request", "cancel", "accept", "decline"),
-            ChatCommandInput.Create("player", "The target player you want to duel")
+            ChatCommandInput.Create("player", "The player to challenge. Or accept or decline to answer a request, or cancel to take yours back.", "accept", "decline", "cancel").Required()
         };
 
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)

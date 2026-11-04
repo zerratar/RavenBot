@@ -6,7 +6,7 @@ namespace ROBot.Core.Chat.Commands
 {
     public class Dps : ChatCommandHandler
     {
-        public override string Description => "This command allows getting the damage per second.";
+        public override string Description => "See your damage and healing per second this session, with your highest hit, highest heal and totals.";
         public override string UsageExample => "!dps";
         public override System.Collections.Generic.IReadOnlyList<ChatCommandInput> Inputs { get; } = new System.Collections.Generic.List<ChatCommandInput>();
         public override string Category => "Game";

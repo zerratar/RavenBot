@@ -10,6 +10,11 @@ namespace ROBot.Core.Chat.Commands
         public override string Category => "Village";
         public override string Description => "Give the streamer's village a decor piece with your loyalty points; the streamer places it in build mode. !decor price shows what a piece costs.";
         public override string UsageExample => "!decor gift snowman, !decor price fountain";
+        public override System.Collections.Generic.IReadOnlyList<ChatCommandInput> Inputs { get; } = new System.Collections.Generic.List<ChatCommandInput>
+        {
+            ChatCommandInput.Create("action", "gift (or give) gives the village the piece, price shows what it costs in loyalty points.", "gift", "price").Required(),
+            ChatCommandInput.Create("piece", "The decor piece, for example snowman or fountain.").Required(),
+        };
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
         {
             var channel = cmd.Channel;

@@ -7,13 +7,13 @@ namespace ROBot.Core.Chat.Commands
 {
     public class Market : ChatCommandHandler
     {
-        public override string Description => "This command allows for interaction with the marketplace. See https://www.ravenfall.stream/marketplace";
+        public override string Description => "Trade with other players on the marketplace: buy items others have listed, sell your own, or check what an item goes for. See https://www.ravenfall.stream/marketplace";
         public override System.Collections.Generic.IReadOnlyList<ChatCommandInput> Inputs { get; } = new System.Collections.Generic.List<ChatCommandInput>
         {
-            ChatCommandInput.Create("action", "What kind of interaction?", "buy", "sell", "value").Required(),
-            ChatCommandInput.Create("item", "What item").Required(),
-            ChatCommandInput.Create("amount", "How many of the said item you want to sell"),
-            ChatCommandInput.Create("price", "The amount of coins you want per item, (required for sell)")
+            ChatCommandInput.Create("action", "buy buys the cheapest listings up to your price, sell lists your items, value (or stock) shows how many are listed and the lowest, highest and average price.", "buy", "sell", "value").Required(),
+            ChatCommandInput.Create("item", "The item's name.").Required(),
+            ChatCommandInput.Create("amount", "How many; leave it out for one. With value, it also works out what that many would cost. Shorthands like 10k work.").NotRequired(),
+            ChatCommandInput.Create("price", "For buy and sell: coins per item, always the last number. When buying it is the most you will pay; when selling it is your asking price. Enchanted and soulbound items cannot be sold.")
         };
 
         public override string UsageExample => "!market buy rune 2h sword 55k";

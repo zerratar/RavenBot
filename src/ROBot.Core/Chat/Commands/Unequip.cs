@@ -8,11 +8,11 @@ namespace ROBot.Core.Chat.Commands
     public class Unequip : ChatCommandHandler
     {
         public override string Category => "Items";
-        public override string Description => "Unequip command is used for unequipping a target equipped item.";
+        public override string Description => "Take off an item you have equipped, or everything with !unequip all.";
         public override string UsageExample => "!unequip rune 2h sword";
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {
-            ChatCommandInput.Create("item", "Which item you want to unequip").Required()
+            ChatCommandInput.Create("item", "The name of the equipped item to take off, or all for everything.").Required()
         };
 
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)

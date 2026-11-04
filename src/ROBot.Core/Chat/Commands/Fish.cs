@@ -8,10 +8,10 @@ namespace ROBot.Core.Chat.Commands
     public class Fish : ChatCommandHandler
     {
         public override string Category => "Skills";
-        public override string Description => "This command allows you to train fishing but to only collect certain resource.";
+        public override string Description => "Train Fishing. Name a fish to catch only that one, or leave it out to catch anything your level allows. Out at sea in your own boat you fish over the side, and some fish only bite there.";
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {
-            ChatCommandInput.Create("target", "What kind of fish you want to collect.").Required(),
+            ChatCommandInput.Create("fish", "The fish to catch, such as shrimp; leave it out to catch anything.").NotRequired(),
         };
 
         public override string UsageExample => "!fish shrimp";

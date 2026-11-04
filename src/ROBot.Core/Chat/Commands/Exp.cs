@@ -8,13 +8,13 @@ namespace ROBot.Core.Chat.Commands
 {
     public class Exp : ChatCommandHandler
     {
-        public override string Description => "Use a Exp Scroll to increase the global exp multiplier, 1 scroll increases the multiplier by 1";
+        public override string Description => "Use your Exp Scrolls to raise the global exp multiplier for everyone in the stream: each scroll adds 1, up to the stream's multiplier limit.";
         public override string UsageExample => "!exp 10";
 
         public override string Category => "Game";
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {
-            ChatCommandInput.Create("amount", "The amount of exp scrolls you want to use, default is 1."),
+            ChatCommandInput.Create("amount", "How many Exp Scrolls to use; leave it out for one.").NotRequired(),
         };
 
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)

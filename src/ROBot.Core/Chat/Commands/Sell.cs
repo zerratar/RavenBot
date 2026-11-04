@@ -9,13 +9,13 @@ namespace ROBot.Core.Chat.Commands
     public class Sell : ChatCommandHandler
     {
         public override string Category => "Items";
-        public override string Description => "Sell items on the marketplace. See https://www.ravenfall.stream/marketplace";
+        public override string Description => "Put items up for sale on the marketplace for other players to buy with !buy. See https://www.ravenfall.stream/marketplace";
         public override string UsageExample => "!sell 10 rune 2h sword 55k";
         public override System.Collections.Generic.IReadOnlyList<ChatCommandInput> Inputs { get; } = new System.Collections.Generic.List<ChatCommandInput>
         {
-            ChatCommandInput.Create("item", "What item you want to sell").Required(),
-            ChatCommandInput.Create("amount", "How many of the said item you want to sell"),
-            ChatCommandInput.Create("price", "The amount of coins you want per item").Required()
+            ChatCommandInput.Create("item", "The name of the item to sell.").Required(),
+            ChatCommandInput.Create("amount", "How many to sell (1 when left out).").NotRequired(),
+            ChatCommandInput.Create("price", "The price in coins for each item; k and m work, like 55k.").Required()
         };
 
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)

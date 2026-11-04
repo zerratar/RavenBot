@@ -10,10 +10,14 @@ namespace ROBot.Core.Chat.Commands
     public class Travel : ChatCommandHandler
     {
         public override string Category => "Sailing";
-        public override string Description => "Travel command is used for sailing between the different islands in game.";
+        public override string Description => "Sail to another island on the ferry; you get off when it docks there.";
+        public override string UsageExample => "!travel ironhill";
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {
-            ChatCommandInput.Create("destination", "Where do you want to sail?", "Home", "Away", "Ironhill", "Kyo", "Heim").Required()
+            ChatCommandInput.Create("destination",
+                "The island to sail to. Mangrove (the banana island) only once the village has unlocked it. " +
+                "The streamer and moderators can add a player's name to send that player.",
+                "Home", "Away", "Ironhill", "Kyo", "Heim", "Atria", "Eldara", "Mangrove").Required()
         };
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
         {

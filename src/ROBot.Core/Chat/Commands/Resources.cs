@@ -7,7 +7,8 @@ namespace ROBot.Core.Chat.Commands
     public class Resources : ChatCommandHandler
     {
         public override string Category => "Items";
-        public override string Description => "Gets how much coins are available on your account.";
+        public override string Description => "Shows how many coins you have.";
+        public override string UsageExample => "!resources";
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
         {
             var channel = cmd.Channel;

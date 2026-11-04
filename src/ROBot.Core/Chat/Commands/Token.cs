@@ -8,7 +8,8 @@ namespace ROBot.Core.Chat.Commands
     public class Token : ChatCommandHandler
     {
         public override string Category => "Items";
-        public override string Description => "Gets the amount of different seasonal tokens you have, (halloween, christmas, easter, new year, birthday, etc)";
+        public override string Description => "Shows how many seasonal tokens you have (Halloween, Christmas, Easter, New Year and so on). Spend them with !redeem.";
+        public override string UsageExample => "!tokens";
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
         {
             var channel = cmd.Channel;

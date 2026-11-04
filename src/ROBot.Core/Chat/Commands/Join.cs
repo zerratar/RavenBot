@@ -10,11 +10,11 @@ namespace ROBot.Core.Chat.Commands
     public class Join : ChatCommandHandler
     {
         public override string Category => "Game";
-        public override string Description => "Use this command to start playing!";
-        public override string UsageExample => "!join main";
+        public override string Description => "Join the game and start playing! You have up to three characters; name one to play it, or leave it out to play your first.";
+        public override string UsageExample => "!join 2";
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {
-            ChatCommandInput.Create("character", "Which character do you want to play with?")
+            ChatCommandInput.Create("character", "Which character to play: its number (1, 2 or 3) or the alias you gave it; leave it out for your first character.").NotRequired()
         };
 
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)

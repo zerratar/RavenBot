@@ -10,14 +10,13 @@ namespace ROBot.Core.Chat.Commands
     public class Vendor : ChatCommandHandler
     {
         public override string Category => "Items";
-        public override string Description => "Sell an item to the vendor. (Note: this command will be replaced with !vendor buy|sell|value later)";
-        public override string UsageExample => "!vendor rune 2h sword";
+        public override string Description => "Sell items from your inventory to the vendor for coins right away. See what the vendor pays with !value; to sell to other players use !sell.";
+        public override string UsageExample => "!vendor 10 iron ore";
 
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {
-            ChatCommandInput.Create("action", "What kind of interaction?", /*"buy",*/ "sell", "value").Required(),
-            ChatCommandInput.Create("item", "The target item you want to vendor").Required(),
-            ChatCommandInput.Create("amount", "The amount of the specified item you want to vendor")
+            ChatCommandInput.Create("item", "The name of the item to sell to the vendor.").Required(),
+            ChatCommandInput.Create("amount", "How many to sell (1 when left out).").NotRequired()
         };
 
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)

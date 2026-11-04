@@ -6,11 +6,14 @@ namespace ROBot.Core.Chat.Commands
 {
     public class Village : ChatCommandHandler
     {
-        public override string Description => "This command allows getting or setting details about the village.";
+        public override string Description => "Shows the village's level and the exp boosts its huts give. !village res shows its resources, and the streamer and moderators can set every hut to boost one skill.";
         public override string UsageExample => "!village melee";
         public override System.Collections.Generic.IReadOnlyList<ChatCommandInput> Inputs { get; } = new System.Collections.Generic.List<ChatCommandInput>
         {
-            ChatCommandInput.Create("skill", "Set all available huts to a target skill allowing for quick update", "melee", "magic", "ranged", "healing", "woodcutting", "mining", "fishing", "sailing", "farming"),
+            ChatCommandInput.Create("option",
+                "Leave empty for the level and active boosts. res shows the village's resources, stats its level and the exp it needs to level up. " +
+                "A skill name sets every hut to boost that skill, for the streamer and moderators only.",
+                "res", "stats", "melee", "magic", "ranged", "healing", "woodcutting", "mining", "fishing", "cooking", "crafting", "farming", "gathering", "alchemy", "sailing", "slayer").NotRequired(),
         };
         public override string Category => "Game";
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)

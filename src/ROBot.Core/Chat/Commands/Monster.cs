@@ -11,9 +11,9 @@ namespace ROBot.Core.Chat.Commands
         public override string Category => "Appearance";
         public override System.Collections.Generic.IReadOnlyList<ChatCommandInput> Inputs { get; } = new System.Collections.Generic.List<ChatCommandInput>
         {
-            ChatCommandInput.Create("target", "target player that will be effected, leave empty for targeting yourself."),
+            ChatCommandInput.Create("player", "Streamer and moderators only: the player to transform; leave it out to transform yourself.").NotRequired(),
         };
-        public override string Description => "Transform your character into a monster. Only streamer or moderator can use this command.";
+        public override string Description => "Turn your character into a monster for five minutes. The streamer and moderators can name another player to transform them instead.";
         public override string UsageExample => "!monster zerratar";
 
         public Monster()

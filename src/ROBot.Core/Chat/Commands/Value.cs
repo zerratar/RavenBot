@@ -9,11 +9,11 @@ namespace ROBot.Core.Chat.Commands
 {
     public class Value : ChatCommandHandler
     {
-        public override string Description => "Gets the vendor value of the specified item";
+        public override string Description => "Shows how many coins the vendor pays for an item.";
         public override string UsageExample => "!value rune 2h sword";
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {
-            ChatCommandInput.Create("item", "Which item you want to check how much its worth").Required()
+            ChatCommandInput.Create("item", "The name of the item to check.").Required()
         };
 
         public override string Category => "Items";

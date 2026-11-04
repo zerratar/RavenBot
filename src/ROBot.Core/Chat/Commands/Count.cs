@@ -8,12 +8,12 @@ namespace ROBot.Core.Chat.Commands
 {
     public class Count : ChatCommandHandler
     {
-        public override string Description => "This command allows for checking how many of a certain item you got in your inventory";
+        public override string Description => "Check how many of an item you have in your inventory.";
         public override string UsageExample => "!count rune 2h sword";
         public override string Category => "Items";
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {
-            ChatCommandInput.Create("item", "Which item you want to count").Required()
+            ChatCommandInput.Create("item", "The item to count.").Required()
         };
 
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)

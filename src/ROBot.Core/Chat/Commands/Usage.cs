@@ -9,10 +9,11 @@ namespace ROBot.Core.Chat.Commands
     public class Usage : ChatCommandHandler
     {
         public override string Category => "Items";
-        public override string Description => "This command shows you which recipes the target item can be used for";
+        public override string Description => "Shows which recipes an item is used in.";
+        public override string UsageExample => "!usage iron ore";
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {
-            ChatCommandInput.Create("item", "target item").Required(),
+            ChatCommandInput.Create("item", "The name of the item to look up.").Required(),
         };
 
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)

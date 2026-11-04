@@ -10,10 +10,11 @@ namespace ROBot.Core.Chat.Commands
     public class Onsen : ChatCommandHandler
     {
         public override string Category => "Game";
-        public override string Description => "Onsen command is used for making your character rest to gain 2x more exp for the rested time. This only works on Heim and Kyo islands.";
+        public override string Description => "Rest at the onsen to build up rested time, which gives you 2x exp afterwards. Onsens are on Kyo, Heim, Atria and Eldara; !onsen leave gets you out.";
+        public override string UsageExample => "!onsen leave";
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {
-            ChatCommandInput.Create("option", "Start resting or stop resting?", "exit")
+            ChatCommandInput.Create("action", "leave gets out of the onsen; leave it out to start resting.", "leave").NotRequired()
         };
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
         {

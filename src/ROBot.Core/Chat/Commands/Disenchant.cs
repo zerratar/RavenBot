@@ -9,10 +9,11 @@ namespace ROBot.Core.Chat.Commands
     public class Disenchant : ChatCommandHandler
     {
         public override string Category => "Skills";
-        public override string Description => "This command allows you disenchant an already enchanted item. You have to be part of a clan to use this command.";
+        public override string Description => "Take the enchantment off an item, turning it back into the plain item. Same as !enchant remove.";
+        public override string UsageExample => "!disenchant rune 2h sword, !disenchant last";
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {
-            ChatCommandInput.Create("item", "target item you want to disenchant").Required(),
+            ChatCommandInput.Create("item", "The enchanted item. Leave it out for the item you enchanted in the last two minutes, or type last for the last one you enchanted.").NotRequired(),
         };
 
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)

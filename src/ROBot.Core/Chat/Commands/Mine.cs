@@ -8,10 +8,10 @@ namespace ROBot.Core.Chat.Commands
     public class Mine : ChatCommandHandler
     {
         public override string Category => "Skills";
-        public override string Description => "This command allows you to train mining but to only collect certain resource.";
+        public override string Description => "Train Mining. Name an ore to mine only that one, or leave it out to mine anything your level allows.";
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {
-            ChatCommandInput.Create("target", "What kind of ore you want to collect.").Required(),
+            ChatCommandInput.Create("ore", "The ore to mine, such as iron ore; leave it out to mine anything.").NotRequired(),
         };
 
         public override string UsageExample => "!mine iron ore";

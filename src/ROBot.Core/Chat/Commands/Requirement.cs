@@ -9,11 +9,11 @@ namespace ROBot.Core.Chat.Commands
     public class Requirement : ChatCommandHandler
     {
         public override string Category => "Items";
-        public override string Description => "Check what the crafting requirements are for a target item.";
+        public override string Description => "Shows what you need for an item: the skill level and materials to craft it, or the level needed to gather or equip it.";
         public override string UsageExample => "!requirement rune 2h sword";
         public override System.Collections.Generic.IReadOnlyList<ChatCommandInput> Inputs { get; } = new System.Collections.Generic.List<ChatCommandInput>
         {
-            ChatCommandInput.Create("item", "Which item do you want to check?").Required(),
+            ChatCommandInput.Create("item", "The name of the item to check, like rune 2h sword.").Required(),
         };
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
         {

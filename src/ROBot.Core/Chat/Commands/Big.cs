@@ -7,11 +7,11 @@ namespace ROBot.Core.Chat.Commands
 {
     public class Big : ChatCommandHandler
     {
-        public override string Description => "Transform your character into a giant. Only streamer or moderator can use this command.";
+        public override string Description => "Turn a character into a giant, three times their size. Anyone can grow themselves; the streamer and moderators can also name another player.";
         public override string UsageExample => "!big zerratar";
         public override System.Collections.Generic.IReadOnlyList<ChatCommandInput> Inputs { get; } = new System.Collections.Generic.List<ChatCommandInput>
         {
-            ChatCommandInput.Create("target", "target player that will be effected, leave empty for targeting yourself."),
+            ChatCommandInput.Create("target", "The player to grow (streamer and moderators only); leave it out to grow yourself.").NotRequired(),
         };
         public override string Category => "Appearance";
         public Big()

@@ -22,15 +22,15 @@ namespace ROBot.Core.Chat.Commands
         };
 
         public override string Category => "Skills";
-        public override string Description => "Used for making your character to start training a specific skill.";
+        public override string Description => "Set the skill your character trains. Add a level to stop gaining exp in that skill once you reach it.";
         public override string UsageExample => "!train fishing";
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {
-            ChatCommandInput.Create("skill", "What skill do you want to train?",
-                "All", "Attack", "Defense", "Strength", "Magic", "Ranged", "Fishing", "Cooking",
-                "Crafting", "Woodcutting", "mining", "Farming", "Healing", "Gathering", "Alchemy"
+            ChatCommandInput.Create("skill", "The skill to train; all trains attack, defense and strength together, and sailing boards the ferry. Slayer is trained in raids and dungeons.",
+                "All", "Attack", "Defense", "Strength", "Magic", "Ranged", "Healing", "Fishing", "Cooking",
+                "Crafting", "Woodcutting", "Mining", "Farming", "Gathering", "Alchemy", "Sailing"
             ).Required(),
-            ChatCommandInput.Create("level", "Target level to train to. Player will stop gaining exp after reaching the target level.", "2", "3", "4", "5", "6", "7", "8", "9", "10", "2..999")
+            ChatCommandInput.Create("level", "A level from 2 to 999 to stop at: you stop gaining exp in the skill once you reach it.").NotRequired()
         };
 
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)

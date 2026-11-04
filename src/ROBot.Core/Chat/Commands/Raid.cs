@@ -9,13 +9,22 @@ namespace ROBot.Core.Chat.Commands
 {
     public class Raid : ChatCommandHandler
     {
-        public override string Description => "This command allows you to join a raid, use a raid scroll, forcibly stop a raid or start a streamer raid.";
+        public override string Description => "Join the raid boss fight with !raid, start one with a raid scroll, set up auto join or pick the combat skill you train in raids. The streamer can also raid another stream with its players.";
         public override System.Collections.Generic.IReadOnlyList<ChatCommandInput> Inputs { get; } = new System.Collections.Generic.List<ChatCommandInput>
         {
-            ChatCommandInput.Create("action", "Leave empty if you intend to join a raid, 'stop' to forcibly stop or 'start' to use a raid scroll", "start", "stop"),
-            ChatCommandInput.Create("target", "The target user to raid. Only broadcaster can use this."),
+            ChatCommandInput.Create("action",
+                "Leave empty to join the raid. " +
+                "start uses one of your raid scrolls to start a raid. " +
+                "stop ends the raid, for the streamer and moderators only. " +
+                "join (or auto) sets up auto join. " +
+                "skill shows or sets the combat skill you train in raids. " +
+                "The streamer can type another streamer's name instead to raid their stream.",
+                "start", "stop", "join", "skill").NotRequired(),
+            ChatCommandInput.Create("value",
+                "join: on, off, status or a number of raids to join. " +
+                "skill: a combat skill (attack, defense, strength, ranged, magic, healing), or reset to go back to your normal training; leave empty to see yours.").NotRequired(),
         };
-        public override string UsageExample => "!raid start";
+        public override string UsageExample => "!raid join on";
         public override string Category => "Events";
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
         {

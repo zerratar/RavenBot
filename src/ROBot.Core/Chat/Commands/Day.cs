@@ -10,7 +10,8 @@ namespace ROBot.Core.Chat.Commands
     {
         public override string Category => "Game";
         public override bool RequiresBroadcaster => true;
-        public override string Description => "This will turn the ingame time to day time and can only be used by broadcasters or mods.";
+        public override string Description => "Turn the in-game time to day. Only the streamer, moderators and game moderators can use it.";
+        public override string UsageExample => "!day";
 
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
         {

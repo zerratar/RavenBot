@@ -9,12 +9,11 @@ namespace ROBot.Core.Chat.Commands
     public class Cook : ChatCommandHandler
     {
         public override string Category => "Skills";
-        public override string Description => "This command allows you to cook an item, it requires your character to be training cooking to do so.";
+        public override string Description => "Cook food with cooking; your character switches to training cooking, and !cook on its own just does that. Use !req <item> to see what a dish needs.";
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {
-            ChatCommandInput.Create("req", "Include 'req' if you want to just check the cooking requirement of a recipe/item."),
-            ChatCommandInput.Create("item", "target item or recipe you want to cook").Required(),
-            ChatCommandInput.Create("amount", "the amount of said item you want to cook"),
+            ChatCommandInput.Create("item", "The dish to cook, or a raw ingredient such as shrimps. Or status to see how long your cooking has left, or cancel to stop it.", "status", "cancel").Required(),
+            ChatCommandInput.Create("amount", "How many to cook, before or after the name; leave it out for one.").NotRequired(),
         };
 
         public override string UsageExample => "!cook 10 shrimps";

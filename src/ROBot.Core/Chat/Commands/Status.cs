@@ -7,7 +7,7 @@ namespace ROBot.Core.Chat.Commands
 {
     public class Status : ChatCommandHandler
     {
-        public override string Description => "This command allows you to get all status effects applied to your character";
+        public override string Description => "Shows the status effects on your character, like potion and food boosts, with how long each one lasts.";
         public override string UsageExample => "!status";
         public override string Category => "Character";
 

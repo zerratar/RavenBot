@@ -8,7 +8,8 @@ namespace ROBot.Core.Chat.Commands
     public class Online : ChatCommandHandler
     {
         public override string Category => "Game";
-        public override string Description => "Gets how many players are currently in this game.";
+        public override string Description => "See how many players are in this stream's game right now.";
+        public override string UsageExample => "!online";
 
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
         {

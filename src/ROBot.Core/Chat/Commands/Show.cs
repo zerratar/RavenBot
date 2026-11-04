@@ -16,11 +16,13 @@ namespace ROBot.Core.Chat.Commands
             RequiresBroadcaster = true;
         }
         public override string Category => "Game";
-        public override string Description => "Allows for focusing the camera on your character.";
+        public override string Description => "Points the game camera at your character. VIPs can also show an island, and the streamer and moderators any player or island.";
         public override string UsageExample => "!show";
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {
-            ChatCommandInput.Create("target", "If you're a broadcaster or moderator you can observe a target player or target island.")
+            ChatCommandInput.Create("target",
+                "Leave empty to show yourself. An island name (home, away, ironhill, kyo, heim, atria, eldara) for VIPs, moderators and the streamer. " +
+                "A player's name, or islands or players to cycle to the next one, for moderators and the streamer.").NotRequired()
         };
 
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)

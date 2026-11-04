@@ -10,12 +10,13 @@ namespace ROBot.Core.Chat.Commands
     public class Auto : ChatCommandHandler
     {
         public override string Category => "Events";
-        public override string Description => "Automatically trigger actions in the game.";
-        public override string UsageExample => "!auto dungeon on\n!auto raid on\n!auto rest";
+        public override string Description => "Let your character join raids and dungeons, or go resting, on their own. Each automatic raid or dungeon join costs coins, and auto rest costs coins for every second you rest.";
+        public override string UsageExample => "!auto dungeon on, !auto raid 5, !auto rest 10 120, !auto rest off";
         public override System.Collections.Generic.IReadOnlyList<ChatCommandInput> Inputs { get; } = new System.Collections.Generic.List<ChatCommandInput>
         {
-            ChatCommandInput.Create("event", "What kind of event to interact with", "dungeon", "raid", "rest").Required(),
-            ChatCommandInput.Create("action", "What kind of action", "on", "stop", "status"),
+            ChatCommandInput.Create("event", "What to do automatically: dungeon or raid joins them for you, rest sends you resting when your rested time runs low.", "dungeon", "raid", "rest").Required(),
+            ChatCommandInput.Create("setting", "For dungeon or raid: on, off, status, or how many to join. For rest: off, status, or the rested minutes left when you start resting (with the stop minute after it). Leave it out on rest to rest whenever your rested time runs out, up to 120 minutes.", "on", "off", "status"),
+            ChatCommandInput.Create("stop", "For rest only: the rested minutes to rest up to, for example !auto rest 10 120. A single number on its own is taken as this one."),
         };
         public override Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
         {

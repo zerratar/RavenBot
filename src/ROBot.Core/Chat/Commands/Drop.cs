@@ -8,9 +8,11 @@ namespace ROBot.Core.Chat.Commands
     public class Drop : ChatCommandHandler
     {
         public override string Category => "Game";
-        public override string Description => "Game Administrators can use this to initiate an item drop event.";
+        public override string Description => "Game admins only: starts an item drop event with two items for every player in the game.";
+        public override string UsageExample => "!drop random";
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {
+            ChatCommandInput.Create("item", "The item to drop, random for random items, or hats for random hats.", "random", "hats").Required(),
         };
 
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)

@@ -9,10 +9,12 @@ namespace ROBot.Core.Chat.Commands
     public class Enchant : ChatCommandHandler
     {
         public override string Category => "Skills";
-        public override string Description => "This command allows you enchant an item. You have to be part of a clan to use this command.";
+        public override string Description => "Enchant an item from your inventory with random bonus stats. You need to be in a clan, and you have to wait a while between tries.";
+        public override string UsageExample => "!enchant rune 2h sword, !enchant replace rune 2h sword, !enchant cooldown";
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {
-            ChatCommandInput.Create("item", "target item you want to enchant").Required(),
+            ChatCommandInput.Create("action", "Leave it out to enchant. replace enchants an item that is already enchanted, remove takes the enchantment off (same as !disenchant), cooldown (or cd) shows how long until you can enchant again, and clear cooldown pays coins to end the wait.", "replace", "remove", "cooldown", "clear cooldown").NotRequired(),
+            ChatCommandInput.Create("item", "The item to enchant; not needed with cooldown or clear cooldown.").Required(),
         };
 
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)

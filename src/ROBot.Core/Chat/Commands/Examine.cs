@@ -7,12 +7,12 @@ namespace ROBot.Core.Chat.Commands
 {
     public class Examine : ChatCommandHandler
     {
-        public override string Description => "This command allows for examine a target item";
+        public override string Description => "Read an item's description. Leave the item out (or type last) to examine the item you got most recently.";
         public override string UsageExample => "!examine rune 2h sword";
         public override string Category => "Items";
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {
-            ChatCommandInput.Create("item", "Which item you want to examine").Required()
+            ChatCommandInput.Create("item", "The item's name; leave it out, or type last, for the item you got most recently.")
         };
 
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)

@@ -8,10 +8,11 @@ namespace ROBot.Core.Chat.Commands
     public class Equipment : ChatCommandHandler
     {
         public override string Category => "Items";
-        public override string Description => "Get the current stats of your equipped items, or more details of a specific one.";
+        public override string Description => "See the combined stats of everything you have equipped, or the stats of one kind of gear.";
+        public override string UsageExample => "!equipment, !equipment weapon, !equipment armor";
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {
-            ChatCommandInput.Create("target", "Details about the equipment", "shield", "weapon", "ranged", "magic", "armor", "amulet", "ring", "pet")
+            ChatCommandInput.Create("target", "Which gear to look at: weapon (or sword, axe, spear, katana), ranged (or bow), magic (or staff), or armor for all the armor you wear together. Leave it out for your totals.", "weapon", "ranged", "magic", "armor").NotRequired()
         };
 
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)

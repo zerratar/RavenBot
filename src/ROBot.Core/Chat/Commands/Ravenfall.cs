@@ -8,10 +8,11 @@ namespace ROBot.Core.Chat.Commands
     {
         public override bool RequiresBroadcaster => false;
         public override string Category => "Game";
-        public override string Description => "Can be used to reload the game, force an update or retrieving the how-to-play guide link.";
+        public override string Description => "Get the link to the how-to-play guide with !ravenfall help. The streamer and moderators can also reload the game or update it to the newest version.";
+        public override string UsageExample => "!ravenfall help";
         public override System.Collections.Generic.IReadOnlyList<ChatCommandInput> Inputs { get; } = new System.Collections.Generic.List<ChatCommandInput>
         {
-            ChatCommandInput.Create("action", "Whether you want some help, update or reload the game.", "update", "reload", "help").Required(),
+            ChatCommandInput.Create("action", "help posts the how-to-play guide link. reload reloads the game and update installs a new version if there is one, both for the streamer and moderators only.", "help", "reload", "update").Required(),
         };
 
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)

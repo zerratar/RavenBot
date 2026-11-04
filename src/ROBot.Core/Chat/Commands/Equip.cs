@@ -9,11 +9,11 @@ namespace ROBot.Core.Chat.Commands
     public class Equip : ChatCommandHandler
     {
         public override string Category => "Items";
-        public override string Description => "This command allows equipping items.";
+        public override string Description => "Equip an item from your inventory, or use !equip all to put on your best items.";
         public override string UsageExample => "!equip rune 2h sword";
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {
-            ChatCommandInput.Create("item", "Which item you want to equip").Required()
+            ChatCommandInput.Create("item", "The item to equip, or all for your best items.", "all").Required()
         };
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
         {

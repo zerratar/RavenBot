@@ -8,10 +8,10 @@ namespace ROBot.Core.Chat.Commands
     public class Gather : ChatCommandHandler
     {
         public override string Category => "Skills";
-        public override string Description => "This command allows you to train gathering but to only collect certain resource.";
+        public override string Description => "Train Gathering. Name something to gather only that, or leave it out to gather anything your level allows.";
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {
-            ChatCommandInput.Create("target", "What kind of item you want to gather.").Required(),
+            ChatCommandInput.Create("item", "What to gather, such as mushroom; leave it out to gather anything.").NotRequired(),
         };
 
         public override string UsageExample => "!gather mushroom";

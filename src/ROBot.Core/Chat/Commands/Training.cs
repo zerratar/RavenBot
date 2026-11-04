@@ -8,7 +8,8 @@ namespace ROBot.Core.Chat.Commands
     public class Training : ChatCommandHandler
     {
         public override string Category => "Skills";
-        public override string Description => "Get information about what skill your character is currently training.";
+        public override string Description => "Shows which skill your character is training right now. Change it with !train.";
+        public override string UsageExample => "!training";
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
         {
             var channel = cmd.Channel;

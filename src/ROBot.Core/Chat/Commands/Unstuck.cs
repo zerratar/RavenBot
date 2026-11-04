@@ -11,11 +11,11 @@ namespace ROBot.Core.Chat.Commands
         {
             RequiresBroadcaster = true;
         }
-        public override string Description => "Unstuck yourself in case your character got stuck, teleporting you back to the spawn point of the island you're on.";
+        public override string Description => "Unstuck yourself in case your character got stuck, teleporting you back to the spawn point of the island you're on. Once every 30 seconds per character.";
         public override string UsageExample => "!unstuck";
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {
-            ChatCommandInput.Create("target", "If you're a broadcaster or moderator you can unstuck a target player.")
+            ChatCommandInput.Create("target", "For the streamer and moderators only: a player's name, all to unstuck everyone, or training to set every idle player to train all. Leave empty to unstuck yourself.", "all", "training").NotRequired()
         };
 
         public override string Category => "Game";

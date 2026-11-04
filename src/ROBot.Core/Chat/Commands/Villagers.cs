@@ -7,7 +7,7 @@ namespace ROBot.Core.Chat.Commands
     public class Villagers : ChatCommandHandler
     {
 
-        public override string Description => "This command allows getting details about the assigned players in your village.";
+        public override string Description => "Shows the players assigned to the huts in the village.";
         public override string UsageExample => "!villagers";
         public override string Category => "Game";
 

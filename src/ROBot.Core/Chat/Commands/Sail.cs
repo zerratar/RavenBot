@@ -9,10 +9,14 @@ namespace ROBot.Core.Chat.Commands
     public class Sail : ChatCommandHandler
     {
         public override string Category => "Sailing";
-        public override string Description => "Sail command is used for sailing between the different islands in game.";
+        public override string Description => "Board the ferry to train sailing, or sail to another island. !sail stop gets you off the ferry.";
+        public override string UsageExample => "!sail kyo";
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {
-            ChatCommandInput.Create("destination", "Where do you want to sail? (Leave empty to train sailing)", "Home", "Away", "Ironhill", "Kyo", "Heim")
+            ChatCommandInput.Create("destination",
+                "The island to sail to, or stop to leave the ferry. Leave empty to board the ferry and train sailing. " +
+                "The streamer and moderators can add a player's name to send that player.",
+                "Home", "Away", "Ironhill", "Kyo", "Heim", "Atria", "Eldara", "Mangrove", "stop").NotRequired()
         };
 
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)

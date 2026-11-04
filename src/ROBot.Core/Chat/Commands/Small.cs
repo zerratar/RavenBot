@@ -13,12 +13,12 @@ namespace ROBot.Core.Chat.Commands
         {
             RequiresBroadcaster = true;
         }
-        public override string Description => "Scales the target player to a super small size for a short period of time. Only streamer or moderator can use this command.";
+        public override string Description => "Shrinks your character to a tiny size for a short while. The streamer and moderators can shrink another player.";
         public override string UsageExample => "!small zerratar";
 
         public override System.Collections.Generic.IReadOnlyList<ChatCommandInput> Inputs { get; } = new System.Collections.Generic.List<ChatCommandInput>
         {
-            ChatCommandInput.Create("target", "target player that will be effected, leave empty for targeting yourself."),
+            ChatCommandInput.Create("player", "For the streamer and moderators: the player to shrink. Leave empty to shrink yourself.").NotRequired(),
         };
 
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
