@@ -10,7 +10,7 @@ namespace ROBot.Core.Chat.Commands
     public class Vendor : ChatCommandHandler
     {
         public override string Category => "Items";
-        public override string Description => "Sell items from your inventory to the vendor for coins right away. See what the vendor pays with !value; to sell to other players use !sell.";
+        public override string Description => "Sell items from your inventory to the vendor for coins right away. See what the vendor pays with !value; to sell to other players use !sell. !vendor sell and !vendor value work too.";
         public override string UsageExample => "!vendor 10 iron ore";
 
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
@@ -34,10 +34,11 @@ namespace ROBot.Core.Chat.Commands
             if (player == null)
                 return;
 
-            if (string.IsNullOrEmpty(cmd.Arguments) || !cmd.Arguments.Contains(' '))
+            // a single word is an item too: !vendor coal was dropped here
+            if (string.IsNullOrWhiteSpace(cmd.Arguments))
                 return;
 
-            var action = cmd.Arguments.Split(' ')[0].ToLower();
+            var action = cmd.Arguments.Trim().Split(' ')[0].ToLower();
             if (action.Equals("value") || action.Equals("buy") || action.Equals("sell"))
             {
                 await connection[cmd].UseVendorAsync(player, cmd.Arguments);

@@ -16,12 +16,12 @@ namespace ROBot.Core.Chat.Commands
                 "Leave empty to join the raid. " +
                 "start uses one of your raid scrolls to start a raid. " +
                 "stop ends the raid, for the streamer and moderators only. " +
-                "join (or auto) sets up auto join. " +
+                "join on its own also joins; join (or auto) with a value sets up auto join. " +
                 "skill shows or sets the combat skill you train in raids. " +
                 "The streamer can type another streamer's name instead to raid their stream.",
                 "start", "stop", "join", "skill").NotRequired(),
             ChatCommandInput.Create("value",
-                "join: on, off, status or a number of raids to join. " +
+                "join or auto: on, off, status or a number of raids to join. " +
                 "skill: a combat skill (attack, defense, strength, ranged, magic, healing), or reset to go back to your normal training; leave empty to see yours.").NotRequired(),
         };
         public override string UsageExample => "!raid join on";
@@ -48,36 +48,43 @@ namespace ROBot.Core.Chat.Commands
                         return;
                     }
 
-                    if (!string.IsNullOrEmpty(cmd.Arguments))
+                    // the first word picks the action; it was matched anywhere in the text, so a streamer's name with "start" or
+                    // "stop" in it started or stopped a raid
+                    var words = cmd.Arguments.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                    var action = words.Length > 0 ? words[0].ToLowerInvariant() : string.Empty;
+                    var rest = string.Join(" ", words.Skip(1));
+                    if (words.Length > 0)
                     {
-                        if (cmd.Arguments.Contains("join ", System.StringComparison.OrdinalIgnoreCase) || cmd.Arguments.Contains("auto ", System.StringComparison.OrdinalIgnoreCase))
+                        if (action == "join" || action == "auto")
                         {
-                            await connection[cmd].AutoJoinRaidAsync(player, cmd.Arguments.Split(' ').LastOrDefault());
+                            // !raid join on its own joins the raid; auto on its own tells the auto join setting
+                            if (rest.Length == 0 && action == "join") await connection[cmd].JoinRaidAsync(player, null);
+                            else await connection[cmd].AutoJoinRaidAsync(player, rest.Length == 0 ? "status" : words.Last());
                             return;
                         }
-                        else if (cmd.Arguments.Contains("start", StringComparison.OrdinalIgnoreCase))
+                        else if (action == "start")
                         {
                             await connection[cmd].RaidStartAsync(player);
                             return;
                         }
-                        else if (cmd.Arguments.Contains("stop", StringComparison.OrdinalIgnoreCase))
+                        else if (action == "stop")
                         {
                             await connection[cmd].StopRaidAsync(player);
                             return;
                         }
-                        else if (cmd.Arguments.Contains("kill boss", System.StringComparison.OrdinalIgnoreCase))
+                        else if (action == "kill" && rest.Equals("boss", StringComparison.OrdinalIgnoreCase))
                         {
                             await connection[cmd].KillRaidBossAsync(player);
                             return;
                         }
-                        else if (cmd.Arguments.Equals("skill", System.StringComparison.OrdinalIgnoreCase))
+                        else if ((action == "skill" || action == "style") && rest.Length == 0)
                         {
                             await connection[cmd].GetRaidCombatStyleAsync(player);
                             return;
                         }
-                        else if (cmd.Arguments.Contains("skill ", System.StringComparison.OrdinalIgnoreCase) || cmd.Arguments.Contains("style ", System.StringComparison.OrdinalIgnoreCase))
+                        else if (action == "skill" || action == "style")
                         {
-                            var targetSkill = cmd.Arguments.Split(' ').Skip(1).FirstOrDefault();
+                            var targetSkill = words[1];
                             if (targetSkill.Equals("reset", System.StringComparison.OrdinalIgnoreCase) || targetSkill.Equals("clear", System.StringComparison.OrdinalIgnoreCase))
                             {
                                 await connection[cmd].ClearRaidCombatStyleAsync(player);

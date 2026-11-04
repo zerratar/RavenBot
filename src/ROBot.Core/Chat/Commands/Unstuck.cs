@@ -1,4 +1,5 @@
-﻿using RavenBot.Core.Handlers;
+﻿using RavenBot.Core;
+using RavenBot.Core.Handlers;
 using ROBot.Core.GameServer;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -37,6 +38,14 @@ namespace ROBot.Core.Chat.Commands
                             cmd.Arguments.Trim().Equals("training", System.StringComparison.OrdinalIgnoreCase))
                         {
                             await connection[cmd.CorrelationId].UnstuckAsync(player, cmd.Arguments);
+                            return;
+                        }
+
+                        // games from 0.9.7 take the name from the moderator; older ones only looked at the sender, so they
+                        // are sent the target as before
+                        if (connection.ClientVersion != null && !GameVersion.IsLessThanOrEquals(connection.ClientVersion, "0.9.6.9"))
+                        {
+                            await connection[cmd].UnstuckAsync(player, cmd.Arguments.Trim());
                             return;
                         }
 

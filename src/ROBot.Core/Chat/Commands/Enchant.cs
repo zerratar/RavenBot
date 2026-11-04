@@ -47,6 +47,15 @@ namespace ROBot.Core.Chat.Commands
                         }
 
                         var part = item.Split(' ');
+
+                        // games before 0.9.7 took req out of "!enchant rune sword req" and enchanted the sword for real
+                        if (System.Array.Exists(part, x => x == "req" || x == "requirement" || x == "requirements")
+                            && (connection.ClientVersion == null || RavenBot.Core.GameVersion.IsLessThanOrEquals(connection.ClientVersion, "0.9.6.9")))
+                        {
+                            await chat.SendReplyAsync(cmd, "Enchanting has no item requirements: you need to be in a clan with the enchanting skill, and each enchant has a cooldown.");
+                            return;
+                        }
+
                         if (part[0] == "remove")
                         {
                             await connection[cmd].DisenchantAsync(player, item.Replace("remove", "").Trim());

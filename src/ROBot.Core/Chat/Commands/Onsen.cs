@@ -27,7 +27,9 @@ namespace ROBot.Core.Chat.Commands
                 {
                     var player = session.Get(cmd);
 
-                    var leaveOnsen = !string.IsNullOrEmpty(cmd.Arguments) && cmd.Arguments.Contains("leave", StringComparison.OrdinalIgnoreCase);
+                    // exit was the documented word and joined the onsen instead; stop and out leave too
+                    var leaveWord = cmd.Arguments?.Trim().ToLowerInvariant();
+                    var leaveOnsen = leaveWord == "leave" || leaveWord == "exit" || leaveWord == "stop" || leaveWord == "out";
                     if (leaveOnsen)
                     {
                         await connection[cmd].LeaveOnsenAsync(player);

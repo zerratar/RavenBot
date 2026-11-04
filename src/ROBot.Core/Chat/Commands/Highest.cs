@@ -12,7 +12,7 @@ namespace ROBot.Core.Chat.Commands
         public override string UsageExample => "!highest fishing";
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {
-            ChatCommandInput.Create("skill", "A skill name such as fishing or attack, combat for the highest combat level, or all for the highest total level.").Required()
+            ChatCommandInput.Create("skill", "A skill name such as fishing or attack, combat for the highest combat level, or all for the highest total level (the same as leaving it out).").NotRequired()
         };
 
         public override string Category => "Competition";
@@ -26,7 +26,8 @@ namespace ROBot.Core.Chat.Commands
                 if (connection != null)
                 {
                     var player = session.Get(cmd);
-                    await connection[cmd].RequestHighestSkillAsync(player, cmd.Arguments);
+                    // a bare !highest is the highest total level; games before 0.9.7 threw on an empty skill
+                    await connection[cmd].RequestHighestSkillAsync(player, string.IsNullOrWhiteSpace(cmd.Arguments) ? "all" : cmd.Arguments.Trim());
                 }
             }
         }

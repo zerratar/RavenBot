@@ -12,7 +12,7 @@ namespace ROBot.Core.Chat.Commands
         public override System.Collections.Generic.IReadOnlyList<ChatCommandInput> Inputs { get; } = new System.Collections.Generic.List<ChatCommandInput>
         {
             ChatCommandInput.Create("player", "The name of the player to give to. It must come first.").Required(),
-            ChatCommandInput.Create("item", "The item to give, coins to give coins (!gift zerratar coins 5000), or an item set followed by the word set (rune set). Soulbound items cannot be given.").Required(),
+            ChatCommandInput.Create("item", "The item to give, coins to give coins (!gift zerratar coins 5000 or !gift zerratar 5000 coins), or an item set followed by the word set (rune set). Soulbound items cannot be given.").Required(),
             ChatCommandInput.Create("amount", "How many to give, or how many of each piece for a set; leave it out for one. Shorthands like 10k or 2m work.").NotRequired(),
         };
 
@@ -32,9 +32,15 @@ namespace ROBot.Core.Chat.Commands
                         return;
                     }
 
+                    // "!gift zerratar 5000 coins" looked for an item called "5000 coins" in games before 0.9.7: coins first
+                    var args = cmd.Arguments.Trim();
+                    var words = args.Split(' ', System.StringSplitOptions.RemoveEmptyEntries);
+                    if (words.Length == 3 && (words[2].Equals("coins", System.StringComparison.OrdinalIgnoreCase) || words[2].Equals("coin", System.StringComparison.OrdinalIgnoreCase)))
+                        args = words[0] + " coins " + words[1];
+
                     var player = session.Get(cmd);
                     if (player != null)
-                        await connection[cmd].GiftItemAsync(player, cmd.Arguments);
+                        await connection[cmd].GiftItemAsync(player, args);
                 }
             }
         }

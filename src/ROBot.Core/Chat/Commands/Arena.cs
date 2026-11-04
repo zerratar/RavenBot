@@ -10,13 +10,12 @@ namespace ROBot.Core.Chat.Commands
     public class Arena : ChatCommandHandler
     {
         public override string Category => "PvP";
-        public override string Description => "Join the arena on the island you are on to fight other players. !arena on its own signs you up too.";
+        public override string Description => "Fight other players in the arena on the island you are on. !arena on its own signs you up; the fight starts once at least two have joined. The streamer and moderators can start it early, call it off, or add and take out players.";
         public override string UsageExample => "!arena join";
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {
-            ChatCommandInput.Create("action", "Type join, or leave it out, to sign up for the arena.", "join")
-            //.WithOptions(ChatCommandInput.Create("join", "joins the arena"),
-            //             ChatCommandInput.Create("leave", "leaves the arena"))
+            ChatCommandInput.Create("action", "join (or leave it out) signs you up, leave takes you out before the fight starts. For the streamer and moderators: start begins the fight without waiting for the countdown, end calls it off with no rewards, kick takes a player out and add signs one up.", "join", "leave", "start", "end", "kick", "add").NotRequired(),
+            ChatCommandInput.Create("player", "For kick and add: the player.").NotRequired(),
         };
 
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
@@ -81,8 +80,10 @@ namespace ROBot.Core.Chat.Commands
                                 return;
                             }
 
-                            var targetPlayer = session.Get(cmd);
-                            await connection[cmd].AddPlayerToArenaAsync(player, targetPlayer);
+                            // the named player; this was the sender, so !arena add <player> added the moderator
+                            var targetPlayer = session.GetUserByName(command.Split(' ').LastOrDefault());
+                            if (targetPlayer != null)
+                                await connection[cmd].AddPlayerToArenaAsync(player, targetPlayer);
                         }
                     }
 

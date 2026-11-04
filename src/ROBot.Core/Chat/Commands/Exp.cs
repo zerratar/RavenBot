@@ -28,9 +28,10 @@ namespace ROBot.Core.Chat.Commands
                 {
                     var player = session.Get(cmd);
 
+                    // anything that is not a number is one scroll; a failed parse left it at 0
                     var numOfSubs = 1;
-                    if (!string.IsNullOrEmpty(cmd.Arguments))
-                        int.TryParse(cmd.Arguments, out numOfSubs);
+                    if (!string.IsNullOrEmpty(cmd.Arguments) && (!int.TryParse(cmd.Arguments.Trim(), out numOfSubs) || numOfSubs < 1))
+                        numOfSubs = 1;
 
                     await connection[cmd].UseExpMultiplierScrollAsync(player, numOfSubs);
                 }

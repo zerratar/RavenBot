@@ -78,8 +78,10 @@ namespace ROBot.Core.Chat.Commands
                     return;
 
                 case "join":
-                    // allow players to join clans that does not require invites.
-                    await connection[cmd].JoinClanAsync(player, argument);
+                    // allow players to join clans that does not require invites. The whole name goes: clan names have spaces,
+                    // and only the first word went before; the game tells a clan's name from a player's
+                    var clanName = string.Join(" ", values.Skip(1).Where(x => x.Length > 0));
+                    await connection[cmd].JoinClanAsync(player, clanName.Length > 0 ? clanName : "-");
                     return;
 
                 case "remove":

@@ -8,7 +8,7 @@ namespace ROBot.Core.Chat.Commands
     public class PubSub : ChatCommandHandler
     {
         public override string Category => "Misc";
-        public override string Description => "Check pubsub connection status or get a link for activation. This is needed for getting channel point rewards to work.";
+        public override string Description => "Tells whether channel point rewards work in this stream. They are turned off on Twitch for now: the Twitch PubSub service they used has been shut down.";
         public override string UsageExample => "!pubsub";
 
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
@@ -24,42 +24,9 @@ namespace ROBot.Core.Chat.Commands
                     return;
                 }
 
-                var connection = game.GetConnection(session);
-                if (connection != null)
-                {
-                    //var state = twitch.GetPubSubState(channel);
-
-                    //if (state == Twitch.PubSub.PubSubState.Ready)
-                    //{
-                    //    await chat.SendReplyAsync(cmd, "Channel Point Rewards is all good SeemsGood");
-                    //    return;
-                    //}
-                    //else
-                    //{
-                    //    var player = session.Get(cmd);
-                    //    if (!player.IsBroadcaster)
-                    //    {
-                    //        await chat.SendReplyAsync(cmd, "Channel Point Rewards currently disabled.");
-                    //        return;
-                    //    }
-
-                    //    switch (state)
-                    //    {
-                    //        case Twitch.PubSub.PubSubState.Connecting:
-                    //        case Twitch.PubSub.PubSubState.Authenticating:
-                    //            await chat.SendReplyAsync(cmd, "We are currently attempting to establish a connection to Twitch PubSub...");
-                    //            break;
-
-                    //        case Twitch.PubSub.PubSubState.Disconnected:
-                    //            await chat.SendReplyAsync(cmd, "Channel Reward Points have not been activated. Please sign in on " + twitch.GetPubSubActivationLink() + " to activate.");
-                    //            break;
-
-                    //        case Twitch.PubSub.PubSubState.Disposed:
-                    //            await chat.SendReplyAsync(cmd, "We were unable to connect to Twitch PubSub. Please sign in again on " + twitch.GetPubSubActivationLink());
-                    //            break;
-                    //    }
-                    //}
-                }
+                // the PubSub connection is no longer made (Twitch shut PubSub down), and this answered nothing at all
+                await chat.SendReplyAsync(cmd, "Channel point rewards are turned off on Twitch for now, as the Twitch service they used has been shut down.");
+                return;
             }
         }
     }
