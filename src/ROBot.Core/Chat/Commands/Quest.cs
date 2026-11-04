@@ -16,7 +16,8 @@ namespace ROBot.Core.Chat.Commands
         private static readonly IReadOnlyList<ChatCommandInput> QuestInputs = new List<ChatCommandInput>
         {
             ChatCommandInput.Create("action",
-                "What to do; leave empty to list your quests. " +
+                "What to do; leave empty to list your quests (on a quest chain, its current step). " +
+                "list shows every quest and today's offers even while you are on a chain. " +
                 "accept (or take) takes a quest. " +
                 "chains lists the quest chains and begin starts one. " +
                 "deliver (or handin) hands in the items a chain step asks for, like \"Bring 150 Logs\", straight from your inventory. " +
@@ -25,7 +26,7 @@ namespace ROBot.Core.Chat.Commands
                 "village shows the streamer's village story, give (or donate) brings it the items it asks for and vote votes on its choices. " +
                 "stream shows the stream quest everyone works on together. " +
                 "title lists your titles or wears one, achievements shows your medals.",
-                "accept", "chains", "begin", "deliver", "answer", "abandon", "village", "give", "vote", "stream", "title", "achievements").NotRequired(),
+                "list", "accept", "chains", "begin", "deliver", "answer", "abandon", "village", "give", "vote", "stream", "title", "achievements").NotRequired(),
             ChatCommandInput.Create("value",
                 "accept: 1, 2 or 3 for one of today's offers, weekly for the weekly quest or seasonal for the event quest (a chain's name begins that chain). " +
                 "begin: the chain's name or its number in !quest chains. " +
