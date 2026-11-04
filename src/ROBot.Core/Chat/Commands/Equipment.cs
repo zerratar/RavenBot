@@ -12,7 +12,7 @@ namespace ROBot.Core.Chat.Commands
         public override string UsageExample => "!equipment, !equipment weapon, !equipment armor";
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {
-            ChatCommandInput.Create("target", "Which gear to look at: weapon (or sword, axe, spear, katana), ranged (or bow), magic (or staff), or armor for all the armor you wear together. Leave it out for your totals.", "weapon", "ranged", "magic", "armor").NotRequired()
+            ChatCommandInput.Create("target", "Which gear to look at: weapon (or sword, axe, spear, katana), ranged (or bow), magic (or staff), armor for all the armor you wear together, or shield, amulet, ring or pet. Leave it out for your totals.", "weapon", "ranged", "magic", "armor", "shield", "amulet", "ring", "pet").NotRequired()
         };
 
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
