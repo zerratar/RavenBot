@@ -124,6 +124,9 @@ namespace RavenBot.Core.Ravenfall
         /// </summary>
         Task SkillTreeAsync(User author, string arguments);
 
+        /// <summary>The tower: !tower with what came after it (leave, boss, info), sent as "tower_command". Games from 0.9.7 read it.</summary>
+        Task TowerAsync(User author, string arguments);
+
         /// <summary>The banana island's !dig, !banana, !regatta and !pirates: the command first, then its arguments.</summary>
         Task MangroveAsync(User author, string arguments);
 
