@@ -118,6 +118,12 @@ namespace RavenBot.Core.Ravenfall
         /// <summary>!boat with what came after it (build sloop, list); games from 0.9.6 read it.</summary>
         Task BoatAsync(User author, string arguments);
 
+        /// <summary>
+        /// The skill trees (combat v2): !tree, !learn, !loadout and !respec, each sent as "skills_command" with its action
+        /// first ("learn cleave", "loadout 1 cleave", "respec confirm"; nothing for !tree). Games from 0.9.7 read it.
+        /// </summary>
+        Task SkillTreeAsync(User author, string arguments);
+
         /// <summary>The banana island's !dig, !banana, !regatta and !pirates: the command first, then its arguments.</summary>
         Task MangroveAsync(User author, string arguments);
 

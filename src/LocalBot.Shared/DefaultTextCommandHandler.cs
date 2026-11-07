@@ -137,6 +137,10 @@ namespace RavenBot
             Register<ShopCommandProcessor>(commandBindingProvider.Get("shop", "shelves"));
             Register<DecorCommandProcessor>(commandBindingProvider.Get("decor"));
             Register<BoatCommandProcessor>(commandBindingProvider.Get("boat"));
+            Register<SkillTreeCommandProcessor>(commandBindingProvider.Get("tree", "skilltree", "talents"));
+            Register<LearnCommandProcessor>(commandBindingProvider.Get("learn"));
+            Register<LoadoutCommandProcessor>(commandBindingProvider.Get("loadout"));
+            Register<RespecCommandProcessor>(commandBindingProvider.Get("respec"));
             Register<DigCommandProcessor>(commandBindingProvider.Get("dig"));
             Register<BananaCommandProcessor>(commandBindingProvider.Get("banana", "bananas"));
             Register<RegattaCommandProcessor>(commandBindingProvider.Get("regatta"));

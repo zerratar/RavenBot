@@ -35,6 +35,7 @@ namespace RavenBot.Core.Ravenfall
         public Task ShopAsync(User player, string arguments) => SendAsync("shop_command", player, arguments);
         public Task DecorAsync(User player, string arguments) => SendAsync("decor_command", player, arguments);
         public Task BoatAsync(User player, string arguments) => SendAsync("boat_command", player, arguments);
+        public Task SkillTreeAsync(User player, string arguments) => SendAsync("skills_command", player, arguments);
         public Task MangroveAsync(User player, string arguments) => SendAsync("mangrove_command", player, arguments);
         public Task QuestAsync(User player, string arguments) => SendAsync("quest_command", player, arguments);
         public Task GetVillageBoostAsync(User player) => SendAsync("get_village_boost", player);
