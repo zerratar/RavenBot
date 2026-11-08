@@ -13,11 +13,11 @@ namespace ROBot.Core.Chat.Commands
     public class Pets : ChatCommandHandler
     {
         public override string Category => "Pets";
-        public override string Description => "Your battle pets. Alone, the pet that is out with you. stable lists them all; use (name) sends one out and away puts it back; rename, skills and slot (number) (skill) change it; evolve evolves it when it is ready; wake (pet item) wakes a pet item you have so it fights too; about (kind) tells you about a kind of pet.";
+        public override string Description => "Your battle pets. Alone, the pet that is out with you. starter (fox, bear or fawn) gives you a first pet; stable lists them all; use (name) sends one out and away puts it back; rename, skills and slot (number) (skill) change it; evolve evolves it when it is ready; wake (pet item) wakes a pet item you have so it fights too; about (kind) tells you about a kind of pet.";
         public override string UsageExample => "!pets, !pets stable, !pets use Bun, !pets slot 2 howl, !pets evolve, !pets wake diamond raven, !pets about bunny";
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {
-            ChatCommandInput.Create("action", "stable, use, away, rename, skills, slot, evolve, wake, release or about.", "stable", "use", "away", "rename", "skills", "slot", "evolve", "wake", "release", "about").NotRequired(),
+            ChatCommandInput.Create("action", "starter, stable, use, away, rename, skills, slot, evolve, wake, release or about.", "starter", "stable", "use", "away", "rename", "skills", "slot", "evolve", "wake", "release", "about").NotRequired(),
             ChatCommandInput.Create("details", "A pet's name or number, a new name, a slot and a skill, a pet item or a kind of pet.").NotRequired(),
         };
 
