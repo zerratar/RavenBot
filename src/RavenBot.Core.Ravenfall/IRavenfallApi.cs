@@ -124,6 +124,12 @@ namespace RavenBot.Core.Ravenfall
         /// </summary>
         Task SkillTreeAsync(User author, string arguments);
 
+        /// <summary>
+        /// Gems and sockets (combat v2): !gems, !socket and !unsocket, each sent as "gems_command" with its action first
+        /// ("enchant ruby 5", "combine ruby flawed", "socket rune sword ruby", "unsocket rune sword 2"). Games from 0.9.7 read it.
+        /// </summary>
+        Task GemsAsync(User author, string arguments);
+
         /// <summary>The tower: !tower with what came after it (leave, boss, info), sent as "tower_command". Games from 0.9.7 read it.</summary>
         Task TowerAsync(User author, string arguments);
 
