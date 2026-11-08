@@ -130,6 +130,13 @@ namespace RavenBot.Core.Ravenfall
         /// </summary>
         Task GemsAsync(User author, string arguments);
 
+        /// <summary>
+        /// Battle pets: !pets sent as "pet_command" with its action first ("stable", "use Bun", "slot 2 howl", "wake diamond raven"),
+        /// !tame as "tame_command" ("bunny", "stop"). !pet stays the cosmetic pet. Games from 0.9.7 read them.
+        /// </summary>
+        Task PetsAsync(User author, string arguments);
+        Task TameAsync(User author, string arguments);
+
         /// <summary>The tower: !tower with what came after it (leave, boss, info), sent as "tower_command". Games from 0.9.7 read it.</summary>
         Task TowerAsync(User author, string arguments);
 

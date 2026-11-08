@@ -144,6 +144,8 @@ namespace RavenBot
             Register<GemsCommandProcessor>(commandBindingProvider.Get("gems", "gem"));
             Register<SocketCommandProcessor>(commandBindingProvider.Get("socket"));
             Register<UnsocketCommandProcessor>(commandBindingProvider.Get("unsocket"));
+            Register<PetsCommandProcessor>(commandBindingProvider.Get("pets", "battlepet"));
+            Register<TameCommandProcessor>(commandBindingProvider.Get("tame"));
             Register<TowerCommandProcessor>(commandBindingProvider.Get("tower"));
             Register<DigCommandProcessor>(commandBindingProvider.Get("dig"));
             Register<BananaCommandProcessor>(commandBindingProvider.Get("banana", "bananas"));
