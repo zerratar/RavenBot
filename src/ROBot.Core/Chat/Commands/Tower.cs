@@ -10,11 +10,11 @@ namespace ROBot.Core.Chat.Commands
     public class Tower : ChatCommandHandler
     {
         public override string Category => "Events";
-        public override string Description => "The tower: a climb of floors the whole stream makes together. On its own it takes you to the stream's floor (and back to your training with !tower leave). Every floor has quests (defeat its monsters); when they are done its boss can be challenged with !tower boss: the streamer or a moderator starts it, or three players in the tower vote for it. !tower info shows the floor, its quests and the boss.";
-        public override string UsageExample => "!tower, !tower leave, !tower boss, !tower info";
+        public override string Description => "The tower: a climb of floors the whole stream makes together. On its own it takes you to the stream's floor, or to the town where everyone waits between floors (you keep training there); !tower leave takes you back to your training. Every floor has quests (defeat its monsters); then its boss can be challenged with !tower boss. After a clear everyone rests in the town until !tower climb takes them up. The streamer or a moderator decides at once, or players in the tower vote: !tower boss, !tower climb, !tower floor <number> (train on a floor already reached) and !tower close (everyone out for now). !tower info shows the floor, its quests and the boss.";
+        public override string UsageExample => "!tower, !tower leave, !tower boss, !tower climb, !tower close, !tower floor 3, !tower info";
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {
-            ChatCommandInput.Create("action", "leave, boss or info; leave it out to enter the tower.", "leave", "boss", "info").NotRequired(),
+            ChatCommandInput.Create("action", "leave, boss, climb, close, floor, town, rest, talk or info; leave it out to enter the tower.", "leave", "boss", "climb", "close", "floor", "town", "rest", "talk", "info").NotRequired(),
         };
 
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
