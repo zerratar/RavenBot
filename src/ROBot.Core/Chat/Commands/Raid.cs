@@ -22,7 +22,7 @@ namespace ROBot.Core.Chat.Commands
                 "start", "stop", "join", "skill").NotRequired(),
             ChatCommandInput.Create("value",
                 "join or auto: on, off, status or a number of raids to join. " +
-                "skill: a combat skill (attack, defense, strength, ranged, magic, healing), or reset to go back to your normal training; leave empty to see yours.").NotRequired(),
+                "skill: a combat skill (attack, defense, strength, all, ranged, magic, healing), or reset to go back to your normal training; leave empty to see yours.").NotRequired(),
         };
         public override string UsageExample => "!raid join on";
         public override string Category => "Events";

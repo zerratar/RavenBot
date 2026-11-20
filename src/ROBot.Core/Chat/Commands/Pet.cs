@@ -9,7 +9,7 @@ namespace ROBot.Core.Chat.Commands
     public class Pet : ChatCommandHandler
     {
         public override string Category => "Appearance";
-        public override string Description => "Choose which of your pets follows you around, or see which one you have out.";
+        public override string Description => "Picks your cosmetic pet, the one that follows you when no battle pet is out, or shows which one you have on. Battle pets are !pets.";
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {
             ChatCommandInput.Create("pet", "The pet to bring out; the word pet is optional (blue orb works). Leave it out to see your current pet.").NotRequired()

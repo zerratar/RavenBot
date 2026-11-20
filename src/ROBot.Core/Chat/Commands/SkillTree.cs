@@ -67,7 +67,7 @@ namespace ROBot.Core.Chat.Commands
     public class Respec : SkillTreeCommandBase
     {
         protected override string Action => "respec";
-        public override string Description => "Gives back every skill point. On its own it tells you the price (a free respec, a Tome of Forgetting, or coins); add confirm to do it. Not during raids, dungeons or duels.";
+        public override string Description => "Gives back every skill point. On its own it tells you the price (a free respec, a Tome of Forgetting, or coins); add confirm to do it. Your first respec is free, and every weekly quest and finished quest chain gives a Tome of Forgetting. Not during raids, dungeons, duels or a tower climb.";
         public override string UsageExample => "!respec, !respec confirm";
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {

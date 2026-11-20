@@ -30,7 +30,7 @@ namespace ROBot.Core.Chat.Commands
     public class Gems : GemsCommandBase
     {
         protected override string Action => "";
-        public override string Description => "Your enchanted gems. With enchant and a raw gem, your clan's Enchanting turns mined gems into gems for sockets (the clan's level gives better tiers). With combine, three gems of a tier become one of the next tier, for coins. With a gem's name, what it does in a weapon, in armour and in a ring or amulet.";
+        public override string Description => "Your enchanted gems. With enchant and a raw gem, your clan's Enchanting turns mined gems into gems for sockets (the clan's level gives better tiers). With combine, three gems of a tier become one of the next tier, for coins (1,000 for Chipped, 5,000 Flawed, 25,000 Polished, 125,000 Flawless). With a gem's name, what it does in a weapon, in armor and in a ring or amulet.";
         public override string UsageExample => "!gems, !gems enchant ruby 5, !gems combine ruby flawed, !gems diamond";
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {
@@ -45,7 +45,7 @@ namespace ROBot.Core.Chat.Commands
     public class Socket : GemsCommandBase
     {
         protected override string Action => "socket";
-        public override string Description => "Puts a gem into an item's socket: weapons, armour, rings and amulets from item level 25 have one (2 from 150, 3 from 400; rings and amulets 1). The best gem of that kind you own is used unless you name a tier. A socket number at the end replaces the gem in it, which crumbles unless the keep roll succeeds.";
+        public override string Description => "Puts a gem into an item's socket: weapons, armor (not hats or masks), rings and amulets from item level 25 have one (2 from 150, 3 from 400; rings and amulets 1). The best gem of that kind you own is used unless you name a tier. A socket number at the end replaces the gem in it, which crumbles unless the keep roll succeeds: you are told the chance first and add confirm to go ahead.";
         public override string UsageExample => "!socket rune sword ruby, !socket rune sword flawless ruby 2";
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {
@@ -58,7 +58,7 @@ namespace ROBot.Core.Chat.Commands
     public class Unsocket : GemsCommandBase
     {
         protected override string Action => "unsocket";
-        public override string Description => "Takes a gem out of an item. It crumbles unless you are lucky: your clan's Enchanting level gives the chance to keep it (from level 100, up to 40% at 400).";
+        public override string Description => "Takes a gem out of an item. It crumbles unless you are lucky: your clan's Enchanting level gives the chance to keep it (from level 100, up to 40% at 400). You are told the chance first and add confirm to go ahead.";
         public override string UsageExample => "!unsocket rune sword, !unsocket rune sword 2";
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {
