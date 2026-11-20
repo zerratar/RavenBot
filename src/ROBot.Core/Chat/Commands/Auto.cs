@@ -10,11 +10,11 @@ namespace ROBot.Core.Chat.Commands
     public class Auto : ChatCommandHandler
     {
         public override string Category => "Events";
-        public override string Description => "Let your character join raids and dungeons, or go resting, on their own. Each automatic raid or dungeon join costs coins, and auto rest costs coins for every second you rest.";
-        public override string UsageExample => "!auto dungeon on, !auto raid 5, !auto rest 10 120, !auto rest off";
+        public override string Description => "Let your character join raids and dungeons, or go resting, on their own. Each automatic raid or dungeon join costs coins (patrons get some free every day), and auto rest costs coins for every second you rest. !auto limit sets how many coins auto join may spend a day.";
+        public override string UsageExample => "!auto dungeon on, !auto raid 5, !auto rest 10 120, !auto rest off, !auto limit 50k, !auto limit off";
         public override System.Collections.Generic.IReadOnlyList<ChatCommandInput> Inputs { get; } = new System.Collections.Generic.List<ChatCommandInput>
         {
-            ChatCommandInput.Create("event", "What to do automatically: dungeon or raid joins them for you, rest sends you resting when your rested time runs low.", "dungeon", "raid", "rest").Required(),
+            ChatCommandInput.Create("event", "What to do automatically: dungeon or raid joins them for you, rest sends you resting when your rested time runs low. limit sets the most coins auto join may spend a day for all your characters together (an amount like 50k, off, or nothing to see what it has spent).", "dungeon", "raid", "rest", "limit").Required(),
             ChatCommandInput.Create("setting", "For dungeon or raid: on, off, status, or how many to join. For rest: off, status, or the rested minutes left when you start resting (with the stop minute after it). Leave it out on rest to rest whenever your rested time runs out, up to 120 minutes.", "on", "off", "status"),
             ChatCommandInput.Create("stop", "For rest only: the rested minutes to rest up to, for example !auto rest 10 120. A single number on its own is taken as this one."),
         };
@@ -81,6 +81,10 @@ namespace ROBot.Core.Chat.Commands
 
                 case "rest":
                     return HandleAutoRestAsync(cmd, connection, player, arguments);
+                case "limit":
+                case "cap":
+                case "spent":
+                    return connection[cmd].AutoJoinLimitAsync(player, action == "spent" ? "" : string.Join(" ", arguments));
 
                 case "eat":
                 case "consume":

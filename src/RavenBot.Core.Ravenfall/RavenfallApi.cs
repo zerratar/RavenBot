@@ -57,6 +57,7 @@ namespace RavenBot.Core.Ravenfall
         public Task PlayerCountAsync(User player) => SendAsync("player_count", player);
         public Task JoinRaidAsync(User player, string query) => SendAsync("raid_join", player, query);
         public Task AutoJoinRaidAsync(User player, string query) => SendAsync("raid_auto", player, query);
+        public Task AutoJoinLimitAsync(User player, string query) => SendAsync("autojoin_limit", player, query);
         public Task RaidStartAsync(User player) => SendAsync("raid_force", player);
         public Task StopDungeonAsync(User player) => SendAsync("dungeon_stop", player);
         public Task DungeonStartAsync(User player) => SendAsync("dungeon_force", player);

@@ -61,6 +61,8 @@ namespace RavenBot.Core.Ravenfall
         Task GetVillageStatsAsync(User author);
         Task JoinRaidAsync(User author, string code);
         Task AutoJoinRaidAsync(User player, string query);
+        /// <summary>!auto limit: the player's own daily limit on what auto join may spend (an amount, off, or empty for the status).</summary>
+        Task AutoJoinLimitAsync(User player, string query);
         Task StopRaidAsync(User author);
         Task RaidStartAsync(User author);
         Task DungeonStartAsync(User author);

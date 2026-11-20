@@ -78,6 +78,12 @@ namespace RavenBot.Core.Ravenfall.Commands
                     await HandleAutoRestAsync(cmd, connection, player, arguments);
                     return;
 
+                case "limit":
+                case "cap":
+                case "spent":
+                    await this.connection[cmd.CorrelationId].AutoJoinLimitAsync(player, action == "spent" ? "" : string.Join(" ", arguments));
+                    return;
+
                 case "eat":
                 case "consume":
                 case "use":
