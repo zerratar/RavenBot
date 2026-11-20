@@ -7,13 +7,13 @@ namespace ROBot.Core.Chat.Commands
 {
     public class Use : ChatCommandHandler
     {
-        public override string Description => "Use an item from your inventory: drink a potion, eat food, or use a scroll (an exp scroll boosts everyone's exp, a raid or dungeon scroll starts one).";
+        public override string Description => "Use an item from your inventory: drink a potion, eat food, use a scroll (an exp scroll boosts everyone's exp, a raid or dungeon scroll starts one), or read an experience book for a skill (!use gathering book fishing).";
         public override string UsageExample => "!use health potion";
         public override string Category => "Items";
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {
-            ChatCommandInput.Create("item", "The name of the item to use, like health potion or exp scroll.").Required(),
-            ChatCommandInput.Create("amount", "For exp scrolls only: how many to use at once, or max.").NotRequired()
+            ChatCommandInput.Create("item", "The name of the item to use, like health potion or exp scroll. For an experience book (quests give one in place of exp for a skill at level 999), its kind and the skill it goes to: combat book magic, gathering book fishing, artisan book cooking, adventure book taming.").Required(),
+            ChatCommandInput.Create("amount", "For exp scrolls and experience books: how many to use at once, or max.").NotRequired()
         };
 
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)

@@ -29,7 +29,8 @@ namespace ROBot.Core.Chat.Commands
                 "list", "accept", "chains", "begin", "deliver", "answer", "abandon", "village", "give", "vote", "stream", "title", "achievements").NotRequired(),
             ChatCommandInput.Create("value",
                 "accept: 1, 2 or 3 for one of today's offers, weekly for the weekly quest or seasonal for the event quest (a chain's name begins that chain). " +
-                "begin: the chain's name or its number in !quest chains. " +
+                "begin: the chain's name or its key in !quest chains. " +
+                "chains: a page number when there are more than fit one message (!quest chains 2). " +
                 "answer and vote: the number of your choice. " +
                 "abandon: the quest's number in !quest, or chain to leave your quest chain. " +
                 "title: the title's number, or off to wear none. " +
