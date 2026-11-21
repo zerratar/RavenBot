@@ -89,6 +89,7 @@ namespace RavenBot.Core.Ravenfall
         public Task RequestHighestSkillAsync(User player, string skill) => SendAsync("highest_skill", player, skill);
         public Task PlayerAppearanceUpdateAsync(User player, string appearance) => SendAsync("change_appearance", player, appearance);
         public Task ToggleHelmetAsync(User player) => SendAsync("toggle_helmet", player);
+        public Task ToggleCapeAsync(User player) => SendAsync("toggle_cape", player);
         public Task TogglePetAsync(User player) => SendAsync("toggle_pet", player);
         public Task SetAllVillageHutsAsync(User player, string skill) => SendAsync("set_village_huts", player, skill);
         public Task GetVillageStatsAsync(User author) => SendAsync("village_stats", author);

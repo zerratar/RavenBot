@@ -503,6 +503,11 @@ namespace ROBot.Tests
             return Task.CompletedTask;
         }
 
+        public Task ToggleCapeAsync(User player)
+        {
+            return Task.CompletedTask;
+        }
+
         public Task ToggleItemRequirementsAsync(User player)
         {
             return Task.CompletedTask;

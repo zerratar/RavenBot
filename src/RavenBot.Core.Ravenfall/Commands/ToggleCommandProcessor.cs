@@ -35,6 +35,11 @@ namespace RavenBot.Core.Ravenfall.Commands
                 var player = playerProvider.Get(cmd);
                 await this.game[cmd.CorrelationId].ToggleHelmetAsync(player);
             }
+            else if (cmd.Arguments.Contains("cape", StringComparison.OrdinalIgnoreCase) || cmd.Arguments.Contains("cloak", StringComparison.OrdinalIgnoreCase))
+            {
+                var player = playerProvider.Get(cmd);
+                await this.game[cmd.CorrelationId].ToggleCapeAsync(player);
+            }
             else if (cmd.Arguments.Contains("pet", StringComparison.OrdinalIgnoreCase))
             {
                 var player = playerProvider.Get(cmd);

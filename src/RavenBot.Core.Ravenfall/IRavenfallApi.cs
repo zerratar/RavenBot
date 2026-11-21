@@ -83,6 +83,7 @@ namespace RavenBot.Core.Ravenfall
         Task ItemDropEventAsync(User author, string item);
         Task ObservePlayerAsync(User author);
         Task ToggleHelmetAsync(User author);
+        Task ToggleCapeAsync(User author);
         Task TogglePetAsync(User author);
 
         Task UseMarketAsync(User author, string itemQuery);
