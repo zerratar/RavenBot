@@ -39,6 +39,7 @@ namespace RavenBot.Core.Ravenfall
         public Task GemsAsync(User player, string arguments) => SendAsync("gems_command", player, arguments);
         public Task PetsAsync(User player, string arguments) => SendAsync("pet_command", player, arguments);
         public Task TameAsync(User player, string arguments) => SendAsync("tame_command", player, arguments);
+        public Task OutfitAsync(User player, string arguments) => SendAsync("outfit_command", player, arguments);
         public Task TowerAsync(User player, string arguments) => SendAsync("tower_command", player, arguments);
         public Task MangroveAsync(User player, string arguments) => SendAsync("mangrove_command", player, arguments);
         public Task QuestAsync(User player, string arguments) => SendAsync("quest_command", player, arguments);

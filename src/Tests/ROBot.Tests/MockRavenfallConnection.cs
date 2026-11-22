@@ -508,6 +508,11 @@ namespace ROBot.Tests
             return Task.CompletedTask;
         }
 
+        public Task OutfitAsync(User player, string arguments)
+        {
+            return Task.CompletedTask;
+        }
+
         public Task ToggleItemRequirementsAsync(User player)
         {
             return Task.CompletedTask;
