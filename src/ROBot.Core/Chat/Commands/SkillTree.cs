@@ -30,11 +30,11 @@ namespace ROBot.Core.Chat.Commands
     public class Tree : SkillTreeCommandBase
     {
         protected override string Action => "";
-        public override string Description => "Your skill trees: on its own, the skill points you have to spend and your loadout of active skills. With a tree's name (Bulwark, Restoration, Might, Precision, Marksman, Elements, Vitality, Hunter, or its combat skill) it lists that tree's skills; with a skill's name it explains the skill.";
-        public override string UsageExample => "!tree, !tree Might, !tree strength, !tree cleave";
+        public override string Description => "Your skill trees: on its own, the skill points you have to spend and your loadout of active skills. With a tree's name it lists that tree's skills: the combat trees (Bulwark, Restoration, Might, Precision, Marksman, Elements, Vitality, Hunter), Beastmaster for Taming, and the trade trees Gathering and Artisan; the name of a tree's skill works too (strength, mining, cooking). With a skill's name it explains the skill.";
+        public override string UsageExample => "!tree, !tree Might, !tree strength, !tree gathering, !tree cleave";
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {
-            ChatCommandInput.Create("tree or skill", "A tree (Bulwark, Restoration, Might, Precision, Marksman, Elements, Vitality, Hunter) or a skill's name.").NotRequired(),
+            ChatCommandInput.Create("tree or skill", "A tree (Bulwark, Restoration, Might, Precision, Marksman, Elements, Vitality, Hunter, Beastmaster, Gathering, Artisan) or a skill's name.").NotRequired(),
         };
     }
 
@@ -44,8 +44,8 @@ namespace ROBot.Core.Chat.Commands
     public class Learn : SkillTreeCommandBase
     {
         protected override string Action => "learn";
-        public override string Description => "Spends skill points on a skill (or one more rank of a passive). Points come from your combat levels; a skill also needs a level in its tree's combat skill. A new active skill goes into a free loadout slot by itself.";
-        public override string UsageExample => "!learn cleave, !learn brute force";
+        public override string Description => "Spends skill points on a skill (or one more rank of a passive). Points come from your levels: combat skills, Taming, and the gathering and making skills. A skill also needs a level in its tree's skill. A new active skill goes into a free loadout slot by itself.";
+        public override string UsageExample => "!learn cleave, !learn brute force, !learn bountiful";
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {
             ChatCommandInput.Create("skill", "The skill's name."),
