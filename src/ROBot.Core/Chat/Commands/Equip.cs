@@ -9,11 +9,11 @@ namespace ROBot.Core.Chat.Commands
     public class Equip : ChatCommandHandler
     {
         public override string Category => "Items";
-        public override string Description => "Equip an item from your inventory, or use !equip all to put on your best items.";
+        public override string Description => "Equip an item, your best items (!equip all), or a role's class gear (!equip tank, ranger, mage).";
         public override string UsageExample => "!equip rune 2h sword";
         public override IReadOnlyList<ChatCommandInput> Inputs { get; } = new List<ChatCommandInput>
         {
-            ChatCommandInput.Create("item", "The item to equip, or all for your best items.", "all").Required()
+            ChatCommandInput.Create("item", "The item to equip, all for your best items, or a role or class gear line (tank, ranger, rogue).", "all").Required()
         };
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
         {
@@ -32,7 +32,7 @@ namespace ROBot.Core.Chat.Commands
                     if (string.IsNullOrEmpty(item))
                     {
 
-                        await chat.SendReplyAsync(cmd, "You have to use !equip <item name> or !equip all for equipping your best items.");
+                        await chat.SendReplyAsync(cmd, "You have to use !equip <item name>, !equip all for your best items, or a role for its class gear: !equip tank, melee, ranger, mage or healer.");
                         return;
                     }
 

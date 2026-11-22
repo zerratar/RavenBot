@@ -29,7 +29,7 @@ namespace RavenBot.Core.Ravenfall.Commands
             if (string.IsNullOrEmpty(item))
             {
 
-                await chat.SendReplyAsync(cmd, "You have to use !equip <item name> or !equip all for equipping your best items.");
+                await chat.SendReplyAsync(cmd, "You have to use !equip <item name>, !equip all for your best items, or a role for its class gear: !equip tank, melee, ranger, mage or healer.");
                 return;
             }
 
