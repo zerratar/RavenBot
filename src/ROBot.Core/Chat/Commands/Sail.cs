@@ -15,8 +15,9 @@ namespace ROBot.Core.Chat.Commands
         {
             ChatCommandInput.Create("destination",
                 "The island to sail to, or stop to leave the ferry. Leave empty to board the ferry and train sailing. " +
+                "Tower is the islet at the foot of the tower: a calm place, !tower from there walks in through the gate. " +
                 "The streamer and moderators can add a player's name to send that player.",
-                "Home", "Away", "Ironhill", "Kyo", "Heim", "Atria", "Eldara", "Mangrove", "stop").NotRequired()
+                "Home", "Away", "Ironhill", "Kyo", "Heim", "Atria", "Eldara", "Mangrove", "Tower", "stop").NotRequired()
         };
 
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)

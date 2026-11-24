@@ -16,8 +16,9 @@ namespace ROBot.Core.Chat.Commands
         {
             ChatCommandInput.Create("destination",
                 "The island to sail to. Mangrove (the banana island) only once the village has unlocked it. " +
+                "Tower is the islet at the foot of the tower. " +
                 "The streamer and moderators can add a player's name to send that player.",
-                "Home", "Away", "Ironhill", "Kyo", "Heim", "Atria", "Eldara", "Mangrove").Required()
+                "Home", "Away", "Ironhill", "Kyo", "Heim", "Atria", "Eldara", "Mangrove", "Tower").Required()
         };
         public override async Task HandleAsync(IBotServer game, IChatCommandClient chat, ICommand cmd)
         {
