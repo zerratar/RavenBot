@@ -3,7 +3,7 @@ using RavenBot.Core.Handlers;
 
 namespace RavenBot.Core.Ravenfall.Commands
 {
-    /// <summary>The tower: !tower, !tower leave, !tower boss and !tower info. The game answers.</summary>
+    /// <summary>The tower: !tower with what came after it (leave, boss, climb, part 3, 1-3, floor 1, info and so on). The game answers.</summary>
     public class TowerCommandProcessor : Net.RavenfallCommandProcessor
     {
         private readonly IRavenfallClient game;

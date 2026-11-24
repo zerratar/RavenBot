@@ -143,7 +143,7 @@ namespace RavenBot.Core.Ravenfall
         /// <summary>Outfits per skill: !outfit with what came after it (save, pin, a skill, auto on|off), sent as "outfit_command". Games from 0.9.7 read it.</summary>
         Task OutfitAsync(User author, string arguments);
 
-        /// <summary>The tower: !tower with what came after it (leave, boss, info), sent as "tower_command". Games from 0.9.7 read it.</summary>
+        /// <summary>The tower: !tower with what came after it (leave, boss, part 3, 1-3, info), sent as "tower_command". Games from 0.9.7 read it.</summary>
         Task TowerAsync(User author, string arguments);
 
         /// <summary>The banana island's !dig, !banana, !regatta and !pirates: the command first, then its arguments.</summary>
